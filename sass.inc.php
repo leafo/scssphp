@@ -8,10 +8,12 @@ class sassc {
 		$tree = $parser->parse($code);
 		$this->formatter = new sass_formatter();
 
+		$this->env = null;
 		return $this->compileBlock($tree);
 	}
 
 	protected function compileBlock($block) {
+		$this->pushEnv($block);
 		$idelta = $this->formatter->indentAmount($block);
 		$this->indentLevel += $idelta;
 
@@ -23,7 +25,9 @@ class sassc {
 
 		$this->indentLevel -= $idelta;
 
-		return $this->formatter->block($block->selectors, false,
+		$selectors = $this->multiplySelectors($block);
+		$this->popEnv();
+		return $this->formatter->block($selectors, false,
 			$lines, $children, $this->indentLevel);
 	}
 
@@ -47,6 +51,43 @@ class sassc {
 		case "keyword":
 			return $value[1];
 		}
+	}
+
+	// find the final set of selectors
+	protected function multiplySelectors($block, $childSelectors = null) {
+		if (is_null($childSelectors)) {
+			$selectors = $block->selectors;
+		} else {
+			$selectors = array();
+			foreach ($block->selectors as $parent) {
+				foreach ($childSelectors as $child) {
+					$selectors[] = $parent . " " . $child;
+				}
+			}
+		}
+
+		if (!empty($block->parent) && empty($block->parent->isRoot)) {
+			return $this->multiplySelectors($block->parent, $selectors);
+		} else {
+			return $selectors;
+		}
+	}
+
+	// not sure we need environments yet, might be able to reuse the blocks
+	protected function pushEnv($block=null) {
+		$env = new stdclass;
+		$env->parent = $this->env;
+		$env->store = array();
+		$env->block = $block;
+
+		$this->env = $env;
+		return $env;
+	}
+
+	protected function popEnv() {
+		$env = $this->env;
+		$this->env = $this->env->parent;
+		return $env;
 	}
 }
 
@@ -139,7 +180,6 @@ class scss_parser {
 	protected function popBlock() {
 		$old = $this->env;
 		$this->env = $this->env->parent;
-		unset($old->parent);
 		return $old;
 	}
 
