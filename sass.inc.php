@@ -9,6 +9,7 @@ class sassc {
 		$this->formatter = new sass_formatter();
 
 		$this->env = null;
+		// print_r($tree);
 		return $this->compileBlock($tree);
 	}
 
@@ -38,10 +39,10 @@ class sassc {
 			$children[] = $this->compileBlock($child[1]);
 			break;
 		case "assign":
-			$lines[] = $child[1] . ":" . $this->compileValue($child[2]);
+			$lines[] = $child[1] . ":" . $this->compileValue($child[2]) . ";";
 			break;
 		default:
-			throw new exception("unknown type: $type");
+			throw new exception("unknown child type: $type");
 		}
 	}
 
@@ -50,6 +51,34 @@ class sassc {
 		switch ($type) {
 		case "keyword":
 			return $value[1];
+		case "color":
+			// [1] - red component (either number for a %)
+			// [2] - green component
+			// [3] - blue component
+			// [4] - optional alpha component
+			list(, $r, $g, $b) = $value;
+			$r = round($r);
+			$g = round($g);
+			$b = round($b);
+
+			if (count($value) == 5 && $value[4] != 1) { // rgba
+				return 'rgba('.$r.','.$g.','.$b.','.$value[4].')';
+			}
+
+			$h = sprintf("#%02x%02x%02x", $r, $g, $b);
+
+			// Converting hex color to short notation (e.g. #003399 to #039) 
+			if ($h[1] === $h[2] && $h[3] === $h[4] && $h[5] === $h[6]) {
+				$h = '#' . $h[1] . $h[3] . $h[5];
+			}
+
+			return $h;
+		case "number":
+			return $value[1] . $value[2];
+		case "string":
+			return $value[1] . $value[2] . $value[1];
+		default:
+			throw new exception("unknown value type: $type");
 		}
 	}
 
@@ -201,16 +230,76 @@ class scss_parser {
 	}
 
 	protected function value(&$out) {
+		if ($this->color($out)) return true;
+		if ($this->unit($out)) return true;
+		if ($this->string($out)) return true;
+
+		// convert keyword to be more borad and include numbers/symbols
 		if ($this->keyword($keyword)) {
 			$out = array("keyword", $keyword);
+			return true;
+		}
+
+
+		return false;
+	}
+
+	protected function color(&$out) {
+		$color = array('color');
+
+		if ($this->match('(#([0-9a-f]{6})|#([0-9a-f]{3}))', $m)) {
+			if (isset($m[3])) {
+				$num = $m[3];
+				$width = 16;
+			} else {
+				$num = $m[2];
+				$width = 256;
+			}
+
+			$num = hexdec($num);
+			foreach (array(3,2,1) as $i) {
+				$t = $num % $width;
+				$num /= $width;
+
+				$color[$i] = $t * (256/$width) + $t * floor(16/$width);
+			}
+
+			$out = $color;
 			return true;
 		}
 
 		return false;
 	}
 
+	protected function unit(&$unit) {
+		if ($this->match('(-?[0-9]*(\.)?[0-9]+)([%a-zA-Z]+)?', $m)) {
+			$unit = array("number", $m[1], $m[3]);
+			return true;
+		}
+		return false;
+	}
+
+	protected function string(&$out) {
+		$s = $this->seek();
+		if ($this->literal('"', false)) {
+			$delim = '"';
+		} elseif ($this->literal("'", false)) {
+			$delim = "'";
+		} else {
+			return false;
+		}
+
+		if (!$this->to($delim, $string)) {
+			$this->seek($s);
+			return false;
+		}
+
+		$out = array("string", $delim, $string);
+		return true;
+	}
+
 	// low level parsers
-	
+
 	protected function selectors(&$out) {
 		$s = $this->seek();
 		$selectors = array();
@@ -261,7 +350,7 @@ class scss_parser {
 		} else {
 			$validChars = $allowNewline ? "." : "[^\n]";
 		}
-		if (!$this->match('('.$validChars.'*?)'.lessc::preg_quote($what), $m, !$until)) return false;
+		if (!$this->match('('.$validChars.'*?)'.$this->preg_quote($what), $m, !$until)) return false;
 		if ($until) $this->count -= strlen($what); // give back $what
 		$out = $m[1];
 		return true;
