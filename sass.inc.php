@@ -12,25 +12,30 @@ class sassc {
 	}
 
 	protected function compileBlock($block) {
-		$children = array();
-		foreach ($block->children as $child) {
-			$children[] = $this->compileChild($child);
-		}
-
 		$idelta = $this->formatter->indentAmount($block);
 		$this->indentLevel += $idelta;
 
+		$lines = array();
+		$children = array();
+		foreach ($block->children as $child) {
+			$this->compileChild($child, $lines, $children);
+		}
+
+		$this->indentLevel -= $idelta;
+
 		return $this->formatter->block($block->selectors, false,
-			$children, array(), $this->indentLevel);
+			$lines, $children, $this->indentLevel);
 	}
 
-	protected function compileChild($child) {
+	protected function compileChild($child, &$lines, &$children) {
 		list($type) = $child;
 		switch ($type) {
 		case "block":
-			return $this->compileBlock($child[1]);
+			$children[] = $this->compileBlock($child[1]);
+			break;
 		case "assign":
-			return $child[1] . ":" . $this->compileValue($child[2]);
+			$lines[] = $child[1] . ":" . $this->compileValue($child[2]);
+			break;
 		default:
 			throw new exception("unknown type: $type");
 		}
