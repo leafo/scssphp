@@ -67,7 +67,7 @@ class sassc {
 
 			$h = sprintf("#%02x%02x%02x", $r, $g, $b);
 
-			// Converting hex color to short notation (e.g. #003399 to #039) 
+			// Converting hex color to short notation (e.g. #003399 to #039)
 			if ($h[1] === $h[2] && $h[3] === $h[4] && $h[5] === $h[6]) {
 				$h = '#' . $h[1] . $h[3] . $h[5];
 			}
@@ -77,6 +77,15 @@ class sassc {
 			return $value[1] . $value[2];
 		case "string":
 			return $value[1] . $value[2] . $value[1];
+		case "function":
+			$args = !empty($value[2]) ? $this->compileValue($value[2]) : "";
+			return "$value[1]($args)";
+		case "list":
+			list(, $delim, $items) = $value;
+			foreach ($items as &$item) {
+				$item = $this->compileValue($item);
+			}
+			return implode("$delim ", $items);
 		default:
 			throw new exception("unknown value type: $type");
 		}
@@ -194,7 +203,7 @@ class scss_parser {
 	}
 
 	// tree builders
-	
+
 	protected function pushBlock($selectors) {
 		$b = new stdclass;
 		$b->parent = $this->env; // not sure if we need this yet
@@ -220,7 +229,7 @@ class scss_parser {
 
 	protected function assign(&$out) {
 		$s = $this->seek();
-		if ($this->keyword($name) && $this->literal(":") && $this->value($value)) {
+		if ($this->keyword($name) && $this->literal(":") && $this->valueList($value)) {
 			$out = array("assign", $name, $value);
 			return true;
 		}
@@ -229,10 +238,43 @@ class scss_parser {
 		return false;
 	}
 
+	protected function valueList(&$out) {
+		if ($this->genericList($list, "commaList")) {
+			$out = $this->flattenList($list);
+			return true;
+		}
+
+		return false;
+	}
+
+	protected function commaList(&$out) {
+		return $this->genericList($out, "value", ",");
+	}
+
+	protected function genericList(&$out, $parseItem, $delim="") {
+		$s = $this->seek();
+		$items = array();
+		while ($this->$parseItem($value)) {
+			$items[] = $value;
+			if ($delim) {
+				if (!$this->literal($delim)) break;
+			}
+		}
+
+		if (count($items) == 0) {
+			$this->seek($s);
+			return false;
+		}
+
+		$out = array("list", $delim, $items);
+		return true;
+	}
+
 	protected function value(&$out) {
 		if ($this->color($out)) return true;
 		if ($this->unit($out)) return true;
 		if ($this->string($out)) return true;
+		if ($this->func($out)) return true;
 
 		// convert keyword to be more borad and include numbers/symbols
 		if ($this->keyword($keyword)) {
@@ -241,6 +283,22 @@ class scss_parser {
 		}
 
 
+		return false;
+	}
+
+	protected function func(&$func) {
+		$s = $this->seek();
+
+		if ($this->keyword($name, false) &&
+			$this->literal("(") &&
+			($this->valueList($args) || true) &&
+			$this->literal(")"))
+		{
+			$func = array("function", $name, $args);
+			return true;
+		}
+
+		$this->seek($s);
 		return false;
 	}
 
@@ -322,8 +380,8 @@ class scss_parser {
 	}
 
 	// consume a keyword
-	protected function keyword(&$word) {
-		if ($this->match('([\w_\-\*!"][\w\-_"]*)', $m)) {
+	protected function keyword(&$word, $eatWhitespace=true) {
+		if ($this->match('([\w_\-\*!"][\w\-_"]*)', $m, $eatWhitespace)) {
 			$word = $m[1];
 			return true;
 		}
@@ -339,6 +397,15 @@ class scss_parser {
 			return true;
 		}
 		return false;
+	}
+
+	protected function flattenList($list) {
+		$type = $list[0];
+		if ($type == "list" && count($list[2]) == 1) {
+			return $this->flattenList($list[2][0]);
+		} else {
+			return $list;
+		}
 	}
 
 	// advance counter to next occurrence of $what
