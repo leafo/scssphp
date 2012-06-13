@@ -1,6 +1,14 @@
 <?php
 
 class sassc {
+	static protected $operatorNames = array(
+		'+' => "add",
+		'-' => "sub",
+		'*' => "mul",
+		'/' => "div",
+		'%' => "mod",
+	);
+
 	function compile($code, $name=null) {
 		$this->indentLevel = -1;
 
@@ -46,7 +54,50 @@ class sassc {
 		}
 	}
 
+	protected function reduce($value) {
+		list($type) = $value;
+		switch ($type) {
+			case "exp":
+				list(, $op, $left, $right) = $value;
+				$opName = self::$operatorNames[$op];
+				$left = $this->reduce($left);
+				$right = $this->reduce($right);
+
+				$fn = "op_${opName}_${left[0]}_${right[0]}";
+				if (is_callable(array($this, $fn))) {
+					return $this->$fn($left, $right);
+				}
+				// echo "missing fn: $fn\n";
+				// remember the whitespace around the operator to recreate it?
+				return array("list", "", array($left, array("keyword", $op), $right));
+			default:
+				return $value;
+		}
+	}
+
+	protected function op_add_number_number($left, $right) {
+		return array("number", $left[1] + $right[1], "");
+	}
+
+	protected function op_mul_number_number($left, $right) {
+		return array("number", $left[1] * $right[1], "");
+	}
+
+	protected function op_sub_number_number($left, $right) {
+		return array("number", $left[1] - $right[1], "");
+	}
+
+	protected function op_div_number_number($left, $right) {
+		return array("number", $left[1] - $right[1], "");
+	}
+
+	protected function op_mod_number_number($left, $right) {
+		return array("number", $left[1] % $right[1], "");
+	}
+
 	protected function compileValue($value) {
+		$value = $this->reduce($value);
+
 		list($type) = $value;
 		switch ($type) {
 		case "keyword":
@@ -131,8 +182,32 @@ class sassc {
 
 
 class scss_parser {
+	static protected $precedence = array(
+		'+' => 1,
+		'-' => 1,
+		'*' => 2,
+		'/' => 2,
+		'%' => 2,
+	);
+
+	static protected $basicOperators = array("+", "-", "*", "%");
+	static protected $allOperators = array("+", "-", "*", "/", "%");
+
+	static protected $basicOperatorStr;
+	static protected $allOperatorStr;
+
 	function __construct($sourceName = null) {
 		$this->sourceName = $sourceName;
+
+		if (empty(scss_parser::$basicOperatorStr)) {
+			self::$basicOperatorStr = $this->makeOperatorStr(self::$basicOperators);
+			self::$allOperatorStr = $this->makeOperatorStr(self::$allOperators);
+		}
+	}
+
+	static protected function makeOperatorStr($operators) {
+		return '('.implode('|', array_map(array('scss_parser','preg_quote'),
+			$operators)).')';
 	}
 
 	function parse($buffer) {
@@ -248,7 +323,7 @@ class scss_parser {
 	}
 
 	protected function commaList(&$out) {
-		return $this->genericList($out, "value", ",");
+		return $this->genericList($out, "expression", ",");
 	}
 
 	protected function genericList(&$out, $parseItem, $delim="") {
@@ -268,6 +343,36 @@ class scss_parser {
 
 		$out = array("list", $delim, $items);
 		return true;
+	}
+
+	protected function expression(&$out) {
+		if ($this->value($lhs)) {
+			$out = $this->expHelper($lhs, 0);
+			return true;
+		}
+		return false;
+	}
+
+	protected function expHelper($lhs, $minP) {
+		$operatorString = self::$basicOperatorStr;
+
+		$ss = $this->seek();
+		while ($this->match($operatorString, $m) && self::$precedence[$m[1]] >= $minP) {
+			$op = $m[1];
+
+			if (!$this->value($rhs)) break;
+
+			// peek and see if rhs belongs to next operator
+			if ($this->peek($operatorString, $next) && self::$precedence[$next[1]] > self::$precedence[$op]) {
+				$rhs = $this->expHelper($rhs, self::$precedence[$next[1]]);
+			}
+
+			$lhs = array("exp", $op, $lhs, $rhs);
+			$ss = $this->seek();
+		}
+
+		$this->seek($ss);
+		return $lhs;
 	}
 
 	protected function value(&$out) {
