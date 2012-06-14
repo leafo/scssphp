@@ -47,7 +47,13 @@ class sassc {
 			$children[] = $this->compileBlock($child[1]);
 			break;
 		case "assign":
-			$lines[] = $child[1] . ":" . $this->compileValue($child[2]) . ";";
+			list(,$name, $value) = $child;
+			if (is_array($name)) {
+				// setting a variable
+				$this->set($name[1], $this->reduce($value));
+			} else {
+				$lines[] = $child[1] . ":" . $this->compileValue($child[2]) . ";";
+			}
 			break;
 		default:
 			throw new exception("unknown child type: $type");
@@ -327,7 +333,9 @@ class scss_parser {
 
 	protected function assign(&$out) {
 		$s = $this->seek();
-		if ($this->keyword($name) && $this->literal(":") && $this->valueList($value)) {
+		if (($this->keyword($name) || $this->variable($name)) &&
+			$this->literal(":") && $this->valueList($value))
+		{
 			$out = array("assign", $name, $value);
 			return true;
 		}
