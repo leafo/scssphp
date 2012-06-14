@@ -77,6 +77,9 @@ class sassc {
 				// echo "missing fn: $fn\n";
 				// remember the whitespace around the operator to recreate it?
 				return array("list", "", array($left, array("keyword", $op), $right));
+			case "var":
+				list(, $name) = $value;
+				return $this->reduce($this->get($name));
 			default:
 				return $value;
 		}
@@ -178,6 +181,22 @@ class sassc {
 
 		$this->env = $env;
 		return $env;
+	}
+
+	protected function set($name, $value) {
+		$this->env->store[$name] = $value;
+	}
+
+	protected function get($name, $env=null) {
+		if (is_null($env)) $env = $this->env;
+
+		if (isset($env->store[$name])) {
+			return $env->store[$name];
+		} elseif (!is_null($env->parent)) {
+			return $this->get($name, $env->parent);
+		}
+
+		return array("keyword", ""); // found nothing
 	}
 
 	protected function popEnv() {
@@ -384,7 +403,10 @@ class scss_parser {
 
 		// parens
 		$inParens = $this->inParens;
-		if ($this->literal("(") && ($this->inParens = true) && $this->expression($exp) && $this->literal(")")) {
+		if ($this->literal("(") &&
+			($this->inParens = true) && $this->expression($exp) &&
+			$this->literal(")"))
+		{
 			$out = $exp;
 			$this->inParens = $inParens;
 			return true;
@@ -393,6 +415,7 @@ class scss_parser {
 			$this->seek($s);
 		}
 
+		if ($this->variable($out)) return true;
 		if ($this->color($out)) return true;
 		if ($this->unit($out)) return true;
 		if ($this->string($out)) return true;
@@ -501,7 +524,16 @@ class scss_parser {
 		return $this->keyword($out);
 	}
 
-	// consume a keyword
+	protected function variable(&$out) {
+		$s = $this->seek();
+		if ($this->literal("$", false) && $this->keyword($name)) {
+			$out = array("var", $name);
+			return true;
+		}
+		$this->seek($s);
+		return false;
+	}
+
 	protected function keyword(&$word, $eatWhitespace=true) {
 		if ($this->match('([\w_\-\*!"][\w\-_"]*)', $m, $eatWhitespace)) {
 			$word = $m[1];
@@ -512,9 +544,9 @@ class scss_parser {
 
 	// consume an end of statement delimiter
 	protected function end() {
-		if ($this->literal(';'))
+		if ($this->literal(';')) {
 			return true;
-		elseif ($this->count == strlen($this->buffer) || $this->buffer{$this->count} == '}') {
+		} elseif ($this->count == strlen($this->buffer) || $this->buffer{$this->count} == '}') {
 			// if there is end of file or a closing block next then we don't need a ;
 			return true;
 		}
