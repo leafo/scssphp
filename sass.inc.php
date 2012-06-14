@@ -214,6 +214,7 @@ class scss_parser {
 		$this->count = 0;
 		$this->line = 1;
 		$this->env = null;
+		$this->inParens = false;
 		$this->pushBlock(null); // root block
 
 		$this->buffer = $this->removeComments($buffer);
@@ -376,6 +377,19 @@ class scss_parser {
 	}
 
 	protected function value(&$out) {
+		$s = $this->seek();
+
+		// parens
+		$inParens = $this->inParens;
+		if ($this->literal("(") && $this->inParens = true && $this->expression($exp) && $this->literal(")")) {
+			$out = $exp;
+			$this->inParens = $inParens;
+			return true;
+		} else {
+			$this->inParens = $inParens;
+			$this->seek($s);
+		}
+
 		if ($this->color($out)) return true;
 		if ($this->unit($out)) return true;
 		if ($this->string($out)) return true;
