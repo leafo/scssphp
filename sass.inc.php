@@ -54,14 +54,21 @@ class sassc {
 		}
 	}
 
-	protected function reduce($value) {
+	protected function reduce($value, $inExp = false) {
 		list($type) = $value;
 		switch ($type) {
 			case "exp":
-				list(, $op, $left, $right) = $value;
+				list(, $op, $left, $right, $inParens) = $value;
 				$opName = self::$operatorNames[$op];
-				$left = $this->reduce($left);
-				$right = $this->reduce($right);
+
+				// only do division in special cases
+				// TODO: add variables type check here
+				if ($opName == "div" && !$inParens && !$inExp) {
+					return array("keyword", $this->compileValue($left) . "/" . $this->compileValue($right));
+				}
+
+				$left = $this->reduce($left, true);
+				$right = $this->reduce($right, true);
 
 				$fn = "op_${opName}_${left[0]}_${right[0]}";
 				if (is_callable(array($this, $fn))) {
@@ -88,7 +95,7 @@ class sassc {
 	}
 
 	protected function op_div_number_number($left, $right) {
-		return array("number", $left[1] - $right[1], "");
+		return array("number", $left[1] / $right[1], "");
 	}
 
 	protected function op_mod_number_number($left, $right) {
@@ -190,18 +197,14 @@ class scss_parser {
 		'%' => 2,
 	);
 
-	static protected $basicOperators = array("+", "-", "*", "%");
-	static protected $allOperators = array("+", "-", "*", "/", "%");
-
-	static protected $basicOperatorStr;
-	static protected $allOperatorStr;
+	static protected $operators = array("+", "-", "*", "/", "%");
+	static protected $operatorStr;
 
 	function __construct($sourceName = null) {
 		$this->sourceName = $sourceName;
 
-		if (empty(scss_parser::$basicOperatorStr)) {
-			self::$basicOperatorStr = $this->makeOperatorStr(self::$basicOperators);
-			self::$allOperatorStr = $this->makeOperatorStr(self::$allOperators);
+		if (empty(scss_parser::$operatorStr)) {
+			self::$operatorStr = $this->makeOperatorStr(self::$operators);
 		}
 	}
 
@@ -355,20 +358,20 @@ class scss_parser {
 	}
 
 	protected function expHelper($lhs, $minP) {
-		$operatorString = self::$basicOperatorStr;
+		$opstr = self::$operatorStr;
 
 		$ss = $this->seek();
-		while ($this->match($operatorString, $m) && self::$precedence[$m[1]] >= $minP) {
+		while ($this->match($opstr, $m) && self::$precedence[$m[1]] >= $minP) {
 			$op = $m[1];
 
 			if (!$this->value($rhs)) break;
 
 			// peek and see if rhs belongs to next operator
-			if ($this->peek($operatorString, $next) && self::$precedence[$next[1]] > self::$precedence[$op]) {
+			if ($this->peek($opstr, $next) && self::$precedence[$next[1]] > self::$precedence[$op]) {
 				$rhs = $this->expHelper($rhs, self::$precedence[$next[1]]);
 			}
 
-			$lhs = array("exp", $op, $lhs, $rhs);
+			$lhs = array("exp", $op, $lhs, $rhs, $this->inParens);
 			$ss = $this->seek();
 		}
 
@@ -381,7 +384,7 @@ class scss_parser {
 
 		// parens
 		$inParens = $this->inParens;
-		if ($this->literal("(") && $this->inParens = true && $this->expression($exp) && $this->literal(")")) {
+		if ($this->literal("(") && ($this->inParens = true) && $this->expression($exp) && $this->literal(")")) {
 			$out = $exp;
 			$this->inParens = $inParens;
 			return true;
