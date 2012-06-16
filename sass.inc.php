@@ -148,14 +148,45 @@ class sassc {
 			$args = !empty($value[2]) ? $this->compileValue($value[2]) : "";
 			return "$value[1]($args)";
 		case "list":
+			$value = $this->extractInterpolation($value);
+			if ($value[0] != "list") return $this->compileValue($value);
+
 			list(, $delim, $items) = $value;
 			foreach ($items as &$item) {
 				$item = $this->compileValue($item);
 			}
 			return implode("$delim ", $items);
+		case "interpolated": # node created by extractInterpolation
+			list(, $interpolate, $left, $right) = $value;
+			list(,, $white_left, $white_right) = $interpolate;
+
+			$left = count($left[2]) > 0 ?
+				$this->compileValue($left).$white_left : "";
+
+			$right = count($right[2]) > 0 ?
+				$white_right.$this->compileValue($right) : "";
+
+			return $left.$this->compileValue($interpolate).$right;
+
+		case "interpolate": # raw parse node
+			list(, $exp) = $value;
+			return $this->compileValue($exp);
 		default:
 			throw new exception("unknown value type: $type");
 		}
+	}
+
+	// doesn't need to be recursive, compileValue will handle that
+	protected function extractInterpolation($list) {
+		$items = $list[2];
+		foreach ($items as $i => $item) {
+			if ($item[0] == "interpolate") {
+				$before = array("list", $list[1], array_slice($items, 0, $i));
+				$after = array("list", $list[1], array_slice($items, $i + 1));
+				return array("interpolated", $item, $before, $after);
+			}
+		}
+		return $list;
 	}
 
 	// find the final set of selectors
@@ -346,7 +377,7 @@ class scss_parser {
 
 	protected function valueList(&$out) {
 		if ($this->genericList($list, "commaList")) {
-			$out = $this->flattenList($list);
+			$out = $list;
 			return true;
 		}
 
@@ -372,7 +403,12 @@ class scss_parser {
 			return false;
 		}
 
-		$out = array("list", $delim, $items);
+		if (count($items) == 1) {
+			$out = $items[0];
+		} else {
+			$out = array("list", $delim, $items);
+		}
+
 		return true;
 	}
 
@@ -423,6 +459,7 @@ class scss_parser {
 			$this->seek($s);
 		}
 
+		if ($this->interpolation($out)) return true;
 		if ($this->variable($out)) return true;
 		if ($this->color($out)) return true;
 		if ($this->unit($out)) return true;
@@ -509,6 +546,26 @@ class scss_parser {
 		return true;
 	}
 
+	// where should this be parsed?
+	protected function interpolation(&$out) {
+		$s = $this->seek();
+		if ($this->literal("#{") && $this->value($value) && $this->literal("}", false)) {
+
+			// TODO: don't error if out of bounds
+			$left = preg_match('/\s/', $this->buffer[$s - 1]) ? " " : "";
+			$right = preg_match('/\s/', $this->buffer[$this->count]) ? " ": "";
+
+			// get rid of the whitespace we didn't get before
+			$this->match("", $m);
+
+			$out = array("interpolate", $value, $left, $right);
+			return true;
+		}
+
+		$this->seek($s);
+		return false;
+	}
+
 	// low level parsers
 
 	protected function selectors(&$out) {
@@ -559,15 +616,6 @@ class scss_parser {
 			return true;
 		}
 		return false;
-	}
-
-	protected function flattenList($list) {
-		$type = $list[0];
-		if ($type == "list" && count($list[2]) == 1) {
-			return $this->flattenList($list[2][0]);
-		} else {
-			return $list;
-		}
 	}
 
 	// advance counter to next occurrence of $what
