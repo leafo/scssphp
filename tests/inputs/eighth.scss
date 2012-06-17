@@ -1,0 +1,24 @@
+
+@mixin something($color) {
+    color: $color;
+
+    div {
+        height: 20px;
+    }
+}
+
+@mixin cool($a, $b, $c) {
+    height: $a + $b + $c;
+}
+
+div {
+    @include something(blue);
+    @include something();
+    @include something;
+}
+
+pre {
+    @include cool(10px, 12px, 21px);
+}
+
+

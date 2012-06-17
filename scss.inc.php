@@ -67,11 +67,21 @@ class scssc {
 			$this->set(self::$namespaces[$block->type] . $block->name, $block);
 			break;
 		case "include": // including a mixin
-			list(,$name) = $child;
+			list(,$name, $argValues) = $child;
 			$mixin = $this->get(self::$namespaces["mixin"] . $name);
+
+			// push scope, apply args
+			$this->pushEnv();
+			if (!is_null($mixin->args)) {
+				$this->applyArguments($mixin->args, $argValues);
+			}
+
 			foreach ($mixin->children as $child) {
 				$this->compileChild($child, $lines, $children);
 			}
+
+			$this->popEnv();
+
 			break;
 		default:
 			throw new exception("unknown child type: $child[0]");
@@ -258,6 +268,11 @@ class scssc {
 	// find the final set of selectors
 	protected function multiplySelectors($env = null, $childSelectors = null) {
 		if (is_null($env)) $env = $this->env;
+		if (empty($env->block)) {
+			// no block, just a scope, skip it
+			return $this->multiplySelectors($env->parent, $childSelectors);
+		}
+
 		$block = $env->block;
 
 		if (is_null($childSelectors)) {
@@ -287,6 +302,7 @@ class scssc {
 	}
 
 	protected function applyArguments($argNames, $argValues) {
+		if (is_null($argValues)) return;
 		$argValues = $this->coerceList($argValues);
 		$argValues = $argValues[2];
 
@@ -388,16 +404,29 @@ class scss_parser {
 
 		// the directives
 		if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == "@") {
-			if ($this->literal("@mixin") && $this->keyword($mixin_name) && $this->literal("{")) {
+			if ($this->literal("@mixin") &&
+				$this->keyword($mixinName) &&
+				($this->argumentDef($args) || true) &&
+				$this->literal("{"))
+			{
 				$mixin = $this->pushSpecialBlock("mixin");
-				$mixin->name = $mixin_name;
+				$mixin->name = $mixinName;
+				$mixin->args = $args;
 				return true;
 			} else {
 				$this->seek($s);
 			}
 
-			if ($this->literal("@include") && $this->keyword($mixin_name) && $this->end()) {
-				$this->append(array("include", $mixin_name));
+			if ($this->literal("@include") &&
+				$this->keyword($mixinName) &&
+				($this->literal("(") &&
+					($this->valueList($argValues) || true) &&
+					$this->literal(")") || true) &&
+				$this->end())
+			{
+				$this->append(array("include",
+					$mixinName,
+					isset($argValues) ? $argValues : null));
 				return true;
 			} else {
 				$this->seek($s);
