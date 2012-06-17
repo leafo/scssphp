@@ -19,3 +19,37 @@ pre {
 }
 
 
+span {
+    @if false {
+        color: red;
+    } @else {
+        color: blue;
+    }
+
+    @if true {
+        height: 10px;
+    } @else {
+        color: 20px;
+    }
+
+}
+
+div {
+    @if false {
+        color: red;
+    } @else if false {
+        color: green;
+    } @else {
+        color: blue;
+    }
+
+    @if false {
+        border-color: red;
+    } @else if true {
+        border-color: green;
+    } @else {
+        border-color: blue;
+    }
+
+}
+

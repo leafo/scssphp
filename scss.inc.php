@@ -81,6 +81,14 @@ class scssc {
 			list(, $if) = $child;
 			if ($this->reduce($if->cond) != self::$false) {
 				return $this->compileChildren($if->children, $lines, $children);
+			} else {
+				foreach ($if->cases as $case) {
+					if ($case->type == "else" ||
+						$case->type == "elseif" && ($this->reduce($case->cond) != self::$false))
+					{
+						return $this->compileChildren($case->children, $lines, $children);
+					}
+				}
 			}
 			break;
 		case "return":
@@ -473,8 +481,30 @@ class scss_parser {
 			if ($this->literal("@if") && $this->valueList($cond) && $this->literal("{")) {
 				$if = $this->pushSpecialBlock("if");
 				$if->cond = $cond;
+				$if->cases = array();
 				return true;
 			} else {
+				$this->seek($s);
+			}
+
+			$last = $this->last();
+			if (!is_null($last) && $last[0] == "if") {
+				list(, $if) = $last;
+				if ($this->literal("@else")) {
+					if ($this->literal("{")) {
+						$else = $this->pushSpecialBlock("else");
+					} elseif ($this->literal("if") && $this->valueList($cond) && $this->literal("{")) {
+						$else = $this->pushSpecialBlock("elseif");
+						$else->cond = $cond;
+					}
+
+					if (isset($else)) {
+						$else->dontAppend = true;
+						$if->cases[] = $else;
+						return true;
+					}
+				}
+
 				$this->seek($s);
 			}
 		}
@@ -498,8 +528,10 @@ class scss_parser {
 		// closing a block
 		if ($this->literal("}")) {
 			$block = $this->popBlock();
-			$type = isset($block->type) ? $block->type : "block";
-			$this->append(array($type, $block));
+			if (empty($block->dontAppend)) {
+				$type = isset($block->type) ? $block->type : "block";
+				$this->append(array($type, $block));
+			}
 			return true;
 		}
 
@@ -554,6 +586,13 @@ class scss_parser {
 
 	protected function append($statement) {
 		$this->env->children[] = $statement;
+	}
+
+	// last child that was appended
+	protected function last() {
+		$i = count($this->env->children) - 1;
+		if (isset($this->env->children[$i]))
+			return $this->env->children[$i];
 	}
 
 	// high level parsers (they return parts of ast)

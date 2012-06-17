@@ -3,3 +3,11 @@ pre {
   val-1:"red";
   val-2:"blue";
 }
+span {
+  color:blue;
+  height:10px;
+}
+div {
+  color:blue;
+  border-color:green;
+}
