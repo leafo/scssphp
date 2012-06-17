@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/../sass.inc.php";
+require_once __DIR__ . "/../scss.inc.php";
 
 // Runs all the tests in inputs/ and compares their output to ouputs/
 
@@ -17,7 +17,7 @@ class InputTest extends PHPUnit_Framework_TestCase {
 	protected static $outputDir = "outputs";
 
 	public function setUp() {
-		$this->scss = new sassc();
+		$this->scss = new scssc();
 	}
 
 	/**

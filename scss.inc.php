@@ -1,6 +1,6 @@
 <?php
 
-class sassc {
+class scssc {
 	static protected $operatorNames = array(
 		'+' => "add",
 		'-' => "sub",
@@ -21,7 +21,7 @@ class sassc {
 
 		$parser = new scss_parser($name);
 		$tree = $parser->parse($code);
-		$this->formatter = new sass_formatter();
+		$this->formatter = new scss_formatter();
 
 		$this->env = null;
 		// print_r($tree);
@@ -862,7 +862,7 @@ class scss_parser {
 	}
 }
 
-class sass_formatter {
+class scss_formatter {
 	public $indentChar = "  ";
 
 	public $break = "\n";
