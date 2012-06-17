@@ -1,0 +1,15 @@
+
+@function hello($x) {
+    @return $x + 4;
+}
+
+@function add($a, $b) {
+    @return $a + $b;
+}
+
+div {
+    color: hello(10px);
+    sum: add(11, 12);
+}
+
+

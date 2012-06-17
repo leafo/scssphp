@@ -14,6 +14,8 @@ class sassc {
 		"function" => "^",
 	);
 
+	static protected $defaultValue = array("keyword", "");
+
 	function compile($code, $name=null) {
 		$this->indentLevel = -1;
 
@@ -103,12 +105,16 @@ class sassc {
 				list(, $name) = $value;
 				return $this->reduce($this->get($name));
 			case "function":
-				list(,$name, $args) = $value;
+				list(,$name, $argValues) = $value;
 				// user defined function?
 				$func = $this->get(self::$namespaces["function"] . $name);
 				if ($func) {
-					print_r($func);
 					$this->pushEnv();
+
+					// set the args
+					if (isset($func->args)) {
+						$this->applyArguments($func->args, $argValues);
+					}
 
 					// ignore any lines or children
 					$lines = array();
@@ -118,7 +124,7 @@ class sassc {
 					}
 
 					$ret = isset($func->returns) ?
-						$this->reduce($func->returns) : array("keyword", "");
+						$this->reduce($func->returns) : self::$defaultValue;
 
 					$this->popEnv();
 					return $ret;
@@ -272,6 +278,25 @@ class sassc {
 		}
 	}
 
+	// convert something to list
+	protected function coerceList($item, $delim = ",") {
+		if ($item[0] == "list") {
+			return $item;
+		}
+		return array("list", $delim, array($item));
+	}
+
+	protected function applyArguments($argNames, $argValues) {
+		$argValues = $this->coerceList($argValues);
+		$argValues = $argValues[2];
+
+		foreach ($argNames as $i => $arg) {
+			$name = $arg[1];
+			$val = isset($argValues[$i]) ? $argValues[$i] : self::$defaultValue;
+			$this->set($arg[1], $this->reduce($val));
+		}
+	}
+
 	// we have environments in addition to blocks for handling mixins, where
 	// blocks are reused in different contexts
 	protected function pushEnv($block=null) {
@@ -297,7 +322,7 @@ class sassc {
 			return $this->get($name, $env->parent);
 		}
 
-		return array("keyword", ""); // found nothing
+		return self::$defaultValue; // found nothing
 	}
 
 	protected function popEnv() {
