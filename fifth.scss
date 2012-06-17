@@ -9,5 +9,10 @@ div {
 
     font-size: 10px/#{something}; // gmm
     font-size: 10px / #{something}; // gmm
+
+    test: "what#{"world"}wrong";
+    test: "what#{'world'}wrong";
+    test: "what#{world}wrong";
+    test: "what"#{world}"wrong";
 }
 

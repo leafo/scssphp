@@ -143,7 +143,7 @@ class sassc {
 		case "number":
 			return $value[1] . $value[2];
 		case "string":
-			return $value[1] . $value[2] . $value[1];
+			return $value[1] . $this->compileStringContent($value) . $value[1];
 		case "function":
 			$args = !empty($value[2]) ? $this->compileValue($value[2]) : "";
 			return "$value[1]($args)";
@@ -170,10 +170,31 @@ class sassc {
 
 		case "interpolate": # raw parse node
 			list(, $exp) = $value;
-			return $this->compileValue($exp);
+
+			// strip quotes if it's a string
+			$reduced = $this->reduce($exp);
+			if ($reduced[0] == "string") {
+				$reduced = array("keyword",
+					$this->compileStringContent($reduced));
+			}
+
+			return $this->compileValue($reduced);
 		default:
 			throw new exception("unknown value type: $type");
 		}
+	}
+
+	protected function compileStringContent($string) {
+		$parts = array();
+		foreach ($string[2] as $part) {
+			if (is_array($part)) {
+				$parts[] = $this->compileValue($part);
+			} else {
+				$parts[] = $part;
+			}
+		}
+
+		return implode($parts);
 	}
 
 	// doesn't need to be recursive, compileValue will handle that
@@ -537,12 +558,28 @@ class scss_parser {
 			return false;
 		}
 
-		if (!$this->to($delim, $string)) {
-			$this->seek($s);
-			return false;
+		$content = array();
+
+		// look for either ending delim or string interpolation
+		$patt = '([^\n]*?)('.
+			$this->preg_quote("#{").'|'. $this->preg_quote($delim).')';
+
+		while ($this->match($patt, $m)) {
+			$content[] = $m[1];
+			if ($m[2] == "#{") {
+				$ss = $this->seek();
+				if ($this->valueList($value) && $this->literal("}")) {
+					$content[] = array("interpolate", $value);
+				} else {
+					$this->seek($ss);
+					$content[] = "#{"; // ignore it
+				}
+			} else {
+				break; // delim
+			}
 		}
 
-		$out = array("string", $delim, $string);
+		$out = array("string", $delim, $content);
 		return true;
 	}
 
