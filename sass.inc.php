@@ -107,7 +107,7 @@ class sassc {
 			case "function":
 				list(,$name, $argValues) = $value;
 				// user defined function?
-				$func = $this->get(self::$namespaces["function"] . $name);
+				$func = $this->get(self::$namespaces["function"] . $name, false);
 				if ($func) {
 					$this->pushEnv();
 
@@ -313,16 +313,17 @@ class sassc {
 		$this->env->store[$name] = $value;
 	}
 
-	protected function get($name, $env=null) {
+	protected function get($name, $defaultValue = null, $env = null) {
 		if (is_null($env)) $env = $this->env;
+		if (is_null($defaultValue)) $defaultValue = self::$defaultValue;
 
 		if (isset($env->store[$name])) {
 			return $env->store[$name];
 		} elseif (!is_null($env->parent)) {
-			return $this->get($name, $env->parent);
+			return $this->get($name, $defaultValue, $env->parent);
 		}
 
-		return self::$defaultValue; // found nothing
+		return $defaultValue; // found nothing
 	}
 
 	protected function popEnv() {
