@@ -9,6 +9,11 @@ class sassc {
 		'%' => "mod",
 	);
 
+	static protected $namespaces = array(
+		"mixin" => "@",
+		"function" => "^",
+	);
+
 	function compile($code, $name=null) {
 		$this->indentLevel = -1;
 
@@ -54,14 +59,14 @@ class sassc {
 				$lines[] = $child[1] . ":" . $this->compileValue($child[2]) . ";";
 			}
 			break;
-		case "mixin": // creating a mixin
-			list(,$mixin) = $child;
-			// hope this isn't a bad idea :)
-			$this->set("@$mixin->name", $mixin);
+		case "mixin":
+		case "function":
+			list(,$block) = $child;
+			$this->set(self::$namespaces[$block->type] . $block->name, $block);
 			break;
 		case "include": // including a mixin
 			list(,$name) = $child;
-			$mixin = $this->get("@$name");
+			$mixin = $this->get(self::$namespaces["mixin"] . $name);
 			foreach ($mixin->children as $child) {
 				$this->compileChild($child, $lines, $children);
 			}
@@ -97,6 +102,29 @@ class sassc {
 			case "var":
 				list(, $name) = $value;
 				return $this->reduce($this->get($name));
+			case "function":
+				list(,$name, $args) = $value;
+				// user defined function?
+				$func = $this->get(self::$namespaces["function"] . $name);
+				if ($func) {
+					print_r($func);
+					$this->pushEnv();
+
+					// ignore any lines or children
+					$lines = array();
+					$children = array();
+					foreach ($func->children as $child) {
+						$this->compileChild($child, $lines, $children);
+					}
+
+					$ret = isset($func->returns) ?
+						$this->reduce($func->returns) : array("keyword", "");
+
+					$this->popEnv();
+					return $ret;
+				}
+
+				return $value;
 			default:
 				return $value;
 		}
@@ -348,6 +376,26 @@ class scss_parser {
 			} else {
 				$this->seek($s);
 			}
+
+			if ($this->literal("@function") &&
+				$this->keyword($fn_name) &&
+				$this->argumentDef($args) &&
+				$this->literal("{"))
+			{
+				$func = $this->pushSpecialBlock("function");
+				$func->name = $fn_name;
+				$func->args = $args;
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
+			if ($this->literal("@return") && $this->valueList($ret_val) && $this->end()) {
+				$this->env->returns = $ret_val;
+				return true;
+			} else {
+				$this->seek($s);
+			}
 		}
 
 		// assign
@@ -419,6 +467,7 @@ class scss_parser {
 
 		$old = $this->env;
 		$this->env = $this->env->parent;
+		unset($old->parent);
 		return $old;
 	}
 
@@ -426,7 +475,7 @@ class scss_parser {
 		$this->env->children[] = $statement;
 	}
 
-	// high level parsers (they returns parts of ast)
+	// high level parsers (they return parts of ast)
 
 	protected function assign(&$out) {
 		$s = $this->seek();
@@ -556,6 +605,25 @@ class scss_parser {
 
 		$this->seek($s);
 		return false;
+	}
+
+	protected function argumentDef(&$out) {
+		$s = $this->seek();
+		$this->literal("(");
+
+		$args = array();
+		while ($this->variable($var)) {
+			$args[] = $var;
+			if (!$this->literal(",")) break;
+		}
+
+		if (!$this->literal(")")) {
+			$this->seek($s);
+			return false;
+		}
+
+		$out = $args;
+		return true;
 	}
 
 	protected function color(&$out) {
