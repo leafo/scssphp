@@ -295,21 +295,22 @@ class scssc {
 
 	// convert something to list
 	protected function coerceList($item, $delim = ",") {
-		if ($item[0] == "list") {
+		if (!is_null($item) && $item[0] == "list") {
 			return $item;
 		}
-		return array("list", $delim, array($item));
+
+		return array("list", $delim, is_null($item) ? array(): array($item));
 	}
 
-	protected function applyArguments($argNames, $argValues) {
-		if (is_null($argValues)) return;
+	protected function applyArguments($argDef, $argValues) {
 		$argValues = $this->coerceList($argValues);
 		$argValues = $argValues[2];
 
-		foreach ($argNames as $i => $arg) {
-			$name = $arg[1];
-			$val = isset($argValues[$i]) ? $argValues[$i] : self::$defaultValue;
-			$this->set($arg[1], $this->reduce($val));
+		foreach ($argDef as $i => $arg) {
+			list($name, $default) = $arg;
+			$val = isset($argValues[$i]) ? $argValues[$i] :
+				(!empty($default) ? $default : self::$defaultValue);
+			$this->set($name, $this->reduce($val));
 		}
 	}
 
@@ -326,6 +327,9 @@ class scssc {
 	}
 
 	protected function set($name, $value) {
+		if (!is_string($name)) {
+			throw new Exception("bad stuff here");
+		}
 		$this->env->store[$name] = $value;
 	}
 
@@ -668,7 +672,16 @@ class scss_parser {
 
 		$args = array();
 		while ($this->variable($var)) {
-			$args[] = $var;
+			$arg = array($var[1], null);
+
+			$ss = $this->seek();
+			if ($this->literal(":") && $this->value($defaultVal)) {
+				$arg[1] = $defaultVal;
+			} else {
+				$this->seek($ss);
+			}
+
+			$args[] = $arg;
 			if (!$this->literal(",")) break;
 		}
 
