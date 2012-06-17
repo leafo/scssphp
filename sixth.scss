@@ -1,0 +1,13 @@
+
+@mixin something {
+    color: red;
+    pre {
+        height: 200px;
+    }
+}
+
+div {
+    color: blue;
+    @include something;
+}
+

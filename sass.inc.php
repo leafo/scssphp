@@ -34,15 +34,14 @@ class sassc {
 
 		$this->indentLevel -= $idelta;
 
-		$selectors = $this->multiplySelectors($block);
+		$selectors = $this->multiplySelectors();
 		$this->popEnv();
 		return $this->formatter->block($selectors, false,
 			$lines, $children, $this->indentLevel);
 	}
 
 	protected function compileChild($child, &$lines, &$children) {
-		list($type) = $child;
-		switch ($type) {
+		switch ($child[0]) {
 		case "block":
 			$children[] = $this->compileBlock($child[1]);
 			break;
@@ -55,8 +54,20 @@ class sassc {
 				$lines[] = $child[1] . ":" . $this->compileValue($child[2]) . ";";
 			}
 			break;
+		case "mixin": // creating a mixin
+			list(,$mixin) = $child;
+			// hope this isn't a bad idea :)
+			$this->set("@$mixin->name", $mixin);
+			break;
+		case "include": // including a mixin
+			list(,$name) = $child;
+			$mixin = $this->get("@$name");
+			foreach ($mixin->children as $child) {
+				$this->compileChild($child, $lines, $children);
+			}
+			break;
 		default:
-			throw new exception("unknown child type: $type");
+			throw new exception("unknown child type: $child[0]");
 		}
 	}
 
@@ -211,7 +222,10 @@ class sassc {
 	}
 
 	// find the final set of selectors
-	protected function multiplySelectors($block, $childSelectors = null) {
+	protected function multiplySelectors($env = null, $childSelectors = null) {
+		if (is_null($env)) $env = $this->env;
+		$block = $env->block;
+
 		if (is_null($childSelectors)) {
 			$selectors = $block->selectors;
 		} else {
@@ -223,14 +237,15 @@ class sassc {
 			}
 		}
 
-		if (!empty($block->parent) && empty($block->parent->isRoot)) {
-			return $this->multiplySelectors($block->parent, $selectors);
+		if (!empty($env->parent->parent)) { // non root environment
+			return $this->multiplySelectors($env->parent, $selectors);
 		} else {
 			return $selectors;
 		}
 	}
 
-	// not sure we need environments yet, might be able to reuse the blocks
+	// we have environments in addition to blocks for handling mixins, where
+	// blocks are reused in different contexts
 	protected function pushEnv($block=null) {
 		$env = new stdclass;
 		$env->parent = $this->env;
@@ -317,6 +332,24 @@ class scss_parser {
 	protected function parseChunk() {
 		$s = $this->seek();
 
+		// the directives
+		if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == "@") {
+			if ($this->literal("@mixin") && $this->keyword($mixin_name) && $this->literal("{")) {
+				$mixin = $this->pushSpecialBlock("mixin");
+				$mixin->name = $mixin_name;
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
+			if ($this->literal("@include") && $this->keyword($mixin_name) && $this->end()) {
+				$this->append(array("include", $mixin_name));
+				return true;
+			} else {
+				$this->seek($s);
+			}
+		}
+
 		// assign
 		if ($this->assign($assign) && $this->end()) {
 			$this->append($assign);
@@ -335,7 +368,9 @@ class scss_parser {
 
 		// closing a block
 		if ($this->literal("}")) {
-			$this->append(array("block", $this->popBlock()));
+			$block = $this->popBlock();
+			$type = isset($block->type) ? $block->type : "block";
+			$this->append(array($type, $block));
 			return true;
 		}
 
@@ -371,7 +406,17 @@ class scss_parser {
 		return $b;
 	}
 
+	protected function pushSpecialBlock($type) {
+		$block = $this->pushBlock(null);
+		$block->type = $type;
+		return $block;
+	}
+
 	protected function popBlock() {
+		if (is_null($this->env->parent)) {
+			$this->throwParseError("unexpected }");
+		}
+
 		$old = $this->env;
 		$this->env = $this->env->parent;
 		return $old;
