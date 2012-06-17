@@ -7,12 +7,14 @@ div {
     color: #{umm}#{yeah}#{what};
     color: #{stacked};
 
-    font-size: 10px/#{something}; // gmm
-    font-size: 10px / #{something}; // gmm
+    font-size: 10px/#{something};
+    font-size: 10px / #{something};
 
     test: "what#{"world"}wrong";
     test: "what#{'world'}wrong";
     test: "what#{world}wrong";
     test: "what"#{world}"wrong";
+
+    hi: "what is #{4 + 12} end"
 }
 

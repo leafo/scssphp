@@ -568,7 +568,7 @@ class scss_parser {
 			$content[] = $m[1];
 			if ($m[2] == "#{") {
 				$ss = $this->seek();
-				if ($this->valueList($value) && $this->literal("}")) {
+				if ($this->valueList($value) && $this->literal("}", false)) {
 					$content[] = array("interpolate", $value);
 				} else {
 					$this->seek($ss);
@@ -586,7 +586,7 @@ class scss_parser {
 	// where should this be parsed?
 	protected function interpolation(&$out) {
 		$s = $this->seek();
-		if ($this->literal("#{") && $this->value($value) && $this->literal("}", false)) {
+		if ($this->literal("#{") && $this->valueList($value) && $this->literal("}", false)) {
 
 			// TODO: don't error if out of bounds
 			$left = preg_match('/\s/', $this->buffer[$s - 1]) ? " " : "";
