@@ -129,12 +129,15 @@ class scssc {
 					// ignore any lines or children
 					$lines = array();
 					$children = array();
+					$ret = self::$defaultValue;
+
 					foreach ($func->children as $child) {
+						if ($child[0] == "return") {
+							$ret = $this->reduce($child[1]);
+							break;
+						}
 						$this->compileChild($child, $lines, $children);
 					}
-
-					$ret = isset($func->returns) ?
-						$this->reduce($func->returns) : self::$defaultValue;
 
 					$this->popEnv();
 					return $ret;
@@ -450,7 +453,7 @@ class scss_parser {
 			}
 
 			if ($this->literal("@return") && $this->valueList($ret_val) && $this->end()) {
-				$this->env->returns = $ret_val;
+				$this->append(array("return", $ret_val));
 				return true;
 			} else {
 				$this->seek($s);
