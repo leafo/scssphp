@@ -93,6 +93,16 @@ class scssc {
 			break;
 		case "return":
 			return $this->reduce($child[1]);
+		case "each":
+			list(,$each) = $child;
+			$list = $this->reduce($this->coerceList($each->list));
+			foreach ($list[2] as $item) {
+				$this->pushEnv();
+				$this->set($each->var, $item);
+				$this->compileChildren($each->children, $lines, $children);
+				$this->popEnv();
+			}
+			break;
 		case "include": // including a mixin
 			list(,$name, $argValues) = $child;
 			$mixin = $this->get(self::$namespaces["mixin"] . $name);
@@ -349,9 +359,6 @@ class scssc {
 	}
 
 	protected function set($name, $value) {
-		if (!is_string($name)) {
-			throw new Exception("bad stuff here");
-		}
 		$this->env->store[$name] = $value;
 	}
 
@@ -471,8 +478,22 @@ class scss_parser {
 				$this->seek($s);
 			}
 
-			if ($this->literal("@return") && $this->valueList($ret_val) && $this->end()) {
-				$this->append(array("return", $ret_val));
+			if ($this->literal("@return") && $this->valueList($retVal) && $this->end()) {
+				$this->append(array("return", $retVal));
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
+			if ($this->literal("@each") &&
+				$this->variable($varName) &&
+				$this->literal("in") &&
+				$this->valueList($list) &&
+				$this->literal("{"))
+			{
+				$each = $this->pushSpecialBlock("each");
+				$each->var = $varName[1];
+				$each->list = $list;
 				return true;
 			} else {
 				$this->seek($s);

@@ -1,0 +1,11 @@
+
+div {
+    @each $var in what is this {
+        color: $var;
+    }
+
+    @each $var in what, is, this {
+        font: $var;
+    }
+}
+

@@ -1,7 +1,7 @@
 
 property blocks, font: { -size: 10px; }
 comments
-@if, @else, @each, @while, @for
+@while, @for
 @media
 !default
 @import
@@ -10,7 +10,10 @@ comments
 
 match operator results
 & (parent selector)
-#{interpolation} in selectors
+#{interpolation} in selectors, property names
 
-make formatter match scss
+make formatter match scss's output
+
+css hacks (find out what they are)
+enhance selector parsing
 
