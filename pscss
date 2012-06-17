@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+error_reporting(E_ALL);
+
+require "sass.inc.php";
+
+$data = "";
+while (!feof(STDIN)) {
+	$data .= fread(STDIN, 8192);
+}
+
+$sass = new sassc();
+echo $sass->compile($data);

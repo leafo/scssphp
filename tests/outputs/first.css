@@ -1,0 +1,7 @@
+div:blue;
+body { color:red; }
+div {
+  color:red;
+  height:yes;
+}
+div pre { color:blue; }

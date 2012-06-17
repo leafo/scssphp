@@ -937,16 +937,3 @@ class sass_formatter {
 	}
 }
 
-
-
-$data = "";
-while (!feof(STDIN)) {
-	$data .= fread(STDIN, 8192);
-}
-
-if ($data) {
-	$sass = new sassc();
-	echo $sass->compile($data);
-}
-
-
