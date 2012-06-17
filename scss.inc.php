@@ -103,6 +103,13 @@ class scssc {
 				$this->popEnv();
 			}
 			break;
+		case "while":
+			list(,$while) = $child;
+			while ($this->reduce($while->cond) != self::$false) {
+				$ret = $this->compileChildren($while->children, $lines, $children);
+				if ($ret) return $ret;
+			}
+			break;
 		case "include": // including a mixin
 			list(,$name, $argValues) = $child;
 			$mixin = $this->get(self::$namespaces["mixin"] . $name);
@@ -499,6 +506,17 @@ class scss_parser {
 				$this->seek($s);
 			}
 
+			if ($this->literal("@while") &&
+				$this->expression($cond) &&
+				$this->literal("{"))
+			{
+				$while = $this->pushSpecialBlock("while");
+				$while->cond = $cond;
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
 			if ($this->literal("@if") && $this->valueList($cond) && $this->literal("{")) {
 				$if = $this->pushSpecialBlock("if");
 				$if->cond = $cond;
@@ -757,7 +775,7 @@ class scss_parser {
 			$arg = array($var[1], null);
 
 			$ss = $this->seek();
-			if ($this->literal(":") && $this->value($defaultVal)) {
+			if ($this->literal(":") && $this->expression($defaultVal)) {
 				$arg[1] = $defaultVal;
 			} else {
 				$this->seek($ss);
