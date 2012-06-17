@@ -14,6 +14,9 @@ class scssc {
 		"function" => "^",
 	);
 
+	static protected $true = array("keyword", "true");
+	static protected $false = array("keyword", "false");
+
 	static protected $defaultValue = array("keyword", "");
 
 	function compile($code, $name=null) {
@@ -35,9 +38,8 @@ class scssc {
 
 		$lines = array();
 		$children = array();
-		foreach ($block->children as $child) {
-			$this->compileChild($child, $lines, $children);
-		}
+		// TODO children has two meanings here
+		$this->compileChildren($block->children, $lines, $children);
 
 		$this->indentLevel -= $idelta;
 
@@ -47,6 +49,15 @@ class scssc {
 			$lines, $children, $this->indentLevel);
 	}
 
+	// should really be "executeChildren"
+	protected function compileChildren($stms, &$lines, &$children) {
+		foreach ($stms as $stm) {
+			$ret = $this->compileChild($stm, $lines, $children);
+			if (!is_null($ret)) return $ret;
+		}
+	}
+
+	// return a value to halt execution
 	protected function compileChild($child, &$lines, &$children) {
 		switch ($child[0]) {
 		case "block":
@@ -66,6 +77,14 @@ class scssc {
 			list(,$block) = $child;
 			$this->set(self::$namespaces[$block->type] . $block->name, $block);
 			break;
+		case "if":
+			list(, $if) = $child;
+			if ($this->reduce($if->cond) != self::$false) {
+				return $this->compileChildren($if->children, $lines, $children);
+			}
+			break;
+		case "return":
+			return $this->reduce($child[1]);
 		case "include": // including a mixin
 			list(,$name, $argValues) = $child;
 			$mixin = $this->get(self::$namespaces["mixin"] . $name);
@@ -126,21 +145,13 @@ class scssc {
 						$this->applyArguments($func->args, $argValues);
 					}
 
-					// ignore any lines or children
+					// throw away lines and children
 					$lines = array();
 					$children = array();
-					$ret = self::$defaultValue;
-
-					foreach ($func->children as $child) {
-						if ($child[0] == "return") {
-							$ret = $this->reduce($child[1]);
-							break;
-						}
-						$this->compileChild($child, $lines, $children);
-					}
-
+					$ret = $this->compileChildren($func->children, $lines, $children);
 					$this->popEnv();
-					return $ret;
+
+					return is_null($ret) ? self::$defaultValue : $ret;
 				}
 
 				return $value;
@@ -454,6 +465,14 @@ class scss_parser {
 
 			if ($this->literal("@return") && $this->valueList($ret_val) && $this->end()) {
 				$this->append(array("return", $ret_val));
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
+			if ($this->literal("@if") && $this->valueList($cond) && $this->literal("{")) {
+				$if = $this->pushSpecialBlock("if");
+				$if->cond = $cond;
 				return true;
 			} else {
 				$this->seek($s);

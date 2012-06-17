@@ -1,0 +1,21 @@
+
+@function conds($val) {
+    @if $val {
+        @return "red";
+    }
+
+    @return "blue";
+}
+
+div {
+    @if something {
+        color: blue;
+    }
+}
+
+pre {
+    val-1: conds(true);
+    val-2: conds(false);
+}
+
+
