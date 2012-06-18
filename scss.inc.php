@@ -7,6 +7,15 @@ class scssc {
 		'*' => "mul",
 		'/' => "div",
 		'%' => "mod",
+
+		'==' => "eq",
+		'!=' => "neq",
+		'<' => "lt",
+		'>' => "gt",
+
+		'<=' => "lte",
+		'>=' => "gte",
+
 	);
 
 	static protected $namespaces = array(
@@ -149,10 +158,10 @@ class scssc {
 				$right = $this->reduce($right, true);
 
 				$fn = "op_${opName}_${left[0]}_${right[0]}";
-				if (is_callable(array($this, $fn))) {
+				if (is_callable(array($this, $fn)) || ($fn = "op_${opName}") && is_callable(array($this, $fn))) {
 					return $this->$fn($left, $right);
 				}
-				// echo "missing fn: $fn\n";
+
 				// remember the whitespace around the operator to recreate it?
 				return array("list", "", array($left, array("keyword", $op), $right));
 			case "var":
@@ -203,6 +212,34 @@ class scssc {
 
 	protected function op_mod_number_number($left, $right) {
 		return array("number", $left[1] % $right[1], "");
+	}
+
+	protected function op_eq($left, $right) {
+		return $this->toBool($left == $right);
+	}
+
+	protected function op_neq($left, $right) {
+		return $this->toBool($left != $right);
+	}
+
+	protected function op_gte_number_number($left, $right) {
+		return $this->toBool($left[1] >= $right[1]);
+	}
+
+	protected function op_gt_number_number($left, $right) {
+		return $this->toBool($left[1] > $right[1]);
+	}
+
+	protected function op_lte_number_number($left, $right) {
+		return $this->toBool($left[1] <= $right[1]);
+	}
+
+	protected function op_lt_number_number($left, $right) {
+		return $this->toBool($left[1] < $right[1]);
+	}
+
+	protected function toBool($thing) {
+		return $thing ? self::$true : self::$false;
 	}
 
 	protected function compileValue($value) {
@@ -392,6 +429,14 @@ class scssc {
 
 class scss_parser {
 	static protected $precedence = array(
+		'==' => 0,
+		'!=' => 0,
+		'<=' => 0,
+		'>=' => 0,
+		'=' => 0,
+		'<' => 0,
+		'>' => 0,
+
 		'+' => 1,
 		'-' => 1,
 		'*' => 2,
@@ -399,7 +444,9 @@ class scss_parser {
 		'%' => 2,
 	);
 
-	static protected $operators = array("+", "-", "*", "/", "%");
+	static protected $operators = array("+", "-", "*", "/", "%",
+		"==", "!=", "<=", ">=", "<", ">");
+
 	static protected $operatorStr;
 
 	function __construct($sourceName = null) {
