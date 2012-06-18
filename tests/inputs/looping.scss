@@ -9,3 +9,12 @@ div {
     }
 }
 
+
+span {
+    $i: 0;
+    @while $i <= 10 {
+        color: $i;
+        $i: $i + 1;
+    }
+}
+

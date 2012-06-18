@@ -1,4 +1,16 @@
 
+@mixin something {
+    color: red;
+    pre {
+        height: 200px;
+    }
+}
+
+div {
+    color: blue;
+    @include something;
+}
+
 @mixin something($color) {
     color: $color;
 
@@ -11,14 +23,15 @@
     height: $a + $b + $c;
 }
 
-div {
+span {
     @include something(blue);
     @include something();
     @include something;
 }
 
-pre {
+html {
     @include cool(10px, 12px, 21px);
 }
+
 
 
