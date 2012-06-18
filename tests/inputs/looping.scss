@@ -18,3 +18,19 @@ span {
     }
 }
 
+pre {
+    @for $x from 1 to 5 {
+        color: $x;
+    }
+
+    @for $x from 1 through 5 {
+        height: $x;
+    }
+
+    $y: 10;
+    @for $x from $y through 3 {
+        cool: $x;
+    }
+
+}
+

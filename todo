@@ -1,7 +1,7 @@
 
 property blocks, font: { -size: 10px; }
 comments
-@while, @for
+@for
 @media
 !default
 @import
@@ -17,4 +17,8 @@ make formatter match scss's output
 css hacks (find out what they are)
 enhance selector parsing
 built in functions
+
+
+setting an existing variable should write in that variable's scope? (check the
+scoping) Also do block statements work in their own scope?
 

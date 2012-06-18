@@ -108,6 +108,7 @@ class scssc {
 			foreach ($list[2] as $item) {
 				$this->pushEnv();
 				$this->set($each->var, $item);
+				// TODO: allow return from here
 				$this->compileChildren($each->children, $lines, $children);
 				$this->popEnv();
 			}
@@ -118,6 +119,29 @@ class scssc {
 				$ret = $this->compileChildren($while->children, $lines, $children);
 				if ($ret) return $ret;
 			}
+			break;
+		case "for":
+			list(,$for) = $child;
+			$start = $this->reduce($for->start);
+			$start = $start[1];
+			$end = $this->reduce($for->end);
+			$end = $end[1];
+			$d = $start < $end ? 1 : -1;
+
+			while (true) {
+				if ((!$for->until && $start - $d == $end) ||
+					($for->until && $start == $end))
+				{
+					break;
+				}
+
+				$this->set($for->var, array("number", $start, ""));
+				$start += $d;
+
+				$ret = $this->compileChildren($for->children, $lines, $children);
+				if ($ret) return $ret;
+			}
+
 			break;
 		case "include": // including a mixin
 			list(,$name, $argValues) = $child;
@@ -559,6 +583,25 @@ class scss_parser {
 			{
 				$while = $this->pushSpecialBlock("while");
 				$while->cond = $cond;
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
+			if ($this->literal("@for") &&
+				$this->variable($varName) &&
+				$this->literal("from") &&
+				$this->expression($start) &&
+				($this->literal("through") ||
+					($forUntil = true && $this->literal("to"))) &&
+				$this->expression($end) &&
+				$this->literal("{"))
+			{
+				$for = $this->pushSpecialBlock("for");
+				$for->var = $varName[1];
+				$for->start = $start;
+				$for->end = $end;
+				$for->until = isset($forUntil);
 				return true;
 			} else {
 				$this->seek($s);
