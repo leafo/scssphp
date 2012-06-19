@@ -1,22 +1,21 @@
 
-comments
 @media
 !default
 @import
 @extend
 @debug, @warn
 
-match operator results
+selector parsing
 & (parent selector)
 #{interpolation} in selectors, property names
 
+match operator results
 make formatter match scss's output
 
 css hacks (find out what they are)
-enhance selector parsing
 built in functions
 
-
-setting an existing variable should write in that variable's scope? (check the
-scoping) Also do block statements work in their own scope?
+check scoping:
+  * setting an existing variable should write in that variable's scope?
+  * do block statements work in their own scope?
 

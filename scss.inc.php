@@ -30,6 +30,7 @@ class scssc {
 
 	function compile($code, $name=null) {
 		$this->indentLevel = -1;
+		$this->commentsSeen = array();
 
 		$parser = new scss_parser($name);
 		$tree = $parser->parse($code);
@@ -80,6 +81,9 @@ class scssc {
 			} else {
 				$lines[] = $child[1] . ":" . $this->compileValue($child[2]) . ";";
 			}
+			break;
+		case "comment":
+			$lines[] = $child[1];
 			break;
 		case "mixin":
 		case "function":
@@ -483,12 +487,23 @@ class scss_parser {
 		"==", "!=", "<=", ">=", "<", ">");
 
 	static protected $operatorStr;
+	static protected $whitePattern;
+
+	// these are escaped in the constructor
+	static protected $commentSingle = "//";
+	static protected $commentMultiLeft = "/*";
+	static protected $commentMultiRight = "*/";
 
 	function __construct($sourceName = null) {
 		$this->sourceName = $sourceName;
 
-		if (empty(scss_parser::$operatorStr)) {
+		if (empty(self::$operatorStr)) {
 			self::$operatorStr = $this->makeOperatorStr(self::$operators);
+
+			$commentSingle = $this->preg_quote(self::$commentSingle);
+			$commentMultiLeft = $this->preg_quote(self::$commentMultiLeft);
+			$commentMultiRight = $this->preg_quote(self::$commentMultiRight);
+			self::$whitePattern = '/'.$commentSingle.'[^\n]*\s*|('.$commentMultiLeft.'.*?'.$commentMultiRight.')\s*|\s+/Ais';
 		}
 	}
 
@@ -506,12 +521,7 @@ class scss_parser {
 
 		$this->buffer = $this->removeComments($buffer);
 
-		// trim whitespace on head
-		if (preg_match('/^\s+/', $this->buffer, $m)) {
-			$this->line += substr_count($m[0], "\n");
-			$this->buffer = ltrim($this->buffer);
-		}
-
+		$this->whitespace();
 		while (false !== $this->parseChunk());
 
 		if ($this->count != strlen($this->buffer))
@@ -1097,12 +1107,24 @@ class scss_parser {
 
 	// try to match something on head of buffer
 	protected function match($regex, &$out, $eatWhitespace = true) {
-		$r = '/'.$regex.($eatWhitespace ? '\s*' : '').'/Ais';
+		$r = '/'.$regex.'/Ais';
 		if (preg_match($r, $this->buffer, $out, null, $this->count)) {
 			$this->count += strlen($out[0]);
+			if ($eatWhitespace) $this->whitespace();
 			return true;
 		}
 		return false;
+	}
+
+	// match some whitespace
+	protected function whitespace() {
+		while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
+			if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
+				$this->append(array("comment", $m[1]));
+				$this->commentsSeen[$this->count] = true;
+			}
+			$this->count += strlen($m[0]);
+		}
 	}
 
 	protected function peek($regex, &$out, $from=null) {
