@@ -32,8 +32,8 @@ class scssc {
 		$this->indentLevel = -1;
 		$this->commentsSeen = array();
 
-		$parser = new scss_parser($name);
-		$tree = $parser->parse($code);
+		$this->parser = new scss_parser($name);
+		$tree = $this->parser->parse($code);
 		$this->formatter = new scss_formatter();
 
 		$this->env = null;
@@ -174,6 +174,12 @@ class scssc {
 
 			$this->popEnv();
 
+			break;
+		case "debug":
+			list(,$value, $pos) = $child;
+			$line = $this->parser->getLineNo($pos);
+			$value = $this->compileValue($value);
+			fwrite(STDERR, "Line $line DEBUG: $value\n");
 			break;
 		default:
 			throw new exception("unknown child type: $child[0]");
@@ -489,7 +495,6 @@ class scss_parser {
 	static protected $operatorStr;
 	static protected $whitePattern;
 
-	// these are escaped in the constructor
 	static protected $commentSingle = "//";
 	static protected $commentMultiLeft = "/*";
 	static protected $commentMultiRight = "*/";
@@ -514,7 +519,6 @@ class scss_parser {
 
 	function parse($buffer) {
 		$this->count = 0;
-		$this->line = 1;
 		$this->env = null;
 		$this->inParens = false;
 		$this->pushBlock(null); // root block
@@ -632,6 +636,15 @@ class scss_parser {
 				$if = $this->pushSpecialBlock("if");
 				$if->cond = $cond;
 				$if->cases = array();
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
+			if (($this->literal("@debug") || $this->literal("@warn")) &&
+				$this->valueList($value) &&
+				$this->end()) {
+				$this->append(array("debug", $value, $s));
 				return true;
 			} else {
 				$this->seek($s);
@@ -1089,8 +1102,7 @@ class scss_parser {
 	protected function throwParseError($msg = "parse error", $count = null) {
 		$count = is_null($count) ? $this->count : $count;
 
-		$line = $this->line +
-			substr_count(substr($this->buffer, 0, $count), "\n");
+		$line = $this->getLineNo($count);
 
 		if (!empty($this->sourceName)) {
 			$loc = "$this->sourceName on line $line";
@@ -1103,6 +1115,10 @@ class scss_parser {
 		} else {
 			throw new exception("$msg: $loc");
 		}
+	}
+
+	public function getLineNo($pos) {
+		return 1 + substr_count(substr($this->buffer, 0, $pos), "\n");
 	}
 
 	// try to match something on head of buffer
