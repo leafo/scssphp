@@ -181,6 +181,10 @@ class scssc {
 			$value = $this->compileValue($value);
 			fwrite(STDERR, "Line $line DEBUG: $value\n");
 			break;
+		case "media":
+			list(,$media) = $child;
+			print_r($media);
+			break;
 		default:
 			throw new exception("unknown child type: $child[0]");
 		}
@@ -540,6 +544,15 @@ class scss_parser {
 
 		// the directives
 		if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == "@") {
+
+			if ($this->literal("@media") && $this->mediaQuery($mediaQuery) && $this->literal("{")) {
+				$media = $this->pushSpecialBlock("media");
+				list($media->media_type, $media->expressions) = $mediaQuery;
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
 			if ($this->literal("@mixin") &&
 				$this->keyword($mixinName) &&
 				($this->argumentDef($args) || true) &&
@@ -797,13 +810,50 @@ class scss_parser {
 
 	// high level parsers (they return parts of ast)
 
-	protected function valueList(&$out) {
-		if ($this->genericList($list, "commaList")) {
-			$out = $list;
+	protected function mediaQueryList(&$out) {
+		return $this->genericList($out, "mediaQuery");
+	}
+
+	protected function mediaQuery(&$out) {
+		$s = $this->seek();
+
+		$mediaType = null;
+		$expressions = null;
+
+		if (($this->literal("only") || $this->literal("not") || true) && $this->keyword($mediaType)) {
+			// ~
+		} else {
+			$this->seek($s);
+		}
+
+		if (!empty($mediaType) && !$this->literal("and")) {
+			// ~
+		} else {
+			$this->genericList($expressions, "mediaExpression", "and");
+		}
+
+		$out = array($mediaType, $expressions);
+		return true;
+	}
+
+	protected function mediaExpression(&$out) {
+		$s = $this->seek();
+		$value = null;
+		if ($this->literal("(") &&
+			$this->keyword($feature) &&
+			($this->literal(":") && $this->expression($value) || true) &&
+			$this->literal(")"))
+		{
+			$out = array($feature, $value);
 			return true;
 		}
 
+		$this->seek($s);
 		return false;
+	}
+
+	protected function valueList(&$out) {
+		return $this->genericList($out, "commaList");
 	}
 
 	protected function commaList(&$out) {
