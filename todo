@@ -1,7 +1,5 @@
 
-property blocks, font: { -size: 10px; }
 comments
-@for
 @media
 !default
 @import

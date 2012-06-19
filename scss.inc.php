@@ -143,6 +143,17 @@ class scssc {
 			}
 
 			break;
+		case "nestedprop":
+			list(,$prop) = $child;
+			$prefixed = array();
+			foreach ($prop->children as $child) {
+				if ($child[0] == "assign") {
+					$child[1] = $prop->prefix . "-" . $child[1];
+				}
+				$prefixed[] = $child;
+			}
+			$this->compileChildren($prefixed, $lines, $children);
+			break;
 		case "include": // including a mixin
 			list(,$name, $argValues) = $child;
 			$mixin = $this->get(self::$namespaces["mixin"] . $name);
@@ -638,9 +649,46 @@ class scss_parser {
 			}
 		}
 
-		// assign
-		if ($this->assign($assign) && $this->end()) {
-			$this->append($assign);
+		// the property assign and property block
+		if ($this->keyword($name) && $this->literal(":")) {
+			$foundSomething = false;
+			// look for value
+			if ($this->valueList($value)) {
+				$foundSomething = true;
+				$this->append(array("assign", $name, $value));
+			}
+
+			// look for nested property block
+			if ($this->literal("{")) {
+				$foundSomething = true;
+				$propBlock = $this->pushSpecialBlock("nestedprop");
+				$propBlock->prefix = $name;
+			} elseif ($foundSomething) {
+				$foundSomething = $this->end();
+			}
+
+			if ($foundSomething) {
+				return true;
+			}
+		} else {
+			$this->seek($s);
+		}
+
+		// variable assign
+		if ($this->variable($name) &&
+			$this->literal(":") &&
+			$this->valueList($value) &&
+			$this->end())
+		{
+			$this->append(array("assign", $name, $value));
+			return true;
+		} else {
+			$this->seek($s);
+		}
+
+		// opening a property block
+		if ($this->keyword($prefix) && $this->literal(":") && $this->literal("{")) {
+			$this->pushSpecialBlock("property");
 			return true;
 		} else {
 			$this->seek($s);
@@ -725,19 +773,6 @@ class scss_parser {
 	}
 
 	// high level parsers (they return parts of ast)
-
-	protected function assign(&$out) {
-		$s = $this->seek();
-		if (($this->keyword($name) || $this->variable($name)) &&
-			$this->literal(":") && $this->valueList($value))
-		{
-			$out = array("assign", $name, $value);
-			return true;
-		}
-
-		$this->seek($s);
-		return false;
-	}
 
 	protected function valueList(&$out) {
 		if ($this->genericList($list, "commaList")) {
