@@ -53,8 +53,13 @@ class scssc {
 
 		$this->indentLevel -= $idelta;
 
-		$selectors = $this->multiplySelectors();
+		if (isset($block->type) && $block->type == "media") {
+			$selectors = array($this->compileMediaQuery($this->multiplyMedia($this->env)));
+		} else {
+			$selectors = $this->multiplySelectors($this->env);
+		}
 		$this->popEnv();
+
 		return $this->formatter->block($selectors, false,
 			$lines, $children, $this->indentLevel);
 	}
@@ -67,9 +72,34 @@ class scssc {
 		}
 	}
 
+	protected function compileMediaQuery($query) {
+		$parts = array();
+		foreach ($query as $q) {
+			switch ($q[0]) {
+			case "mediaType":
+				$parts[] = implode(" ", array_slice($q, 1));
+				break;
+			case "mediaExp":
+				if (isset($q[2])) {
+					$parts[] = "($q[1]: " . $this->compileValue($q[2]) . ")";
+				} else {
+					$parts[] = "($q[1])";
+				}
+				break;
+			}
+		}
+
+		$out = "@media";
+		if (!empty($parts)) {
+			$out = $out . " " . implode(" and ", $parts);
+		}
+		return $out;
+	}
+
 	// return a value to halt execution
 	protected function compileChild($child, &$lines, &$children) {
 		switch ($child[0]) {
+		case "media":
 		case "block":
 			$children[] = $this->compileBlock($child[1]);
 			break;
@@ -180,10 +210,6 @@ class scssc {
 			$line = $this->parser->getLineNo($pos);
 			$value = $this->compileValue($value);
 			fwrite(STDERR, "Line $line DEBUG: $value\n");
-			break;
-		case "media":
-			list(,$media) = $child;
-			print_r($media);
 			break;
 		default:
 			throw new exception("unknown child type: $child[0]");
@@ -391,10 +417,10 @@ class scssc {
 	}
 
 	// find the final set of selectors
-	protected function multiplySelectors($env = null, $childSelectors = null) {
-		if (is_null($env)) $env = $this->env;
-		if (empty($env->block)) {
-			// no block, just a scope, skip it
+	protected function multiplySelectors($env, $childSelectors = null) {
+		if (is_null($env)) return $childSelectors;
+
+		if (empty($env->block) || empty($env->block->selectors)) {
 			return $this->multiplySelectors($env->parent, $childSelectors);
 		}
 
@@ -411,11 +437,24 @@ class scssc {
 			}
 		}
 
-		if (!empty($env->parent->parent)) { // non root environment
-			return $this->multiplySelectors($env->parent, $selectors);
-		} else {
-			return $selectors;
+		return $this->multiplySelectors($env->parent, $selectors);
+	}
+
+	protected function multiplyMedia($env, $childMedia = null) {
+		if (is_null($env)) return $childMedia;
+
+		if (empty($env->block->type) || $env->block->type != "media") {
+			return $this->multiplyMedia($env->parent, $childMedia);
 		}
+
+		$query = $env->block->query;
+		if ($childMedia == null) {
+			$childMedia = $query;
+		} else {
+			$childMedia = array_merge($query, $childMedia);
+		}
+
+		return $this->multiplyMedia($env->parent, $childMedia);
 	}
 
 	// convert something to list
@@ -544,10 +583,9 @@ class scss_parser {
 
 		// the directives
 		if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == "@") {
-
 			if ($this->literal("@media") && $this->mediaQuery($mediaQuery) && $this->literal("{")) {
 				$media = $this->pushSpecialBlock("media");
-				list($media->media_type, $media->expressions) = $mediaQuery;
+				$media->query = $mediaQuery;
 				return true;
 			} else {
 				$this->seek($s);
@@ -817,22 +855,28 @@ class scss_parser {
 	protected function mediaQuery(&$out) {
 		$s = $this->seek();
 
-		$mediaType = null;
 		$expressions = null;
+		$parts = array();
 
-		if (($this->literal("only") || $this->literal("not") || true) && $this->keyword($mediaType)) {
-			// ~
+		if (($this->literal("only") && ($only = true) || $this->literal("not") && ($not = true) || true) && $this->keyword($mediaType)) {
+			$prop = array("mediaType");
+			if (isset($only)) $prop[] = "only";
+			if (isset($not)) $prop[] = "not";
+			$prop[] = $mediaType;
+			$parts[] = $prop;
 		} else {
 			$this->seek($s);
 		}
 
+
 		if (!empty($mediaType) && !$this->literal("and")) {
 			// ~
 		} else {
-			$this->genericList($expressions, "mediaExpression", "and");
+			$this->genericList($expressions, "mediaExpression", "and", false);
+			if (is_array($expressions)) $parts = array_merge($parts, $expressions[2]);
 		}
 
-		$out = array($mediaType, $expressions);
+		$out = $parts;
 		return true;
 	}
 
@@ -844,7 +888,8 @@ class scss_parser {
 			($this->literal(":") && $this->expression($value) || true) &&
 			$this->literal(")"))
 		{
-			$out = array($feature, $value);
+			$out = array("mediaExp", $feature);
+			if ($value) $out[] = $value;
 			return true;
 		}
 
@@ -860,7 +905,7 @@ class scss_parser {
 		return $this->genericList($out, "expression", ",");
 	}
 
-	protected function genericList(&$out, $parseItem, $delim="") {
+	protected function genericList(&$out, $parseItem, $delim="", $flatten=true) {
 		$s = $this->seek();
 		$items = array();
 		while ($this->$parseItem($value)) {
@@ -875,7 +920,7 @@ class scss_parser {
 			return false;
 		}
 
-		if (count($items) == 1) {
+		if ($flatten && count($items) == 1) {
 			$out = $items[0];
 		} else {
 			$out = array("list", $delim, $items);
