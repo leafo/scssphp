@@ -4,3 +4,16 @@ $color: red, two, three;
 div {
     height: $color;
 }
+
+$a: 1000;
+
+div {
+    $a: 2000 !default;
+    num: $a;
+}
+
+div {
+    $b: 2000 !default;
+    num: $b;
+}
+

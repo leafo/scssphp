@@ -128,8 +128,10 @@ class scssc {
 		case "assign":
 			list(,$name, $value) = $child;
 			if (is_array($name)) {
-				// setting a variable
-				$this->set($name[1], $this->reduce($value));
+				$isDefault = !empty($child[3]);
+				if (!$isDefault || $this->get($name[1], true) === true) {
+					$this->set($name[1], $this->reduce($value));
+				}
 			} else {
 				$out->lines[] = $child[1] . ":" . $this->compileValue($child[2]) . ";";
 			}
@@ -780,7 +782,17 @@ class scss_parser {
 			$this->valueList($value) &&
 			$this->end())
 		{
-			$this->append(array("assign", $name, $value));
+			$defaultVar = false;
+			// check for !default
+			if ($value[0] == "list") {
+				$def = end($value[2]);
+				if ($def[0] == "keyword" && $def[1] == "!default") {
+					array_pop($value[2]);
+					$defaultVar = true;
+				}
+			}
+
+			$this->append(array("assign", $name, $value, $defaultVar));
 			return true;
 		} else {
 			$this->seek($s);
