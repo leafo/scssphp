@@ -118,23 +118,41 @@ class scssc {
 		return $out;
 	}
 
+	// returns true if the value was something that could be imported
+	protected function compileImport($rawPath, $out) {
+		if ($rawPath[0] == "string") {
+			$path = $this->compileStringContent($rawPath);
+			if ($path = $this->findImport($path)) {
+				$this->importFile($path, $out);
+				return true;
+			}
+			return false;
+		} if ($rawPath[0] == "list") {
+			// handle a list of strings
+			if (count($rawPath[2]) == 0) return false;
+			foreach ($rawPath[2] as $path) {
+				if ($path[0] != "string") return false;
+			}
+
+			foreach ($rawPath[2] as $path) {
+				$this->compileImport($path, $out);
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
 	// return a value to halt execution
 	protected function compileChild($child, $out) {
 		switch ($child[0]) {
 		case "import":
 			list(,$rawPath) = $child;
 			$rawPath = $this->reduce($rawPath);
-			if ($rawPath[0] == "string") {
-				$path = $this->compileStringContent($rawPath);
-				if (!preg_match('/\.css|^http:\/\/$/', $path) &&
-					($path = $this->findImport($path)))
-				{
-					$this->importFile($path, $out);
-					break;
-				}
+			if (!$this->compileImport($rawPath, $out)) {
+				$out->lines[] = "@import " . $this->compileValue($rawPath) . ";";
 			}
-
-			$out->lines[] = "@import " . $this->compileValue($rawPath) . ";";
 			break;
 		case "media":
 			$this->compileMedia($child[1]);
@@ -571,6 +589,8 @@ class scssc {
 
 	// results the file path for an import url if it exists
 	protected function findImport($url) {
+		if (preg_match('/\.css|^http:\/\/$/', $url)) return null;
+
 		foreach ((array)$this->importPaths as $dir) {
 			$full = $dir .
 				(!empty($dir) && substr($dir, -1) != '/' ? '/' : '') .

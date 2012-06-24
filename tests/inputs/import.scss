@@ -11,3 +11,7 @@ pre {
     @import "imports/simple.scss";
 }
 
+code {
+    @import "imports/simple", "imports/simple";
+}
+
