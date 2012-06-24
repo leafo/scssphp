@@ -1,0 +1,13 @@
+
+@import "foo.css";
+@import "foo" screen;
+@import "http://foo.com/bar";
+@import url(foo);
+
+@import "imports/simple";
+
+pre {
+    color: red;
+    @import "imports/simple.scss";
+}
+

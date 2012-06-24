@@ -18,6 +18,7 @@ class InputTest extends PHPUnit_Framework_TestCase {
 
 	public function setUp() {
 		$this->scss = new scssc();
+		$this->scss->addImportPath(__DIR__ . "/" . self::$inputDir);
 	}
 
 	/**
@@ -54,7 +55,7 @@ class InputTest extends PHPUnit_Framework_TestCase {
 
 	static public function findInputNames($pattern="*") {
 		$files = glob(__DIR__ . "/" . self::$inputDir . "/" . $pattern);
-		return $files;
+		return array_filter($files, "is_file");
 	}
 
 	static public function outputNameFor($input) {

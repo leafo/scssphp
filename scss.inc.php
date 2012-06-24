@@ -28,6 +28,8 @@ class scssc {
 
 	static protected $defaultValue = array("keyword", "");
 
+	protected $importPaths = array("");
+
 	function compile($code, $name=null) {
 		$this->indentLevel = -1;
 		$this->commentsSeen = array();
@@ -119,6 +121,21 @@ class scssc {
 	// return a value to halt execution
 	protected function compileChild($child, $out) {
 		switch ($child[0]) {
+		case "import":
+			list(,$rawPath) = $child;
+			$rawPath = $this->reduce($rawPath);
+			if ($rawPath[0] == "string") {
+				$path = $this->compileStringContent($rawPath);
+				if (!preg_match('/\.css|^http:\/\/$/', $path) &&
+					($path = $this->findImport($path)))
+				{
+					$this->importFile($path, $out);
+					break;
+				}
+			}
+
+			$out->lines[] = "@import " . $this->compileValue($rawPath) . ";";
+			break;
 		case "media":
 			$this->compileMedia($child[1]);
 			break;
@@ -536,6 +553,42 @@ class scssc {
 		$this->env = $this->env->parent;
 		return $env;
 	}
+
+	public function addImportPath($path) {
+		$this->importPaths[] = $path;
+	}
+
+	protected function importFile($path, $out) {
+		$code = file_get_contents($path);
+		$parser = new scss_parser($path);
+		$tree = $parser->parse($code);
+
+		$pi = pathinfo($path);
+		array_unshift($this->importPaths, $pi['dirname']);
+		$this->compileChildren($tree->children, $out);
+		array_shift($this->importPaths);
+	}
+
+	// results the file path for an import url if it exists
+	protected function findImport($url) {
+		foreach ((array)$this->importPaths as $dir) {
+			$full = $dir .
+				(!empty($dir) && substr($dir, -1) != '/' ? '/' : '') .
+				$url;
+
+			if ($this->fileExists($file = $full.'.scss') ||
+				$this->fileExists($file = $full))
+			{
+				return $file;
+			}
+		}
+
+		return null;
+	}
+
+	protected function fileExists($name) {
+		return is_file($name);
+	}
 }
 
 
@@ -642,6 +695,16 @@ class scss_parser {
 				$this->append(array("include",
 					$mixinName,
 					isset($argValues) ? $argValues : null));
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
+			if ($this->literal("@import") &&
+				$this->valueList($importPath) &&
+				$this->end())
+			{
+				$this->append(array("import", $importPath));
 				return true;
 			} else {
 				$this->seek($s);
