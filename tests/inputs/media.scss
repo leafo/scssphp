@@ -1,8 +1,36 @@
 
-@media { }
-@media what {}
+// media syntax
+@media {
+    div { color: blue; }
+}
+@media what {
+    div { color: blue; }
+}
 
-@media (cool) {}
-@media (cool: blue) {}
+@media (cool) {
+    div { color: blue; }
+}
+@media (cool: blue) {
+    div { color: blue; }
+}
 
-@media hello and (world) and (butt: man) { }
+@media hello and (world) and (butt: man) {
+    div { color: blue; }
+}
+
+// media bubbling
+@media not hello and (world) {
+   color: blue;
+   pre {
+       color: blue;
+   }
+
+   @media butt {
+       color: red;
+       div {
+           color: red;
+       }
+   }
+}
+
+

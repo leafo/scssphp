@@ -34,40 +34,60 @@ class scssc {
 
 		$this->parser = new scss_parser($name);
 		$tree = $this->parser->parse($code);
-		$this->formatter = new scss_formatter();
+		$formatter = new scss_formatter();
 
 		$this->env = null;
-		// print_r($tree);
-		return $this->compileBlock($tree);
+		$scope = $this->compileRoot($tree);
+
+		ob_start();
+		$formatter->block($scope);
+		return ob_get_clean();
+	}
+
+	protected function makeOutputBlock($selectors = null) {
+		$out = new stdclass;
+		$out->lines = array();
+		$out->children = array();
+		$out->selectors = $selectors;
+
+		return $out;
+	}
+
+	protected function compileRoot($rootBlock) {
+		$this->pushEnv($rootBlock);
+		$this->topScope = $this->scope = $this->makeOutputBlock();
+		$this->compileChildren($rootBlock->children, $this->scope);
+		$this->popEnv();
+		return $this->topScope;
+	}
+
+	protected function compileMedia($media) {
+		$this->pushEnv($media);
+		$oldScope = $this->scope;
+		$this->scope = $this->makeOutputBlock(array(
+			$this->compileMediaQuery($this->multiplyMedia($this->env))
+		));
+		$this->topScope->children[] = $this->scope;
+		$this->compileChildren($media->children, $this->scope);
+
+		$this->scope = $oldScope;
+		$this->popEnv();
 	}
 
 	protected function compileBlock($block) {
 		$this->pushEnv($block);
-		$idelta = $this->formatter->indentAmount($block);
-		$this->indentLevel += $idelta;
 
-		$lines = array();
-		$children = array();
-		// TODO children has two meanings here
-		$this->compileChildren($block->children, $lines, $children);
+		$out = $this->makeOutputBlock($this->multiplySelectors($this->env));
+		$this->scope->children[] = $out;
+		$this->compileChildren($block->children, $out);
 
-		$this->indentLevel -= $idelta;
-
-		if (isset($block->type) && $block->type == "media") {
-			$selectors = array($this->compileMediaQuery($this->multiplyMedia($this->env)));
-		} else {
-			$selectors = $this->multiplySelectors($this->env);
-		}
 		$this->popEnv();
-
-		return $this->formatter->block($selectors, false,
-			$lines, $children, $this->indentLevel);
 	}
 
 	// should really be "executeChildren"
-	protected function compileChildren($stms, &$lines, &$children) {
+	protected function compileChildren($stms, $out) {
 		foreach ($stms as $stm) {
-			$ret = $this->compileChild($stm, $lines, $children);
+			$ret = $this->compileChild($stm, $out);
 			if (!is_null($ret)) return $ret;
 		}
 	}
@@ -97,11 +117,13 @@ class scssc {
 	}
 
 	// return a value to halt execution
-	protected function compileChild($child, &$lines, &$children) {
+	protected function compileChild($child, $out) {
 		switch ($child[0]) {
 		case "media":
+			$this->compileMedia($child[1]);
+			break;
 		case "block":
-			$children[] = $this->compileBlock($child[1]);
+			$this->compileBlock($child[1]);
 			break;
 		case "assign":
 			list(,$name, $value) = $child;
@@ -109,11 +131,11 @@ class scssc {
 				// setting a variable
 				$this->set($name[1], $this->reduce($value));
 			} else {
-				$lines[] = $child[1] . ":" . $this->compileValue($child[2]) . ";";
+				$out->lines[] = $child[1] . ":" . $this->compileValue($child[2]) . ";";
 			}
 			break;
 		case "comment":
-			$lines[] = $child[1];
+			$out->lines[] = $child[1];
 			break;
 		case "mixin":
 		case "function":
@@ -123,13 +145,13 @@ class scssc {
 		case "if":
 			list(, $if) = $child;
 			if ($this->reduce($if->cond) != self::$false) {
-				return $this->compileChildren($if->children, $lines, $children);
+				return $this->compileChildren($if->children, $out);
 			} else {
 				foreach ($if->cases as $case) {
 					if ($case->type == "else" ||
 						$case->type == "elseif" && ($this->reduce($case->cond) != self::$false))
 					{
-						return $this->compileChildren($case->children, $lines, $children);
+						return $this->compileChildren($case->children, $out);
 					}
 				}
 			}
@@ -143,14 +165,14 @@ class scssc {
 				$this->pushEnv();
 				$this->set($each->var, $item);
 				// TODO: allow return from here
-				$this->compileChildren($each->children, $lines, $children);
+				$this->compileChildren($each->children, $out);
 				$this->popEnv();
 			}
 			break;
 		case "while":
 			list(,$while) = $child;
 			while ($this->reduce($while->cond) != self::$false) {
-				$ret = $this->compileChildren($while->children, $lines, $children);
+				$ret = $this->compileChildren($while->children, $out);
 				if ($ret) return $ret;
 			}
 			break;
@@ -172,7 +194,7 @@ class scssc {
 				$this->set($for->var, array("number", $start, ""));
 				$start += $d;
 
-				$ret = $this->compileChildren($for->children, $lines, $children);
+				$ret = $this->compileChildren($for->children, $out);
 				if ($ret) return $ret;
 			}
 
@@ -186,7 +208,7 @@ class scssc {
 				}
 				$prefixed[] = $child;
 			}
-			$this->compileChildren($prefixed, $lines, $children);
+			$this->compileChildren($prefixed, $out);
 			break;
 		case "include": // including a mixin
 			list(,$name, $argValues) = $child;
@@ -199,7 +221,7 @@ class scssc {
 			}
 
 			foreach ($mixin->children as $child) {
-				$this->compileChild($child, $lines, $children);
+				$this->compileChild($child, $out);
 			}
 
 			$this->popEnv();
@@ -574,6 +596,10 @@ class scss_parser {
 		if ($this->count != strlen($this->buffer))
 			$this->throwParseError();
 
+		if (!empty($this->env->parent)) {
+			$this->throwParseError("unclosed block");
+		}
+
 		$this->env->isRoot = true;
 		return $this->env;
 	}
@@ -825,7 +851,7 @@ class scss_parser {
 	}
 
 	protected function popBlock() {
-		if (is_null($this->env->parent)) {
+		if (empty($this->env->parent)) {
 			$this->throwParseError("unexpected }");
 		}
 
@@ -1274,66 +1300,52 @@ class scss_formatter {
 	public $openSingle = " { ";
 	public $closeSingle = " }";
 
-	// returns the amount of indent that should happen for a block
-	function indentAmount($block) {
-		return isset($block->isRoot) || !empty($block->no_multiply) ? 1 : 0;
+	public function __construct() {
+		$this->indentLevel = 0;
 	}
 
-	// an $indentLevel of -1 signifies the root level
-	function block($tags, $wrapChildren, $lines, $children, $indentLevel) {
-		$indent = str_repeat($this->indentChar, max($indentLevel, 0));
+	public function block($block) {
+		if (empty($block->lines) && empty($block->children)) return;
 
-		// what $lines is imploded by
-		$nl = $indentLevel == -1 ? $this->break :
-			$this->break.$indent.$this->indentChar;
+		$isSingle = false;
+		if (!empty($block->selectors)) {
+			$preIndent = str_repeat($this->indentChar, $this->indentLevel);
+			echo $preIndent .
+				implode($this->tagSeparator, $block->selectors);
 
-		ob_start();
-
-		$isSingle = !$this->disableSingle && !$wrapChildren
-			&& count($lines) <= 1;
-
-		$showDelim = !empty($tags) && (count($lines) > 0 || $wrapChildren);
-
-		if ($showDelim) {
-			if (is_array($tags)) {
-				$tags = implode($this->tagSeparator, $tags);
+			// check for single mode
+			if (count($block->lines) == 1 && empty($block->children)) {
+				echo $this->openSingle;
+				$isSingle = true;
+			} else {
+				echo $this->open . $this->break;
 			}
 
-			echo $indent.$tags;
-			if ($isSingle) echo $this->openSingle;
-			else {
-				echo $this->open;
-				if (!empty($lines)) echo $nl;
-				else echo $this->break;
-			}
+			$this->indentLevel++;
 		}
 
-		echo implode($nl, $lines);
+		$indent = str_repeat($this->indentChar, $this->indentLevel);
 
-		if ($wrapChildren) {
-			if (!empty($lines)) echo $this->break;
-			foreach ($children as $child) echo $child;
+		if ($isSingle) {
+			echo $block->lines[0];
+		} elseif (count($block->lines) > 0) {
+			echo $indent . implode("\n$indent", $block->lines) . $this->break;
 		}
 
-		if ($showDelim) {
-			if ($isSingle) echo $this->closeSingle;
-			else {
-				if (!$wrapChildren) echo $this->break;
-				echo $indent.$this->close;
+		foreach ($block->children as $child) {
+			$this->block($child);
+		}
+
+		if (!empty($block->selectors)) {
+			$this->indentLevel--;
+			if ($isSingle) {
+				echo $this->closeSingle;
+			} else {
+				echo $preIndent . $this->close;
 			}
-			echo $this->break;
-		} elseif (!empty($lines)) {
+
 			echo $this->break;
 		}
-
-		if (!$wrapChildren)
-			foreach ($children as $child) echo $child;
-
-		return ob_get_clean();
-	}
-
-	function property($name, $values) {
-		return "";
 	}
 }
 
