@@ -1,5 +1,8 @@
 
-selector parsing
+Multiple extends can also be written using a comma-separated list of selectors.
+For example, @extend .error, .attention is the same as @extend .error;
+@extend.attention.
+
 & (parent selector)
 #{interpolation} in selectors, property names
 

@@ -37,6 +37,7 @@ class scssc {
 
 		$this->parser = new scss_parser($name);
 		$tree = $this->parser->parse($code);
+
 		$formatter = new scss_formatter();
 
 		$this->env = null;
@@ -99,16 +100,35 @@ class scssc {
 	}
 
 	protected function compileBlock($block) {
-		$this->pushEnv($block);
+		$env = $this->pushEnv($block);
 
-		$out = $this->makeOutputBlock($this->multiplySelectors($this->env));
+		$env->selectors =
+			array_map(array($this, "compileSelector"), $block->selectors);
+
+		$out = $this->makeOutputBlock($this->multiplySelectors($env));
 		$this->scope->children[] = $out;
 		$this->compileChildren($block->children, $out);
 
 		$this->popEnv();
 	}
 
-	// should really be "executeChildren"
+	protected function compileSelector($selector) {
+		$parts = array();
+		foreach ($selector as $sel) {
+			if (is_string($sel)) {
+				$parts[] = $sel;
+			} else {
+				switch ($sel[0]) {
+					case "self":
+						break;
+					default:
+						$parts[] = $this->compileValue($sel);
+				}
+			}
+		}
+		return implode($parts);
+	}
+
 	protected function compileChildren($stms, $out) {
 		foreach ($stms as $stm) {
 			$ret = $this->compileChild($stm, $out);
@@ -204,7 +224,7 @@ class scssc {
 		case "extend":
 			// TODO need to eval the selector
 			list(, $selector) = $child;
-			$this->extends[$selector] = $out->selectors;
+			$this->extends[$this->compileSelector($selector)] = $out->selectors;
 			break;
 		case "if":
 			list(, $if) = $child;
@@ -506,17 +526,15 @@ class scssc {
 	protected function multiplySelectors($env, $childSelectors = null) {
 		if (is_null($env)) return $childSelectors;
 
-		if (empty($env->block) || empty($env->block->selectors)) {
+		if (empty($env->selectors)) {
 			return $this->multiplySelectors($env->parent, $childSelectors);
 		}
 
-		$block = $env->block;
-
 		if (is_null($childSelectors)) {
-			$selectors = $block->selectors;
+			$selectors = $env->selectors;
 		} else {
 			$selectors = array();
-			foreach ($block->selectors as $parent) {
+			foreach ($env->selectors as $parent) {
 				foreach ($childSelectors as $child) {
 					$selectors[] = $parent . " " . $child;
 				}
@@ -871,8 +889,8 @@ class scss_parser {
 			}
 		}
 
-		// the property assign and property block
-		if ($this->keyword($name) && $this->literal(":")) {
+		// nested property assign (or normal assign)
+		if ($this->keyword($name) && $this->literal(": ")) {
 			$foundSomething = false;
 			// look for value
 			if ($this->valueList($value)) {
@@ -892,35 +910,6 @@ class scss_parser {
 			if ($foundSomething) {
 				return true;
 			}
-		} else {
-			$this->seek($s);
-		}
-
-		// variable assign
-		if ($this->variable($name) &&
-			$this->literal(":") &&
-			$this->valueList($value) &&
-			$this->end())
-		{
-			$defaultVar = false;
-			// check for !default
-			if ($value[0] == "list") {
-				$def = end($value[2]);
-				if ($def[0] == "keyword" && $def[1] == "!default") {
-					array_pop($value[2]);
-					$defaultVar = true;
-				}
-			}
-
-			$this->append(array("assign", $name, $value, $defaultVar));
-			return true;
-		} else {
-			$this->seek($s);
-		}
-
-		// opening a property block
-		if ($this->keyword($prefix) && $this->literal(":") && $this->literal("{")) {
-			$this->pushSpecialBlock("property");
 			return true;
 		} else {
 			$this->seek($s);
@@ -929,6 +918,43 @@ class scss_parser {
 		// opening css block
 		if ($this->selectors($selectors) && $this->literal("{")) {
 			$this->pushBlock($selectors);
+			return true;
+		} else {
+			$this->seek($s);
+		}
+
+		// all other types of assign (including variable)
+		if (($this->variable($name) || $this->keyword($name)) &&
+			$this->literal(":") &&
+			$this->valueList($value) &&
+			$this->end())
+		{
+			$assign = array("assign", $name);
+			if ($name[0] == "var") {
+				$defaultVar = false;
+				// check for !default
+				if ($value[0] == "list") {
+					$def = end($value[2]);
+					if ($def[0] == "keyword" && $def[1] == "!default") {
+						array_pop($value[2]);
+						$defaultVar = true;
+					}
+				}
+				$assign[] = $value;
+				$assign[] = $defaultVar;
+			} else {
+				$assign[] = $value;
+			}
+
+			$this->append($assign);
+			return true;
+		} else {
+			$this->seek($s);
+		}
+
+		// opening a property block
+		if ($this->keyword($prefix) && $this->literal(":") && $this->literal("{")) {
+			$this->pushSpecialBlock("property");
 			return true;
 		} else {
 			$this->seek($s);
@@ -1305,7 +1331,48 @@ class scss_parser {
 	}
 
 	public function selector(&$out) {
-		return $this->keyword($out);
+		// string
+		// interpolation
+		// &
+		// not {},:;
+
+		$s = $this->seek();
+		$selector = array();
+		while (true) {
+			if ($this->string($str)) {
+				// TODO this is stealing whitespace
+				$selector[] = $str;
+				continue;
+			}
+
+			if ($this->literal("&", false)) {
+				$selector[] = array("self");
+				continue;
+			}
+
+			if ($this->interpolation($interpolate)) {
+				$selector[] = $interpolate;
+				continue;
+			}
+
+			$s = $this->seek();
+			if ($this->match('[^{},;\s&"\']+', $m)) {
+				$selector[] = $m[0];
+				// whitespace?
+				if (preg_match('/\s/', $this->buffer[$this->seek() - 1])) {
+					$selector[] = " ";
+				}
+				continue;
+			}
+
+			break;
+		}
+
+		// trim extra whitespace from last string
+		if (end($selector) == " ") array_pop($selector);
+
+		$out = $selector;
+		return count($out) > 0;
 	}
 
 	protected function variable(&$out) {
