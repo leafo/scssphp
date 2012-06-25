@@ -1,0 +1,20 @@
+
+error, other {
+  border: 1px #f00;
+  background-color: #fdd;
+}
+
+pre, span {
+    seriousError {
+        @extend error;
+        font-size: 20px;
+    }
+}
+
+hello {
+    @extend other;
+    color: green;
+    div {
+        margin: 10px;
+    }
+}

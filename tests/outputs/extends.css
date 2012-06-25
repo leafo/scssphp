@@ -1,0 +1,7 @@
+error, pre seriousError, span seriousError, other, hello {
+  border:1px #f00;
+  background-color:#fdd;
+}
+pre seriousError, span seriousError { font-size:20px; }
+hello { color:green; }
+hello div { margin:10px; }

@@ -33,6 +33,7 @@ class scssc {
 	function compile($code, $name=null) {
 		$this->indentLevel = -1;
 		$this->commentsSeen = array();
+		$this->extends = array();
 
 		$this->parser = new scss_parser($name);
 		$tree = $this->parser->parse($code);
@@ -40,6 +41,7 @@ class scssc {
 
 		$this->env = null;
 		$scope = $this->compileRoot($tree);
+		$this->applyExtends($scope);
 
 		ob_start();
 		$formatter->block($scope);
@@ -53,6 +55,26 @@ class scssc {
 		$out->selectors = $selectors;
 
 		return $out;
+	}
+
+	protected function applyExtends($block) {
+		if ($block->selectors) {
+			$selectors = array();
+			foreach ($block->selectors as $s) {
+				$selectors[] = $s;
+				if (isset($this->extends[$s])) {
+					foreach ($this->extends[$s] as $extended) {
+						$selectors[] = $extended;
+					}
+				}
+			}
+
+			$block->selectors = $selectors;
+		}
+
+		foreach ($block->children as $child) {
+			$this->applyExtends($child);
+		}
 	}
 
 	protected function compileRoot($rootBlock) {
@@ -178,6 +200,11 @@ class scssc {
 		case "function":
 			list(,$block) = $child;
 			$this->set(self::$namespaces[$block->type] . $block->name, $block);
+			break;
+		case "extend":
+			// TODO need to eval the selector
+			list(, $selector) = $child;
+			$this->extends[$selector] = $out->selectors;
 			break;
 		case "if":
 			list(, $if) = $child;
@@ -725,6 +752,16 @@ class scss_parser {
 				$this->end())
 			{
 				$this->append(array("import", $importPath));
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
+			if ($this->literal("@extend") &&
+				$this->selector($selector) &&
+				$this->end())
+			{
+				$this->append(array("extend", $selector));
 				return true;
 			} else {
 				$this->seek($s);

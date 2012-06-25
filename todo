@@ -1,6 +1,4 @@
 
-@extend
-
 selector parsing
 & (parent selector)
 #{interpolation} in selectors, property names
