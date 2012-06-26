@@ -112,6 +112,19 @@ class scssc {
 		$this->popEnv();
 	}
 
+	protected function compilePropertyName($prop) {
+		list(, $parts) = $prop;
+		if (is_array($parts)) {
+			foreach ($parts as &$part) {
+				if (!is_string($part)) {
+					$part = $this->compileValue($part);
+				}
+			}
+			$parts = implode($parts);
+		}
+		return $parts;
+	}
+
 	protected function compileSelector($selector) {
 		$parts = array();
 		$hasSelf = false;
@@ -211,13 +224,18 @@ class scssc {
 			break;
 		case "assign":
 			list(,$name, $value) = $child;
-			if (is_array($name)) {
+			switch ($name[0]) {
+			case "var":
 				$isDefault = !empty($child[3]);
 				if (!$isDefault || $this->get($name[1], true) === true) {
 					$this->set($name[1], $this->reduce($value));
 				}
-			} else {
-				$out->lines[] = $child[1] . ":" . $this->compileValue($child[2]) . ";";
+				break;
+			case "property":
+				$out->lines[] =
+					$this->compilePropertyName($child[1]) . ":" .
+					$this->compileValue($child[2]) . ";";
+				break;
 			}
 			break;
 		case "comment":
@@ -293,9 +311,14 @@ class scssc {
 		case "nestedprop":
 			list(,$prop) = $child;
 			$prefixed = array();
+			$prefix = $this->compilePropertyName($prop->prefix);
 			foreach ($prop->children as $child) {
 				if ($child[0] == "assign") {
-					$child[1] = $prop->prefix . "-" . $child[1];
+					// replace assign name with merged one
+					$child[1] = array(
+						"property",
+						$prefix . "-" . $this->compilePropertyName($child[1])
+					);
 				}
 				$prefixed[] = $child;
 			}
@@ -923,7 +946,7 @@ class scss_parser {
 		}
 
 		// nested property assign (or normal assign)
-		if ($this->keyword($name) && $this->literal(": ")) {
+		if ($this->propertyName($name) && $this->literal(": ")) {
 			$foundSomething = false;
 			// look for value
 			if ($this->valueList($value)) {
@@ -957,7 +980,7 @@ class scss_parser {
 		}
 
 		// all other types of assign (including variable)
-		if (($this->variable($name) || $this->keyword($name)) &&
+		if (($this->variable($name) || $this->propertyName($name)) &&
 			$this->literal(":") &&
 			$this->valueList($value) &&
 			$this->end())
@@ -1345,6 +1368,33 @@ class scss_parser {
 	}
 
 	// low level parsers
+
+	// returns an array of parts or a string
+	protected function propertyName(&$out) {
+		$s = $this->seek();
+
+		$parts = array();
+		$hasInterpolation = false;
+		while (true) {
+			if ($this->interpolation($inter)) {
+				$hasInterpolation = true;
+				$parts[] = $inter;
+			} elseif ($this->keyword($text)) {
+				$parts[] = $text;
+			} else {
+				break;
+			}
+		}
+
+		if (count($parts) == 0) return false;
+		if ($hasInterpolation) {
+			$out = $parts;
+		} else {
+			$out = implode($parts);
+		}
+		$out = array("property", $out);
+		return true;
+	}
 
 	protected function selectors(&$out) {
 		$s = $this->seek();

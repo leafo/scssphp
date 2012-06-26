@@ -21,3 +21,12 @@ cool .thing-2 { color:red; }
 cool .thing-3 { color:red; }
 cool .thing-4 { color:red; }
 cool .thing-5 { color:red; }
+div {
+  hello:world;
+  coolhello:world;
+  helloone:world;
+  twohelloone:world;
+  hello-world:red;
+  hello-mold:white;
+  hello-hello:blue;
+}

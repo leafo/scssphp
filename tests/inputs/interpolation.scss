@@ -45,3 +45,20 @@ cool {
     }
 }
 
+// property interpolation
+
+div {
+    $var: hello;
+    #{$var}: world;
+    cool#{$var}:world;
+    #{$var}one:world;
+    two#{$var}one:world;
+
+    #{hello}: {
+        #{world}: red;
+        #{mold}: white;
+        #{$var}: blue;
+    }
+
+}
+
