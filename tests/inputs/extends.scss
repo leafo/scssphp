@@ -18,3 +18,16 @@ hello {
         margin: 10px;
     }
 }
+
+.cool {
+    color: red;
+}
+
+.blue {
+    color: purple;
+}
+
+.me {
+    @extend .cool, .blue;
+}
+

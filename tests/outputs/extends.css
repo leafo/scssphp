@@ -5,3 +5,5 @@ error, pre seriousError, span seriousError, other, hello {
 pre seriousError, span seriousError { font-size:20px; }
 hello { color:green; }
 hello div { margin:10px; }
+.cool, .me { color:red; }
+.blue, .me { color:purple; }

@@ -1,7 +1,5 @@
 
-Multiple extends can also be written using a comma-separated list of selectors.
-For example, @extend .error, .attention is the same as @extend .error;
-@extend.attention.
+all the @extend special cases
 
 match operator results
 make formatter match scss's output

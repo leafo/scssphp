@@ -247,9 +247,18 @@ class scssc {
 			$this->set(self::$namespaces[$block->type] . $block->name, $block);
 			break;
 		case "extend":
-			// TODO need to eval the selector
-			list(, $selector) = $child;
-			$this->extends[$this->compileSelector($selector)] = $out->selectors;
+			list(, $selectors) = $child;
+			foreach ($selectors as $sel) {
+				$sel = $this->compileSelector($sel);
+				if (isset($this->extends[$sel])) {
+					// append them all
+					foreach ($out->selectors as $current) {
+						$this->extends[$sel][] = $current;
+					}
+				} else {
+					$this->extends[$sel] = $out->selectors;
+				}
+			}
 			break;
 		case "if":
 			list(, $if) = $child;
@@ -832,7 +841,7 @@ class scss_parser {
 			}
 
 			if ($this->literal("@extend") &&
-				$this->selector($selector) &&
+				$this->selectors($selector) &&
 				$this->end())
 			{
 				$this->append(array("extend", $selector));
