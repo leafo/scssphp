@@ -114,19 +114,26 @@ class scssc {
 
 	protected function compileSelector($selector) {
 		$parts = array();
+		$hasSelf = false;
 		foreach ($selector as $sel) {
 			if (is_string($sel)) {
 				$parts[] = $sel;
 			} else {
 				switch ($sel[0]) {
 					case "self":
+						$hasSelf = true;
+						$parts[] = $sel;
 						break;
 					default:
 						$parts[] = $this->compileValue($sel);
 				}
 			}
 		}
-		return implode($parts);
+		if ($hasSelf) {
+			return $parts;
+		} else {
+			return implode($parts);
+		}
 	}
 
 	protected function compileChildren($stms, $out) {
@@ -524,19 +531,45 @@ class scssc {
 
 	// find the final set of selectors
 	protected function multiplySelectors($env, $childSelectors = null) {
-		if (is_null($env)) return $childSelectors;
+		if (is_null($env)) {
+			// flatten the results
+			if (is_array($childSelectors)) {
+				return array_map("implode", $childSelectors);
+			}
+			return $childSelectors;
+		}
 
 		if (empty($env->selectors)) {
 			return $this->multiplySelectors($env->parent, $childSelectors);
 		}
 
 		if (is_null($childSelectors)) {
-			$selectors = $env->selectors;
+			// create initial selector buffers (might already be array from &)
+			$selectors = array();
+			foreach ($env->selectors as $sel) $selectors[] = (array)$sel;
 		} else {
 			$selectors = array();
 			foreach ($env->selectors as $parent) {
 				foreach ($childSelectors as $child) {
-					$selectors[] = $parent . " " . $child;
+					$parent = (array)$parent;
+
+					$setParent = false;
+					$updatedChild = array();
+					foreach ($child as &$part) {
+						if ($part == array("self")) {
+							// push the parent
+							$setParent = true;
+							foreach ($parent as $parentPart) $updatedChild[] = $parentPart;
+						} else {
+							$updatedChild[] = $part;
+						}
+					}
+
+					if ($setParent) {
+						$selectors[] = $updatedChild;
+					} else {
+						$selectors[] = array_merge($parent, array(" "), $child);
+					}
 				}
 			}
 		}
@@ -1342,30 +1375,21 @@ class scss_parser {
 			if ($this->string($str)) {
 				// TODO this is stealing whitespace
 				$selector[] = $str;
-				continue;
-			}
-
-			if ($this->literal("&", false)) {
+			} elseif ($this->literal("&")) {
 				$selector[] = array("self");
-				continue;
-			}
-
-			if ($this->interpolation($interpolate)) {
+			} elseif ($this->interpolation($interpolate)) {
 				$selector[] = $interpolate;
-				continue;
-			}
-
-			$s = $this->seek();
-			if ($this->match('[^{},;\s&"\']+', $m)) {
+			} elseif ($this->match('\s*[^{},;\s&"\']+', $m)) {
 				$selector[] = $m[0];
-				// whitespace?
-				if (preg_match('/\s/', $this->buffer[$this->seek() - 1])) {
-					$selector[] = " ";
-				}
-				continue;
+			} else {
+				break;
 			}
 
-			break;
+			// extra whitespace
+			// TODO this won't work well with comments
+			if (preg_match('/\s/', $this->buffer[$this->seek() - 1])) {
+				$selector[] = " ";
+			}
 		}
 
 		// trim extra whitespace from last string

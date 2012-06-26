@@ -54,5 +54,39 @@ div {
 
 }
 
+// self selector
+
+.something {
+    &.world {
+        color: blue;
+    }
+
+    & .mold {
+        height: 200px;
+    }
+
+    .dog & {
+        color: blue;
+    }
+}
+
+.simple {
+    .dad & .wolf {
+        color: blue;
+    }
+
+    .rad&.bad {
+        color: blue;
+    }
+
+}
+
+div {
+    .something & .what {
+        &.world {
+            color: blue;
+        }
+    }
+}
 
 

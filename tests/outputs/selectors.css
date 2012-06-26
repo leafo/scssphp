@@ -38,3 +38,9 @@ div {
   font-size:30em;
 }
 div font:something { size:30em; }
+.something.world { color:blue; }
+.something .mold { height:200px; }
+.dog .something { color:blue; }
+.dad .simple .wolf { color:blue; }
+.rad.simple.bad { color:blue; }
+.something div .what.world { color:blue; }
