@@ -1377,9 +1377,16 @@ class scss_parser {
 				$selector[] = $str;
 			} elseif ($this->literal("&")) {
 				$selector[] = array("self");
-			} elseif ($this->interpolation($interpolate)) {
-				$selector[] = $interpolate;
-			} elseif ($this->match('\s*[^{},;\s&"\']+', $m)) {
+			} elseif (isset($this->buffer[$this->count]) &&
+				$this->buffer[$this->count] == "#")
+			{
+				if ($this->interpolation($interpolate)) {
+					$selector[] = $interpolate;
+				} else {
+					$this->count++;
+					$selector[] = "#";
+				}
+			} elseif ($this->match('\s*[^{},;\s&#"\']+', $m)) {
 				$selector[] = $m[0];
 			} else {
 				break;

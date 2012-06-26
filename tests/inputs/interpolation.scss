@@ -18,3 +18,30 @@ div {
     hi: "what is #{4 + 12} end"
 }
 
+
+// interpolation in selectors
+
+pre {
+    $var: cool;
+
+    #{var} {
+        color: red;
+    }
+
+    #{var} dad {
+        color: red;
+    }
+
+    bed#{var}dad {
+        color: red;
+    }
+}
+
+cool {
+    @for $x from 1 through 5 {
+        .thing-#{$x} {
+            color: red;
+        }
+    }
+}
+
