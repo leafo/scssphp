@@ -31,3 +31,6 @@ hello {
     @extend .cool, .blue;
 }
 
+.hoverlink { @extend a:hover }
+a:hover { text-decoration: underline }
+

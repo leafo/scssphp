@@ -10,6 +10,10 @@ E[foo^="color: green;"] { color:blue; }
 E[foo$="239023"] { color:blue; }
 E[foo*="29302"] { color:blue; }
 E[foo|="239032"] { color:blue; }
+[foo|att=val] { color:blue; }
+[*|att] { color:yellow; }
+[|att] { color:green; }
+[att] { color:green; }
 E:root { color:blue; }
 E:nth-child(odd) { color:blue; }
 E:nth-child(2n+1) { color:blue; }

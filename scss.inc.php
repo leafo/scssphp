@@ -42,7 +42,7 @@ class scssc {
 
 		$this->env = null;
 		$scope = $this->compileRoot($tree);
-		$this->applyExtends($scope);
+		$this->flattenSelectors($scope);
 
 		ob_start();
 		$formatter->block($scope);
@@ -58,14 +58,15 @@ class scssc {
 		return $out;
 	}
 
-	protected function applyExtends($block) {
+	protected function flattenSelectors($block) {
 		if ($block->selectors) {
 			$selectors = array();
 			foreach ($block->selectors as $s) {
+				$s = $this->compileSelector($s);
 				$selectors[] = $s;
 				if (isset($this->extends[$s])) {
 					foreach ($this->extends[$s] as $extended) {
-						$selectors[] = $extended;
+						$selectors[] = $this->compileSelector($extended);
 					}
 				}
 			}
@@ -74,7 +75,7 @@ class scssc {
 		}
 
 		foreach ($block->children as $child) {
-			$this->applyExtends($child);
+			$this->flattenSelectors($child);
 		}
 	}
 
@@ -103,7 +104,7 @@ class scssc {
 		$env = $this->pushEnv($block);
 
 		$env->selectors =
-			array_map(array($this, "compileSelector"), $block->selectors);
+			array_map(array($this, "evalSelector"), $block->selectors);
 
 		$out = $this->makeOutputBlock($this->multiplySelectors($env));
 		$this->scope->children[] = $out;
@@ -125,27 +126,43 @@ class scssc {
 		return $parts;
 	}
 
-	protected function compileSelector($selector) {
-		$parts = array();
-		$hasSelf = false;
-		foreach ($selector as $sel) {
-			if (is_string($sel)) {
-				$parts[] = $sel;
-			} else {
-				switch ($sel[0]) {
-					case "self":
-						$hasSelf = true;
-						$parts[] = $sel;
-						break;
-					default:
-						$parts[] = $this->compileValue($sel);
-				}
-			}
+	// replaces all the interpolates
+	protected function evalSelector($selector) {
+		return array_map(array($this, "evalSelectorPart"), $selector);
+	}
+
+	protected function evalSelectorPart($part) {
+		if (!is_array($part)) return $part;
+		switch ($part[0]) {
+		case "interpolate":
+			return $this->compileValue($part);
+		case "parens":
+			return array(
+				"parens",
+				$this->evalSelector($part[1])
+			);
 		}
-		if ($hasSelf) {
-			return $parts;
-		} else {
-			return implode($parts);
+
+		return $part;
+	}
+
+	// compiles to string
+	// // self should have been replaced by now
+	protected function compileSelector($selector) {
+		if (!is_array($selector)) return $selector;
+		return implode(array_map(
+			array($this, "compileSelectorPart"), $selector));
+	}
+
+	protected function compileSelectorPart($part) {
+		if (!is_array($part)) return $part;
+		switch ($part[0]) {
+		case "self":
+			return "&";
+		case "parens":
+			return "(".$this->compileSelector($part[1]).")";
+		default:
+			return $this->compileValue($part);
 		}
 	}
 
@@ -564,40 +581,33 @@ class scssc {
 	// find the final set of selectors
 	protected function multiplySelectors($env, $childSelectors = null) {
 		if (is_null($env)) {
-			// flatten the results
-			if (is_array($childSelectors)) {
-				return array_map("implode", $childSelectors);
-			}
 			return $childSelectors;
 		}
 
+		// skip env, has no selectors
 		if (empty($env->selectors)) {
 			return $this->multiplySelectors($env->parent, $childSelectors);
 		}
 
 		if (is_null($childSelectors)) {
-			// create initial selector buffers (might already be array from &)
-			$selectors = array();
-			foreach ($env->selectors as $sel) $selectors[] = (array)$sel;
+			$selectors = $env->selectors;
 		} else {
 			$selectors = array();
 			foreach ($env->selectors as $parent) {
 				foreach ($childSelectors as $child) {
-					$parent = (array)$parent;
-
-					$setParent = false;
+					$haveParent = false;
 					$updatedChild = array();
 					foreach ($child as &$part) {
 						if ($part == array("self")) {
 							// push the parent
-							$setParent = true;
+							$haveParent = true;
 							foreach ($parent as $parentPart) $updatedChild[] = $parentPart;
 						} else {
 							$updatedChild[] = $part;
 						}
 					}
 
-					if ($setParent) {
+					if ($haveParent) {
 						$selectors[] = $updatedChild;
 					} else {
 						$selectors[] = array_merge($parent, array(" "), $child);
@@ -772,6 +782,7 @@ class scss_parser {
 		$this->env = null;
 		$this->inParens = false;
 		$this->pushBlock(null); // root block
+		$this->eatWhiteDefault = true;
 
 		$this->buffer = $this->removeComments($buffer);
 
@@ -1423,46 +1434,157 @@ class scss_parser {
 	}
 
 	public function selector(&$out) {
-		// string
-		// interpolation
-		// &
-		// not {},:;
+		$oldWhite = $this->eatWhiteDefault;
+		$this->eatWhiteDefault = false;
 
 		$s = $this->seek();
 		$selector = array();
 		while (true) {
-			if ($this->string($str)) {
-				// TODO this is stealing whitespace
-				$selector[] = $str;
-			} elseif ($this->literal("&")) {
-				$selector[] = array("self");
-			} elseif (isset($this->buffer[$this->count]) &&
-				$this->buffer[$this->count] == "#")
-			{
-				if ($this->interpolation($interpolate)) {
-					$selector[] = $interpolate;
-				} else {
-					$this->count++;
-					$selector[] = "#";
-				}
-			} elseif ($this->match('\s*[^{},;\s&#"\']+', $m)) {
-				$selector[] = $m[0];
-			} else {
+			// see if we can break out early, a little faster
+			if ($this->match('\s*{', $m)) {
+				$this->count--;
 				break;
 			}
 
-			// extra whitespace
-			// TODO this won't work well with comments
-			if (preg_match('/\s/', $this->buffer[$this->seek() - 1])) {
-				$selector[] = " ";
+			$s = $this->seek();
+			if ($this->string($str)) {
+				$selector[] = $str;
+				continue;
 			}
+
+			// self
+			if ($this->literal("&", false)) {
+				$selector[] = array("self");
+				continue;
+			}
+
+			// *
+			if ($this->literal("*", false)) {
+				$selector[] = "*";
+				continue;
+			}
+
+			// tag
+			if ($this->keyword($tag)) {
+				$selector[] = $tag;
+				continue;
+			}
+
+			// class
+			if ($this->literal(".", false) && $this->keyword($cls)) {
+				$selector[] = ".$cls"; continue;
+			} else {
+				$this->seek($s);
+			}
+
+			// id
+			if ($this->literal("#", false) && $this->keyword($cls)) {
+				$selector[] = "#$cls";
+				continue;
+			} else {
+				$this->seek($s);
+			}
+
+			// a pseudo selector
+			if ($this->match("::?", $m) && $this->keyword($name)) {
+				$selector[] = $m[0] . $name;
+				continue;
+			} else {
+				$this->seek($s);
+			}
+
+			// interpolation
+
+			if ($this->interpolation($inter)) {
+				$selector[] = $inter;
+				continue;
+			}
+
+			// parens
+			if ($this->literal("(", false) && ($this->selector($inner) || true) && $this->literal(")", false)) {
+				$selector[] = array("parens", $inner);
+				continue;
+			} else {
+				$this->seek($s);
+			}
+
+			// attribute selector
+			if ($this->literal("[", false)) {
+				$attrParts = array("[");
+				// keyword, string, operator
+				while (true) {
+					if ($this->literal("]", false)) { 
+						$this->count--;
+						break; // get out early
+					}
+
+					if ($this->match('\s+', $m)) {
+						$attrParts[] = " ";
+						continue;
+					}
+					if ($this->string($str)) {
+						$attrParts[] = $str;
+						continue;
+					}
+
+					if ($this->keyword($word)) {
+						$attrParts[] = $word;
+						continue;
+					}
+
+					// operator, handles attr namespace too
+					if ($this->match('[|-~\$\*\^=]+', $m)) {
+						$attrParts[] = $m[0];
+						continue;
+					}
+
+					break;
+				}
+
+				if ($this->literal("]", false)) {
+					$attrParts[] = "]";
+					foreach ($attrParts as $part) {
+						$selector[] = $part;
+					}
+					continue;
+				}
+				$this->seek($s);
+			} else {
+				$this->seek($s);
+			}
+
+			// operators
+			// > + ~
+			if ($this->match('\s*[>+~]\s*', $m)) {
+				if (strlen($m[0] > 1)) {
+					$selector[] = preg_replace('/\s+/', ' ', $m[0]);
+				} else {
+					$selector[] = $m[0];
+				}
+				continue;
+			}
+
+			// whitespace
+			if ($this->whitespace()) {
+				$selector[] = " ";
+				continue;
+			}
+
+			break;
+		}
+
+		$this->eatWhiteDefault = $oldWhite;
+
+		if (count($selector) == 0) {
+			$this->seek($s);
+			return false;
 		}
 
 		// trim extra whitespace from last string
 		if (end($selector) == " ") array_pop($selector);
 
 		$out = $selector;
-		return count($out) > 0;
+		return true;
 	}
 
 	protected function variable(&$out) {
@@ -1475,7 +1597,7 @@ class scss_parser {
 		return false;
 	}
 
-	protected function keyword(&$word, $eatWhitespace=true) {
+	protected function keyword(&$word, $eatWhitespace = null) {
 		if ($this->match('([\w_\-\*!"][\w\-_"]*)', $m, $eatWhitespace)) {
 			$word = $m[1];
 			return true;
@@ -1532,7 +1654,9 @@ class scss_parser {
 	}
 
 	// try to match something on head of buffer
-	protected function match($regex, &$out, $eatWhitespace = true) {
+	protected function match($regex, &$out, $eatWhitespace = null) {
+		if (is_null($eatWhitespace)) $eatWhitespace = $this->eatWhiteDefault;
+
 		$r = '/'.$regex.'/Ais';
 		if (preg_match($r, $this->buffer, $out, null, $this->count)) {
 			$this->count += strlen($out[0]);
@@ -1544,13 +1668,16 @@ class scss_parser {
 
 	// match some whitespace
 	protected function whitespace() {
+		$gotWhite = false;
 		while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
 			if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
 				$this->append(array("comment", $m[1]));
 				$this->commentsSeen[$this->count] = true;
 			}
 			$this->count += strlen($m[0]);
+			$gotWhite = true;
 		}
+		return $gotWhite;
 	}
 
 	protected function peek($regex, &$out, $from=null) {

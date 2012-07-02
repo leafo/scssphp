@@ -7,3 +7,4 @@ hello { color:green; }
 hello div { margin:10px; }
 .cool, .me { color:red; }
 .blue, .me { color:purple; }
+a:hover, .hoverlink { text-decoration:underline; }
