@@ -27,6 +27,7 @@ class scssc {
 	static protected $false = array("keyword", "false");
 
 	static protected $defaultValue = array("keyword", "");
+	static public $selfSelector = array("self");
 
 	protected $importPaths = array("");
 
@@ -131,39 +132,49 @@ class scssc {
 		return array_map(array($this, "evalSelectorPart"), $selector);
 	}
 
-	protected function evalSelectorPart($part) {
-		if (!is_array($part)) return $part;
-		switch ($part[0]) {
-		case "interpolate":
-			return $this->compileValue($part);
-		case "parens":
-			return array(
-				"parens",
-				$this->evalSelector($part[1])
-			);
-		}
+	protected function evalSelectorPart($piece) {
+		foreach ($piece as &$p) {
+			if (!is_array($p)) continue;
 
-		return $part;
+			switch ($p[0]) {
+			case "interpolate":
+				$p = $this->compileValue($p);
+				break;
+			}
+		}
+		return $piece;
 	}
 
 	// compiles to string
-	// // self should have been replaced by now
+	// self(&) should have been replaced by now
 	protected function compileSelector($selector) {
-		if (!is_array($selector)) return $selector;
-		return implode(array_map(
+		if (!is_array($selector)) return $selector; // media and the like
+
+		return implode(" ", array_map(
 			array($this, "compileSelectorPart"), $selector));
 	}
 
-	protected function compileSelectorPart($part) {
-		if (!is_array($part)) return $part;
-		switch ($part[0]) {
-		case "self":
-			return "&";
-		case "parens":
-			return "(".$this->compileSelector($part[1]).")";
-		default:
-			return $this->compileValue($part);
+	protected function compileSelectorPart($piece) {
+		foreach ($piece as &$p) {
+			if (!is_array($p)) continue;
+
+			switch ($p[0]) {
+			case "parens":
+				$inner = implode(", ", array_map(
+					array($this, "compileSelector"),
+					$p[1]));
+				$p = "($inner)";
+				break;
+			case "self":
+				$p = "&";
+				break;
+			default:
+				$p = $this->compileValue($p);
+				break;
+			}
 		}
+
+		return implode($piece);
 	}
 
 	protected function compileChildren($stms, $out) {
@@ -595,28 +606,42 @@ class scssc {
 			$selectors = array();
 			foreach ($env->selectors as $parent) {
 				foreach ($childSelectors as $child) {
-					$haveParent = false;
-					$updatedChild = array();
-					foreach ($child as &$part) {
-						if ($part == array("self")) {
-							// push the parent
-							$haveParent = true;
-							foreach ($parent as $parentPart) $updatedChild[] = $parentPart;
-						} else {
-							$updatedChild[] = $part;
-						}
-					}
-
-					if ($haveParent) {
-						$selectors[] = $updatedChild;
-					} else {
-						$selectors[] = array_merge($parent, array(" "), $child);
-					}
+					$selectors[] = $this->joinSelectors($parent, $child);
 				}
 			}
 		}
 
 		return $this->multiplySelectors($env->parent, $selectors);
+	}
+
+	// looks for & to replace, or append parent before child
+	protected function joinSelectors($parent, $child) {
+		$setSelf = false;
+		$out = array();
+		foreach ($child as $part) {
+			$newPart = array();
+			foreach ($part as $p) {
+				if ($p == self::$selfSelector) {
+					$setSelf = true;
+					foreach ($parent as $i => $parentPart) {
+						if ($i > 0) {
+							$out[] = $newPart;
+							$newPart = array();
+						}
+
+						foreach ($parentPart as $pp) {
+							$newPart[] = $pp;
+						}
+					}
+				} else {
+					$newPart[] = $p;
+				}
+			}
+
+			$out[] = $newPart;
+		}
+
+		return $setSelf ? $out : array_merge($parent, $child);
 	}
 
 	protected function multiplyMedia($env, $childMedia = null) {
@@ -1433,53 +1458,52 @@ class scss_parser {
 		return true;
 	}
 
-	public function selector(&$out) {
+	protected function selector(&$out) {
+		$selector = array();
+		while ($this->selectorSingle($part)) {
+			$selector[] = $part;
+			$this->whitespace();
+
+			if ($this->match('[>+~]', $m)) {
+				$selector[] = array($m[0]);
+			}
+		}
+
+		if (count($selector) == 0) {
+			return false;
+		}
+
+		$out = $selector;
+		return true;
+	}
+
+
+	// div[yes=no]#something.hello.world:nth-child(-2n+1)
+	protected function selectorSingle(&$out) {
 		$oldWhite = $this->eatWhiteDefault;
 		$this->eatWhiteDefault = false;
 
-		$s = $this->seek();
-		$selector = array();
+		$parts = array();
+
+		if ($this->keyword($tag)) {
+			$parts[] = $tag;
+		} elseif ($this->literal("*", false)) {
+			$parts[] = "*";
+		}
+
 		while (true) {
-			// see if we can break out early, a little faster
-			if ($this->match('\s*{', $m)) {
-				$this->count--;
-				break;
-			}
-
 			$s = $this->seek();
-			if ($this->string($str)) {
-				$selector[] = $str;
-				continue;
-			}
-
 			// self
 			if ($this->literal("&", false)) {
-				$selector[] = array("self");
+				$parts[] = scssc::$selfSelector;
 				continue;
 			}
 
-			// *
-			if ($this->literal("*", false)) {
-				$selector[] = "*";
-				continue;
-			}
-
-			// tag
-			if ($this->keyword($tag)) {
-				$selector[] = $tag;
-				continue;
-			}
-
-			// class
-			if ($this->literal(".", false) && $this->keyword($cls)) {
-				$selector[] = ".$cls"; continue;
-			} else {
-				$this->seek($s);
-			}
-
-			// id
-			if ($this->literal("#", false) && $this->keyword($cls)) {
-				$selector[] = "#$cls";
+			if (($this->literal(".", false) && ($front = ".") ||
+				$this->literal("#", false) && ($front = "#")) &&
+				$this->keyword($name))
+			{
+				$parts[] = $front . $name;
 				continue;
 			} else {
 				$this->seek($s);
@@ -1487,25 +1511,34 @@ class scss_parser {
 
 			// a pseudo selector
 			if ($this->match("::?", $m) && $this->keyword($name)) {
-				$selector[] = $m[0] . $name;
+				$parts[] = $m[0] . $name;
+
+				$ss = $this->seek();
+				if ($this->literal("(")) {
+					$this->selectors($inner);
+
+					if ($this->literal(")")) {
+						$parts[] = array("parens",
+							is_null($inner) ? array() : $inner);
+					} else {
+						$this->seek($ss);
+					}
+				}
+
 				continue;
 			} else {
 				$this->seek($s);
 			}
-
-			// interpolation
 
 			if ($this->interpolation($inter)) {
-				$selector[] = $inter;
-				continue;
-			}
+				$parts[] = $inter;
 
-			// parens
-			if ($this->literal("(", false) && ($this->selector($inner) || true) && $this->literal(")", false)) {
-				$selector[] = array("parens", $inner);
+				// #{something}here
+				if ($this->keyword($rest)) {
+					$parts[] = $rest;
+				}
+
 				continue;
-			} else {
-				$this->seek($s);
 			}
 
 			// attribute selector
@@ -1513,7 +1546,7 @@ class scss_parser {
 				$attrParts = array("[");
 				// keyword, string, operator
 				while (true) {
-					if ($this->literal("]", false)) { 
+					if ($this->literal("]", false)) {
 						$this->count--;
 						break; // get out early
 					}
@@ -1544,30 +1577,12 @@ class scss_parser {
 				if ($this->literal("]", false)) {
 					$attrParts[] = "]";
 					foreach ($attrParts as $part) {
-						$selector[] = $part;
+						$parts[] = $part;
 					}
 					continue;
 				}
 				$this->seek($s);
-			} else {
-				$this->seek($s);
-			}
-
-			// operators
-			// > + ~
-			if ($this->match('\s*[>+~]\s*', $m)) {
-				if (strlen($m[0] > 1)) {
-					$selector[] = preg_replace('/\s+/', ' ', $m[0]);
-				} else {
-					$selector[] = $m[0];
-				}
-				continue;
-			}
-
-			// whitespace
-			if ($this->whitespace()) {
-				$selector[] = " ";
-				continue;
+				// should just break here?
 			}
 
 			break;
@@ -1575,15 +1590,12 @@ class scss_parser {
 
 		$this->eatWhiteDefault = $oldWhite;
 
-		if (count($selector) == 0) {
+		if (count($parts) == 0) {
 			$this->seek($s);
 			return false;
 		}
 
-		// trim extra whitespace from last string
-		if (end($selector) == " ") array_pop($selector);
-
-		$out = $selector;
+		$out = $parts;
 		return true;
 	}
 

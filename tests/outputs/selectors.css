@@ -16,9 +16,9 @@ E[foo|="239032"] { color:blue; }
 [att] { color:green; }
 E:root { color:blue; }
 E:nth-child(odd) { color:blue; }
-E:nth-child(2n+1) { color:blue; }
+E:nth-child(2n + 1) { color:blue; }
 E:nth-child(5) { color:blue; }
-E:nth-last-child(-n+2) { color:blue; }
+E:nth-last-child(-n + 2) { color:blue; }
 E:nth-of-type(2n) { color:blue; }
 E:nth-last-of-type(n) { color:blue; }
 E:first-child { color:blue; }

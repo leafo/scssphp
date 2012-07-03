@@ -45,6 +45,10 @@ cool {
     }
 }
 
+a#{b}c#{d}e {
+    color: red;
+}
+
 // property interpolation
 
 div {
@@ -61,4 +65,5 @@ div {
     }
 
 }
+
 
