@@ -1485,13 +1485,17 @@ class scss_parser {
 
 		$parts = array();
 
-		if ($this->keyword($tag)) {
-			$parts[] = $tag;
-		} elseif ($this->literal("*", false)) {
+		if ($this->literal("*", false)) {
 			$parts[] = "*";
 		}
 
 		while (true) {
+			// see if we can stop early
+			if ($this->match("\s*[{,]", $m)) {
+				$this->count--;
+				break;
+			}
+
 			$s = $this->seek();
 			// self
 			if ($this->literal("&", false)) {
@@ -1499,14 +1503,24 @@ class scss_parser {
 				continue;
 			}
 
-			if (($this->literal(".", false) && ($front = ".") ||
-				$this->literal("#", false) && ($front = "#")) &&
-				$this->keyword($name))
-			{
-				$parts[] = $front . $name;
+			if ($this->literal(".", false)) {
+				$parts[] = ".";
 				continue;
-			} else {
-				$this->seek($s);
+			}
+
+			if ($this->keyword($name)) {
+				$parts[] = $name;
+				continue;
+			}
+
+			if ($this->interpolation($inter)) {
+				$parts[] = $inter;
+				continue;
+			}
+
+			if ($this->literal("#", false)) {
+				$parts[] = "#";
+				continue;
 			}
 
 			// a pseudo selector
@@ -1530,16 +1544,6 @@ class scss_parser {
 				$this->seek($s);
 			}
 
-			if ($this->interpolation($inter)) {
-				$parts[] = $inter;
-
-				// #{something}here
-				if ($this->keyword($rest)) {
-					$parts[] = $rest;
-				}
-
-				continue;
-			}
 
 			// attribute selector
 			if ($this->literal("[", false)) {
@@ -1590,10 +1594,7 @@ class scss_parser {
 
 		$this->eatWhiteDefault = $oldWhite;
 
-		if (count($parts) == 0) {
-			$this->seek($s);
-			return false;
-		}
+		if (count($parts) == 0) return false;
 
 		$out = $parts;
 		return true;

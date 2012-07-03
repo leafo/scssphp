@@ -22,6 +22,8 @@ cool .thing-3 { color:red; }
 cool .thing-4 { color:red; }
 cool .thing-5 { color:red; }
 abcde { color:red; }
+#hello, .world { color:red; }
+#abchelloyeah, .coolworldyes { color:red; }
 div {
   hello:world;
   coolhello:world;

@@ -49,6 +49,14 @@ a#{b}c#{d}e {
     color: red;
 }
 
+##{hello}, .#{world}{
+    color: red;
+}
+
+#abc#{hello}yeah, .cool#{world}yes{
+    color: red;
+}
+
 // property interpolation
 
 div {
