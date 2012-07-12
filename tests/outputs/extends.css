@@ -8,3 +8,6 @@ hello div { margin:10px; }
 .cool, .me { color:red; }
 .blue, .me { color:purple; }
 a:hover, .hoverlink { text-decoration:underline; }
+div.hello.world.hmm, pre div.okay.span.world.hmm, code div.okay.span.world.hmm { color:blue; }
+.xxxxx .xxxxx .xxxxx, code .xxxxx .xxxxx, code code .xxxxx, code code code, code .xxxxx code, .xxxxx code .xxxxx, .xxxxx code code, .xxxxx .xxxxx code { color:green; }
+code { color:red; }

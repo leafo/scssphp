@@ -34,3 +34,27 @@ hello {
 .hoverlink { @extend a:hover }
 a:hover { text-decoration: underline }
 
+
+// partial matching and selector merging:
+
+div.hello.world.hmm {
+    color: blue;
+}
+
+pre, code  {
+    .okay.span {
+        @extend .hello;
+    }
+}
+
+// recursive extends
+.xxxxx .xxxxx .xxxxx {
+    color: green;
+}
+
+code {
+    @extend .xxxxx;
+    color: red;
+}
+
+

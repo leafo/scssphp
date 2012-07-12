@@ -123,8 +123,9 @@ class scssc {
 		return $out;
 	}
 
-	protected function matchExtends($selector, &$out) {
+	protected function matchExtends($selector, &$out, $from = 0) {
 		foreach ($selector as $i => $part) {
+			if ($i < $from) continue;
 			if ($this->matchExtendsSingle($part, $origin, $rem)) {
 				$before = array_slice($selector, 0, $i);
 				$after = array_slice($selector, $i + 1);
@@ -132,7 +133,12 @@ class scssc {
 				foreach ($origin as $new) {
 					$new[count($new) - 1] =
 						$this->combineSelectorSingle(end($new), $rem);
-					$out[] = array_merge($before, $new, $after);
+
+					$result = array_merge($before, $new, $after);
+					$out[] = $result;
+
+					// recursively check for more matches
+					$this->matchExtends($result, $out, $i);
 				}
 			}
 		}
