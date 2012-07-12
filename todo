@@ -16,5 +16,42 @@ check scoping:
   * do block statements work in their own scope?
 
 
+# sequence merging:
+
+
+a b c d { color: red; }
+x y z w  { @extend a; }
+
+	a b c d, x y z w b c d { color: red; }
+
+
+a b c d { color: red; }
+x y z w  { @extend b; }
+
+	a b c d, a x y z w c d, x y z a w c d { color: red; }
+
+
+a b c d { color: red; }
+x y z w  { @extend c; }
+
+	a b c d, a b x y z w d, x y z a b w d { color: red; }
+
+	x y z a b w d
+
+	before: a b
+	after:  d
+	new: x y z w
+
+
+a b c d { color: red; }
+x y z w  { @extend d; }
+
+	a b c d, a b c x y z w, x y z a b c w { color: red; }
+
+
+->> new[:-1] . before . new[-1] . after
+	
+	new.len > 1
+	before not empty
 
 

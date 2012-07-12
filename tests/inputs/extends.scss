@@ -47,7 +47,7 @@ pre, code  {
     }
 }
 
-// recursive extends
+// multiple matches per selector
 .xxxxx .xxxxx .xxxxx {
     color: green;
 }
@@ -56,5 +56,43 @@ code {
     @extend .xxxxx;
     color: red;
 }
+
+
+// chained 
+
+.alpha {
+    color: red;
+}
+
+.beta {
+    @extend .alpha;
+    color: white;
+}
+
+.gama {
+    @extend .beta;
+    color: blue;
+}
+
+// merging selector sequences
+
+#admin .tabbar a {font-weight: bold}
+#demo .overview .fakelink {@extend a}
+
+a1 b1 c1 d1 { color: red; }
+x1 y1 z1 w1 { @extend a1; }
+
+a2 b2 c2 d2 { color: red; }
+x2 y2 z2 w2 { @extend b2; }
+
+
+a3 b3 c3 d3 { color: red; }
+x3 y3 z3 w3 { @extend c3; }
+
+
+a4 b4 c4 d4 { color: red; }
+x4 y4 z4 w4 { @extend d4; }
+
+
 
 

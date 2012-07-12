@@ -11,3 +11,11 @@ a:hover, .hoverlink { text-decoration:underline; }
 div.hello.world.hmm, pre div.okay.span.world.hmm, code div.okay.span.world.hmm { color:blue; }
 .xxxxx .xxxxx .xxxxx, code .xxxxx .xxxxx, code code .xxxxx, code code code, code .xxxxx code, .xxxxx code .xxxxx, .xxxxx code code, .xxxxx .xxxxx code { color:green; }
 code { color:red; }
+.alpha, .beta, .gama { color:red; }
+.beta, .gama { color:white; }
+.gama { color:blue; }
+#admin .tabbar a, #admin .tabbar #demo .overview .fakelink, #demo .overview #admin .tabbar .fakelink { font-weight:bold; }
+a1 b1 c1 d1, x1 y1 z1 w1 b1 c1 d1 { color:red; }
+a2 b2 c2 d2, a2 x2 y2 z2 w2 c2 d2, x2 y2 z2 a2 w2 c2 d2 { color:red; }
+a3 b3 c3 d3, a3 b3 x3 y3 z3 w3 d3, x3 y3 z3 a3 b3 w3 d3 { color:red; }
+a4 b4 c4 d4, a4 b4 c4 x4 y4 z4 w4, x4 y4 z4 a4 b4 c4 w4 { color:red; }

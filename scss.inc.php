@@ -135,10 +135,22 @@ class scssc {
 						$this->combineSelectorSingle(end($new), $rem);
 
 					$result = array_merge($before, $new, $after);
+
 					$out[] = $result;
 
 					// recursively check for more matches
 					$this->matchExtends($result, $out, $i);
+
+					// selector sequence merging
+					if (!empty($before) && count($new) > 1) {
+						$result2 = array_merge(
+							array_slice($new, 0, -1),
+							$before,
+							array_slice($new, -1),
+							$after);
+
+						$out[] = $result2;
+					}
 				}
 			}
 		}
