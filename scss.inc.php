@@ -15,7 +15,6 @@ class scssc {
 
 		'<=' => "lte",
 		'>=' => "gte",
-
 	);
 
 	static protected $namespaces = array(
@@ -35,6 +34,7 @@ class scssc {
 		$this->indentLevel = -1;
 		$this->commentsSeen = array();
 		$this->extends = array();
+		$this->extendsMap = array();
 
 		$this->parser = new scss_parser($name);
 		$tree = $this->parser->parse($code);
@@ -43,11 +43,25 @@ class scssc {
 
 		$this->env = null;
 		$scope = $this->compileRoot($tree);
+
 		$this->flattenSelectors($scope);
 
 		ob_start();
 		$formatter->block($scope);
 		return ob_get_clean();
+	}
+
+	protected function pushExtends($target, $origin) {
+		$i = count($this->extends);
+		$this->extends[] = array($target, $origin);
+
+		foreach ($target as $part) {
+			if (isset($this->extendsMap[$part])) {
+				$this->extendsMap[$part][] = $i;
+			} else {
+				$this->extendsMap[$part] = array($i);
+			}
+		}
 	}
 
 	protected function makeOutputBlock($selectors = null) {
@@ -59,19 +73,81 @@ class scssc {
 		return $out;
 	}
 
+	protected function matchExtendsSingle($single, &$out_origin, &$out_rem) {
+		$counts = array();
+		foreach ($single as $part) {
+			if (isset($this->extendsMap[$part])) {
+				foreach ($this->extendsMap[$part] as $idx) {
+					$counts[$idx] =
+						isset($counts[$idx]) ? $counts[$idx] + 1 : 1;
+				}
+			}
+		}
+
+		foreach ($counts as $idx => $count) {
+			list($target, $origin) = $this->extends[$idx];
+			// check count
+			if ($count != count($target)) continue;
+			// check if target is subset of single
+			if (array_diff(array_intersect($single, $target), $target)) continue;
+
+			$out_origin = $origin;
+			$out_rem = array_diff($single, $target);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	protected function combineSelectorSingle($base, $other) {
+		$tag = null;
+		$out = array();
+
+		foreach (array($base, $other) as $single) {
+			foreach ($single as $part) {
+				if (preg_match('/^[^.#:]/', $part)) {
+					$tag = $part;
+				} else {
+					$out[] = $part;
+				}
+			}
+		}
+
+		if ($tag) {
+			array_unshift($out, $tag);
+		}
+
+		return $out;
+	}
+
+	protected function matchExtends($selector, &$out) {
+		foreach ($selector as $i => $part) {
+			if ($this->matchExtendsSingle($part, $origin, $rem)) {
+				$before = array_slice($selector, 0, $i);
+				$after = array_slice($selector, $i + 1);
+
+				foreach ($origin as $new) {
+					$new[count($new) - 1] =
+						$this->combineSelectorSingle(end($new), $rem);
+					$out[] = array_merge($before, $new, $after);
+				}
+			}
+		}
+	}
+
 	protected function flattenSelectors($block) {
 		if ($block->selectors) {
 			$selectors = array();
 			foreach ($block->selectors as $s) {
-				$s = $this->compileSelector($s);
 				$selectors[] = $s;
-				if (isset($this->extends[$s])) {
-					foreach ($this->extends[$s] as $extended) {
-						$selectors[] = $this->compileSelector($extended);
-					}
+				// check extends
+				if (!empty($this->extendsMap)) {
+					$this->matchExtends($s, $selectors);
 				}
 			}
 
+			$selectors = array_map(array($this, "compileSelector"), $selectors);
 			$block->selectors = $selectors;
 		}
 
@@ -277,15 +353,9 @@ class scssc {
 		case "extend":
 			list(, $selectors) = $child;
 			foreach ($selectors as $sel) {
-				$sel = $this->compileSelector($sel);
-				if (isset($this->extends[$sel])) {
-					// append them all
-					foreach ($out->selectors as $current) {
-						$this->extends[$sel][] = $current;
-					}
-				} else {
-					$this->extends[$sel] = $out->selectors;
-				}
+				// only use the first one
+				$sel = current($this->evalSelector($sel));
+				$this->pushExtends($sel, $out->selectors);
 			}
 			break;
 		case "if":
@@ -1477,6 +1547,23 @@ class scss_parser {
 		return true;
 	}
 
+	// joins together .classes and #ids
+	protected function flattenSelectorSingle($single) {
+		$joined = array();
+		foreach ($single as $part) {
+			if (empty($joined) ||
+				!is_string($part) ||
+				preg_match('/[.:#]/', $part))
+			{
+				$joined[] = $part;
+				continue;
+			}
+
+			$joined[count($joined) - 1] .= $part;
+		}
+
+		return $joined;
+	}
 
 	// div[yes=no]#something.hello.world:nth-child(-2n+1)
 	protected function selectorSingle(&$out) {
@@ -1596,7 +1683,7 @@ class scss_parser {
 
 		if (count($parts) == 0) return false;
 
-		$out = $parts;
+		$out = $this->flattenSelectorSingle($parts);
 		return true;
 	}
 
