@@ -76,6 +76,8 @@ class scssc {
 	protected function matchExtendsSingle($single, &$out_origin, &$out_rem) {
 		$counts = array();
 		foreach ($single as $part) {
+			if (!is_string($part)) return false; // hmm
+
 			if (isset($this->extendsMap[$part])) {
 				foreach ($this->extendsMap[$part] as $idx) {
 					$counts[$idx] =
@@ -203,6 +205,28 @@ class scssc {
 		return $parts;
 	}
 
+	// joins together .classes and #ids
+	protected function flattenSelectorSingle($single) {
+		$joined = array();
+		foreach ($single as $part) {
+			if (empty($joined) ||
+				!is_string($part) ||
+				preg_match('/[.:#]/', $part))
+			{
+				$joined[] = $part;
+				continue;
+			}
+
+			if (is_array(end($joined))) {
+				$joined[] = $part;
+			} else {
+				$joined[count($joined) - 1] .= $part;
+			}
+		}
+
+		return $joined;
+	}
+
 	// replaces all the interpolates
 	protected function evalSelector($selector) {
 		return array_map(array($this, "evalSelectorPart"), $selector);
@@ -218,7 +242,8 @@ class scssc {
 				break;
 			}
 		}
-		return $piece;
+
+		return $this->flattenSelectorSingle($piece);
 	}
 
 	// compiles to string
@@ -1547,24 +1572,6 @@ class scss_parser {
 		return true;
 	}
 
-	// joins together .classes and #ids
-	protected function flattenSelectorSingle($single) {
-		$joined = array();
-		foreach ($single as $part) {
-			if (empty($joined) ||
-				!is_string($part) ||
-				preg_match('/[.:#]/', $part))
-			{
-				$joined[] = $part;
-				continue;
-			}
-
-			$joined[count($joined) - 1] .= $part;
-		}
-
-		return $joined;
-	}
-
 	// div[yes=no]#something.hello.world:nth-child(-2n+1)
 	protected function selectorSingle(&$out) {
 		$oldWhite = $this->eatWhiteDefault;
@@ -1683,7 +1690,7 @@ class scss_parser {
 
 		if (count($parts) == 0) return false;
 
-		$out = $this->flattenSelectorSingle($parts);
+		$out = $parts;
 		return true;
 	}
 
