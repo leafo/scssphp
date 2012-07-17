@@ -176,6 +176,7 @@ class scssc {
 			$selectors = array();
 			foreach ($block->selectors as $s) {
 				$selectors[] = $s;
+				if (!is_array($s)) continue;
 				// check extends
 				if (!empty($this->extendsMap)) {
 					$this->matchExtends($s, $selectors);
