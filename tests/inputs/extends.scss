@@ -93,6 +93,14 @@ x3 y3 z3 w3 { @extend c3; }
 a4 b4 c4 d4 { color: red; }
 x4 y4 z4 w4 { @extend d4; }
 
+// removing common prefix
 
+#butt .yeah .okay { font-weight: bold }
+#butt .umm .sure { @extend .okay }
 
+a9 b9 s9 t9 v9 { color: red; }
+
+a9 b9 x9 y9 z9 {
+    @extend v9;
+}
 
