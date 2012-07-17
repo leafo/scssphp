@@ -151,6 +151,7 @@ class scssc {
 						$after);
 
 
+					if ($result == $selector) continue;
 					$out[] = $result;
 
 					// recursively check for more matches

@@ -118,3 +118,10 @@ man {
 }
 
 
+// result == match
+
+wassup {
+    color: blue;
+    @extend wassup;
+}
+
