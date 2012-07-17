@@ -1,5 +1,8 @@
 
-keyword arguments
+variables: underscores and dashes can be used interchangeably
+
+fix: properties inside of function shouldn't error
+fix: reduce should reduce lists (functions should be able to return a list of variables)
 
 match operator results
 make formatter match scss's output
@@ -14,8 +17,12 @@ check scoping:
   * do block statements work in their own scope?
 
 
-# sequence merging:
 
+
+
+
+
+# sequence merging:
 
 a b c d { color: red; }
 x y z w  { @extend a; }

@@ -493,7 +493,8 @@ class scssc {
 			break;
 		case "include": // including a mixin
 			list(,$name, $argValues) = $child;
-			$mixin = $this->get(self::$namespaces["mixin"] . $name);
+			$mixin = $this->get(self::$namespaces["mixin"] . $name, false);
+			if (!$mixin) break; // throw error?
 
 			// push scope, apply args
 			$this->pushEnv();
@@ -545,7 +546,7 @@ class scssc {
 			case "var":
 				list(, $name) = $value;
 				return $this->reduce($this->get($name));
-			case "function":
+			case "fncall":
 				list(,$name, $argValues) = $value;
 				// user defined function?
 				$func = $this->get(self::$namespaces["function"] . $name, false);
@@ -566,7 +567,14 @@ class scssc {
 					return is_null($ret) ? self::$defaultValue : $ret;
 				}
 
-				return $value;
+				// need to flatten the arguments into a list
+				$listArgs = array();
+				foreach ((array)$argValues as $arg) {
+					if (empty($arg[0])) {
+						$listArgs[] = $this->reduce($arg[1]);
+					}
+				}
+				return array("function", $name, array("list", ",", $listArgs));
 			default:
 				return $value;
 		}
@@ -801,13 +809,33 @@ class scssc {
 	}
 
 	protected function applyArguments($argDef, $argValues) {
-		$argValues = $this->coerceList($argValues);
-		$argValues = $argValues[2];
+		$argValues = (array)$argValues;
+
+		$keywordArgs = array();
+		$remaining = array();
+
+		// assign the keyword args
+		foreach ($argValues as $arg) {
+			if (!empty($arg[0])) {
+				$keywordArgs[$arg[0][1]] = $arg[1];
+			} else {
+				$remaining[] = $arg[1];
+			}
+		}
 
 		foreach ($argDef as $i => $arg) {
 			list($name, $default) = $arg;
-			$val = isset($argValues[$i]) ? $argValues[$i] :
-				(!empty($default) ? $default : self::$defaultValue);
+
+			if (isset($remaining[$i])) {
+				$val = $remaining[$i];
+			} elseif (isset($keywordArgs[$name])) {
+				$val = $keywordArgs[$name];
+			} elseif (!empty($default)) {
+				$val = $default;
+			} else {
+				$val = self::$defaultValue;
+			}
+
 			$this->set($name, $this->reduce($val));
 		}
 	}
@@ -984,10 +1012,10 @@ class scss_parser {
 			if ($this->literal("@include") &&
 				$this->keyword($mixinName) &&
 				($this->literal("(") &&
-					($this->valueList($argValues) || true) &&
+					($this->argValues($argValues) || true) &&
 					$this->literal(")") || true) &&
 				$this->end())
-			{
+		{
 				$this->append(array("include",
 					$mixinName,
 					isset($argValues) ? $argValues : null));
@@ -1312,6 +1340,32 @@ class scss_parser {
 		return false;
 	}
 
+	protected function argValues(&$out) {
+		if ($this->genericList($list, "argValue", ",", false)) {
+			$out = $list[2];
+			return true;
+		}
+		return false;
+	}
+
+	protected function argValue(&$out) {
+		$s = $this->seek();
+
+		$keyword = null;
+		if (!$this->variable($keyword) || !$this->literal(":")) {
+			$this->seek($s);
+			$keyword = null;
+		}
+
+		if ($this->genericList($value, "expression")) {
+			$out = array($keyword, $value);
+			return true;
+		}
+
+		return false;
+	}
+
+
 	protected function valueList(&$out) {
 		return $this->genericList($out, "commaList");
 	}
@@ -1413,10 +1467,10 @@ class scss_parser {
 
 		if ($this->keyword($name, false) &&
 			$this->literal("(") &&
-			($this->valueList($args) || true) &&
+			($this->argValues($args) || true) &&
 			$this->literal(")"))
 		{
-			$func = array("function", $name, $args);
+			$func = array("fncall", $name, $args);
 			return true;
 		}
 
