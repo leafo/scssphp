@@ -55,7 +55,14 @@ class InputTest extends PHPUnit_Framework_TestCase {
 
 	static public function findInputNames($pattern="*") {
 		$files = glob(__DIR__ . "/" . self::$inputDir . "/" . $pattern);
-		return array_filter($files, "is_file");
+		$files = array_filter($files, "is_file");
+		if ($pattern = getenv("MATCH")) {
+			$files = array_filter($files, function($fname) use ($pattern) {
+				return preg_match("/$pattern/", $fname);
+			});
+		}
+
+		return $files;
 	}
 
 	static public function outputNameFor($input) {
