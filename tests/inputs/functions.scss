@@ -12,4 +12,25 @@ div {
     sum: add(11, 12);
 }
 
+// make sure values are being reduced before being passed up to previous scope
+
+@function one($a, $b) {
+    @return $a $b;
+}
+
+@function two($a, $b) {
+    @return $a#{$a} $b;
+}
+
+@function three($a, $b) {
+    @return "hello #{$a} and #{$b}"
+}
+
+
+div {
+    hello: one(10, 55);
+    hello: two(10, 55);
+    hello: three(10, 55);
+}
+
 

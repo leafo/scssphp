@@ -2,7 +2,6 @@
 variables: underscores and dashes can be used interchangeably
 
 fix: properties inside of function shouldn't error
-fix: reduce should reduce lists (functions should be able to return a list of variables)
 
 match operator results
 make formatter match scss's output

@@ -546,6 +546,21 @@ class scssc {
 			case "var":
 				list(, $name) = $value;
 				return $this->reduce($this->get($name));
+			case "list":
+				foreach ($value[2] as &$item) {
+					$item = $this->reduce($item);
+				}
+				return $value;
+			case "string":
+				foreach ($value[2] as &$item) {
+					if (is_array($item)) {
+						$item = $this->reduce($item);
+					}
+				}
+				return $value;
+			case "interpolate":
+				$value[1] = $this->reduce($value[1]);
+				return $value;
 			case "fncall":
 				list(,$name, $argValues) = $value;
 				// user defined function?
