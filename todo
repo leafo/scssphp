@@ -1,6 +1,4 @@
 
-variables: underscores and dashes can be used interchangeably
-
 fix: properties inside of function shouldn't error
 
 match operator results
@@ -16,9 +14,7 @@ check scoping:
   * do block statements work in their own scope?
 
 
-
-
-
+check mixin infinite loop
 
 
 # sequence merging:

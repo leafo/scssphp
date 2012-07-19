@@ -867,11 +867,17 @@ class scssc {
 		return $env;
 	}
 
+	protected function normalizeName($name) {
+		return str_replace("_", "-", $name);
+	}
+
 	protected function set($name, $value) {
-		$this->env->store[$name] = $value;
+		$this->env->store[$this->normalizeName($name)] = $value;
 	}
 
 	protected function get($name, $defaultValue = null, $env = null) {
+		$name = $this->normalizeName($name);
+
 		if (is_null($env)) $env = $this->env;
 		if (is_null($defaultValue)) $defaultValue = self::$defaultValue;
 

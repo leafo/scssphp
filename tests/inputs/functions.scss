@@ -34,3 +34,12 @@ div {
 }
 
 
+@function hello_world() {
+    @return 1000;
+}
+
+del {
+    color: hello-world();
+}
+
+
