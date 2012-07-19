@@ -8,12 +8,9 @@ built in functions
 @page
 
 check scoping:
-  * setting an existing variable should write in that variable's scope?
   * do block statements work in their own scope?
 
-
 check mixin infinite loop
-
 
 # sequence merging:
 

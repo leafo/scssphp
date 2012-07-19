@@ -20,3 +20,17 @@ div {
 $something_man: 100px;
 cool: $something_man;
 
+
+del {
+    $something: blue;
+
+    div {
+        $something: red;
+        pre {
+            color: $something;
+        }
+    }
+
+    color: $something;
+}
+

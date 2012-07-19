@@ -874,7 +874,19 @@ class scssc {
 	}
 
 	protected function set($name, $value) {
-		$this->env->store[$this->normalizeName($name)] = $value;
+		$name = $this->normalizeName($name);
+		$this->setExisting($name, $value);
+	}
+
+	protected function setExisting($name, $value, $env = null) {
+		if (is_null($env)) $env = $this->env;
+		if (isset($env->store[$name])) {
+			$env->store[$name] = $value;
+		} elseif (!is_null($env->parent)) {
+			$this->setExisting($name, $value, $env->parent);
+		} else {
+			$this->env->store[$name] = $value;
+		}
 	}
 
 	protected function get($name, $defaultValue = null, $env = null) {
