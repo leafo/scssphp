@@ -1,6 +1,4 @@
 
-fix: properties inside of function shouldn't error
-
 match operator results
 make formatter match scss's output
 

@@ -574,9 +574,11 @@ class scssc {
 					}
 
 					// throw away lines and children
-					$lines = array();
-					$children = array();
-					$ret = $this->compileChildren($func->children, $lines, $children);
+					$tmp = (object)array(
+						"lines" => array(),
+						"children" => array()
+					);
+					$ret = $this->compileChildren($func->children, $tmp);
 					$this->popEnv();
 
 					return is_null($ret) ? self::$defaultValue : $ret;
