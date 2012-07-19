@@ -53,3 +53,14 @@ div {
 
 }
 
+// doesn't work in scss, thing loses scope
+del {
+    @if false {
+        $thing: yes;
+    } @else {
+        $thing: no;
+    }
+
+    thing: $thing;
+}
+

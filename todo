@@ -7,9 +7,6 @@ built in functions
 
 @page
 
-check scoping:
-  * do block statements work in their own scope?
-
 check mixin infinite loop
 
 # sequence merging:
