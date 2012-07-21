@@ -408,13 +408,13 @@ class scssc {
 				$out->lines[] = "@import " . $this->compileValue($rawPath) . ";";
 			}
 			break;
-		case "page":
-			list(, $page) = $child;
-			$s = "@page";
-			if (!empty($page->value)) {
-				$s .= " " . $this->compileSelector($page->value);
+		case "directive":
+			list(, $directive) = $child;
+			$s = "@" . $directive->name;
+			if (!empty($directive->value)) {
+				$s .= " " . $this->compileValue($directive->value);
 			}
-			$this->compileNestedBlock($page, array($s));
+			$this->compileNestedBlock($directive, array($s));
 			break;
 		case "media":
 			$this->compileMedia($child[1]);
@@ -1072,17 +1072,6 @@ class scss_parser {
 				$this->seek($s);
 			}
 
-			if ($this->literal("@page") &&
-				($this->selector($pageValue) || true) &&
-				$this->literal("{"))
-			{
-				$page = $this->pushSpecialBlock("page");
-				if (isset($pageValue)) $page->value = $pageValue;
-				return true;
-			} else {
-				$this->seek($s);
-			}
-
 			if ($this->literal("@mixin") &&
 				$this->keyword($mixinName) &&
 				($this->argumentDef($args) || true) &&
@@ -1102,7 +1091,7 @@ class scss_parser {
 					($this->argValues($argValues) || true) &&
 					$this->literal(")") || true) &&
 				$this->end())
-		{
+			{
 				$this->append(array("include",
 					$mixinName,
 					isset($argValues) ? $argValues : null));
@@ -1233,6 +1222,24 @@ class scss_parser {
 
 				$this->seek($s);
 			}
+
+
+			// doesn't match built in directive, do generic one
+			if ($this->literal("@", false) && $this->keyword($dirName) &&
+				($this->openString("{", $dirValue) || true) &&
+				$this->literal("{"))
+			{
+				// echo "got open: $dirName\n";
+				// print_r($dirValue);
+
+				$directive = $this->pushSpecialBlock("directive");
+				$directive->name = $dirName;
+				if (isset($dirValue)) $directive->value = $dirValue;
+				return true;
+			}
+
+			$this->seek($s);
+			return false;
 		}
 
 		// nested property assign (or normal assign)
@@ -1660,6 +1667,47 @@ class scss_parser {
 		}
 
 		$out = array("string", $delim, $content);
+		return true;
+	}
+
+	// an unbounded string stopped by $end
+	protected function openString($end, &$out) {
+		$stop = array("'", '"', "#{", $end);
+		$stop = array_map(array($this, "preg_quote"), $stop);
+
+		$patt = '(.*?)('.implode("|", $stop).')';
+
+		$content = array();
+		while ($this->match($patt, $m, false)) {
+			if (!empty($m[1]))
+				$content[] = $m[1];
+
+			$tok = $m[2];
+			$this->count-= strlen($tok);
+			if ($tok == $end) break;
+
+			if (($tok == "'" || $tok == '"') && $this->string($str)) {
+				$content[] = $str;
+				continue;
+			}
+
+			if ($tok == "#{" && $this->interpolation($inter)) {
+				$content[] = $inter;
+				continue;
+			}
+
+			$content[] = $tok;
+			$this->count+= strlen($tok);
+		}
+
+		if (count($content) == 0) return false;
+
+		// trim the end
+		if (is_string(end($content))) {
+			$content[count($content) - 1] = rtrim(end($content));
+		}
+
+		$out = array("string", "", $content);
 		return true;
 	}
 
