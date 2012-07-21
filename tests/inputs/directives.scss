@@ -1,0 +1,46 @@
+
+@page :left {
+    div {
+        color: red;
+    }
+}
+
+@page test {
+    @media yes {
+        div {
+            color: red;
+        }
+
+        @media no {
+            pre {
+                color: blue;
+            }
+        }
+    }
+}
+
+@media something {
+    @page {
+        @media else {
+            div {
+                height: 200px;
+            }
+        }
+    }
+}
+
+
+div {
+    color: red;
+    @page yeah {
+        pre {
+            height: 20px;
+        }
+    }
+}
+
+@font-face {
+    color: red;
+    height: 20px;
+}
+
