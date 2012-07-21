@@ -1054,6 +1054,32 @@ class scssc {
 		return $finalArgs;
 	}
 
+	protected function assertColor($value) {
+		if ($value[0] != "color")
+			throw new exception("expecting color");
+		return $value;
+	}
+
+	protected function coercePercent($value) {
+		if ($value[0] == "number") {
+			if ($value[2] == "%") {
+				return $value[1] / 100;
+			}
+			return $value[1];
+		}
+		return 0;
+	}
+
+	// make sure a color's components don't go out of bounds
+	protected function fixColor($c) {
+		foreach (range(1, 3) as $i) {
+			if ($c[$i] < 0) $c[$i] = 0;
+			if ($c[$i] > 255) $c[$i] = 255;
+		}
+
+		return $c;
+	}
+
 	// Built in functions
 
 	protected static $lib_rgb = array("red", "green", "blue");
@@ -1061,6 +1087,72 @@ class scssc {
 		list($r,$g,$b) = $args;
 		return array("color", $r[1], $g[1], $b[1]);
 	}
+
+	protected static $lib_rgba = array("red", "green", "blue", "alpha");
+	protected function lib_rgba($args) {
+		list($r,$g,$b, $a) = $args;
+		return array("color", $r[1], $g[1], $b[1], $a[1]);
+	}
+
+	protected static $lib_red = array("color");
+	protected function lib_red($args) {
+		list($color) = $args;
+		return $color[1];
+	}
+
+	protected static $lib_green = array("color");
+	protected function lib_green($args) {
+		list($color) = $args;
+		return $color[2];
+	}
+
+	protected static $lib_blue = array("color");
+	protected function lib_blue($args) {
+		list($color) = $args;
+		return $color[3];
+	}
+
+	protected static $lib_alpha = array("color");
+	protected function lib_alpha($args) {
+		list($color) = $args;
+		return isset($color[4]) ? $color[4] : 1;
+	}
+
+	// mix two colors
+	protected static $lib_mix = array("color-1", "color-2", "weight");
+	protected function lib_mix($args) {
+		list($first, $second, $weight) = $args;
+		$first = $this->assertColor($first);
+		$second = $this->assertColor($second);
+
+		if ($weight == self::$defaultValue) {
+			$weight = 0.5;
+		} else {
+			$weight = $this->coercePercent($weight);
+		}
+
+		$first_a = isset($first[4]) ? $first[4] : 1;
+		$second_a = isset($second[4]) ? $second[4] : 1;
+
+		$w = $weight * 2 - 1;
+		$a = $first_a - $second_a;
+
+		$w1 = (($w * $a == -1 ? $w : ($w + $a)/(1 + $w * $a)) + 1) / 2.0;
+		$w2 = 1.0 - $w1;
+
+		$new = array('color',
+			$w1 * $first[1] + $w2 * $second[1],
+			$w1 * $first[2] + $w2 * $second[2],
+			$w1 * $first[3] + $w2 * $second[3],
+		);
+
+		if ($first_a != 1.0 || $second_a != 1.0) {
+			$new[] = $first_a * $weight + $second_a * ($weight - 1);
+		}
+
+		return $this->fixColor($new);
+	}
+
 }
 
 

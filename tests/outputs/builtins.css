@@ -1,1 +1,10 @@
-div { color:#22ea18; }
+div {
+  color:#22ea18;
+  red:34;
+  green:234;
+  blue:24;
+  color:rgba(1,2,4,0.5);
+  a1:1;
+  a2:0.5;
+  mix:#020304;
+}

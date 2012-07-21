@@ -1,5 +1,15 @@
 
 div {
     color: rgb(34,234,24);
+
+    red: red(rgb(34,234,24));
+    green: green(rgb(34,234,24));
+    blue: blue(rgb(34,234,24));
+
+    color: rgba(1,2,4, 0.5);
+    a1: alpha(rgb(1,2,4));
+    a2: alpha(rgba(1,2,4, 0.5));
+
+    mix: mix(rgb(1,2,3), rgb(3,4,5));
 }
 
