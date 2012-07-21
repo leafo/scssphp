@@ -1080,6 +1080,71 @@ class scssc {
 		return $c;
 	}
 
+	function toHSL($r, $g, $b) {
+		$r = $r / 255;
+		$g = $g / 255;
+		$b = $b / 255;
+
+		$min = min($r, $g, $b);
+		$max = max($r, $g, $b);
+
+		$L = ($min + $max) / 2;
+		if ($min == $max) {
+			$S = $H = 0;
+		} else {
+			if ($L < 0.5)
+				$S = ($max - $min)/($max + $min);
+			else
+				$S = ($max - $min)/(2.0 - $max - $min);
+
+			if ($r == $max) $H = ($g - $b)/($max - $min);
+			elseif ($g == $max) $H = 2.0 + ($b - $r)/($max - $min);
+			elseif ($b == $max) $H = 4.0 + ($r - $g)/($max - $min);
+
+		}
+
+		return array('hsl',
+			($H < 0 ? $H + 6 : $H)*60,
+			$S*100,
+			$L*100,
+		);
+	}
+
+	function toRGB_helper($comp, $temp1, $temp2) {
+		if ($comp < 0) $comp += 1.0;
+		elseif ($comp > 1) $comp -= 1.0;
+
+		if (6 * $comp < 1) return $temp1 + ($temp2 - $temp1) * 6 * $comp;
+		if (2 * $comp < 1) return $temp2;
+		if (3 * $comp < 2) return $temp1 + ($temp2 - $temp1)*((2/3) - $comp) * 6;
+
+		return $temp1;
+	}
+
+	// expects H to be in range of 0 to 360, S and L in 0 to 100
+	function toRGB($H, $S, $L) {
+		$H = $H / 360;
+		$S = $S / 100;
+		$L = $L / 100;
+
+		if ($S == 0) {
+			$r = $g = $b = $L;
+		} else {
+			$temp2 = $L < 0.5 ?
+				$L*(1.0 + $S) :
+				$L + $S - $L * $S;
+
+			$temp1 = 2.0 * $L - $temp2;
+
+			$r = $this->toRGB_helper($H + 1/3, $temp1, $temp2);
+			$g = $this->toRGB_helper($H, $temp1, $temp2);
+			$b = $this->toRGB_helper($H - 1/3, $temp1, $temp2);
+		}
+
+		$out = array('color', $r*255, $g*255, $b*255);
+		return $out;
+	}
+
 	// Built in functions
 
 	protected static $lib_rgb = array("red", "green", "blue");
@@ -1153,8 +1218,44 @@ class scssc {
 		return $this->fixColor($new);
 	}
 
-}
+	protected static $lib_hsl = array("hue", "saturation", "lightness");
+	protected function lib_hsl($args) {
+		list($h, $s, $l) = $args;
+		return $this->toRGB($h[1], $s[1], $l[1]);
+	}
 
+	protected static $lib_hsla = array("hue", "saturation",
+		"lightness", "alpha");
+	protected function lib_hsla($args) {
+		list($h, $s, $l, $a) = $args;
+		$color = $this->toRGB($h[1], $s[1], $l[1]);
+		$color[4] = $a[1];
+		return $color;
+	}
+
+	protected static $lib_hue = array("color");
+	protected function lib_hue($args) {
+		$color = $this->assertColor($args[0]);
+		$hsl = $this->toHSL($color[1], $color[2], $color[3]);
+		return array("number", $hsl[1], "deg");
+	}
+
+	protected static $lib_saturation = array("color");
+	protected function lib_saturation($args) {
+		$color = $this->assertColor($args[0]);
+		$hsl = $this->toHSL($color[1], $color[2], $color[3]);
+		return array("number", $hsl[2], "%");
+	}
+
+	protected static $lib_lightness = array("color");
+	protected function lib_lightness($args) {
+		$color = $this->assertColor($args[0]);
+		$hsl = $this->toHSL($color[1], $color[2], $color[3]);
+		return array("number", $hsl[3], "%");
+	}
+
+
+}
 
 class scss_parser {
 	static protected $precedence = array(

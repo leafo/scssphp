@@ -13,3 +13,12 @@ div {
     mix: mix(rgb(1,2,3), rgb(3,4,5));
 }
 
+del {
+    color: hsl(100, 50, 55);
+    color: hsla(100, 50, 55, 0.5);
+
+    hue: hue(hsl(100, 50, 55));
+    sat: saturation(hsl(100, 50, 55));
+    lig: lightness(hsl(100, 50, 55));
+}
+

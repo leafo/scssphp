@@ -8,3 +8,10 @@ div {
   a2:0.5;
   mix:#020304;
 }
+del {
+  color:#79c653;
+  color:rgba(121,198,83,0.5);
+  hue:100deg;
+  sat:50%;
+  lig:55%;
+}
