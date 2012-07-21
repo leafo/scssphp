@@ -30,6 +30,8 @@ class scssc {
 
 	protected $importPaths = array("");
 
+	protected $libFunctions = array();
+
 	function compile($code, $name=null) {
 		$this->indentLevel = -1;
 		$this->commentsSeen = array();
@@ -602,6 +604,7 @@ class scssc {
 				return $value;
 			case "fncall":
 				list(,$name, $argValues) = $value;
+
 				// user defined function?
 				$func = $this->get(self::$namespaces["function"] . $name, false);
 				if ($func) {
@@ -621,6 +624,11 @@ class scssc {
 					$this->popEnv();
 
 					return is_null($ret) ? self::$defaultValue : $ret;
+				}
+
+				// built in function
+				if ($this->callBuiltin($name, $argValues, $returnValue)) {
+					return $returnValue;
 				}
 
 				// need to flatten the arguments into a list
@@ -991,6 +999,68 @@ class scssc {
 	protected function fileExists($name) {
 		return is_file($name);
 	}
+
+	protected function callBuiltin($name, $args, &$returnValue) {
+		// try a lib function
+		$libName = "lib_".$name;
+		$f = array($this, $libName);
+		$prototype = isset(self::$$libName) ? self::$$libName : null;
+
+		if (is_callable($f)) {
+			$sorted = $this->sortArgs($prototype, $args);
+			$sorted = array_map(array($this, "reduce"), $sorted);
+			$returnValue = call_user_func($f, $sorted, $this);
+
+			// coerce a php value into a scss one
+			if (is_numeric($returnValue)) {
+				$returnValue = array('number', $returnValue, "");
+			} elseif (!is_array($returnValue)) {
+				$returnValue = array('keyword', $returnValue);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	// sorts any keyword arguments
+	// TODO: merge with apply arguments
+	protected function sortArgs($prototype, $args) {
+		$keyArgs = array();
+		$posArgs = array();
+
+		foreach ($args as $arg) {
+			list($key, $value) = $arg;
+			$key = $key[1];
+			if (empty($key)) {
+				$posArgs[] = $value;
+			} else {
+				$keyArgs[$key] = $value;
+			}
+		}
+
+		if (is_null($prototype)) return $posArgs;
+
+		$finalArgs = array();
+		foreach ($prototype as $i => $name) {
+			if (isset($posArgs[$i])) {
+				$finalArgs[] = $posArgs[$i];
+			} elseif (isset($keyArgs[$name])) {
+				$finalArgs[] = $keyArgs[$name];
+			} else {
+				$finalArgs[] = self::$defaultValue;
+			}
+		}
+
+		return $finalArgs;
+	}
+
+	// Built in functions
+
+	protected static $lib_rgb = array("red", "green", "blue");
+	protected function lib_rgb($args) {
+		list($r,$g,$b) = $args;
+		return array("color", $r[1], $g[1], $b[1]);
+	}
 }
 
 
@@ -1240,9 +1310,6 @@ class scss_parser {
 				($this->openString("{", $dirValue) || true) &&
 				$this->literal("{"))
 			{
-				// echo "got open: $dirName\n";
-				// print_r($dirValue);
-
 				$directive = $this->pushSpecialBlock("directive");
 				$directive->name = $dirName;
 				if (isset($dirValue)) $directive->value = $dirValue;
