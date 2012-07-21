@@ -1,3 +1,4 @@
+@charset "hello-world";
 @page :left {
   div { color:red; }
 }

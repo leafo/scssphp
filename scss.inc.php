@@ -422,6 +422,9 @@ class scssc {
 		case "block":
 			$this->compileBlock($child[1]);
 			break;
+		case "charset":
+			$out->lines[] = "@charset ".$this->compileValue($child[1]).";";
+			break;
 		case "assign":
 			list(,$name, $value) = $child;
 			switch ($name[0]) {
@@ -1223,6 +1226,14 @@ class scss_parser {
 				$this->seek($s);
 			}
 
+			if ($this->literal("@charset") &&
+				$this->valueList($charset) && $this->end())
+			{
+				$this->append(array("charset", $charset));
+				return true;
+			} else {
+				$this->seek($s);
+			}
 
 			// doesn't match built in directive, do generic one
 			if ($this->literal("@", false) && $this->keyword($dirName) &&

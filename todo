@@ -5,8 +5,6 @@ make formatter match scss's output
 css hacks (find out what they are)
 built in functions
 
-@charset
-
 check mixin infinite loop
 
 # sequence merging:
