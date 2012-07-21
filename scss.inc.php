@@ -1760,6 +1760,7 @@ class scss_parser {
 		return true;
 	}
 
+	// comma separated list of selectors
 	protected function selectors(&$out) {
 		$s = $this->seek();
 		$selectors = array();
@@ -1777,6 +1778,7 @@ class scss_parser {
 		return true;
 	}
 
+	// whitepsace separated list of selectorSingle
 	protected function selector(&$out) {
 		$selector = array();
 		while ($this->selectorSingle($part)) {
@@ -1796,6 +1798,7 @@ class scss_parser {
 		return true;
 	}
 
+	// the parts that make up
 	// div[yes=no]#something.hello.world:nth-child(-2n+1)
 	protected function selectorSingle(&$out) {
 		$oldWhite = $this->eatWhiteDefault;
@@ -1823,6 +1826,12 @@ class scss_parser {
 
 			if ($this->literal(".", false)) {
 				$parts[] = ".";
+				continue;
+			}
+
+			// for keyframes
+			if ($this->unit($unit)) {
+				$parts[] = $unit;
 				continue;
 			}
 
