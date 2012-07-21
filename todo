@@ -5,7 +5,7 @@ make formatter match scss's output
 css hacks (find out what they are)
 built in functions
 
-@page
+@keyframes, @font-face
 
 check mixin infinite loop
 

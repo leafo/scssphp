@@ -42,12 +42,13 @@ class scssc {
 		$formatter = new scss_formatter();
 
 		$this->env = null;
-		$scope = $this->compileRoot($tree);
+		$this->scope = null;
 
-		$this->flattenSelectors($scope);
+		$this->compileRoot($tree);
+		$this->flattenSelectors($this->scope);
 
 		ob_start();
-		$formatter->block($scope);
+		$formatter->block($this->scope);
 		return ob_get_clean();
 	}
 
@@ -64,10 +65,12 @@ class scssc {
 		}
 	}
 
-	protected function makeOutputBlock($selectors = null) {
+	protected function makeOutputBlock($type, $selectors = null) {
 		$out = new stdclass;
+		$out->type = $type;
 		$out->lines = array();
 		$out->children = array();
+		$out->parent = $this->scope;
 		$out->selectors = $selectors;
 
 		return $out;
@@ -195,22 +198,47 @@ class scssc {
 
 	protected function compileRoot($rootBlock) {
 		$this->pushEnv($rootBlock);
-		$this->topScope = $this->scope = $this->makeOutputBlock();
+		$this->scope = $this->makeOutputBlock("root");
 		$this->compileChildren($rootBlock->children, $this->scope);
 		$this->popEnv();
-		return $this->topScope;
 	}
 
 	protected function compileMedia($media) {
 		$this->pushEnv($media);
-		$oldScope = $this->scope;
-		$this->scope = $this->makeOutputBlock(array(
-			$this->compileMediaQuery($this->multiplyMedia($this->env))
-		));
-		$this->topScope->children[] = $this->scope;
+		$parentScope = $this->mediaParent($this->scope);
+
+		$this->scope = $this->makeOutputBlock("media", array(
+			$this->compileMediaQuery($this->multiplyMedia($this->env)))
+		);
+
+		$parentScope->children[] = $this->scope;
+
 		$this->compileChildren($media->children, $this->scope);
 
-		$this->scope = $oldScope;
+		$this->scope = $this->scope->parent;
+		$this->popEnv();
+	}
+
+	protected function mediaParent($scope) {
+		while (!empty($scope->parent)) {
+			if (!empty($scope->type) && $scope->type != "media") {
+				break;
+			}
+			$scope = $scope->parent;
+		}
+
+		return $scope;
+	}
+
+	// TODO refactor compileNestedBlock and compileMedia into same thing
+	protected function compileNestedBlock($block, $selectors) {
+		$this->pushEnv($block);
+
+		$this->scope = $this->makeOutputBlock($block->type, $selectors);
+		$this->scope->parent->children[] = $this->scope;
+		$this->compileChildren($block->children, $this->scope);
+
+		$this->scope = $this->scope->parent;
 		$this->popEnv();
 	}
 
@@ -220,7 +248,7 @@ class scssc {
 		$env->selectors =
 			array_map(array($this, "evalSelector"), $block->selectors);
 
-		$out = $this->makeOutputBlock($this->multiplySelectors($env));
+		$out = $this->makeOutputBlock(null, $this->multiplySelectors($env));
 		$this->scope->children[] = $out;
 		$this->compileChildren($block->children, $out);
 
@@ -379,6 +407,14 @@ class scssc {
 			if (!$this->compileImport($rawPath, $out)) {
 				$out->lines[] = "@import " . $this->compileValue($rawPath) . ";";
 			}
+			break;
+		case "page":
+			list(, $page) = $child;
+			$s = "@page";
+			if (!empty($page->value)) {
+				$s .= " " . $this->compileSelector($page->value);
+			}
+			$this->compileNestedBlock($page, array($s));
 			break;
 		case "media":
 			$this->compileMedia($child[1]);
@@ -800,9 +836,14 @@ class scssc {
 	}
 
 	protected function multiplyMedia($env, $childMedia = null) {
-		if (is_null($env)) return $childMedia;
+		if (is_null($env) ||
+			!empty($env->block->type) && $env->block->type != "media")
+		{
+			return $childMedia;
+		}
 
-		if (empty($env->block->type) || $env->block->type != "media") {
+		// plain old block, skip
+		if (empty($env->block->type)) {
 			return $this->multiplyMedia($env->parent, $childMedia);
 		}
 
@@ -1026,6 +1067,17 @@ class scss_parser {
 			if ($this->literal("@media") && $this->mediaQuery($mediaQuery) && $this->literal("{")) {
 				$media = $this->pushSpecialBlock("media");
 				$media->query = $mediaQuery;
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
+			if ($this->literal("@page") &&
+				($this->selector($pageValue) || true) &&
+				$this->literal("{"))
+			{
+				$page = $this->pushSpecialBlock("page");
+				if (isset($pageValue)) $page->value = $pageValue;
 				return true;
 			} else {
 				$this->seek($s);
