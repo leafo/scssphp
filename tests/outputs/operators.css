@@ -2,8 +2,8 @@ body {
   color:8;
   color:16;
   height:10px/10px;
-  color:6;
-  color:5;
+  color:6px;
+  color:5px;
 }
 div {
   color:false;
@@ -11,4 +11,9 @@ div {
   color:true;
   color:false;
   color:what > 3;
+}
+#units {
+  test:2.575in;
+  test:11mm;
+  test:1.1cm;
 }

@@ -22,6 +22,17 @@ class scssc {
 		"function" => "^",
 	);
 
+	static protected $numberPrecision = 3;
+	static protected $unitTable = array(
+		"in" => array(
+			"in" => 1,
+			"pt" => 72,
+			"pc" => 6,
+			"cm" => 2.54,
+			"mm" => 25.4,
+		)
+	);
+
 	static protected $true = array("keyword", "true");
 	static protected $false = array("keyword", "false");
 
@@ -571,15 +582,34 @@ class scssc {
 				// only do division in special cases
 				// TODO: add variables type check here
 				if ($opName == "div" && !$inParens && !$inExp) {
-					return array("keyword", $this->compileValue($left) . "/" . $this->compileValue($right));
+					return array("keyword",
+						$this->compileValue($left) . "/" .
+						$this->compileValue($right));
 				}
 
 				$left = $this->reduce($left, true);
 				$right = $this->reduce($right, true);
 
 				$fn = "op_${opName}_${left[0]}_${right[0]}";
-				if (is_callable(array($this, $fn)) || ($fn = "op_${opName}") && is_callable(array($this, $fn))) {
-					return $this->$fn($left, $right);
+				if (is_callable(array($this, $fn)) ||
+					($genOp = true &&
+						$fn = "op_${opName}") &&
+						is_callable(array($this, $fn)))
+				{
+					$unitChange = false;
+					if (!isset($genOp) &&
+						$left[0] == "number" && $right[0] == "number")
+					{
+						$unitChange = true;
+						$targetUnit = $left[2];
+						$left = $this->normalizeNumber($left);
+						$right = $this->normalizeNumber($right);
+					}
+					$out = $this->$fn($left, $right);
+					if ($unitChange && $out[0] == "number") {
+						$out = $this->coerceUnit($out, $targetUnit);
+					}
+					return $out;
 				}
 
 				// remember the whitespace around the operator to recreate it?
@@ -644,24 +674,44 @@ class scssc {
 		}
 	}
 
+	// just does physical lengths for now
+	protected function normalizeNumber($number) {
+		list(, $value, $unit) = $number;
+		if (isset(self::$unitTable["in"][$unit])) {
+			$conv = self::$unitTable["in"][$unit];
+			return array("number", $value / $conv, "in");
+		}
+		return $number;
+	}
+
+	// $number should be normalized
+	protected function coerceUnit($number, $unit) {
+		list(, $value, $baseUnit) = $number;
+		if (isset(self::$unitTable[$baseUnit][$unit])) {
+			$value = $value * self::$unitTable[$baseUnit][$unit];
+		}
+
+		return array("number", $value, $unit);
+	}
+
 	protected function op_add_number_number($left, $right) {
-		return array("number", $left[1] + $right[1], "");
+		return array("number", $left[1] + $right[1], $left[2]);
 	}
 
 	protected function op_mul_number_number($left, $right) {
-		return array("number", $left[1] * $right[1], "");
+		return array("number", $left[1] * $right[1], $left[2]);
 	}
 
 	protected function op_sub_number_number($left, $right) {
-		return array("number", $left[1] - $right[1], "");
+		return array("number", $left[1] - $right[1], $left[2]);
 	}
 
 	protected function op_div_number_number($left, $right) {
-		return array("number", $left[1] / $right[1], "");
+		return array("number", $left[1] / $right[1], $left[2]);
 	}
 
 	protected function op_mod_number_number($left, $right) {
-		return array("number", $left[1] % $right[1], "");
+		return array("number", $left[1] % $right[1], $left[2]);
 	}
 
 	protected function op_eq($left, $right) {
@@ -722,7 +772,7 @@ class scssc {
 
 			return $h;
 		case "number":
-			return $value[1] . $value[2];
+			return round($value[1], self::$numberPrecision) . $value[2];
 		case "string":
 			return $value[1] . $this->compileStringContent($value) . $value[1];
 		case "function":
