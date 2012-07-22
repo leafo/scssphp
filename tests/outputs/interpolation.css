@@ -11,41 +11,29 @@ div {
   test: "whatworldwrong";
   test: "whatworldwrong";
   test: "what"world"wrong";
-  hi: "what is 16 end";
-}
+  hi: "what is 16 end"; }
 pre var {
-  color: red;
-}
-pre var dad {
-  color: red;
-}
-pre bedvardad {
-  color: red;
-}
+  color: red; }
+  pre var dad {
+    color: red; }
+  pre bedvardad {
+    color: red; }
 cool .thing-1 {
-  color: red;
-}
-cool .thing-2 {
-  color: red;
-}
-cool .thing-3 {
-  color: red;
-}
-cool .thing-4 {
-  color: red;
-}
-cool .thing-5 {
-  color: red;
-}
+  color: red; }
+  cool .thing-2 {
+    color: red; }
+  cool .thing-3 {
+    color: red; }
+  cool .thing-4 {
+    color: red; }
+  cool .thing-5 {
+    color: red; }
 abcde {
-  color: red;
-}
+  color: red; }
 #hello, .world {
-  color: red;
-}
+  color: red; }
 #abchelloyeah, .coolworldyes {
-  color: red;
-}
+  color: red; }
 div {
   hello: world;
   coolhello: world;
@@ -53,5 +41,4 @@ div {
   twohelloone: world;
   hello-world: red;
   hello-mold: white;
-  hello-hello: blue;
-}
+  hello-hello: blue; }

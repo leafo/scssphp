@@ -1,72 +1,48 @@
 error, pre seriousError, span seriousError, other, hello {
   border: 1px #f00;
-  background-color: #fdd;
-}
+  background-color: #fdd; }
 pre seriousError, span seriousError {
-  font-size: 20px;
-}
+  font-size: 20px; }
 hello {
-  color: green;
-}
-hello div {
-  margin: 10px;
-}
+  color: green; }
+  hello div {
+    margin: 10px; }
 .cool, .me {
-  color: red;
-}
+  color: red; }
 .blue, .me {
-  color: purple;
-}
+  color: purple; }
 a:hover, .hoverlink {
-  text-decoration: underline;
-}
+  text-decoration: underline; }
 div.hello.world.hmm, pre div.okay.span.world.hmm, pre #butt .umm div.sure.span.world.hmm, #butt .umm pre div.sure.span.world.hmm, code div.okay.span.world.hmm, code #butt .umm div.sure.span.world.hmm, #butt .umm code div.sure.span.world.hmm {
-  color: blue;
-}
+  color: blue; }
 .xxxxx .xxxxx .xxxxx, code .xxxxx .xxxxx, code code .xxxxx, code code code, code .xxxxx code, .xxxxx code .xxxxx, .xxxxx code code, .xxxxx .xxxxx code {
-  color: green;
-}
+  color: green; }
 code {
-  color: red;
-}
+  color: red; }
 .alpha, .beta, .gama {
-  color: red;
-}
+  color: red; }
 .beta, .gama {
-  color: white;
-}
+  color: white; }
 .gama {
-  color: blue;
-}
+  color: blue; }
 #admin .tabbar a, #admin .tabbar #demo .overview .fakelink, #demo .overview #admin .tabbar .fakelink {
-  font-weight: bold;
-}
+  font-weight: bold; }
 a1 b1 c1 d1, x1 y1 z1 w1 b1 c1 d1 {
-  color: red;
-}
+  color: red; }
 a2 b2 c2 d2, a2 x2 y2 z2 w2 c2 d2, x2 y2 z2 a2 w2 c2 d2 {
-  color: red;
-}
+  color: red; }
 a3 b3 c3 d3, a3 b3 x3 y3 z3 w3 d3, x3 y3 z3 a3 b3 w3 d3 {
-  color: red;
-}
+  color: red; }
 a4 b4 c4 d4, a4 b4 c4 x4 y4 z4 w4, x4 y4 z4 a4 b4 c4 w4 {
-  color: red;
-}
+  color: red; }
 #butt .yeah .okay, #butt .yeah .umm .sure, #butt .umm .yeah .sure {
-  font-weight: bold;
-}
+  font-weight: bold; }
 a9 b9 s9 t9 v9, a9 b9 s9 t9 x9 y9 z9, a9 b9 x9 y9 s9 t9 z9 {
-  color: red;
-}
+  color: red; }
 @media print {
   horse, man {
-    color: blue;
-  }
-}
+    color: blue; } }
 man {
-  color: red;
-}
+  color: red; }
 wassup {
-  color: blue;
-}
+  color: blue; }

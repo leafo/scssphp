@@ -43,6 +43,8 @@ class scssc {
 
 	protected $libFunctions = array();
 
+	public $formatter = "scss_formatter_nested";
+
 	function compile($code, $name=null) {
 		$this->indentLevel = -1;
 		$this->commentsSeen = array();
@@ -52,7 +54,7 @@ class scssc {
 		$this->parser = new scss_parser($name);
 		$tree = $this->parser->parse($code);
 
-		$this->formatter = new scss_formatter();
+		$this->formatter = new $this->formatter();
 
 		$this->env = null;
 		$this->scope = null;
@@ -2613,15 +2615,11 @@ class scss_formatter {
 	public $tagSeparator = ", ";
 	public $assignSeparator = ": ";
 
-	public $disableSingle = false;
-	public $openSingle = " { ";
-	public $closeSingle = " }";
-
 	public function __construct() {
 		$this->indentLevel = 0;
 	}
 
-	public function indentStr($n=0) {
+	public function indentStr($n = 0) {
 		return str_repeat($this->indentChar, max($this->indentLevel + $n, 0));
 	}
 
@@ -2658,6 +2656,78 @@ class scss_formatter {
 			$this->indentLevel--;
 			if (empty($block->children)) echo $this->break;
 			echo $pre . $this->close . $this->break;
+		}
+	}
+}
+
+
+class scss_formatter_nested extends scss_formatter {
+	public $close = " }";
+
+	// adjust the depths of all children, depth first
+	public function adjustAllChildren($block) {
+		// flatten empty nested blocks
+		$children = array();
+		foreach ($block->children as $i => $child) {
+			if (empty($child->lines) && empty($child->children)) {
+				if (isset($block->children[$i + 1])) {
+					$block->children[$i + 1]->depth = $child->depth;
+				}
+				continue;
+			}
+			$children[] = $child;
+		}
+		$block->children = $children;
+
+		// make relative to parent
+		foreach ($block->children as $child) {
+			$this->adjustAllChildren($child);
+			$child->depth = $child->depth - $block->depth;
+		}
+	}
+
+	public function block($block) {
+		if ($block->type == "root") {
+			$this->adjustAllChildren($block);
+		}
+
+		$inner = $pre = $this->indentStr($block->depth - 1);
+		if (!empty($block->selectors)) {
+			echo $pre .
+				implode($this->tagSeparator, $block->selectors) .
+				$this->open . $this->break;
+			$this->indentLevel++;
+			$inner = $this->indentStr($block->depth - 1);
+		}
+
+		if (!empty($block->lines)) {
+			$glue = $this->break.$inner;
+			echo $inner . implode($glue, $block->lines);
+			if (!empty($block->children)) echo $this->break;
+		}
+
+		foreach ($block->children as $i => $child) {
+			// echo "*** block: ".$block->depth." child: ".$child->depth."\n";
+			$this->block($child);
+			if ($i < count($block->children) - 1) {
+				echo $this->break;
+
+				if (isset($block->children[$i + 1])) {
+					$next = $block->children[$i + 1];
+					if ($next->depth == $block->depth && $child->depth > $next->depth) {
+						echo $this->break;
+					}
+				}
+			}
+		}
+
+		if (!empty($block->selectors)) {
+			$this->indentLevel--;
+			echo $this->close;
+		}
+
+		if ($block->type == "root") {
+			echo $this->break;
 		}
 	}
 }

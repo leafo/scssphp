@@ -3,17 +3,14 @@ body {
   color: 16;
   height: 10px/10px;
   color: 6px;
-  color: 5px;
-}
+  color: 5px; }
 div {
   color: false;
   color: true;
   color: true;
   color: false;
-  color: what > 3;
-}
+  color: what > 3; }
 #units {
   test: 2.575in;
   test: 11mm;
-  test: 1.1cm;
-}
+  test: 1.1cm; }

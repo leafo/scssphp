@@ -1,12 +1,9 @@
 div {
   color: 14px;
-  sum: 23;
-}
+  sum: 23; }
 div {
   hello: 10 55;
   hello: 1010 55;
-  hello: "hello 10 and 55";
-}
+  hello: "hello 10 and 55"; }
 del {
-  color: 1000;
-}
+  color: 1000; }

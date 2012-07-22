@@ -1,16 +1,11 @@
 cool: 100px;
 div {
-  height: red, two, three;
-}
+  height: red, two, three; }
 div {
-  num: 1000;
-}
+  num: 1000; }
 div {
-  num: 2000;
-}
+  num: 2000; }
 del {
-  color: red;
-}
-del div pre {
-  color: red;
-}
+  color: red; }
+  del div pre {
+    color: red; }
