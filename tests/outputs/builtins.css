@@ -3,14 +3,14 @@
   red: 34;
   green: 234;
   blue: 24;
-  color: rgba(1,2,4,0.5);
+  color: rgba(1, 2, 4, 0.5);
   a1: 1;
   a2: 0.5;
   mix: #020304; }
 
 #hsl {
   color: #79c653;
-  color: rgba(121,198,83,0.5);
+  color: rgba(121, 198, 83, 0.5);
   hue: 100deg;
   sat: 50%;
   lig: 55%; }
@@ -26,15 +26,15 @@
 
 #more-more-color {
   op: 0.5;
-  opacify: rgba(1,2,3,0.6);
-  opacify: rgba(1,2,3,0.6);
-  transparentize: rgba(1,2,3,0.4);
-  transparentize: rgba(1,2,3,0.4);
-  transparentize: rgba(52,130,3,0.9); }
+  opacify: rgba(1, 2, 3, 0.6);
+  opacify: rgba(1, 2, 3, 0.6);
+  transparentize: rgba(1, 2, 3, 0.4);
+  transparentize: rgba(1, 2, 3, 0.4);
+  transparentize: rgba(52, 130, 3, 0.9); }
 
 #string {
   color: hello what is going on;
-  color: "yeah you know it";
+  color: "yeah";
   color: "I do?"; }
 
 #number {
@@ -47,7 +47,6 @@
   len: 3;
   len: 1;
   n: hello;
-  n: ;
   hello: one, two, three, hello;
   hello: one, two, three, hello, world, what, is, going;
   hello: one, two, three, hello;

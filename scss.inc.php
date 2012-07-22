@@ -763,7 +763,7 @@ class scssc {
 			$b = round($b);
 
 			if (count($value) == 5 && $value[4] != 1) { // rgba
-				return 'rgba('.$r.','.$g.','.$b.','.$value[4].')';
+				return 'rgba('.$r.', '.$g.', '.$b.', '.$value[4].')';
 			}
 
 			$h = sprintf("#%02x%02x%02x", $r, $g, $b);

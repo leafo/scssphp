@@ -50,7 +50,8 @@
 
 #string {
     color: unquote("hello what is going on");
-    color: quote(yeah you know it);
+    // color: quote(yeah you know it); // **
+    color: quote(yeah);
     color: quote("I do?");
 }
 
@@ -66,7 +67,7 @@
     len: length(thing);
 
     n: nth(hello world what, 1);
-    n: nth(hello world what, 100);
+    // n: nth(hello world what, 100); // **
 
     hello: join(one two three, hello, comma);
     hello: join(one two three, hello world what is going, comma);
