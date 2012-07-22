@@ -1,23 +1,37 @@
 @media {
-  div { color:blue; }
+  div {
+    color: blue;
+  }
 }
 @media what {
-  div { color:blue; }
+  div {
+    color: blue;
+  }
 }
 @media (cool) {
-  div { color:blue; }
+  div {
+    color: blue;
+  }
 }
 @media (cool: blue) {
-  div { color:blue; }
+  div {
+    color: blue;
+  }
 }
 @media hello and (world) and (butt: man) {
-  div { color:blue; }
+  div {
+    color: blue;
+  }
 }
 @media not hello and (world) {
-  color:blue;
-  pre { color:blue; }
+  color: blue;
+  pre {
+    color: blue;
+  }
 }
 @media not hello and (world) and butt {
-  color:red;
-  div { color:red; }
+  color: red;
+  div {
+    color: red;
+  }
 }

@@ -3,19 +3,21 @@
 @import "http://foo.com/bar";
 @import url(foo);
 div {
-  height:200px;
-  color:red;
+  height: 200px;
+  color: red;
 }
-pre { color:red; }
+pre {
+  color: red;
+}
 pre div {
-  height:200px;
-  color:red;
+  height: 200px;
+  color: red;
 }
 code div {
-  height:200px;
-  color:red;
+  height: 200px;
+  color: red;
 }
 code div {
-  height:200px;
-  color:red;
+  height: 200px;
+  color: red;
 }

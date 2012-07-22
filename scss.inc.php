@@ -52,7 +52,7 @@ class scssc {
 		$this->parser = new scss_parser($name);
 		$tree = $this->parser->parse($code);
 
-		$formatter = new scss_formatter();
+		$this->formatter = new scss_formatter();
 
 		$this->env = null;
 		$this->scope = null;
@@ -61,7 +61,7 @@ class scssc {
 		$this->flattenSelectors($this->scope);
 
 		ob_start();
-		$formatter->block($this->scope);
+		$this->formatter->block($this->scope);
 		return ob_get_clean();
 	}
 
@@ -85,6 +85,7 @@ class scssc {
 		$out->children = array();
 		$out->parent = $this->scope;
 		$out->selectors = $selectors;
+		$out->depth = $this->env->depth;
 
 		return $out;
 	}
@@ -448,9 +449,9 @@ class scssc {
 				}
 				break;
 			case "property":
-				$out->lines[] =
-					$this->compilePropertyName($child[1]) . ":" .
-					$this->compileValue($child[2]) . ";";
+				$out->lines[] = $this->formatter->property(
+					$this->compilePropertyName($child[1]),
+					$this->compileValue($child[2]));
 				break;
 			}
 			break;
@@ -959,13 +960,12 @@ class scssc {
 		}
 	}
 
-	// we have environments in addition to blocks for handling mixins, where
-	// blocks are reused in different contexts
 	protected function pushEnv($block=null) {
 		$env = new stdclass;
 		$env->parent = $this->env;
 		$env->store = array();
 		$env->block = $block;
+		$env->depth = isset($this->env->depth) ? $this->env->depth + 1 : 0;
 
 		$this->env = $env;
 		return $env;
@@ -2611,6 +2611,7 @@ class scss_formatter {
 	public $open = " {";
 	public $close = "}";
 	public $tagSeparator = ", ";
+	public $assignSeparator = ": ";
 
 	public $disableSingle = false;
 	public $openSingle = " { ";
@@ -2620,32 +2621,33 @@ class scss_formatter {
 		$this->indentLevel = 0;
 	}
 
+	public function indentStr($n=0) {
+		return str_repeat($this->indentChar, max($this->indentLevel + $n, 0));
+	}
+
+	public function property($name, $value) {
+		return $name . $this->assignSeparator . $value . ";";
+	}
+
 	public function block($block) {
 		if (empty($block->lines) && empty($block->children)) return;
 
-		$isSingle = false;
+		$inner = $pre = $this->indentStr();
+
 		if (!empty($block->selectors)) {
-			$preIndent = str_repeat($this->indentChar, $this->indentLevel);
-			echo $preIndent .
-				implode($this->tagSeparator, $block->selectors);
-
-			// check for single mode
-			if (count($block->lines) == 1 && empty($block->children)) {
-				echo $this->openSingle;
-				$isSingle = true;
-			} else {
-				echo $this->open . $this->break;
-			}
-
+			echo $pre .
+				implode($this->tagSeparator, $block->selectors) .
+				$this->open . $this->break;
 			$this->indentLevel++;
+			$inner = $this->indentStr();
 		}
 
-		$indent = str_repeat($this->indentChar, $this->indentLevel);
-
-		if ($isSingle) {
-			echo $block->lines[0];
-		} elseif (count($block->lines) > 0) {
-			echo $indent . implode("\n$indent", $block->lines) . $this->break;
+		if (!empty($block->lines)) {
+			$glue = $this->break.$inner;
+			echo $inner . implode($glue, $block->lines);
+			if (!empty($block->children)) {
+				echo $this->break;
+			}
 		}
 
 		foreach ($block->children as $child) {
@@ -2654,13 +2656,8 @@ class scss_formatter {
 
 		if (!empty($block->selectors)) {
 			$this->indentLevel--;
-			if ($isSingle) {
-				echo $this->closeSingle;
-			} else {
-				echo $preIndent . $this->close;
-			}
-
-			echo $this->break;
+			if (empty($block->children)) echo $this->break;
+			echo $pre . $this->close . $this->break;
 		}
 	}
 }

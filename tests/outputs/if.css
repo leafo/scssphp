@@ -1,14 +1,18 @@
-div { color:blue; }
+div {
+  color: blue;
+}
 pre {
-  val-1:"red";
-  val-2:"blue";
+  val-1: "red";
+  val-2: "blue";
 }
 span {
-  color:blue;
-  height:10px;
+  color: blue;
+  height: 10px;
 }
 div {
-  color:blue;
-  border-color:green;
+  color: blue;
+  border-color: green;
 }
-del { thing:no; }
+del {
+  thing: no;
+}

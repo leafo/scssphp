@@ -1,15 +1,27 @@
 div {
-  color:blue;
-  color:red;
+  color: blue;
+  color: red;
 }
-div pre { height:200px; }
+div pre {
+  height: 200px;
+}
 span {
-  color:blue;
-  color:;
-  color:;
+  color: blue;
+  color: ;
+  color: ;
 }
-span div { height:20px; }
-span div { height:20px; }
-span div { height:20px; }
-html { height:43px; }
-del { height:20px; }
+span div {
+  height: 20px;
+}
+span div {
+  height: 20px;
+}
+span div {
+  height: 20px;
+}
+html {
+  height: 43px;
+}
+del {
+  height: 20px;
+}

@@ -1,14 +1,18 @@
-div:blue;
-body { color:red; }
-div {
-  color:red;
-  height:yes;
+div: blue;
+body {
+  color: red;
 }
-div pre { color:blue; }
 div {
-  font:10px hello world;
-  font-size:10px;
-  font-color:blue;
-  border-left:1px solid blue;
-  border-right:2px dashed green;
+  color: red;
+  height: yes;
+}
+div pre {
+  color: blue;
+}
+div {
+  font: 10px hello world;
+  font-size: 10px;
+  font-color: blue;
+  border-left: 1px solid blue;
+  border-right: 2px dashed green;
 }
