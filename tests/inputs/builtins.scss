@@ -1,5 +1,5 @@
 
-div {
+#color {
     color: rgb(34,234,24);
 
     red: red(rgb(34,234,24));
@@ -13,7 +13,7 @@ div {
     mix: mix(rgb(1,2,3), rgb(3,4,5));
 }
 
-del {
+#hsl {
     color: hsl(100, 50, 55);
     color: hsla(100, 50, 55, 0.5);
 
@@ -22,7 +22,7 @@ del {
     lig: lightness(hsl(100, 50, 55));
 }
 
-span {
+#more-color {
     $color: hsl(-80,44,33);
 
     light: lighten($color, 10%);
@@ -36,7 +36,7 @@ span {
     inv: invert($color);
 }
 
-body {
+#more-more-color {
     $color: rgba(1,2,3,0.5);
     op: opacity($color);
 
@@ -48,20 +48,20 @@ body {
     transparentize: transparentize(#348203, 0.1);
 }
 
-blockquote {
+#string {
     color: unquote("hello what is going on");
     color: quote(yeah you know it);
     color: quote("I do?");
 }
 
-div {
+#number {
     color: percentage(100/40);
     color: round(3.4);
     color: floor(3.4);
     color: ceil(3.4);
 }
 
-dt {
+#list {
     len: length(hello world what);
     len: length(thing);
 
@@ -82,3 +82,23 @@ dt {
     cool: join($yes, $no, space);
     cool: join($no, $yes);
 } 
+
+#introspection {
+    t: type-of(100px);
+    t: type-of(asdf);
+    t: type-of("asdf");
+    t: type-of(true);
+    t: type-of(#fff);
+    t: type-of(blue);
+    t: type-of(one two three);
+
+    u: unit(12);
+    u: unit(12px);
+    u: unit(12em);
+
+
+    l: unitless(23);
+    l: unitless(23deg);
+}
+
+

@@ -1,4 +1,4 @@
-div {
+#color {
   color:#22ea18;
   red:34;
   green:234;
@@ -8,14 +8,14 @@ div {
   a2:0.5;
   mix:#020304;
 }
-del {
+#hsl {
   color:#79c653;
   color:rgba(121,198,83,0.5);
   hue:100deg;
   sat:50%;
   lig:55%;
 }
-span {
+#more-color {
   light:#7e3d9e;
   dark:#432154;
   sat:#632782;
@@ -24,7 +24,7 @@ span {
   comp:#48792f;
   inv:#9fd086;
 }
-body {
+#more-more-color {
   op:0.5;
   opacify:rgba(1,2,3,0.6);
   opacify:rgba(1,2,3,0.6);
@@ -32,18 +32,18 @@ body {
   transparentize:rgba(1,2,3,0.4);
   transparentize:rgba(52,130,3,0.9);
 }
-blockquote {
+#string {
   color:hello what is going on;
   color:"yeah you know it";
   color:"I do?";
 }
-div {
+#number {
   color:250%;
   color:3;
   color:3;
   color:4;
 }
-dt {
+#list {
   len:3;
   len:1;
   n:hello;
@@ -55,4 +55,18 @@ dt {
   world:one, two, three, great job;
   cool:one two three great job;
   cool:great job one two three;
+}
+#introspection {
+  t:number;
+  t:string;
+  t:string;
+  t:bool;
+  t:color;
+  t:string;
+  t:list;
+  u:"";
+  u:"px";
+  u:"em";
+  l:true;
+  l:false;
 }

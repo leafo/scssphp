@@ -1017,6 +1017,8 @@ class scssc {
 			// coerce a php value into a scss one
 			if (is_numeric($returnValue)) {
 				$returnValue = array('number', $returnValue, "");
+			} elseif (is_bool($returnValue)) {
+				$returnValue = $returnValue ? self::$true : self::$false;
 			} elseif (!is_array($returnValue)) {
 				$returnValue = array('keyword', $returnValue);
 			}
@@ -1454,6 +1456,43 @@ class scssc {
 		$list1 = $this->coerceList($list1, " ");
 		$sep = $this->listSeparatorForJoin($list1, $sep);
 		return array("list", $sep, array_merge($list1[2], array($value)));
+	}
+
+
+	protected static $lib_type_of = array("value");
+	protected function lib_type_of($args) {
+		$value = $args[0];
+		switch ($value[0]) {
+		case "keyword":
+			if ($value == self::$true || $value == self::$false) {
+				return "bool";
+			}
+			// TODO coerce color
+			return "string";
+		default:
+			return $value[0];
+		}
+	}
+
+	protected static $lib_unit = array("number");
+	protected function lib_unit($args) {
+		$num = $args[0];
+		if ($num[0] == "number") {
+			return array("string", '"', array($num[2]));
+		}
+		return "";
+	}
+
+	protected static $lib_unitless = array("number");
+	protected function lib_unitless($args) {
+		$value = $args[0];
+		return $value[0] == "number" && empty($value[2]);
+	}
+
+
+	protected static $lib_comparable = array("number-1", "number-2");
+	protected function lib_comparable($args) {
+		return true; // TODO: THIS
 	}
 }
 
