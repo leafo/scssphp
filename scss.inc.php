@@ -1009,7 +1009,9 @@ class scssc {
 
 		if (is_callable($f)) {
 			$sorted = $this->sortArgs($prototype, $args);
-			$sorted = array_map(array($this, "reduce"), $sorted);
+			foreach ($sorted as &$val) {
+				$val = $this->reduce($val, true);
+			}
 			$returnValue = call_user_func($f, $sorted, $this);
 
 			// coerce a php value into a scss one
@@ -1196,6 +1198,11 @@ class scssc {
 		return isset($color[4]) ? $color[4] : 1;
 	}
 
+	protected static $lib_opacity = array("color");
+	protected function lib_opacity($args) {
+		return $this->lib_alpha($args);
+	}
+
 	// mix two colors
 	protected static $lib_mix = array("color-1", "color-2", "weight");
 	protected function lib_mix($args) {
@@ -1328,6 +1335,82 @@ class scssc {
 		$color[2] = 255 - $color[2];
 		$color[3] = 255 - $color[3];
 		return $color;
+	}
+
+
+	// increases opacity by amount
+	protected static $lib_opacify = array("color", "amount");
+	protected function lib_opacify($args) {
+		$color = $this->assertColor($args[0]);
+		$amount = $this->coercePercent($args[1]);
+
+		$color[4] = (isset($color[4]) ? $color[4] : 1) + $amount;
+		$color[4] = min(1, max(0, $color[4]));
+		return $color;
+	}
+
+	protected static $lib_fade_in = array("color", "amount");
+	protected function lib_fade_in($args) {
+		return $this->lib_opacify($args);
+	}
+
+	// decreases opacity by amount
+	protected static $lib_transparentize = array("color", "amount");
+	protected function lib_transparentize($args) {
+		$color = $this->assertColor($args[0]);
+		$amount = $this->coercePercent($args[1]);
+
+		$color[4] = (isset($color[4]) ? $color[4] : 1) - $amount;
+		$color[4] = min(1, max(0, $color[4]));
+		return $color;
+	}
+
+	protected static $lib_fade_out = array("color", "amount");
+	protected function lib_fade_out($args) {
+		return $this->lib_transparentize($args);
+	}
+
+	protected static $lib_unquote = array("string");
+	protected function lib_unquote($args) {
+		$str = $args[0];
+		$str[1] = "";
+		return $str;
+	}
+
+	protected static $lib_quote = array("string");
+	protected function lib_quote($args) {
+		$value = $args[0];
+		if ($value[0] == "string" && !empty($value[1]))
+			return $value;
+		return array("string", '"', array($value));
+	}
+
+	protected static $lib_percentage = array("value");
+	protected function lib_percentage($args) {
+		return array("number",
+			$this->coercePercent($args[0]) * 100,
+			"%");
+	}
+
+	protected static $lib_round = array("value");
+	protected function lib_round($args) {
+		$num = $args[0];
+		$num[1] = round($num[1]);
+		return $num;
+	}
+
+	protected static $lib_floor = array("value");
+	protected function lib_floor($args) {
+		$num = $args[0];
+		$num[1] = floor($num[1]);
+		return $num;
+	}
+
+	protected static $lib_ceil = array("value");
+	protected function lib_ceil($args) {
+		$num = $args[0];
+		$num[1] = ceil($num[1]);
+		return $num;
 	}
 
 }

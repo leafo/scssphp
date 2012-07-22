@@ -36,4 +36,28 @@ span {
     inv: invert($color);
 }
 
+body {
+    $color: rgba(1,2,3,0.5);
+    op: opacity($color);
+
+    opacify: opacify($color, 0.1);
+    opacify: fade-in($color, 0.1);
+
+    transparentize: transparentize($color, 0.1);
+    transparentize: fade-out($color, 0.1);
+    transparentize: transparentize(#348203, 0.1);
+}
+
+blockquote {
+    color: unquote("hello what is going on");
+    color: quote(yeah you know it);
+    color: quote("I do?");
+}
+
+div {
+    color: percentage(100/40);
+    color: round(3.4);
+    color: floor(3.4);
+    color: ceil(3.4);
+}
 

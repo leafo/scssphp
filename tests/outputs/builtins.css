@@ -24,3 +24,22 @@ span {
   comp:#48792f;
   inv:#9fd086;
 }
+body {
+  op:0.5;
+  opacify:rgba(1,2,3,0.6);
+  opacify:rgba(1,2,3,0.6);
+  transparentize:rgba(1,2,3,0.4);
+  transparentize:rgba(1,2,3,0.4);
+  transparentize:rgba(52,130,3,0.9);
+}
+blockquote {
+  color:hello what is going on;
+  color:"yeah you know it";
+  color:"I do?";
+}
+div {
+  color:250%;
+  color:3;
+  color:3;
+  color:4;
+}
