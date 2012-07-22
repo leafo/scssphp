@@ -3,6 +3,7 @@ div {
   color: red; }
     div pre {
       height: 200px; }
+
 span {
   color: blue;
   color: ;
@@ -13,7 +14,9 @@ span {
       height: 20px; }
     span div {
       height: 20px; }
+
 html {
   height: 43px; }
+
 del {
   height: 20px; }

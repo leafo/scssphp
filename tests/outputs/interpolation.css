@@ -12,12 +12,14 @@ div {
   test: "whatworldwrong";
   test: "what"world"wrong";
   hi: "what is 16 end"; }
+
 pre var {
   color: red; }
   pre var dad {
     color: red; }
   pre bedvardad {
     color: red; }
+
 cool .thing-1 {
   color: red; }
   cool .thing-2 {
@@ -28,12 +30,16 @@ cool .thing-1 {
     color: red; }
   cool .thing-5 {
     color: red; }
+
 abcde {
   color: red; }
+
 #hello, .world {
   color: red; }
+
 #abchelloyeah, .coolworldyes {
   color: red; }
+
 div {
   hello: world;
   coolhello: world;

@@ -1,5 +1,4 @@
 
-* make formatter match scss's output
 * css hacks (find out what they are)
 * check mixin infinite loop
 * change all calls to reduce to not suppress division where appropriate

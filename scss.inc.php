@@ -2714,7 +2714,7 @@ class scss_formatter_nested extends scss_formatter {
 
 				if (isset($block->children[$i + 1])) {
 					$next = $block->children[$i + 1];
-					if ($next->depth == $block->depth && $child->depth > $next->depth) {
+					if ($next->depth == max($block->depth, 1) && $child->depth >= $next->depth) {
 						echo $this->break;
 					}
 				}
