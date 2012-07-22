@@ -61,3 +61,24 @@ div {
     color: ceil(3.4);
 }
 
+dt {
+    len: length(hello world what);
+    len: length(thing);
+
+    n: nth(hello world what, 1);
+    n: nth(hello world what, 100);
+
+    hello: join(one two three, hello, comma);
+    hello: join(one two three, hello world what is going, comma);
+    hello: append(one two three, hello, comma);
+
+
+
+    $yes: one, two, three;
+    $no: great job;
+    world: join($yes, $no);
+    world: append($yes, $no);
+
+    cool: join($yes, $no, space);
+    cool: join($no, $yes);
+} 

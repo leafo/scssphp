@@ -7,6 +7,16 @@ built in functions
 
 check mixin infinite loop
 
+change all calls to reduce to not suppress division where appropriate
+
+MISSING FUNCS:
+	rgba($color, $alpha)
+	Adds an alpha layer to any color value.
+
+comma separated list literals in parens (for function/mixin calls)
+
+append(10px 20px, 30px 40px) => 10px 20px (30px 40px) # DOCS are wrong about this?
+
 # sequence merging:
 
 a b c d { color: red; }

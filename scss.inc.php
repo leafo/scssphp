@@ -1373,7 +1373,7 @@ class scssc {
 	protected static $lib_unquote = array("string");
 	protected function lib_unquote($args) {
 		$str = $args[0];
-		$str[1] = "";
+		if ($str[0] == "string") $str[1] = "";
 		return $str;
 	}
 
@@ -1413,6 +1413,48 @@ class scssc {
 		return $num;
 	}
 
+	protected static $lib_length = array("list");
+	protected function lib_length($args) {
+		$list = $this->coerceList($args[0]);
+		return count($list[2]);
+	}
+
+	protected static $lib_nth = array("list", "n");
+	protected function lib_nth($args) {
+		$list = $this->coerceList($args[0]);
+		$n = $this->assertNumber($args[1]) - 1;
+		return isset($list[2][$n]) ? $list[2][$n] : self::$defaultValue;
+	}
+
+
+	protected function listSeparatorForJoin($list1, $sep) {
+		if ($sep == self::$defaultValue) return $list1[1];
+		switch ($this->compileValue($sep)) {
+		case "comma":
+			return ",";
+		case "space":
+			return "";
+		default:
+			return $list1[1];
+		}
+	}
+
+	protected static $lib_join = array("list1", "list2", "separator");
+	protected function lib_join($args) {
+		list($list1, $list2, $sep) = $args;
+		$list1 = $this->coerceList($list1, " ");
+		$list2 = $this->coerceList($list2, " ");
+		$sep = $this->listSeparatorForJoin($list1, $sep);
+		return array("list", $sep, array_merge($list1[2], $list2[2]));
+	}
+
+	protected static $lib_append = array("list", "val", "separator");
+	protected function lib_append($args) {
+		list($list1, $value, $sep) = $args;
+		$list1 = $this->coerceList($list1, " ");
+		$sep = $this->listSeparatorForJoin($list1, $sep);
+		return array("list", $sep, array_merge($list1[2], array($value)));
+	}
 }
 
 class scss_parser {
