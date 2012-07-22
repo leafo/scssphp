@@ -15,3 +15,12 @@ del {
   sat:50%;
   lig:55%;
 }
+span {
+  light:#7e3d9e;
+  dark:#432154;
+  sat:#632782;
+  desat:#5e3871;
+  gray:#545454;
+  comp:#48792f;
+  inv:#9fd086;
+}

@@ -922,7 +922,7 @@ class scssc {
 	}
 
 	protected function normalizeName($name) {
-		return str_replace("_", "-", $name);
+		return str_replace("-", "_", $name);
 	}
 
 	protected function set($name, $value) {
@@ -1002,6 +1002,7 @@ class scssc {
 
 	protected function callBuiltin($name, $args, &$returnValue) {
 		// try a lib function
+		$name = $this->normalizeName($name);
 		$libName = "lib_".$name;
 		$f = array($this, $libName);
 		$prototype = isset(self::$$libName) ? self::$$libName : null;
@@ -1058,6 +1059,12 @@ class scssc {
 		if ($value[0] != "color")
 			throw new exception("expecting color");
 		return $value;
+	}
+
+	protected function assertNumber($value) {
+		if ($value[0] != "number")
+			throw new exception("expecting number");
+		return $value[1];
 	}
 
 	protected function coercePercent($value) {
@@ -1121,8 +1128,14 @@ class scssc {
 		return $temp1;
 	}
 
-	// expects H to be in range of 0 to 360, S and L in 0 to 100
+	// H from 0 to 360, S and L from 0 to 100
 	function toRGB($H, $S, $L) {
+		$H = $H % 360;
+		if ($H < 0) $H += 360;
+
+		$S = min(100, max(0, $S));
+		$L = min(100, max(0, $L));
+
 		$H = $H / 360;
 		$S = $S / 100;
 		$L = $L / 100;
@@ -1254,6 +1267,68 @@ class scssc {
 		return array("number", $hsl[3], "%");
 	}
 
+
+	protected function adjustHsl($color, $idx, $amount) {
+		$hsl = $this->toHSL($color[1], $color[2], $color[3]);
+		$hsl[$idx] += $amount;
+		$out = $this->toRGB($hsl[1], $hsl[2], $hsl[3]);
+		if (isset($color[4])) $out[4] = $color[4];
+		return $out;
+	}
+
+	protected static $lib_adjust_hue = array("color", "degrees");
+	protected function lib_adjust_hue($args) {
+		$color = $this->assertColor($args[0]);
+		$degrees = $this->assertNumber($args[1]);
+		return $this->adjustHsl($color, 1, $degrees);
+	}
+
+	protected static $lib_lighten = array("color", "amount");
+	protected function lib_lighten($args) {
+		$color = $this->assertColor($args[0]);
+		$amount = 100*$this->coercePercent($args[1]);
+		return $this->adjustHsl($color, 3, $amount);
+	}
+
+	protected static $lib_darken = array("color", "amount");
+	protected function lib_darken($args) {
+		$color = $this->assertColor($args[0]);
+		$amount = 100*$this->coercePercent($args[1]);
+		return $this->adjustHsl($color, 3, -$amount);
+	}
+
+	protected static $lib_saturate = array("color", "amount");
+	protected function lib_saturate($args) {
+		$color = $this->assertColor($args[0]);
+		$amount = 100*$this->coercePercent($args[1]);
+		return $this->adjustHsl($color, 2, $amount);
+	}
+
+	protected static $lib_desaturate = array("color", "amount");
+	protected function lib_desaturate($args) {
+		$color = $this->assertColor($args[0]);
+		$amount = 100*$this->coercePercent($args[1]);
+		return $this->adjustHsl($color, 2, -$amount);
+	}
+
+	protected static $lib_grayscale = array("color");
+	protected function lib_grayscale($args) {
+		return $this->adjustHsl($this->assertColor($args[0]), 2, -100);
+	}
+
+	protected static $lib_complement = array("color");
+	protected function lib_complement($args) {
+		return $this->adjustHsl($this->assertColor($args[0]), 1, 180);
+	}
+
+	protected static $lib_invert = array("color");
+	protected function lib_invert($args) {
+		$color = $this->assertColor($args[0]);
+		$color[1] = 255 - $color[1];
+		$color[2] = 255 - $color[2];
+		$color[3] = 255 - $color[3];
+		return $color;
+	}
 
 }
 

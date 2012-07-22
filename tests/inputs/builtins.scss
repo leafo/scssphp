@@ -22,3 +22,18 @@ del {
     lig: lightness(hsl(100, 50, 55));
 }
 
+span {
+    $color: hsl(-80,44,33);
+
+    light: lighten($color, 10%);
+    dark: darken($color, 10%);
+
+    sat: saturate($color, 10%);
+    desat: desaturate($color, 10%);
+
+    gray: grayscale($color);
+    comp: complement($color);
+    inv: invert($color);
+}
+
+
