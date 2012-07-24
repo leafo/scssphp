@@ -2590,8 +2590,11 @@ class scss_parser {
 	// returns an array of parts or a string
 	protected function propertyName(&$out) {
 		$s = $this->seek();
-
 		$parts = array();
+
+		$oldWhite = $this->eatWhiteDefault;
+		$this->eatWhiteDefault = false;
+
 		$hasInterpolation = false;
 		while (true) {
 			if ($this->interpolation($inter)) {
@@ -2599,18 +2602,35 @@ class scss_parser {
 				$parts[] = $inter;
 			} elseif ($this->keyword($text)) {
 				$parts[] = $text;
+			} elseif (count($parts) == 0 && $this->match('[:.#]', $m, false)) {
+				// css hacks
+				$parts[] = $m[0];
 			} else {
 				break;
 			}
 		}
 
+		$this->eatWhiteDefault = $oldWhite;
 		if (count($parts) == 0) return false;
+
+		// match comment hack
+		if (preg_match(self::$whitePattern,
+			$this->buffer, $m, null, $this->count))
+		{
+			if (!empty($m[0])) {
+				$parts[] = $m[0];
+				$this->count += strlen($m[0]);
+			}
+		}
+
 		if ($hasInterpolation) {
 			$out = $parts;
 		} else {
 			$out = implode($parts);
 		}
+
 		$out = array("property", $out);
+
 		return true;
 	}
 
