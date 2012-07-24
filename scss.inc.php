@@ -2792,7 +2792,9 @@ class scss_parser {
 	}
 
 	protected function keyword(&$word, $eatWhitespace = null) {
-		if ($this->match('([\w_\-\*!"][\w\-_"]*)', $m, $eatWhitespace)) {
+		if ($this->match('([\w_\-\*!"\'\\\\][\w\-_"\'\\\\]*)',
+			$m, $eatWhitespace))
+		{
 			$word = $m[1];
 			return true;
 		}
