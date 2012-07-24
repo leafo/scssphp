@@ -2128,6 +2128,11 @@ class scss_parser {
 			return true;
 		}
 
+		// extra ;
+		if ($this->literal(";")) {
+			return true;
+		}
+
 		return false;
 	}
 
