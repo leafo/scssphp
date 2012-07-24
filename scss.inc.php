@@ -2361,17 +2361,37 @@ class scss_parser {
 		return false;
 	}
 
+	protected function show() {
+		if ($this->peek("(.*?)(\n|$)", $m, $this->count)) {
+			return $m[1];
+		}
+		return "";
+	}
+
 	protected function func(&$func) {
 		$s = $this->seek();
 
 		if ($this->keyword($name, false) &&
-			$this->literal("(") &&
-			($this->argValues($args) || true) &&
-			$this->literal(")"))
+			$this->literal("("))
 		{
-			$func = array("fncall", $name, $args);
-			return true;
+			$ss = $this->seek();
+			if ($this->argValues($args) && $this->literal(")")) {
+				$func = array("fncall", $name, $args);
+				return true;
+			}
+
+			$this->seek($ss);
+			if ($this->to(")", $str)) {
+				$args = array();
+				if (!empty($str)) {
+					$args[] = array(null, array("string", "", array($str)));
+				}
+
+				$func = array("fncall", $name, $args);
+				return true;
+			}
 		}
+
 
 		$this->seek($s);
 		return false;
