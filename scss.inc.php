@@ -271,19 +271,6 @@ class scssc {
 		$this->popEnv();
 	}
 
-	protected function compilePropertyName($prop) {
-		list(, $parts) = $prop;
-		if (is_array($parts)) {
-			foreach ($parts as &$part) {
-				if (!is_string($part)) {
-					$part = $this->compileValue($part);
-				}
-			}
-			$parts = implode($parts);
-		}
-		return $parts;
-	}
-
 	// joins together .classes and #ids
 	protected function flattenSelectorSingle($single) {
 		$joined = array();
@@ -443,19 +430,17 @@ class scssc {
 			break;
 		case "assign":
 			list(,$name, $value) = $child;
-			switch ($name[0]) {
-			case "var":
+			if ($name[0] == "var") {
 				$isDefault = !empty($child[3]);
 				if (!$isDefault || $this->get($name[1], true) === true) {
 					$this->set($name[1], $this->reduce($value));
 				}
 				break;
-			case "property":
-				$out->lines[] = $this->formatter->property(
-					$this->compilePropertyName($child[1]),
-					$this->compileValue($child[2]));
-				break;
 			}
+
+			$out->lines[] = $this->formatter->property(
+				$this->compileValue($child[1]),
+				$this->compileValue($child[2]));
 			break;
 		case "comment":
 			$out->lines[] = $child[1];
@@ -533,14 +518,10 @@ class scssc {
 		case "nestedprop":
 			list(,$prop) = $child;
 			$prefixed = array();
-			$prefix = $this->compilePropertyName($prop->prefix);
+			$prefix = $this->compileValue($prop->prefix) . "-";
 			foreach ($prop->children as $child) {
 				if ($child[0] == "assign") {
-					// replace assign name with merged one
-					$child[1] = array(
-						"property",
-						$prefix . "-" . $this->compilePropertyName($child[1])
-					);
+					array_unshift($child[1][2], $prefix);
 				}
 				$prefixed[] = $child;
 			}
@@ -2623,14 +2604,7 @@ class scss_parser {
 			}
 		}
 
-		if ($hasInterpolation) {
-			$out = $parts;
-		} else {
-			$out = implode($parts);
-		}
-
-		$out = array("property", $out);
-
+		$out = array("string", "", $parts);
 		return true;
 	}
 
