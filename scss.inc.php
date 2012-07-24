@@ -2073,6 +2073,11 @@ class scss_parser {
 			$this->seek($s);
 		}
 
+		// misc
+		if ($this->literal("-->")) {
+			return true;
+		}
+
 		// opening css block
 		if ($this->selectors($selectors) && $this->literal("{")) {
 			$this->pushBlock($selectors);
@@ -2128,8 +2133,10 @@ class scss_parser {
 			return true;
 		}
 
-		// extra ;
-		if ($this->literal(";")) {
+		// extra stuff
+		if ($this->literal(";") ||
+			$this->literal("<!--"))
+		{
 			return true;
 		}
 
