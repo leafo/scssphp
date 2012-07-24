@@ -575,6 +575,16 @@ class scssc {
 		}
 	}
 
+	protected function expToString($exp) {
+		list(, $op, $left, $right, $inParens, $whiteLeft, $whiteRight) = $exp;
+		$content = array($left);
+		if ($whiteLeft) $content[] = " ";
+		$content[] = $op;
+		if ($whiteRight) $content[] = " ";
+		$content[] = $right;
+		return array("string", "", $content);
+	}
+
 	protected function reduce($value, $inExp = false) {
 		list($type) = $value;
 		switch ($type) {
@@ -589,9 +599,7 @@ class scssc {
 				// TODO: add variables type check here
 				if ($opName == "div" && !$inParens && !$inExp) {
 					if ($left[0] != "color" && $right[0] != "color") {
-						return array("keyword",
-							$this->compileValue($left) . "/" .
-							$this->compileValue($right));
+						return $this->expToString($value);
 					}
 				}
 
@@ -642,8 +650,7 @@ class scssc {
 					return $out;
 				}
 
-				// remember the whitespace around the operator to recreate it?
-				return array("list", "", array($left, array("keyword", $op), $right));
+				return $this->expToString($value);
 			case "var":
 				list(, $name) = $value;
 				return $this->reduce($this->get($name));
@@ -742,6 +749,10 @@ class scssc {
 
 	protected function op_mod_number_number($left, $right) {
 		return array("number", $left[1] % $right[1], $left[2]);
+	}
+
+	protected function op_add_keyword_keyword($left, $right) {
+		return array("keyword", $left[1] . $right[1]);
 	}
 
 	protected function op_color_color($op, $left, $right) {
@@ -867,13 +878,13 @@ class scssc {
 			return implode("$delim ", $items);
 		case "interpolated": # node created by extractInterpolation
 			list(, $interpolate, $left, $right) = $value;
-			list(,, $white_left, $white_right) = $interpolate;
+			list(,, $whiteLeft, $whiteRight) = $interpolate;
 
 			$left = count($left[2]) > 0 ?
-				$this->compileValue($left).$white_left : "";
+				$this->compileValue($left).$whiteLeft : "";
 
 			$right = count($right[2]) > 0 ?
-				$white_right.$this->compileValue($right) : "";
+				$whiteRight.$this->compileValue($right) : "";
 
 			return $left.$this->compileValue($interpolate).$right;
 
@@ -2321,7 +2332,12 @@ class scss_parser {
 		$opstr = self::$operatorStr;
 
 		$ss = $this->seek();
+		$whiteBefore = isset($this->buffer[$this->count - 1]) &&
+			ctype_space($this->buffer[$this->count - 1]);
 		while ($this->match($opstr, $m) && self::$precedence[$m[1]] >= $minP) {
+			$whiteAfter = isset($this->buffer[$this->count - 1]) &&
+				ctype_space($this->buffer[$this->count - 1]);
+
 			$op = $m[1];
 
 			if (!$this->value($rhs)) break;
@@ -2331,8 +2347,10 @@ class scss_parser {
 				$rhs = $this->expHelper($rhs, self::$precedence[$next[1]]);
 			}
 
-			$lhs = array("exp", $op, $lhs, $rhs, $this->inParens);
+			$lhs = array("exp", $op, $lhs, $rhs, $this->inParens, $whiteBefore, $whiteAfter);
 			$ss = $this->seek();
+			$whiteBefore = isset($this->buffer[$this->count - 1]) &&
+				ctype_space($this->buffer[$this->count - 1]);
 		}
 
 		$this->seek($ss);
@@ -2371,13 +2389,6 @@ class scss_parser {
 
 
 		return false;
-	}
-
-	protected function show() {
-		if ($this->peek("(.*?)(\n|$)", $m, $this->count)) {
-			return $m[1];
-		}
-		return "";
 	}
 
 	protected function func(&$func) {
@@ -2878,6 +2889,13 @@ class scss_parser {
 
 	static function preg_quote($what) {
 		return preg_quote($what, '/');
+	}
+
+	protected function show() {
+		if ($this->peek("(.*?)(\n|$)", $m, $this->count)) {
+			return $m[1];
+		}
+		return "";
 	}
 }
 

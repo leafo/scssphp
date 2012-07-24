@@ -27,3 +27,7 @@ div {
   color: rgba(3, 4, 5, 0.5);
   color: rgba(0, 0, 1, 0.5);
   color: #22f; }
+
+#preserve {
+  hello: what -going;
+  hello: what - going; }
