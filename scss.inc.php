@@ -2384,14 +2384,20 @@ class scss_parser {
 		if ($this->keyword($name, false) &&
 			$this->literal("("))
 		{
-			$ss = $this->seek();
-			if ($this->argValues($args) && $this->literal(")")) {
-				$func = array("fncall", $name, $args);
-				return true;
+			if ($name != "expression") {
+				$ss = $this->seek();
+				if ($name != "expression") {
+					if ($this->argValues($args) && $this->literal(")")) {
+						$func = array("fncall", $name, $args);
+						return true;
+					}
+				}
+				$this->seek($ss);
 			}
 
-			$this->seek($ss);
-			if ($this->to(")", $str)) {
+			if (($this->openString(")", $str, "(") || true ) &&
+				$this->literal(")"))
+			{
 				$args = array();
 				if (!empty($str)) {
 					$args[] = array(null, array("string", "", array($str)));
@@ -2401,7 +2407,6 @@ class scss_parser {
 				return true;
 			}
 		}
-
 
 		$this->seek($s);
 		return false;
@@ -2506,20 +2511,32 @@ class scss_parser {
 	}
 
 	// an unbounded string stopped by $end
-	protected function openString($end, &$out) {
+	protected function openString($end, &$out, $nestingOpen=null) {
 		$stop = array("'", '"', "#{", $end);
 		$stop = array_map(array($this, "preg_quote"), $stop);
 
 		$patt = '(.*?)('.implode("|", $stop).')';
 
+		$nestingLevel = 0;
+
 		$content = array();
 		while ($this->match($patt, $m, false)) {
-			if (!empty($m[1]))
+			if (!empty($m[1])) {
 				$content[] = $m[1];
+				if ($nestingOpen) {
+					$nestingLevel += substr_count($m[1], $nestingOpen);
+				}
+			}
 
 			$tok = $m[2];
 			$this->count-= strlen($tok);
-			if ($tok == $end) break;
+			if ($tok == $end) {
+				if ($nestingLevel == 0) {
+					break;
+				} else {
+					$nestingLevel--;
+				}
+			}
 
 			if (($tok == "'" || $tok == '"') && $this->string($str)) {
 				$content[] = $str;
