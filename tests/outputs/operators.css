@@ -16,3 +16,14 @@ div {
   test: 2.575in;
   test: 11mm;
   test: 1.1cm; }
+
+#colors {
+  color: #ff0203;
+  color: #fe0000;
+  color: rgba(3, 8, 15, 0.5);
+  color: rgba(5, 8, 10, 0.5);
+  color: rgba(2, 4, 6, 0.5);
+  color: rgba(1, 1, 2, 0.5);
+  color: rgba(3, 4, 5, 0.5);
+  color: rgba(0, 0, 1, 0.5);
+  color: #22f; }

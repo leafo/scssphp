@@ -61,7 +61,7 @@
   t: string;
   t: bool;
   t: color;
-  t: string;
+  t: color;
   t: list;
   u: "";
   u: "px";

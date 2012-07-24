@@ -582,22 +582,43 @@ class scssc {
 				list(, $op, $left, $right, $inParens) = $value;
 				$opName = self::$operatorNames[$op];
 
-				// only do division in special cases
-				// TODO: add variables type check here
-				if ($opName == "div" && !$inParens && !$inExp) {
-					return array("keyword",
-						$this->compileValue($left) . "/" .
-						$this->compileValue($right));
-				}
-
 				$left = $this->reduce($left, true);
 				$right = $this->reduce($right, true);
 
-				$fn = "op_${opName}_${left[0]}_${right[0]}";
+				// only do division in special cases
+				// TODO: add variables type check here
+				if ($opName == "div" && !$inParens && !$inExp) {
+					if ($left[0] != "color" && $right[0] != "color") {
+						return array("keyword",
+							$this->compileValue($left) . "/" .
+							$this->compileValue($right));
+					}
+				}
+
+
+				if ($lColor = $this->coerceColor($left)) {
+					$left = $lColor;
+				}
+
+				if ($rColor = $this->coerceColor($right)) {
+					$right = $rColor;
+				}
+
+				$ltype = $left[0];
+				$rtype = $right[0];
+
+				// this tries:
+				// 1. op_[op name]_[left type]_[right type]
+				// 2. op_[left type]_[right type] (passing the op as first arg
+				// 3. op_[op name]
+				$fn = "op_${opName}_${ltype}_${rtype}";
 				if (is_callable(array($this, $fn)) ||
-					($genOp = true &&
-						$fn = "op_${opName}") &&
-						is_callable(array($this, $fn)))
+					(($fn = "op_${ltype}_${rtype}") &&
+						is_callable(array($this, $fn)) &&
+						$passOp = true) ||
+					(($fn = "op_${opName}") &&
+						is_callable(array($this, $fn)) &&
+						$genOp = true))
 				{
 					$unitChange = false;
 					if (!isset($genOp) &&
@@ -608,7 +629,13 @@ class scssc {
 						$left = $this->normalizeNumber($left);
 						$right = $this->normalizeNumber($right);
 					}
-					$out = $this->$fn($left, $right);
+
+					if (isset($passOp)) {
+						$out = $this->$fn($op, $left, $right);
+					} else {
+						$out = $this->$fn($left, $right);
+					}
+
 					if ($unitChange && $out[0] == "number") {
 						$out = $this->coerceUnit($out, $targetUnit);
 					}
@@ -717,6 +744,53 @@ class scssc {
 		return array("number", $left[1] % $right[1], $left[2]);
 	}
 
+	protected function op_color_color($op, $left, $right) {
+		$out = array('color');
+		foreach (range(1, 3) as $i) {
+			$lval = isset($left[$i]) ? $left[$i] : 0;
+			$rval = isset($right[$i]) ? $right[$i] : 0;
+			switch ($op) {
+			case '+':
+				$out[] = $lval + $rval;
+				break;
+			case '-':
+				$out[] = $lval - $rval;
+				break;
+			case '*':
+				$out[] = $lval * $rval;
+				break;
+			case '%':
+				$out[] = $lval % $rval;
+				break;
+			case '/':
+				if ($rval == 0) {
+					throw new exception("color: Can't divide by zero");
+				}
+				$out[] = $lval / $rval;
+				break;
+			default:
+				throw new exception("color: unknow op $op");
+			}
+		}
+
+		if (isset($left[4])) $out[4] = $left[4];
+		elseif (isset($right[4])) $out[4] = $right[4];
+
+		return $this->fixColor($out);
+	}
+
+	protected function op_color_number($op, $left, $right) {
+		$value = $right[1];
+		return $this->op_color_color($op, $left,
+			array("color", $value, $value, $value));
+	}
+
+	protected function op_number_color($op, $left, $right) {
+		$value = $left[1];
+		return $this->op_color_color($op,
+			array("color", $value, $value, $value), $right);
+	}
+
 	protected function op_eq($left, $right) {
 		return $this->toBool($left == $right);
 	}
@@ -758,6 +832,7 @@ class scssc {
 			// [3] - blue component
 			// [4] - optional alpha component
 			list(, $r, $g, $b) = $value;
+
 			$r = round($r);
 			$g = round($g);
 			$b = round($b);
@@ -1111,10 +1186,24 @@ class scssc {
 		return $finalArgs;
 	}
 
+	protected function coerceColor($value) {
+		switch ($value[0]) {
+		case "color": return $value;
+		case "keyword":
+			$name = $value[1];
+			if (isset(self::$cssColors[$name])) {
+				list($r, $g, $b) = explode(',', self::$cssColors[$name]);
+				return array('color', $r, $g, $b);
+			}
+			return null;
+		}
+
+		return null;
+	}
+
 	protected function assertColor($value) {
-		if ($value[0] != "color")
-			throw new exception("expecting color");
-		return $value;
+		if ($color = $this->coerceColor($value)) return $color;
+		throw new exception("expecting color");
 	}
 
 	protected function assertNumber($value) {
@@ -1519,7 +1608,11 @@ class scssc {
 			if ($value == self::$true || $value == self::$false) {
 				return "bool";
 			}
-			// TODO coerce color
+
+			if ($this->coerceColor($value)) {
+				return "color";
+			}
+
 			return "string";
 		default:
 			return $value[0];
@@ -1546,6 +1639,156 @@ class scssc {
 	protected function lib_comparable($args) {
 		return true; // TODO: THIS
 	}
+
+	static protected $cssColors = array(
+		'aliceblue' => '240,248,255',
+		'antiquewhite' => '250,235,215',
+		'aqua' => '0,255,255',
+		'aquamarine' => '127,255,212',
+		'azure' => '240,255,255',
+		'beige' => '245,245,220',
+		'bisque' => '255,228,196',
+		'black' => '0,0,0',
+		'blanchedalmond' => '255,235,205',
+		'blue' => '0,0,255',
+		'blueviolet' => '138,43,226',
+		'brown' => '165,42,42',
+		'burlywood' => '222,184,135',
+		'cadetblue' => '95,158,160',
+		'chartreuse' => '127,255,0',
+		'chocolate' => '210,105,30',
+		'coral' => '255,127,80',
+		'cornflowerblue' => '100,149,237',
+		'cornsilk' => '255,248,220',
+		'crimson' => '220,20,60',
+		'cyan' => '0,255,255',
+		'darkblue' => '0,0,139',
+		'darkcyan' => '0,139,139',
+		'darkgoldenrod' => '184,134,11',
+		'darkgray' => '169,169,169',
+		'darkgreen' => '0,100,0',
+		'darkgrey' => '169,169,169',
+		'darkkhaki' => '189,183,107',
+		'darkmagenta' => '139,0,139',
+		'darkolivegreen' => '85,107,47',
+		'darkorange' => '255,140,0',
+		'darkorchid' => '153,50,204',
+		'darkred' => '139,0,0',
+		'darksalmon' => '233,150,122',
+		'darkseagreen' => '143,188,143',
+		'darkslateblue' => '72,61,139',
+		'darkslategray' => '47,79,79',
+		'darkslategrey' => '47,79,79',
+		'darkturquoise' => '0,206,209',
+		'darkviolet' => '148,0,211',
+		'deeppink' => '255,20,147',
+		'deepskyblue' => '0,191,255',
+		'dimgray' => '105,105,105',
+		'dimgrey' => '105,105,105',
+		'dodgerblue' => '30,144,255',
+		'firebrick' => '178,34,34',
+		'floralwhite' => '255,250,240',
+		'forestgreen' => '34,139,34',
+		'fuchsia' => '255,0,255',
+		'gainsboro' => '220,220,220',
+		'ghostwhite' => '248,248,255',
+		'gold' => '255,215,0',
+		'goldenrod' => '218,165,32',
+		'gray' => '128,128,128',
+		'green' => '0,128,0',
+		'greenyellow' => '173,255,47',
+		'grey' => '128,128,128',
+		'honeydew' => '240,255,240',
+		'hotpink' => '255,105,180',
+		'indianred' => '205,92,92',
+		'indigo' => '75,0,130',
+		'ivory' => '255,255,240',
+		'khaki' => '240,230,140',
+		'lavender' => '230,230,250',
+		'lavenderblush' => '255,240,245',
+		'lawngreen' => '124,252,0',
+		'lemonchiffon' => '255,250,205',
+		'lightblue' => '173,216,230',
+		'lightcoral' => '240,128,128',
+		'lightcyan' => '224,255,255',
+		'lightgoldenrodyellow' => '250,250,210',
+		'lightgray' => '211,211,211',
+		'lightgreen' => '144,238,144',
+		'lightgrey' => '211,211,211',
+		'lightpink' => '255,182,193',
+		'lightsalmon' => '255,160,122',
+		'lightseagreen' => '32,178,170',
+		'lightskyblue' => '135,206,250',
+		'lightslategray' => '119,136,153',
+		'lightslategrey' => '119,136,153',
+		'lightsteelblue' => '176,196,222',
+		'lightyellow' => '255,255,224',
+		'lime' => '0,255,0',
+		'limegreen' => '50,205,50',
+		'linen' => '250,240,230',
+		'magenta' => '255,0,255',
+		'maroon' => '128,0,0',
+		'mediumaquamarine' => '102,205,170',
+		'mediumblue' => '0,0,205',
+		'mediumorchid' => '186,85,211',
+		'mediumpurple' => '147,112,219',
+		'mediumseagreen' => '60,179,113',
+		'mediumslateblue' => '123,104,238',
+		'mediumspringgreen' => '0,250,154',
+		'mediumturquoise' => '72,209,204',
+		'mediumvioletred' => '199,21,133',
+		'midnightblue' => '25,25,112',
+		'mintcream' => '245,255,250',
+		'mistyrose' => '255,228,225',
+		'moccasin' => '255,228,181',
+		'navajowhite' => '255,222,173',
+		'navy' => '0,0,128',
+		'oldlace' => '253,245,230',
+		'olive' => '128,128,0',
+		'olivedrab' => '107,142,35',
+		'orange' => '255,165,0',
+		'orangered' => '255,69,0',
+		'orchid' => '218,112,214',
+		'palegoldenrod' => '238,232,170',
+		'palegreen' => '152,251,152',
+		'paleturquoise' => '175,238,238',
+		'palevioletred' => '219,112,147',
+		'papayawhip' => '255,239,213',
+		'peachpuff' => '255,218,185',
+		'peru' => '205,133,63',
+		'pink' => '255,192,203',
+		'plum' => '221,160,221',
+		'powderblue' => '176,224,230',
+		'purple' => '128,0,128',
+		'red' => '255,0,0',
+		'rosybrown' => '188,143,143',
+		'royalblue' => '65,105,225',
+		'saddlebrown' => '139,69,19',
+		'salmon' => '250,128,114',
+		'sandybrown' => '244,164,96',
+		'seagreen' => '46,139,87',
+		'seashell' => '255,245,238',
+		'sienna' => '160,82,45',
+		'silver' => '192,192,192',
+		'skyblue' => '135,206,235',
+		'slateblue' => '106,90,205',
+		'slategray' => '112,128,144',
+		'slategrey' => '112,128,144',
+		'snow' => '255,250,250',
+		'springgreen' => '0,255,127',
+		'steelblue' => '70,130,180',
+		'tan' => '210,180,140',
+		'teal' => '0,128,128',
+		'thistle' => '216,191,216',
+		'tomato' => '255,99,71',
+		'turquoise' => '64,224,208',
+		'violet' => '238,130,238',
+		'wheat' => '245,222,179',
+		'white' => '255,255,255',
+		'whitesmoke' => '245,245,245',
+		'yellow' => '255,255,0',
+		'yellowgreen' => '154,205,50'
+	);
 }
 
 class scss_parser {

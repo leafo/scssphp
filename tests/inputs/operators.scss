@@ -25,3 +25,18 @@ div {
     test: 1cm + 1mm;
 }
 
+
+#colors {
+    color: red + rgb(1,2,3);
+    color: red - rgb(1,2,3);
+    color: rgba(1,2,3, 0.5) * rgba(3,4,5, 0.5);
+    color: rgba(10,15,20, 0.5) / rgba(2,2,2, 0.5);
+
+    color: rgba(1,2,3, 0.5) * 2;
+    color: rgba(1,2,3, 0.5) / 2;
+    color: rgba(1,2,3, 0.5) + 2;
+    color: rgba(1,2,3, 0.5) - 2;
+
+    color: blue + 34;
+}
+
