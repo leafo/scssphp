@@ -46,4 +46,16 @@ div {
     hello: what - going;
 }
 
+#strings {
+    hello: what -going;
+
+    hello: what +going;
+    hello: what+going;
+    hello: what+ going;
+    hello: what + going;
+
+    hello: "what" + going;
+    hello: going + "what";
+    hello: "what" + "what";
+}
 

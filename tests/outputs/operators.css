@@ -31,3 +31,13 @@ div {
 #preserve {
   hello: what -going;
   hello: what - going; }
+
+#strings {
+  hello: what -going;
+  hello: whatgoing;
+  hello: whatgoing;
+  hello: whatgoing;
+  hello: whatgoing;
+  hello: "whatgoing";
+  hello: goingwhat;
+  hello: "whatwhat"; }

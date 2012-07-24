@@ -603,14 +603,8 @@ class scssc {
 					}
 				}
 
-
-				if ($lColor = $this->coerceColor($left)) {
-					$left = $lColor;
-				}
-
-				if ($rColor = $this->coerceColor($right)) {
-					$right = $rColor;
-				}
+				$left = $this->coerceForExpression($left);
+				$right = $this->coerceForExpression($right);
 
 				$ltype = $left[0];
 				$rtype = $right[0];
@@ -751,8 +745,8 @@ class scssc {
 		return array("number", $left[1] % $right[1], $left[2]);
 	}
 
-	protected function op_add_keyword_keyword($left, $right) {
-		return array("keyword", $left[1] . $right[1]);
+	protected function op_add_string_string($left, $right) {
+		return array("string", $left[1], array_merge($left[2], $right[2]));
 	}
 
 	protected function op_color_color($op, $left, $right) {
@@ -1195,6 +1189,18 @@ class scssc {
 		}
 
 		return $finalArgs;
+	}
+
+	protected function coerceForExpression($value) {
+		if ($color = $this->coerceColor($value)) {
+			return $color;
+		}
+
+		if ($value[0] == "keyword") {
+			return array("string", "", array($value[1]));
+		}
+
+		return $value;
 	}
 
 	protected function coerceColor($value) {
