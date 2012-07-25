@@ -2361,14 +2361,32 @@ class scss_parser {
 		if ($this->unit($out)) return true;
 		if ($this->string($out)) return true;
 		if ($this->func($out)) return true;
+		if ($this->progid($out)) return true;
 
-		// convert keyword to be more borad and include numbers/symbols
 		if ($this->keyword($keyword)) {
 			$out = array("keyword", $keyword);
 			return true;
 		}
 
+		return false;
+	}
 
+	protected function progid(&$out) {
+		$s = $this->seek();
+		if ($this->literal("progid:", false) &&
+			$this->openString("(", $fn) &&
+			$this->literal("("))
+		{
+			$this->openString(")", $args, "(");
+			if ($this->literal(")")) {
+				$out = array("string", "", array(
+					"progid:", $fn, "(", $args, ")"
+				));
+				return true;
+			}
+		}
+
+		$this->seek($s);
 		return false;
 	}
 
