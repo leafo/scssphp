@@ -1329,8 +1329,12 @@ class scssc {
 
 	protected static $lib_alpha = array("color");
 	protected function lib_alpha($args) {
-		list($color) = $args;
-		return isset($color[4]) ? $color[4] : 1;
+		if ($color = $this->coerceColor($args[0])) {
+			return isset($color[4]) ? $color[4] : 1;
+		}
+
+		// this might be the IE function, so return value unchanged
+		return array("function", "alpha", array("list", ",", $args));
 	}
 
 	protected static $lib_opacity = array("color");
