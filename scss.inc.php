@@ -2615,6 +2615,8 @@ class scss_parser {
 			}
 		}
 
+		$this->whitespace(); // get any extra whitespace
+
 		$out = array("string", "", $parts);
 		return true;
 	}
