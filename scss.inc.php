@@ -326,12 +326,6 @@ class scssc {
 			if (!is_array($p)) continue;
 
 			switch ($p[0]) {
-			case "parens":
-				$inner = implode(", ", array_map(
-					array($this, "compileSelector"),
-					$p[1]));
-				$p = "($inner)";
-				break;
 			case "self":
 				$p = "&";
 				break;
@@ -2720,22 +2714,21 @@ class scss_parser {
 				$parts[] = $m[0] . $name;
 
 				$ss = $this->seek();
-				if ($this->literal("(")) {
-					$this->selectors($inner);
-
-					if ($this->literal(")")) {
-						$parts[] = array("parens",
-							is_null($inner) ? array() : $inner);
-					} else {
-						$this->seek($ss);
-					}
+				if ($this->literal("(") &&
+					($this->openString(")", $str, "(") || true ) &&
+					$this->literal(")"))
+				{
+					$parts[] = "(";
+					if (!empty($str)) $parts[] = $str;
+					$parts[] = ")";
+				} else {
+					$this->seek($ss);
 				}
 
 				continue;
 			} else {
 				$this->seek($s);
 			}
-
 
 			// attribute selector
 			if ($this->literal("[", false)) {
