@@ -2664,13 +2664,17 @@ class scss_parser {
 	// whitepsace separated list of selectorSingle
 	protected function selector(&$out) {
 		$selector = array();
-		while ($this->selectorSingle($part)) {
-			$selector[] = $part;
-			$this->whitespace();
 
-			if ($this->match('[>+~]', $m)) {
+		while (true) {
+			if ($this->match('[>+~]+', $m)) {
 				$selector[] = array($m[0]);
+			} elseif ($this->selectorSingle($part)) {
+				$selector[] = $part;
+				$this->whitespace();
+			} else {
+				break;
 			}
+
 		}
 
 		if (count($selector) == 0) {
@@ -2709,6 +2713,11 @@ class scss_parser {
 
 			if ($this->literal(".", false)) {
 				$parts[] = ".";
+				continue;
+			}
+
+			if ($this->literal("|", false)) {
+				$parts[] = "|";
 				continue;
 			}
 
