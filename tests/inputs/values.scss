@@ -15,4 +15,9 @@
   a: 12px expression(1 + (3 / Foo.bar("baz" + "bang") + function() {return 12;}) % 12);
 }
 
+#unary {
+    b: +0.5em;
+    c: -foo(12px);
+    d: +foo(12px);
+}
 

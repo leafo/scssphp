@@ -620,6 +620,12 @@ class scssc {
 				}
 
 				return $this->expToString($value);
+			case "unary":
+				list(, $op, $exp) = $value;
+				if ($op == "+" && $exp[0] == "number") {
+					return $exp;
+				}
+				return array("string", "", array($op, $exp));
 			case "var":
 				list(, $name) = $value;
 				return $this->reduce($this->get($name));
@@ -2357,6 +2363,11 @@ class scss_parser {
 		} else {
 			$this->inParens = $inParens;
 			$this->seek($s);
+		}
+
+		if ($this->literal("+") && $this->value($inner)) {
+			$out = array("unary", "+", $inner);
+			return true;
 		}
 
 		if ($this->interpolation($out)) return true;
