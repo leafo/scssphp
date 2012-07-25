@@ -2539,6 +2539,9 @@ class scss_parser {
 
 	// an unbounded string stopped by $end
 	protected function openString($end, &$out, $nestingOpen=null) {
+		$oldWhite = $this->eatWhiteDefault;
+		$this->eatWhiteDefault = false;
+
 		$stop = array("'", '"', "#{", $end);
 		$stop = array_map(array($this, "preg_quote"), $stop);
 
@@ -2578,6 +2581,8 @@ class scss_parser {
 			$content[] = $tok;
 			$this->count+= strlen($tok);
 		}
+
+		$this->eatWhiteDefault = $oldWhite;
 
 		if (count($content) == 0) return false;
 
