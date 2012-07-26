@@ -1,7 +1,8 @@
 
-* css hacks (find out what they are)
-* check mixin infinite loop
 * change all calls to reduce to not suppress division where appropriate
+* make it so calc function doesn't evaluate arguments, open string
+
+TESTS THAT DONT WORK:
 
 MISSING FUNCS:
 	rgba($color, $alpha)

@@ -2145,7 +2145,9 @@ class scss_parser {
 		return false;
 	}
 
-	protected function literal($what, $eatWhitespace = true) {
+	protected function literal($what, $eatWhitespace = null) {
+		if (is_null($eatWhitespace)) $eatWhitespace = $this->eatWhiteDefault;
+
 		// this is here mainly prevent notice from { } string accessor
 		if ($this->count >= strlen($this->buffer)) return false;
 
@@ -2534,12 +2536,18 @@ class scss_parser {
 					$content[] = $delim;
 				}
 			} else {
+				$this->count -= strlen($delim);
 				break; // delim
 			}
 		}
 
-		$out = array("string", $delim, $content);
-		return true;
+		if ($this->literal($delim)) {
+			$out = array("string", $delim, $content);
+			return true;
+		}
+
+		$this->seek($s);
+		return false;
 	}
 
 	// an unbounded string stopped by $end
