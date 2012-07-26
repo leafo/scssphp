@@ -2514,11 +2514,11 @@ class scss_parser {
 
 		$content = array();
 
-		// look for either ending delim or string interpolation
-		$patt = '([^\n]*?)('.
-			$this->preg_quote("#{").'|'. $this->preg_quote($delim).')';
+		// look for either ending delim , escape, or string interpolation
+		$patt = '([^\n]*?)(#\{|\\\\|' .
+			$this->preg_quote($delim).')';
 
-		while ($this->match($patt, $m)) {
+		while ($this->match($patt, $m, false)) {
 			$content[] = $m[1];
 			if ($m[2] == "#{") {
 				$ss = $this->seek();
@@ -2527,6 +2527,11 @@ class scss_parser {
 				} else {
 					$this->seek($ss);
 					$content[] = "#{"; // ignore it
+				}
+			} elseif ($m[2] == '\\') {
+				$content[] = $m[2];
+				if ($this->literal($delim, false)) {
+					$content[] = $delim;
 				}
 			} else {
 				break; // delim
