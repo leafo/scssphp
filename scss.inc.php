@@ -2552,6 +2552,36 @@ class scss_parser {
 		return false;
 	}
 
+	protected function mixedKeyword(&$out) {
+		$s = $this->seek();
+
+		$parts = array();
+
+		$oldWhite = $this->eatWhiteDefault;
+		$this->eatWhiteDefault = false;
+
+		while (true) {
+			if ($this->keyword($key)) {
+				$parts[] = $key;
+				continue;
+			}
+
+			if ($this->interpolation($inter)) {
+				$parts[] = $inter;
+				continue;
+			}
+
+			break;
+		}
+
+		$this->eatWhiteDefault = $oldWhite;
+
+		if (count($parts) == 0) return false;
+
+		$out = $parts;
+		return true;
+	}
+
 	// an unbounded string stopped by $end
 	protected function openString($end, &$out, $nestingOpen=null) {
 		$oldWhite = $this->eatWhiteDefault;
@@ -2780,8 +2810,11 @@ class scss_parser {
 			}
 
 			// a pseudo selector
-			if ($this->match("::?", $m) && $this->keyword($name)) {
-				$parts[] = $m[0] . $name;
+			if ($this->match("::?", $m) && $this->mixedKeyword($nameParts)) {
+				$parts[] = $m[0];
+				foreach ($nameParts as $sub) {
+					$parts[] = $sub;
+				}
 
 				$ss = $this->seek();
 				if ($this->literal("(") &&
