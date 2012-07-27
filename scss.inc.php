@@ -1815,6 +1815,7 @@ class scss_parser {
 
 	static protected $operatorStr;
 	static protected $whitePattern;
+	static protected $commentMulti;
 
 	static protected $commentSingle = "//";
 	static protected $commentMultiLeft = "/*";
@@ -1829,7 +1830,8 @@ class scss_parser {
 			$commentSingle = $this->preg_quote(self::$commentSingle);
 			$commentMultiLeft = $this->preg_quote(self::$commentMultiLeft);
 			$commentMultiRight = $this->preg_quote(self::$commentMultiRight);
-			self::$whitePattern = '/'.$commentSingle.'[^\n]*\s*|('.$commentMultiLeft.'.*?'.$commentMultiRight.')\s*|\s+/Ais';
+			self::$commentMulti = $commentMultiLeft.'.*?'.$commentMultiRight;
+			self::$whitePattern = '/'.$commentSingle.'[^\n]*\s*|('.self::$commentMulti.')\s*|\s+/Ais';
 		}
 	}
 
@@ -2557,6 +2559,7 @@ class scss_parser {
 
 		$stop = array("'", '"', "#{", $end);
 		$stop = array_map(array($this, "preg_quote"), $stop);
+		$stop[] = self::$commentMulti;
 
 		$patt = '(.*?)('.implode("|", $stop).')';
 
@@ -2572,6 +2575,7 @@ class scss_parser {
 			}
 
 			$tok = $m[2];
+
 			$this->count-= strlen($tok);
 			if ($tok == $end) {
 				if ($nestingLevel == 0) {
