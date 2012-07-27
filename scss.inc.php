@@ -2801,6 +2801,7 @@ class scss_parser {
 			}
 
 			// attribute selector
+			// TODO: replace with open string?
 			if ($this->literal("[", false)) {
 				$attrParts = array("[");
 				// keyword, string, operator
@@ -2821,6 +2822,11 @@ class scss_parser {
 
 					if ($this->keyword($word)) {
 						$attrParts[] = $word;
+						continue;
+					}
+
+					if ($this->interpolation($inter)) {
+						$attrParts[] = $inter;
 						continue;
 					}
 
