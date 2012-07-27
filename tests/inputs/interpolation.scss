@@ -66,6 +66,8 @@ div {
     #{$var}one:world;
     two#{$var}one:world;
 
+    one#{a + b}two: cool;
+
     #{hello}: {
         #{world}: red;
         #{mold}: white;

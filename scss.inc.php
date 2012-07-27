@@ -2614,6 +2614,9 @@ class scss_parser {
 
 	// where should this be parsed?
 	protected function interpolation(&$out) {
+		$oldWhite = $this->eatWhiteDefault;
+		$this->eatWhiteDefault = true;
+
 		$s = $this->seek();
 		if ($this->literal("#{") && $this->valueList($value) && $this->literal("}", false)) {
 
@@ -2621,14 +2624,15 @@ class scss_parser {
 			$left = preg_match('/\s/', $this->buffer[$s - 1]) ? " " : "";
 			$right = preg_match('/\s/', $this->buffer[$this->count]) ? " ": "";
 
-			// get rid of the whitespace we didn't get before
-			$this->match("", $m);
 
 			$out = array("interpolate", $value, $left, $right);
+			$this->eatWhiteDefault = $oldWhite;
+			if ($this->eatWhiteDefault) $this->whitespace();
 			return true;
 		}
 
 		$this->seek($s);
+		$this->eatWhiteDefault = $oldWhite;
 		return false;
 	}
 
