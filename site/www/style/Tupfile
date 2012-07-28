@@ -1,0 +1,5 @@
+.gitignore
+include_rules
+
+: foreach $(site_root_dir)/*.scss	 |> ^ pscss %o^ pscss < %f > %o |> %B.css 
+

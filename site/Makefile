@@ -1,0 +1,4 @@
+
+all:
+	sitegen
+	tup upd

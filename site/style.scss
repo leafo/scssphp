@@ -1,0 +1,184 @@
+
+$site_width: 640px;
+
+$light_teal: #7FC7AF;
+$teal: desaturate(#3FB8AF, 10%);
+$brown: #DAD8A7;
+$pink: darken(#FF9E9D, 10%);
+$btn_color: desaturate(#FF3D7F, 10%);
+
+@mixin unselectable {
+    -moz-user-select: none; 
+    -webkit-user-select: none; 
+    user-select: none; 
+}
+
+@mixin grad($top, $bottom) {
+	background-color: mix($top, $bottom);
+	background-image: linear-gradient(bottom, $bottom 0%, $top 100%);
+	background-image: -webkit-linear-gradient(bottom, $bottom 0%, $top 100%);
+	background-image: -moz-linear-gradient(bottom, $bottom 0%, $top 100%);
+	background-image: -o-linear-gradient(bottom, $bottom 0%, $top 100%);
+	background-image: -ms-linear-gradient(bottom, $bottom 0%, $top 100%);
+}
+
+@mixin autograd($color, $amount: 10%) {
+	@include grad($color, darken($color, $amount));
+}
+
+body {
+    background: $pink;
+}
+
+.header, .footer, .body {
+    .inner {
+        width: $site_width;
+        margin: 0 auto;
+    }
+}
+
+.header {
+    background: $teal url(../img/tile.png);
+    // @include autograd($teal);
+
+    border-top: 4px solid $light_teal;
+    box-shadow: inset 0px 1px 0px rgba(255,255,255, 0.5), inset 0px 8px 8px (-8px) #37505A, inset 0px (-1px) 0px rgba(0,0,0,0.2);
+
+    color: #EDFFF9;
+    text-shadow: 0px (-1px) 0px darken($teal, 15%);
+
+    h1 {
+        // font-family: 'Capriola', sans-serif;
+        font-size: 40px;
+        font-weight: normal;
+        padding: 20px 0;
+        margin: 0;
+    }
+
+    .nav {
+        padding: 8px 0;
+        font-size: 14px;
+        text-shadow: none;
+        background: darken($teal, 30%);
+        color: $teal;
+        box-shadow: inset 0px 4px 8px (-4px) rgba(0,0,0,0.9);
+
+        a {
+            color: lighten($teal, 40%);
+            text-decoration: none;
+            font-weight: bold;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .download-area {
+        float: right;
+        margin-top: 18px;
+        background: rgba(255,255,255, 0.3);
+        border-radius: 8px;
+        padding: 5px;
+
+        .download-button {
+            $height: 8px;
+            $depress: 4px;
+
+            @include unselectable;
+
+            text-align: center;
+
+            @include autograd($btn_color);
+
+            position: relative;
+            top: -1px * $height;
+
+            padding: 8px 20px;
+            border-radius: 8px;
+            text-shadow: none;
+
+            box-shadow: 0px $height 0px darken($btn_color, 30%), inset 0px (-1px) 0px rgba(255,255,255, 0.2), inset 0px 1px 0px rgba(0,0,0, 0.2);
+            text-shadow: 0px 1px 2px darken($btn_color, 40%);
+
+            cursor: pointer;
+
+            -webkit-transition: all 0.05s ease-in-out;
+            -moz-transition: all 0.05s ease-in-out;
+            transition: all 0.05s ease-in-out;
+
+            &:hover {
+                @include autograd(lighten($btn_color, 3%));
+            }
+
+            &:active {
+                box-shadow: 0px $height - $depress 0px darken($btn_color, 30%), inset 0px (-1px) 0px rgba(255,255,255, 0.2), inset 0px 1px 0px rgba(0,0,0, 0.2);
+                top: -1px * ($height - $depress);
+            }
+
+            .top {
+                font-weight: bold;
+                font-size: 16px;
+            }
+
+            .sub {
+                font-size: 14px;
+            }
+        }
+    }
+
+}
+
+.body {
+    box-shadow: inset 0px 8px 16px (-8px) rgba(0,0,0,0.5);
+    background: #F5FFED;
+    overflow: hidden;
+    color: darken($brown, 60%);
+    font-size: 16px;
+
+    .inner {
+        width: $site_width - 20px;
+    }
+
+    h2, h3 {
+        margin: 20px 0px 5px 0px;
+    }
+
+    p {
+        margin: 0 0 15px 0;
+    }
+
+    a {
+        color: #DB1C4A;
+        &:hover {
+            color: lighten(#DB1C4A, 10%);
+        }
+    }
+}
+
+.footer {
+    font-size: 14px;
+    color: lighten($pink, 20%);
+    text-shadow: 0px 1px 0px darken($pink, 20%);
+
+    border-top: 1px dashed darken($pink, 50%);
+    box-shadow: inset 0px 1px 0px rgba(255,255,255, 0.5);
+    padding: 8px 0 20px 0;
+
+    line-height: 150%;
+
+    a {
+        color: white;
+        font-weight: bold;
+        text-decoration: none;
+        padding: 0 4px;
+        border-radius: 4px;
+        border: 1px solid lighten($pink, 4%);
+
+        &:hover {
+            background: darken($pink, 10%);
+            border: 1px solid lighten($pink, 4%);
+        }
+    }
+}
+
