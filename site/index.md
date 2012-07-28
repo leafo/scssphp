@@ -25,6 +25,15 @@ For a complete guide to the syntax of SCSS, consult the [official documentation]
 
 ## PHP Reference
 
+    ```scss
+    .header, .footer, .body {
+      .inner {
+          width: $site_width;
+          margin: 0 auto;
+      }
+    }
+    ```
+
 ## Changelog
 
   * Initial Release (June 8th, 1988)
