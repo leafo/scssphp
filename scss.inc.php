@@ -2522,14 +2522,17 @@ class scss_parser {
 		$patt = '([^\n]*?)(#\{|\\\\|' .
 			$this->preg_quote($delim).')';
 
+		$oldWhite = $this->eatWhiteDefault;
+		$this->eatWhiteDefault = false;
+
 		while ($this->match($patt, $m, false)) {
 			$content[] = $m[1];
 			if ($m[2] == "#{") {
-				$ss = $this->seek();
-				if ($this->valueList($value) && $this->literal("}", false)) {
-					$content[] = array("interpolate", $value);
+				$this->count -= strlen($m[2]);
+				if ($this->interpolation($inter, false)) {
+					$content[] = $inter;
 				} else {
-					$this->seek($ss);
+					$this->count += strlen($m[2]);
 					$content[] = "#{"; // ignore it
 				}
 			} elseif ($m[2] == '\\') {
@@ -2542,6 +2545,8 @@ class scss_parser {
 				break; // delim
 			}
 		}
+
+		$this->eatWhiteDefault = $oldWhite;
 
 		if ($this->literal($delim)) {
 			$out = array("string", $delim, $content);
@@ -2642,8 +2647,8 @@ class scss_parser {
 		return true;
 	}
 
-	// where should this be parsed?
-	protected function interpolation(&$out) {
+	// $lookWhite: save information about whitespace before and after
+	protected function interpolation(&$out, $lookWhite=true) {
 		$oldWhite = $this->eatWhiteDefault;
 		$this->eatWhiteDefault = true;
 
@@ -2651,9 +2656,13 @@ class scss_parser {
 		if ($this->literal("#{") && $this->valueList($value) && $this->literal("}", false)) {
 
 			// TODO: don't error if out of bounds
-			$left = preg_match('/\s/', $this->buffer[$s - 1]) ? " " : "";
-			$right = preg_match('/\s/', $this->buffer[$this->count]) ? " ": "";
 
+			if ($lookWhite) {
+				$left = preg_match('/\s/', $this->buffer[$s - 1]) ? " " : "";
+				$right = preg_match('/\s/', $this->buffer[$this->count]) ? " ": "";
+			} else {
+				$left = $right = false;
+			}
 
 			$out = array("interpolate", $value, $left, $right);
 			$this->eatWhiteDefault = $oldWhite;
@@ -2676,10 +2685,8 @@ class scss_parser {
 		$oldWhite = $this->eatWhiteDefault;
 		$this->eatWhiteDefault = false;
 
-		$hasInterpolation = false;
 		while (true) {
 			if ($this->interpolation($inter)) {
-				$hasInterpolation = true;
 				$parts[] = $inter;
 			} elseif ($this->keyword($text)) {
 				$parts[] = $text;
@@ -2858,7 +2865,7 @@ class scss_parser {
 						continue;
 					}
 
-					if ($this->interpolation($inter)) {
+					if ($this->interpolation($inter, false)) {
 						$attrParts[] = $inter;
 						continue;
 					}
