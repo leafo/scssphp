@@ -2724,6 +2724,7 @@ class scss_parser {
 		while ($this->selector($sel)) {
 			$selectors[] = $sel;
 			if (!$this->literal(",")) break;
+			while ($this->literal(",")); // ignore extra
 		}
 
 		if (count($selectors) == 0) {
