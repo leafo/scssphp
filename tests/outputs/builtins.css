@@ -38,7 +38,11 @@
   color: rgba(65, 110, 79, 0.4);
   color: rgba(20, 255, 216, 0);
   color: rgba(55, 100, 69, 0.4);
-  color: rgba(0, 255, 213, 0); }
+  color: rgba(0, 255, 213, 0);
+  color: rgba(145, 10, 10, 0);
+  color: rgba(5, 10, 10, 0);
+  color: rgba(145, 145, 145, 0);
+  color: rgba(5, 5, 5, 0); }
 
 #string {
   color: hello what is going on;

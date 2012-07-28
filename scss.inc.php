@@ -1367,9 +1367,9 @@ class scssc {
 		foreach (array(1,2,3,7) as $i) {
 			if (!is_null($args[$i])) {
 				$val = $this->assertNumber($args[$i]);
-				if ($i == 7) $i = 4; // alpha
-				$color[$i] =
-					$this->$fn(isset($color[$i]) ? $color[$i] : 0, $val);
+				$ii = $i == 7 ? 4 : $i; // alpha
+				$color[$ii] =
+					$this->$fn(isset($color[$ii]) ? $color[$ii] : 0, $val, $i);
 			}
 		}
 
@@ -1378,7 +1378,7 @@ class scssc {
 			foreach (array(4,5,6) as $i) {
 				if (!is_null($args[$i])) {
 					$val = $this->assertNumber($args[$i]);
-					$hsl[$i - 3] = $this->$fn($hsl[$i - 3], $val);
+					$hsl[$i - 3] = $this->$fn($hsl[$i - 3], $val, $i);
 				}
 			}
 
@@ -1394,7 +1394,7 @@ class scssc {
 		"color", "red", "green", "blue",
 		"hue", "saturation", "lightness", "alpha"
 	);
-	protected function adjust_color_helper($base, $alter) {
+	protected function adjust_color_helper($base, $alter, $i) {
 		return $base += $alter;
 	}
 	protected function lib_adjust_color($args) {
@@ -1405,13 +1405,44 @@ class scssc {
 		"color", "red", "green", "blue",
 		"hue", "saturation", "lightness", "alpha"
 	);
-	protected function change_color_helper($base, $alter) {
+	protected function change_color_helper($base, $alter, $i) {
 		return $alter;
 	}
 	protected function lib_change_color($args) {
 		return $this->alter_color($args, "change_color_helper");
 	}
 
+	protected static $lib_scale_color = array(
+		"color", "red", "green", "blue",
+		"hue", "saturation", "lightness", "alpha"
+	);
+	protected function scale_color_helper($base, $scale, $i) {
+		// 1,2,3 - rgb
+		// 4, 5, 6 - hsl
+		// 7 - a
+		switch ($i) {
+		case 1:
+		case 2:
+		case 3:
+			$max = 255; break;
+		case 4:
+			$max = 360; break;
+		case 7:
+			$max = 1; break;
+		default:
+			$max = 100;
+		}
+
+		$scale = $scale / 100;
+		if ($scale < 0) {
+			return $base * $scale + $base;
+		} else {
+			return ($max - $base) * $scale + $base;
+		}
+	}
+	protected function lib_scale_color($args) {
+		return $this->alter_color($args, "scale_color_helper");
+	}
 
 	protected static $lib_red = array("color");
 	protected function lib_red($args) {

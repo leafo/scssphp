@@ -4,15 +4,10 @@
 * store count in elements so we can have position of compile time errors
 * failed parsing paths can add comments early
 
-TESTS THAT DONT WORK:
+misc:
 
-MISSING FUNCS:
-	scale-color($color, [$red], [$green], [$blue], [$saturation], [$lightness], [$alpha]
-	Fluidly scale one or more components of a color.
-
-comma separated list literals in parens (for function/mixin calls)
-
-append(10px 20px, 30px 40px) => 10px 20px (30px 40px) # DOCS are wrong about this?
+* comma separated list literals in parens (for function/mixin calls)
+	append(10px 20px, 30px 40px) => 10px 20px (30px 40px) # DOCS are wrong about this?
 
 # sequence merging:
 

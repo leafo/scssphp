@@ -58,6 +58,12 @@
 
     color: change-color($color, $blue: 69, $red: 55, $green: 100, $alpha: 0.4);
     color: change-color($color, $hue: 170, $saturation: 100, $lightness: 50);
+
+    color: scale-color($color, $red: 55%);
+    color: scale-color($color, $red: -55%);
+
+    color: scale-color($color, $lightness: 55%);
+    color: scale-color($color, $lightness: -55%);
 }
 
 #string {
