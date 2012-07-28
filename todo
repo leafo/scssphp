@@ -2,6 +2,7 @@
 * change all calls to reduce to not suppress division where appropriate
 * make it so calc function doesn't evaluate arguments, open string
 * store count in elements so we can have position of compile time errors
+* failed parsing paths can add comments early
 
 TESTS THAT DONT WORK:
 

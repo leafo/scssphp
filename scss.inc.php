@@ -2055,6 +2055,20 @@ class scss_parser {
 			return false;
 		}
 
+		// property shortcut
+		// captures most properties before having to parse a selector
+		if ($this->keyword($name, false) &&
+			$this->literal(": ") &&
+			$this->valueList($value) &&
+			$this->end())
+		{
+			$name = array("string", "", array($name));
+			$this->append(array("assign", $name, $value));
+			return true;
+		} else {
+			$this->seek($s);
+		}
+
 		// variable assigns
 		if ($this->variable($name) &&
 			$this->literal(":") &&
