@@ -30,3 +30,16 @@ div {
     }
 }
 
+
+#nested-nesting {
+    bar: baz;
+    bang: {
+        bop: bar;
+        bip: 1px;
+        blat: {
+            baf: bort
+        }
+    }
+}
+
+

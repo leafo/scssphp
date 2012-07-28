@@ -517,6 +517,9 @@ class scssc {
 				if ($child[0] == "assign") {
 					array_unshift($child[1][2], $prefix);
 				}
+				if ($child[0] == "nestedprop") {
+					array_unshift($child[1]->prefix[2], $prefix);
+				}
 				$prefixed[] = $child;
 			}
 			$this->compileChildren($prefixed, $out);
