@@ -1,14 +1,3 @@
-/* Foo
-Bar
-  Baz */
-/* Foo
-Bar
-  Baz */
-/* Foo
-   Bar */
-/* Foo
-   Bar
-  Baz */
 @import "foo.css";
 @import 'foo.css';
 @import url("foo.css");
@@ -18,19 +7,8 @@ Bar
 @import "foo.css" screen, print;
 /* Foo
    * Bar */
-/* Foo
-   * Bar */
 /* Baz
    * Bang */
-/* Foo Bar */
-/* Baz Bang */
-/* Foo */
-/* Foo
-   * Bar */
-/* .a #foo */
-/*
-  //comment here
-  */
 @charset "UTF-8";
 [foo~=bar] {
   a: b; }

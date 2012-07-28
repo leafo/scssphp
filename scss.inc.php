@@ -1849,6 +1849,7 @@ class scss_parser {
 		$this->inParens = false;
 		$this->pushBlock(null); // root block
 		$this->eatWhiteDefault = true;
+		$this->insertComments = true;
 
 		$this->buffer = $this->removeComments($buffer);
 
@@ -2054,27 +2055,21 @@ class scss_parser {
 			return false;
 		}
 
-		// nested property assign (or normal assign)
-		if ($this->propertyName($name) && $this->literal(": ")) {
-			$foundSomething = false;
-			// look for value
-			if ($this->valueList($value)) {
-				$foundSomething = true;
-				$this->append(array("assign", $name, $value));
+		// variable assigns
+		if ($this->variable($name) &&
+			$this->literal(":") &&
+			$this->valueList($value) && $this->end())
+		{
+			$defaultVar = false;
+			// check for !default
+			if ($value[0] == "list") {
+				$def = end($value[2]);
+				if ($def[0] == "keyword" && $def[1] == "!default") {
+					array_pop($value[2]);
+					$defaultVar = true;
+				}
 			}
-
-			// look for nested property block
-			if ($this->literal("{")) {
-				$foundSomething = true;
-				$propBlock = $this->pushSpecialBlock("nestedprop");
-				$propBlock->prefix = $name;
-			} elseif ($foundSomething) {
-				$foundSomething = $this->end();
-			}
-
-			if ($foundSomething) {
-				return true;
-			}
+			$this->append(array("assign", $name, $value, $defaultVar));
 			return true;
 		} else {
 			$this->seek($s);
@@ -2086,46 +2081,37 @@ class scss_parser {
 		}
 
 		// opening css block
+		$oldComments = $this->insertComments;
+		$this->insertComments = false;
 		if ($this->selectors($selectors) && $this->literal("{")) {
 			$this->pushBlock($selectors);
+			$this->insertComments = $oldComments;
 			return true;
 		} else {
 			$this->seek($s);
 		}
+		$this->insertComments = $oldComments;
 
-		// all other types of assign (including variable)
-		if (($this->variable($name) || $this->propertyName($name)) &&
-			$this->literal(":") &&
-			$this->valueList($value) &&
-			$this->end())
-		{
-			$assign = array("assign", $name);
-			if ($name[0] == "var") {
-				$defaultVar = false;
-				// check for !default
-				if ($value[0] == "list") {
-					$def = end($value[2]);
-					if ($def[0] == "keyword" && $def[1] == "!default") {
-						array_pop($value[2]);
-						$defaultVar = true;
-					}
-				}
-				$assign[] = $value;
-				$assign[] = $defaultVar;
-			} else {
-				$assign[] = $value;
+		// property assign, or nested assign
+		if ($this->propertyName($name) && $this->literal(":")) {
+			if ($this->valueList($value)) {
+				$this->append(array("assign", $name, $value));
+				$foundSomething = true;
 			}
 
-			$this->append($assign);
-			return true;
-		} else {
-			$this->seek($s);
-		}
+			if ($this->literal("{")) {
+				$propBlock = $this->pushSpecialBlock("nestedprop");
+				$propBlock->prefix = $name;
+				$foundSomething = true;
+			} elseif ($foundSomething) {
+				$foundSomething = $this->end();
+			}
 
-		// opening a property block
-		if ($this->keyword($prefix) && $this->literal(":") && $this->literal("{")) {
-			$this->pushSpecialBlock("property");
-			return true;
+			if ($foundSomething) {
+				return true;
+			}
+
+			$this->seek($s);
 		} else {
 			$this->seek($s);
 		}
@@ -2990,9 +2976,11 @@ class scss_parser {
 	protected function whitespace() {
 		$gotWhite = false;
 		while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
-			if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
-				$this->append(array("comment", $m[1]));
-				$this->commentsSeen[$this->count] = true;
+			if ($this->insertComments) {
+				if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
+					$this->append(array("comment", $m[1]));
+					$this->commentsSeen[$this->count] = true;
+				}
 			}
 			$this->count += strlen($m[0]);
 			$gotWhite = true;
