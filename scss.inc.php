@@ -1179,13 +1179,23 @@ class scssc {
 		if (is_null($prototype)) return $posArgs;
 
 		$finalArgs = array();
-		foreach ($prototype as $i => $name) {
+		foreach ($prototype as $i => $names) {
 			if (isset($posArgs[$i])) {
 				$finalArgs[] = $posArgs[$i];
-			} elseif (isset($keyArgs[$name])) {
-				$finalArgs[] = $keyArgs[$name];
-			} else {
-				$finalArgs[] = self::$defaultValue;
+				continue;
+			}
+
+			$set = false;
+			foreach ((array)$names as $name) {
+				if (isset($keyArgs[$name])) {
+					$finalArgs[] = $keyArgs[$name];
+					$set = true;
+					break;
+				}
+			}
+
+			if (!$set) {
+				$finalArgs[] = null;
 			}
 		}
 
@@ -1381,7 +1391,7 @@ class scssc {
 		$first = $this->assertColor($first);
 		$second = $this->assertColor($second);
 
-		if ($weight == self::$defaultValue) {
+		if (is_null($weight)) {
 			$weight = 0.5;
 		} else {
 			$weight = $this->coercePercent($weight);
@@ -1599,7 +1609,7 @@ class scssc {
 
 
 	protected function listSeparatorForJoin($list1, $sep) {
-		if ($sep == self::$defaultValue) return $list1[1];
+		if (is_null($sep)) return $list1[1];
 		switch ($this->compileValue($sep)) {
 		case "comma":
 			return ",";
