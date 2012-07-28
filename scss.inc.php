@@ -616,10 +616,12 @@ class scssc {
 						$out = $this->$fn($left, $right);
 					}
 
-					if ($unitChange && $out[0] == "number") {
-						$out = $this->coerceUnit($out, $targetUnit);
+					if (!is_null($out)) {
+						if ($unitChange && $out[0] == "number") {
+							$out = $this->coerceUnit($out, $targetUnit);
+						}
+						return $out;
 					}
-					return $out;
 				}
 
 				return $this->expToString($value);
@@ -729,8 +731,23 @@ class scssc {
 		return array("number", $left[1] % $right[1], $left[2]);
 	}
 
-	protected function op_add_string_string($left, $right) {
-		return array("string", $left[1], array_merge($left[2], $right[2]));
+	// adding strings
+	protected function op_add($left, $right) {
+		if ($strLeft = $this->coerceString($left)) {
+			if ($right[0] == "string") {
+				$right[1] = "";
+			}
+			$strLeft[2][] = $right;
+			return $strLeft;
+		}
+
+		if ($strRight = $this->coerceString($right)) {
+			if ($left[0] == "string") {
+				$left[1] = "";
+			}
+			array_unshift($strRight[2], $left);
+			return $strRight;
+		}
 	}
 
 	protected function op_color_color($op, $left, $right) {
@@ -1180,10 +1197,6 @@ class scssc {
 			return $color;
 		}
 
-		if ($value[0] == "keyword") {
-			return array("string", "", array($value[1]));
-		}
-
 		return $value;
 	}
 
@@ -1199,6 +1212,16 @@ class scssc {
 			return null;
 		}
 
+		return null;
+	}
+
+	protected function coerceString($value) {
+		switch ($value[0]) {
+		case "string":
+			return $value;
+		case "keyword":
+			return array("string", "", array($value[1]));
+		}
 		return null;
 	}
 

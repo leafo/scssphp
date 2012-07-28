@@ -458,7 +458,7 @@ foo|* {
   a: b; }
 
 foo {
-  a: "bang 1 + " bar " bip"; }
+  a: "bang 1 bar  bip"; }
 
 :nth-child(-n) {
   a: b; }
