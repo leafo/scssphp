@@ -1360,6 +1360,59 @@ class scssc {
 		return array("color", $r[1], $g[1], $b[1], $a[1]);
 	}
 
+	// helper function for adjust_color, change_color, and scale_color
+	protected function alter_color($args, $fn) {
+		$color = $this->assertColor($args[0]);
+
+		foreach (array(1,2,3,7) as $i) {
+			if (!is_null($args[$i])) {
+				$val = $this->assertNumber($args[$i]);
+				if ($i == 7) $i = 4; // alpha
+				$color[$i] =
+					$this->$fn(isset($color[$i]) ? $color[$i] : 0, $val);
+			}
+		}
+
+		if (!is_null($args[4]) || !is_null($args[5]) || !is_null($args[6])) {
+			$hsl = $this->toHSL($color[1], $color[2], $color[3]);
+			foreach (array(4,5,6) as $i) {
+				if (!is_null($args[$i])) {
+					$val = $this->assertNumber($args[$i]);
+					$hsl[$i - 3] = $this->$fn($hsl[$i - 3], $val);
+				}
+			}
+
+			$rgb = $this->toRGB($hsl[1], $hsl[2], $hsl[3]);
+			if (isset($color[4])) $rgb[4] = $color[4];
+			$color = $rgb;
+		}
+
+		return $color;
+	}
+
+	protected static $lib_adjust_color = array(
+		"color", "red", "green", "blue",
+		"hue", "saturation", "lightness", "alpha"
+	);
+	protected function adjust_color_helper($base, $alter) {
+		return $base += $alter;
+	}
+	protected function lib_adjust_color($args) {
+		return $this->alter_color($args, "adjust_color_helper");
+	}
+
+	protected static $lib_change_color = array(
+		"color", "red", "green", "blue",
+		"hue", "saturation", "lightness", "alpha"
+	);
+	protected function change_color_helper($base, $alter) {
+		return $alter;
+	}
+	protected function lib_change_color($args) {
+		return $this->alter_color($args, "change_color_helper");
+	}
+
+
 	protected static $lib_red = array("color");
 	protected function lib_red($args) {
 		list($color) = $args;

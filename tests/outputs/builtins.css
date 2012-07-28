@@ -34,6 +34,12 @@
   transparentize: rgba(1, 2, 3, 0.4);
   transparentize: rgba(52, 130, 3, 0.9); }
 
+#more-more-more-color {
+  color: rgba(65, 110, 79, 0.4);
+  color: rgba(20, 255, 216, 0);
+  color: rgba(55, 100, 69, 0.4);
+  color: rgba(0, 255, 213, 0); }
+
 #string {
   color: hello what is going on;
   color: "yeah";

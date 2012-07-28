@@ -51,6 +51,15 @@
     transparentize: transparentize(#348203, 0.1);
 }
 
+#more-more-more-color {
+    $color: rgba(10,10,10,0);
+    color: adjust-color($color, $blue: 69, $red: 55, $green: 100, $alpha: 0.4);
+    color: adjust-color($color, $hue: 170, $saturation: 100, $lightness: 50);
+
+    color: change-color($color, $blue: 69, $red: 55, $green: 100, $alpha: 0.4);
+    color: change-color($color, $hue: 170, $saturation: 100, $lightness: 50);
+}
+
 #string {
     color: unquote("hello what is going on");
     // color: quote(yeah you know it); // **

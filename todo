@@ -7,14 +7,8 @@
 TESTS THAT DONT WORK:
 
 MISSING FUNCS:
-	adjust-color($color, [$red], [$green], [$blue], [$hue], [$saturation], [$lightness], [$alpha]
-	Increase or decrease any of the components of a color.
-
 	scale-color($color, [$red], [$green], [$blue], [$saturation], [$lightness], [$alpha]
 	Fluidly scale one or more components of a color.
-
-	change-color($color, [$red], [$green], [$blue], [$hue], [$saturation], [$lightness], [$alpha]
-	Changes one or more properties of a color.
 
 comma separated list literals in parens (for function/mixin calls)
 
