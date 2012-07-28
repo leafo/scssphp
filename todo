@@ -7,9 +7,6 @@
 TESTS THAT DONT WORK:
 
 MISSING FUNCS:
-	rgba($color, $alpha)
-	Adds an alpha layer to any color value.
-
 	adjust-color($color, [$red], [$green], [$blue], [$hue], [$saturation], [$lightness], [$alpha]
 	Increase or decrease any of the components of a color.
 

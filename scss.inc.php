@@ -1345,8 +1345,17 @@ class scssc {
 		return array("color", $r[1], $g[1], $b[1]);
 	}
 
-	protected static $lib_rgba = array("red", "green", "blue", "alpha");
+	protected static $lib_rgba = array(
+		array("red", "color"),
+		"green", "blue", "alpha");
 	protected function lib_rgba($args) {
+		if ($color = $this->coerceColor($args[0])) {
+			$num = is_null($args[1]) ? $args[3] : $args[1];
+			$alpha = $this->assertNumber($num);
+			$color[4] = $alpha;
+			return $color;
+		}
+
 		list($r,$g,$b, $a) = $args;
 		return array("color", $r[1], $g[1], $b[1], $a[1]);
 	}

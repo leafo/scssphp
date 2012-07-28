@@ -11,6 +11,9 @@
     a2: alpha(rgba(1,2,4, 0.5));
 
     mix: mix(rgb(1,2,3), rgb(3,4,5));
+
+    rgba: rgba($color: #a7c, $alpha: 0.4);
+    rgba: rgba(#a7c, 0.4);
 }
 
 #hsl {
