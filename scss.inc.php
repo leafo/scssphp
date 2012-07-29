@@ -2464,6 +2464,11 @@ class scss_parser {
 
 			$op = $m[1];
 
+			// don't turn negative numbers into expressions
+			if ($op == "-" && $whiteBefore) {
+				if (!$whiteAfter) break;
+			}
+
 			if (!$this->value($rhs)) break;
 
 			// peek and see if rhs belongs to next operator
