@@ -627,8 +627,15 @@ class scssc {
 				return $this->expToString($value);
 			case "unary":
 				list(, $op, $exp) = $value;
-				if ($op == "+" && $exp[0] == "number") {
-					return $exp;
+				$exp = $this->reduce($exp);
+				if ($exp[0] == "number") {
+					switch ($op) {
+					case "+":
+						return $exp;
+					case "-":
+						$exp[1] *= -1;
+						return $exp;
+					}
 				}
 				return array("string", "", array($op, $exp));
 			case "var":
@@ -2234,6 +2241,7 @@ class scss_parser {
 
 		// property assign, or nested assign
 		if ($this->propertyName($name) && $this->literal(":")) {
+			$foundSomething = false;
 			if ($this->valueList($value)) {
 				$this->append(array("assign", $name, $value));
 				$foundSomething = true;
@@ -2489,25 +2497,25 @@ class scss_parser {
 	protected function value(&$out) {
 		$s = $this->seek();
 
-		// parens
-		$inParens = $this->inParens;
-		if ($this->literal("(") &&
-			($this->inParens = true) && $this->expression($exp) &&
-			$this->literal(")"))
-		{
-			$out = $exp;
-			$this->inParens = $inParens;
-			return true;
-		} else {
-			$this->inParens = $inParens;
-			$this->seek($s);
-		}
 
 		if ($this->literal("+") && $this->value($inner)) {
 			$out = array("unary", "+", $inner);
 			return true;
 		}
 
+		// negation
+		if ($this->literal("-", false) &&
+			($this->variable($inner) ||
+			$this->unit($inner) ||
+			$this->parenValue($inner)))
+		{
+			$out = array("unary", "-", $inner);
+			return true;
+		} else {
+			$this->seek($s);
+		}
+
+		if ($this->parenValue($out)) return true;
 		if ($this->interpolation($out)) return true;
 		if ($this->variable($out)) return true;
 		if ($this->color($out)) return true;
@@ -2519,6 +2527,26 @@ class scss_parser {
 		if ($this->keyword($keyword)) {
 			$out = array("keyword", $keyword);
 			return true;
+		}
+
+		return false;
+	}
+
+	// value wrappen in parentheses
+	protected function parenValue(&$out) {
+		$s = $this->seek();
+
+		$inParens = $this->inParens;
+		if ($this->literal("(") &&
+			($this->inParens = true) && $this->expression($exp) &&
+			$this->literal(")"))
+		{
+			$out = $exp;
+			$this->inParens = $inParens;
+			return true;
+		} else {
+			$this->inParens = $inParens;
+			$this->seek($s);
 		}
 
 		return false;
@@ -2633,7 +2661,7 @@ class scss_parser {
 	}
 
 	protected function unit(&$unit) {
-		if ($this->match('(-?[0-9]*(\.)?[0-9]+)([%a-zA-Z]+)?', $m)) {
+		if ($this->match('([0-9]*(\.)?[0-9]+)([%a-zA-Z]+)?', $m)) {
 			$unit = array("number", $m[1], empty($m[3]) ? "" : $m[3]);
 			return true;
 		}

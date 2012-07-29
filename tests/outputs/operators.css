@@ -41,3 +41,8 @@ div {
   hello: "whatgoing";
   hello: goingwhat;
   hello: "whatwhat"; }
+
+#negation {
+  a: -60;
+  b: 10 -100;
+  b: -90; }
