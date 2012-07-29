@@ -25,6 +25,7 @@ For a complete guide to the syntax of SCSS, consult the [official documentation]
 
 ## PHP Reference
 
+
     ```scss
     .header, .footer, .body {
       .inner {

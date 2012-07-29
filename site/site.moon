@@ -1,4 +1,5 @@
 require "sitegen"
-site = sitegen.create_site =>
-  @title = "Hello World"
-site\write!
+
+sitegen.create_site =>
+  @version = "0.0.1"
+  deploy_to "leaf@leafo.net", "www/aroma/"

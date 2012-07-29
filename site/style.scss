@@ -7,6 +7,11 @@ $brown: #DAD8A7;
 $pink: darken(#FF9E9D, 10%);
 $btn_color: desaturate(#FF3D7F, 10%);
 
+::selection {
+    background: red;
+    color: white;
+}
+
 @mixin unselectable {
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -38,21 +43,30 @@ body {
 }
 
 .header {
-    color: #EDFFF9;
-    text-shadow: 0px (-1px) 0px darken($teal, 15%);
+    text-shadow: 0px -1px 0px darken($teal, 15%);
 
     .color {
         background: $teal url(../img/tile.png);
         border-top: 4px solid $light_teal;
-        box-shadow: inset 0px 1px 0px rgba(255,255,255, 0.5), inset 0px 8px 8px (-8px) #37505A, inset 0px (-1px) 0px rgba(255,255,255, 0.3);
+        box-shadow: inset 0px 1px 0px rgba(255,255,255, 0.5), inset 0px 8px 8px -8px #37505A, inset 0px -1px 0px rgba(255,255,255, 0.3);
     }
 
     h1 {
-        font-family: 'Capriola', sans-serif;
+        font-family: 'Quicksand', sans-serif;
         font-size: 40px;
         font-weight: normal;
         padding: 20px 0;
         margin: 0;
+
+        a {
+            text-decoration: none;
+            color: #EDFFF9;
+
+            &:active {
+                position: relative;
+                top: 1px;
+            }
+        }
     }
 
     .nav {
@@ -61,7 +75,7 @@ body {
         text-shadow: none;
         background: darken($teal, 30%);
         color: $teal;
-        box-shadow: inset 0px 4px 8px (-4px) rgba(0,0,0,0.9), inset 0px (-1px) 0px rgba(255,255,255, 0.8);
+        box-shadow: inset 0px 4px 8px -4px rgba(0,0,0,0.9), inset 0px -1px 0px rgba(255,255,255, 0.8);
 
         a {
             color: lighten($teal, 40%);
@@ -76,7 +90,7 @@ body {
 
     .download-area {
         float: right;
-        margin-top: 18px;
+        margin-top: 22px;
         background: rgba(255,255,255, 0.3);
         border-radius: 8px;
         padding: 5px;
@@ -87,6 +101,7 @@ body {
 
             @include unselectable;
 
+            color: white;
             text-align: center;
 
             @include autograd($btn_color);
@@ -98,7 +113,7 @@ body {
             border-radius: 8px;
             text-shadow: none;
 
-            box-shadow: 0px $height 0px darken($btn_color, 30%), inset 0px (-1px) 0px rgba(255,255,255, 0.2), inset 0px 1px 0px rgba(0,0,0, 0.2);
+            box-shadow: 0px $height 0px darken($btn_color, 30%), inset 0px -1px 0px rgba(255,255,255, 0.2), inset 0px 1px 0px rgba(0,0,0, 0.2);
             text-shadow: 0px 1px 2px darken($btn_color, 40%);
 
             cursor: pointer;
@@ -112,7 +127,7 @@ body {
             }
 
             &:active {
-                box-shadow: 0px $height - $depress 0px darken($btn_color, 30%), inset 0px (-1px) 0px rgba(255,255,255, 0.2), inset 0px 1px 0px rgba(0,0,0, 0.2);
+                box-shadow: 0px $height - $depress 0px darken($btn_color, 30%), inset 0px -1px 0px rgba(255,255,255, 0.2), inset 0px 1px 0px rgba(0,0,0, 0.2);
                 top: -1px * ($height - $depress);
             }
 
@@ -130,7 +145,7 @@ body {
 }
 
 .body {
-    box-shadow: inset 0px 4px 8px (-4px) rgba(0,0,0,0.7), inset 0px (-4px) 8px (-4px) rgba(0,0,0,0.4);
+    box-shadow: inset 0px 4px 8px -4px rgba(0,0,0,0.7), inset 0px -4px 8px -4px rgba(0,0,0,0.4);
     background: #FEFFED;
     overflow: hidden;
     color: darken($brown, 60%);
