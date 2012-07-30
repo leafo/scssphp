@@ -1108,6 +1108,10 @@ class scssc {
 		$this->importPaths[] = $path;
 	}
 
+	public function setImportPaths($path) {
+		$this->importPaths = (array)$path;
+	}
+
 	protected function importFile($path, $out) {
 		$code = file_get_contents($path);
 		$parser = new scss_parser($path);
@@ -3319,4 +3323,96 @@ class scss_formatter_nested extends scss_formatter {
 		}
 	}
 }
+
+class scss_server {
+	protected function join($left, $right) {
+		return rtrim($left, "/") . "/" . ltrim($right, "/");
+	}
+
+	protected function inputName() {
+		if (isset($_SERVER["PATH_INFO"])) return $_SERVER["PATH_INFO"];
+		if (isset($_SERVER["DOCUMENT_URI"])) {
+			return substr($_SERVER["DOCUMENT_URI"], strlen($_SERVER["SCRIPT_NAME"]));
+		}
+
+		if (isset($_GET["p"])) return $_GET["p"];
+	}
+
+	protected function findInput() {
+		if ($input = $this->inputName()) {
+			$name = $this->join($this->dir, $input);
+			if (is_readable($name)) return $name;
+		}
+		return false;
+	}
+
+	protected function cacheName($fname) {
+		return $this->join($this->cacheDir, md5($fname) . ".css");
+	}
+
+	protected function needsCompile($in, $out) {
+		return !is_file($out) || filemtime($in) > filemtime($out);
+	}
+
+	protected function compile($in, $out) {
+		$start = microtime(true);
+		$css = $this->scss->compile(file_get_contents($in), $in);
+		$elapsed = round((microtime(true) - $start), 4);
+
+		$v = scssc::$VERSION;
+		$t = date("r");
+		$css = "/* compiled by scssphp $v on $t (${elapsed}s) */\n\n" . $css;
+
+		file_put_contents($out, $css);
+		return $css;
+	}
+
+	public function serve() {
+		if ($input = $this->findInput()) {
+			$output = $this->cacheName($input);
+			header("Content-type: text/css");
+
+			if ($this->needsCompile($input, $output)) {
+				try {
+					echo $this->compile($input, $output);
+				} catch (exception $e) {
+					header('HTTP/1.1 500 Internal Server Error');
+					echo "Parse error: " . $e->getMessage() . "\n";
+				}
+			} else {
+				header('X-SCSS-Cache: true');
+				echo file_get_contents($output);
+			}
+
+			return;
+		}
+
+		header('HTTP/1.0 404 Not Found');
+		header("Content-type: text");
+		$v = scssc::$VERSION;
+		echo "/* INPUT NOT FOUND scss $v */\n";
+	}
+
+	public function __construct($dir, $cacheDir=null, $scss=null) {
+		$this->dir = $dir;
+
+		if (is_null($cacheDir)) {
+			$cacheDir = $this->join($dir, "scss_cache");
+		}
+
+		$this->cacheDir = $cacheDir;
+		if (!is_dir($this->cacheDir)) mkdir($this->cacheDir);
+
+		if (is_null($scss)) {
+			$scss = new scssc();
+			$scss->setImportPaths($this->dir);
+		}
+		$this->scss = $scss;
+	}
+
+	static public function serveFrom($path) {
+		(new self($path))->serve();
+	}
+}
+
 
