@@ -7,7 +7,7 @@ The entire compiler comes in a single class file ready for including in any
 kind of project in addition to a command line tool for running the compiler
 from the terminal.
 
-**scssphp** implements the latest version of SCSS (3.1.20). It doesnt not
+**scssphp** implements the latest version of SCSS (3.1.20). It does not
 implement the SASS syntax, only the SCSS syntax.
 
 Follow the author on twitter: [@moonscript](http://twitter.com/moonscript).
