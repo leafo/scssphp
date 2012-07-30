@@ -3411,7 +3411,8 @@ class scss_server {
 	}
 
 	static public function serveFrom($path) {
-		(new self($path))->serve();
+		$server = new self($path);
+		$server->serve();
 	}
 }
 
