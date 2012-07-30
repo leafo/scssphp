@@ -95,6 +95,10 @@ body {
         border-radius: 8px;
         padding: 5px;
 
+        a {
+            text-decoration: none;
+        }
+
         .download-button {
             $height: 8px;
             $depress: 4px;

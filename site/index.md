@@ -13,8 +13,8 @@ implement the SASS syntax, only the SCSS syntax.
 Follow the author on twitter: [@moonscript](http://twitter.com/moonscript).
 
 <div class="github-buttons">
-<iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=leafo&repo=lessphp&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
-<iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=leafo&repo=lessphp&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="95px" height="20px"></iframe>
+<iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=leafo&repo=scssphp&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+<iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=leafo&repo=scssphp&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="95px" height="20px"></iframe>
 </div>
 
 <a name="installing"></a>
@@ -43,12 +43,47 @@ For a complete guide to the syntax of SCSS, consult the [official documentation]
 
 ## PHP Reference
 
-The entire library comes in a single file, `scss.inc.php`. Just `require` it
-and you're ready to start compiling SCSS.
+### Quickstart
+
+If you just want to start serving compiled `scss` files as quick as possible
+then start here.
+
+**scssphp** comes with a easy to use class that automatically compiles modified
+`scss` files and serves them from a directory you specify.
+
+Create a file, like `style.php`:
 
     ```php
     <?php
-    require "scss.inc.php";
+    $directory = "styleshets";
+
+    require "scssphp/scss.inc.php";
+    scss_server::serveFrom($directory);
+
+    ```
+
+Create the directory set in the script alongside the script, then add your
+`scss` files to it.
+
+If we've got a file in there called `style.scss`, then we just need to hit the
+url: `example.com/style.php/style.scss` to get the compiled css.
+
+If there is an error compiling, the url will result in a `500` error with the
+error message. If the file can't be found, then a friendly `404` is returned.
+
+**scssphp** will automatically create a `scss_cache` directory inside the
+stylesheets directory where it will cache the compiled output. This way it can
+quickly serve the files if no modifications have been made. Your PHP script
+must have permission to wite in `scss_cache`.
+
+### Compiler Interface
+
+If you're interested in directly using the compiler, then all you need to do is
+require `scss.inc.php` and invoke the `scss` class:
+
+    ```php
+    <?php
+    require "scssphp/scss.inc.php";
     $scss = new scss();
 
     echo $scss->compile('
@@ -57,6 +92,10 @@ and you're ready to start compiling SCSS.
     ');
 
     ```
+
+The `compile` method takes `SCSS` as a string, and returns the `CSS`. If there
+is an error when compiling then an exception is thrown with an appropriate
+message.
 
 <a name="issues"></a>
 ## Issues
@@ -72,14 +111,14 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 <div class="comments" id="disqus_thread"></div>
 <script type="text/javascript">
-	var disqus_shortname = 'leafo';
-	var disqus_url = 'http://leafo.net/scssphp/';
+  var disqus_shortname = 'leafo';
+  var disqus_url = 'http://leafo.net/scssphp/';
 
-	(function() {
-		var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-	})();
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
 </script>
 
 
