@@ -4,6 +4,20 @@ error_reporting(E_ALL);
 
 require "scss.inc.php";
 
+$opts = getopt('vf:', array('version'));
+
+function has() {
+	global $opts;
+	foreach (func_get_args() as $arg) {
+		if (isset($opts[$arg])) return true;
+	}
+	return false;
+}
+
+if (has("v", "version")) {
+	exit(scssc::$VERSION . "\n");
+}
+
 $data = "";
 while (!feof(STDIN)) {
 	$data .= fread(STDIN, 8192);

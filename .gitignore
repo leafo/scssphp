@@ -1,1 +1,5 @@
 /*.scss
+/*.css
+/*.php
+.sass-cache
+/sass/

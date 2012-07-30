@@ -1,6 +1,8 @@
 <?php
 
 class scssc {
+	static public $VERSION = "v0.0.1";
+
 	static protected $operatorNames = array(
 		'+' => "add",
 		'-' => "sub",

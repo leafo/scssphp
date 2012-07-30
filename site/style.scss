@@ -19,16 +19,16 @@ $btn_color: desaturate(#FF3D7F, 10%);
 }
 
 @mixin grad($top, $bottom) {
-	background-color: mix($top, $bottom);
-	background-image: linear-gradient(bottom, $bottom 0%, $top 100%);
-	background-image: -webkit-linear-gradient(bottom, $bottom 0%, $top 100%);
-	background-image: -moz-linear-gradient(bottom, $bottom 0%, $top 100%);
-	background-image: -o-linear-gradient(bottom, $bottom 0%, $top 100%);
-	background-image: -ms-linear-gradient(bottom, $bottom 0%, $top 100%);
+    background-color: mix($top, $bottom);
+    background-image: linear-gradient(bottom, $bottom 0%, $top 100%);
+    background-image: -webkit-linear-gradient(bottom, $bottom 0%, $top 100%);
+    background-image: -moz-linear-gradient(bottom, $bottom 0%, $top 100%);
+    background-image: -o-linear-gradient(bottom, $bottom 0%, $top 100%);
+    background-image: -ms-linear-gradient(bottom, $bottom 0%, $top 100%);
 }
 
 @mixin autograd($color, $amount: 10%) {
-	@include grad($color, darken($color, $amount));
+    @include grad($color, darken($color, $amount));
 }
 
 body {
@@ -158,6 +158,8 @@ body {
 
     h2, h3 {
         margin: 20px 0px 5px 0px;
+        text-shadow: 1px 1px 0px white;
+        letter-spacing: -1px;
     }
 
     p {
@@ -199,8 +201,21 @@ body {
 }
 
 
+p {
+    line-height: 130%;
+    code {
+        background: rgba(0,0,0, 0.1);
+        border-radius: 4px;
+        padding: 1px 4px;
+    }
+}
 
-.lang_scss {
+
+.comments {
+    font-size: 12px;
+}
+
+.highlight {
     background: #333;
     color: white;
     font-size: 14px;
@@ -216,7 +231,7 @@ body {
     }
 
     // strings
-    .s, .s1, .s2, .se {
+    .s, .s1, .s2, .se, .nt {
         color: #ffe898;
     }
 
@@ -235,12 +250,6 @@ body {
         color: #9fff98;
     }
 
-    // operators
-    .o {
-        font-weight: bold;
-        color: #ff9898;
-    }
-
     .nv {
         color: #ff9898;
     }
@@ -254,7 +263,7 @@ body {
         color: #929292;
     }
 
-    .m, .mi, .mf, .mh {
+    .m, .mi, .mf, .mh, .o {
         color: #9495ff;
     }
 }
