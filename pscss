@@ -24,4 +24,7 @@ while (!feof(STDIN)) {
 }
 
 $scss = new scssc();
+if (has("f")) {
+	$scss->setFormatter($opts["f"]);
+}
 echo $scss->compile($data);
