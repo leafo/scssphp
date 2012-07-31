@@ -14,7 +14,7 @@
       <div class="inner">
         <div class="download-area">
           <a href="$root/src/scssphp-$current_version.tar.gz">
-            <div class="download-button">
+            <div class="download-button" id="download-button">
               <div class="top">Download</div>
               <div class="sub">scssphp-$current_version.tar.gz</div>
             </div>
@@ -60,6 +60,18 @@
       </div>
     </div>
   </div>
+
+  <script type="text/javascript">
+    (function() {
+      document.getElementById("download-button").onclick = function() {
+        _gaq.push(['_trackEvent', 'scssphp', 'click', 'download-button']); 
+      }
+      var link = document.getElementById("download-link");
+      if (link) link.onclick = function() {
+        _gaq.push(['_trackEvent', 'scssphp', 'click', 'download-link']); 
+      }
+    })();
+  </script>
 
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 </body>

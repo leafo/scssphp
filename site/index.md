@@ -24,7 +24,7 @@ Follow the author on twitter: [@moonscript](http://twitter.com/moonscript).
 ## Installing
 
 You can always download the latest version here:  
-<a href="$root/src/scssphp-$current_version.tar.gz">scssphp-$current_version.tar.gz</a>
+<a href="$root/src/scssphp-$current_version.tar.gz" id="download-link">scssphp-$current_version.tar.gz</a>
 
 You can also find the latest source online:  
 <https://github.com/leafo/scssphp/>
@@ -112,6 +112,8 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
+  * SCSS server is aware of imports, added custom function interface,
+    compressed formatter, <a href="http://leafo.net/scssphp/docs/">documentation</a> (July 30th, 2012)
   * Initial Release v0.0.1 (July 29th, 2012)
 
 <a name="comments"></a>
