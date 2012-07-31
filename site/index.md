@@ -3,6 +3,9 @@
 
 **scssphp** is a compiler for [SCSS][0] written in PHP.
 
+SCSS is a CSS preprocessor that adds many features like variables, mixins,
+imports, color manipulation, functions, and tons of other powerful features.
+
 The entire compiler comes in a single class file ready for including in any
 kind of project in addition to a command line tool for running the compiler
 from the terminal.
@@ -36,12 +39,14 @@ If you use [Packagist][2] for installing packages, then you can update your `com
     }
     ```
 
-<a name="reference"></a>
+<a name="quickstart"></a>
 ## Language Reference
 
 For a complete guide to the syntax of SCSS, consult the [official documentation][1].
 
 ## PHP Reference
+
+Complete documentation for **scssphp** is located at <a href="$root/docs/">http://leafo.net/scssphp/docs/</a>.
 
 ### Quickstart
 
@@ -74,7 +79,7 @@ error message. If the file can't be found, then a friendly `404` is returned.
 **scssphp** will automatically create a `scss_cache` directory inside the
 stylesheets directory where it will cache the compiled output. This way it can
 quickly serve the files if no modifications have been made. Your PHP script
-must have permission to wite in `scss_cache`.
+must have permission to write in `scss_cache`.
 
 ### Compiler Interface
 
@@ -96,6 +101,9 @@ require `scss.inc.php` and invoke the `scss` class:
 The `compile` method takes `SCSS` as a string, and returns the `CSS`. If there
 is an error when compiling then an exception is thrown with an appropriate
 message.
+
+
+For a more detailed guide consult <a href="$root/docs/">http://leafo.net/scssphp/docs/</a>.
 
 <a name="issues"></a>
 ## Issues
@@ -120,8 +128,6 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
-
-
 
 
   [0]: http://sass-lang.com/

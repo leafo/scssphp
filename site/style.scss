@@ -154,10 +154,12 @@ body {
 }
 
 .body {
+    $bg_color: #FEFFED;
+    $text_color: darken($brown, 60%);
     box-shadow: inset 0px 4px 8px -4px rgba(0,0,0,0.7), inset 0px -4px 8px -4px rgba(0,0,0,0.4);
-    background: #FEFFED;
+    background: $bg_color;
     overflow: hidden;
-    color: darken($brown, 60%);
+    color: $text_color;
     font-size: 16px;
     padding-bottom: 20px;
 
@@ -167,7 +169,10 @@ body {
 
     h2, h3 {
         margin: 20px 0px 5px 0px;
-        text-shadow: 1px 1px 0px white;
+    }
+
+    h1, h2, h3 {
+        text-shadow: 1px 1px 0px $bg_color, 2px 2px 0px rgba($text_color, 0.3);
         letter-spacing: -1px;
     }
 
@@ -223,9 +228,15 @@ p {
     }
 }
 
-
 .comments {
     font-size: 12px;
+}
+
+.index {
+    line-height: 150%;
+    ul {
+        margin: 0;
+    }
 }
 
 .highlight {
@@ -240,7 +251,7 @@ p {
 
     // builtins
     .nb {
-        color: #FFA122;
+        color: #FFA67C;
     }
 
     // strings
