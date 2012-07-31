@@ -34,7 +34,7 @@ If you use [Packagist][2] for installing packages, then you can update your `com
     ```json
     {
       "require": {
-        "leafo/scssphp": "dev-master"
+        "leafo/scssphp": "0.0.2"
       }
     }
     ```
