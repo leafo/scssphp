@@ -53,6 +53,7 @@ class scssc {
 		$this->extends = array();
 		$this->extendsMap = array();
 
+		$this->parsedFiles = array();
 		$this->parser = new scss_parser($name);
 		$tree = $this->parser->parse($code);
 
@@ -1104,6 +1105,10 @@ class scssc {
 		return $env;
 	}
 
+	public function getParsedFiles() {
+		return $this->parsedFiles;
+	}
+
 	public function addImportPath($path) {
 		$this->importPaths[] = $path;
 	}
@@ -1116,6 +1121,7 @@ class scssc {
 		$code = file_get_contents($path);
 		$parser = new scss_parser($path);
 		$tree = $parser->parse($code);
+		$this->parsedFiles[] = $path;
 
 		$pi = pathinfo($path);
 		array_unshift($this->importPaths, $pi['dirname']);
@@ -3325,6 +3331,7 @@ class scss_formatter_nested extends scss_formatter {
 }
 
 class scss_server {
+
 	protected function join($left, $right) {
 		return rtrim($left, "/") . "/" . ltrim($right, "/");
 	}
@@ -3350,8 +3357,25 @@ class scss_server {
 		return $this->join($this->cacheDir, md5($fname) . ".css");
 	}
 
+	protected function importsCacheName($out) {
+		return $out . ".imports";
+	}
+
 	protected function needsCompile($in, $out) {
-		return !is_file($out) || filemtime($in) > filemtime($out);
+		if (!is_file($out)) return true;
+
+		$mtime = filemtime($out);
+		if (filemtime($in) > $mtime) return true;
+
+		// look for modified imports
+		$icache = $this->importsCacheName($out);
+		if (is_readable($icache)) {
+			$imports = unserialize(file_get_contents($icache));
+			foreach ($imports as $import) {
+				if (filemtime($import) > $mtime) return true;
+			}
+		}
+		return false;
 	}
 
 	protected function compile($in, $out) {
@@ -3364,6 +3388,8 @@ class scss_server {
 		$css = "/* compiled by scssphp $v on $t (${elapsed}s) */\n\n" . $css;
 
 		file_put_contents($out, $css);
+		file_put_contents($this->importsCacheName($out),
+			serialize($this->scss->getParsedFiles()));
 		return $css;
 	}
 
