@@ -3373,12 +3373,12 @@ class scss_server {
 	}
 
 	protected function inputName() {
+		if (isset($_GET["p"])) return $_GET["p"];
+
 		if (isset($_SERVER["PATH_INFO"])) return $_SERVER["PATH_INFO"];
 		if (isset($_SERVER["DOCUMENT_URI"])) {
 			return substr($_SERVER["DOCUMENT_URI"], strlen($_SERVER["SCRIPT_NAME"]));
 		}
-
-		if (isset($_GET["p"])) return $_GET["p"];
 	}
 
 	protected function findInput() {

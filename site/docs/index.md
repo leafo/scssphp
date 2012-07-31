@@ -1,3 +1,5 @@
+    title: Dmcumentation
+--
 
 <h1 skip="true">scssphp $current_version Documentation</h1>
 
@@ -37,15 +39,15 @@ options, then run the compiler with the `compile` method.
   exception is thrown with an appropriate error message.
   </p>
 
-### Import Directory
+### Import Paths
 
 When you import a file using the `@import` directive, the current path of your
-PHP script is used as the search directory. This is often not what you want, so
-there are two methods for manipulating the import path: `addImportPath`, and
-`setImportPaths`.
+PHP script is used as the search path by default. This is often not what
+you want, so there are two methods for manipulating the import path:
+`addImportPath`, and `setImportPaths`.
 
 * `addImportPath($path)` will append `$path` to the list of the import
-  directories that is searched.
+  paths that are searched.
 
 * `setImportPaths($pathArray)` will replace the entire import path with
   `$pathArray`. The value of `$pathArray` will be converted to an array if it
@@ -150,7 +152,7 @@ We can add and remove functions using the methods `registerFunction` and
 
 * `registerFunction($functionName, $callable)` assigns the callable value to
   the name `$functionName`. The name is normalized using the rules of SCSS.
-  Meaning underscores and dashes and interchangeable. If a function with the
+  Meaning underscores and dashes are interchangeable. If a function with the
   same name already exists then it is replaced.
 
 * `unregisterFunction($functionName)` removes `$functionName` from the list of
@@ -167,7 +169,7 @@ SCSS has different types than PHP, and this is how **scssphp** represents them
 internally.
 
 For example, the value `10px` in PHP would be `array("number", 1, "px")`. There
-is a large variety of types, it's best to a debugging function like `print_r`
+is a large variety of types. Experiment with a debugging function like `print_r`
 to examine the possible inputs.
 
 The return value of the custom function can either be a SCSS type or a basic
@@ -192,4 +194,96 @@ together. PHP's anonymous function syntax is used to define the function.
 It's worth noting that in this example we lose the units of the number, and we
 also don't do any type checking. This will have undefined results if we give it
 anything other than two numbers.
+
+
+## SCSS Server
+
+The SCSS server is a small class that helps with automatically compiling SCSS.
+
+It's an endpoint for your web application that searches for SCSS files in a
+directory then compiles and serves them as CSS. It will only compile
+files if they've been modified (or one of the imports has been modified).
+
+### Using `serveFrom`
+
+`scss_server::serveFrom` is a simple to use function that should handle most cases.
+
+For example, create a file `style.php`:
+
+    ```php
+    <?php
+    $directory = "styleshets";
+
+    require "scssphp/scss.inc.php";
+    scss_server::serveFrom($directory);
+    ```
+
+Going to the URL `example.com/style.php/style.scss` will attempt to compile
+`style.scss` from the `stylesheets` directory, and serve it as CSS.
+
+* <p>`scss_server::serveFrom($directory)` will serve SCSS files out of
+  `$directory`. It will attempt to get the path to the file out of
+  `$_SERVER["PATH_INFO"]`. (It also looks at the GET parameter `p`)
+  </p>
+
+If it can not find the file it will return an HTTP 404 page:
+
+    ```text
+    /* INPUT NOT FOUND scss v0.0.1 */
+    ```
+
+If the file can't be compiled due to an error, then an HTTP 500 page is
+returned. Similar to the following:
+
+    ```text
+    Parse error: parse error: failed at `height: ;` stylesheets/test.scss on line 8
+    ```
+
+By default , the SCSS server must have write access to the style sheet
+directory. It writes its cache in a special directory called `scss_cache`.
+
+Also, because SCSS server writes headers, make sure no output is written before
+it runs.
+
+### Using `scss_server`
+
+Creating an instance of `scss_server` is just another way of accomplishing what
+`serveFrom` does. It let's us customize the cache directory and the instance
+of the `scssc` that is used to compile
+
+
+* <p>`new scss_server($sourceDir, $cacheDir, $scss)` creates a new server that
+  serves files from `$sourceDir`. The cache dir is where the cached compiled
+  files are placed. When `null`, `$sourceDir . "/scss_cache"` is used. `$scss`
+  is the instance of `scss` that is used to compile.
+  </p>
+
+Just call the `serve` method to let it render its output.
+
+Here's an example of creating a SCSS server that outputs compressed CSS:
+
+    ```php
+    <?php
+    require "scssphp/scss.inc.php";
+
+    $scss = new scssc();
+    $scss->setFormatter("scss_formatter_compressed");
+
+    $server = new scss_server("stylesheets", null, $scss);
+    $server->serve();
+    ```
+
+
+## Command Line Tool
+
+A really basic command line tool is included for integration with scripts. It
+is called `pscss`. It reads a SCSS file from standard out and returns the CSS.
+
+If passed the flag `-v`, input is ignored and the current version if returned.
+
+The flag `-f` can be used to set the [formatter](#Output_formatting):
+
+    ```bash
+    $ ./pscss -f scss_formatter_compressed < styles.scss
+    ```
 
