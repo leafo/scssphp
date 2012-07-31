@@ -45,7 +45,7 @@ class scssc {
 
 	protected $libFunctions = array();
 
-	public $formatter = "scss_formatter_nested";
+	protected $formatter = "scss_formatter_nested";
 
 	function compile($code, $name=null) {
 		$this->indentLevel = -1;
@@ -1115,6 +1115,10 @@ class scssc {
 
 	public function setImportPaths($path) {
 		$this->importPaths = (array)$path;
+	}
+
+	public function setFormatter($formatterName) {
+		$this->formatter = $formatterName;
 	}
 
 	protected function importFile($path, $out) {
@@ -3327,6 +3331,17 @@ class scss_formatter_nested extends scss_formatter {
 		if ($block->type == "root") {
 			echo $this->break;
 		}
+	}
+}
+
+class scss_formatter_compressed extends scss_formatter {
+	public $open = "{";
+	public $tagSeparator = ",";
+	public $assignSeparator = ":";
+	public $break = "";
+
+	public function indentStr($n = 0) {
+		return "";
 	}
 }
 
