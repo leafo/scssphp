@@ -13,6 +13,7 @@ tar -c `git ls-files` | tar -C $OUT_DIR -x
 
 rm $OUT_DIR/.gitignore
 rm $OUT_DIR/package.sh
+rm $OUT_DIR/todo
 rm -r $OUT_DIR/site
 
 OUT_PATH="$TARGET_DIR/scssphp-$VERSION.tar.gz"
