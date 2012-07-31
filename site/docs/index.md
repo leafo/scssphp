@@ -1,4 +1,4 @@
-    title: Dmcumentation
+    title: Documentation
 --
 
 <h1 skip="true">scssphp $current_version Documentation</h1>
