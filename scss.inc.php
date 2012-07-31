@@ -43,7 +43,7 @@ class scssc {
 
 	protected $importPaths = array("");
 
-	protected $libFunctions = array();
+	protected $userFunctions = array();
 
 	protected $formatter = "scss_formatter_nested";
 
@@ -1121,6 +1121,14 @@ class scssc {
 		$this->formatter = $formatterName;
 	}
 
+	public function registerFunction($name, $func) {
+		$this->userFunctions[$this->normalizeName($name)] = $func;
+	}
+
+	public function unregisterFunction($name) {
+		unset($this->userFunctions[$this->normalizeName($name)]);
+	}
+
 	protected function importFile($path, $out) {
 		$code = file_get_contents($path);
 		$parser = new scss_parser($path);
@@ -1169,7 +1177,18 @@ class scssc {
 				$val = $this->reduce($val, true);
 			}
 			$returnValue = call_user_func($f, $sorted, $this);
+		} else if (isset($this->userFunctions[$name])) {
+			// see if we can find a user function
+			$fn = $this->userFunctions[$name];
 
+			foreach ($args as &$val) {
+				$val = $this->reduce($val[1], true);
+			}
+
+			$returnValue = call_user_func($fn, $args, $this);
+		}
+
+		if (isset($returnValue)) {
 			// coerce a php value into a scss one
 			if (is_numeric($returnValue)) {
 				$returnValue = array('number', $returnValue, "");
@@ -1178,8 +1197,10 @@ class scssc {
 			} elseif (!is_array($returnValue)) {
 				$returnValue = array('keyword', $returnValue);
 			}
+
 			return true;
 		}
+
 		return false;
 	}
 
