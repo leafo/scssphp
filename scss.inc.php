@@ -457,7 +457,7 @@ class scssc {
 			break;
 		case "if":
 			list(, $if) = $child;
-			if ($this->reduce($if->cond) != self::$false) {
+			if ($this->reduce($if->cond, true) != self::$false) {
 				return $this->compileChildren($if->children, $out);
 			} else {
 				foreach ($if->cases as $case) {
@@ -470,7 +470,7 @@ class scssc {
 			}
 			break;
 		case "return":
-			return $this->reduce($child[1]);
+			return $this->reduce($child[1], true);
 		case "each":
 			list(,$each) = $child;
 			$list = $this->reduce($this->coerceList($each->list));
@@ -484,16 +484,16 @@ class scssc {
 			break;
 		case "while":
 			list(,$while) = $child;
-			while ($this->reduce($while->cond) != self::$false) {
+			while ($this->reduce($while->cond, true) != self::$false) {
 				$ret = $this->compileChildren($while->children, $out);
 				if ($ret) return $ret;
 			}
 			break;
 		case "for":
 			list(,$for) = $child;
-			$start = $this->reduce($for->start);
+			$start = $this->reduce($for->start, true);
 			$start = $start[1];
-			$end = $this->reduce($for->end);
+			$end = $this->reduce($for->end, true);
 			$end = $end[1];
 			$d = $start < $end ? 1 : -1;
 
@@ -1408,6 +1408,13 @@ class scssc {
 	}
 
 	// Built in functions
+
+	protected static $lib_if = array("condition", "if-true", "if-false");
+	protected function lib_if($args) {
+		list($cond,$t, $f) = $args;
+		if ($cond == self::$false) return $f;
+		return $t;
+	}
 
 	protected static $lib_rgb = array("red", "green", "blue");
 	protected function lib_rgb($args) {

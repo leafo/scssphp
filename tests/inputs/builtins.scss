@@ -120,4 +120,11 @@
     l: unitless(23deg);
 }
 
+#if {
+    color: if(true, yes, no);
+    color: if(false, yes, no);
+    color: if(false or true, yes, no);
+    color: if(10px, yes, no);
+}
+
 

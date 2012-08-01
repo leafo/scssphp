@@ -80,3 +80,9 @@
   u: "em";
   l: true;
   l: false; }
+
+#if {
+  color: yes;
+  color: no;
+  color: yes;
+  color: yes; }
