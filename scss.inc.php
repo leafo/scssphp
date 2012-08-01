@@ -548,7 +548,7 @@ class scssc {
 		case "debug":
 			list(,$value, $pos) = $child;
 			$line = $this->parser->getLineNo($pos);
-			$value = $this->compileValue($value);
+			$value = $this->compileValue($this->reduce($value, true));
 			fwrite(STDERR, "Line $line DEBUG: $value\n");
 			break;
 		default:
@@ -2001,21 +2001,22 @@ class scssc {
 
 class scss_parser {
 	static protected $precedence = array(
-		'==' => 0,
-		'!=' => 0,
-		'<=' => 0,
-		'>=' => 0,
-		'=' => 0,
-		'<' => 0,
-		'>' => 0,
-
-		'+' => 1,
-		'-' => 1,
-		"or" => 1,
-		'*' => 2,
-		'/' => 2,
-		'%' => 2,
+		"or" => 0,
 		"and" => 1,
+
+		'==' => 2,
+		'!=' => 2,
+		'<=' => 2,
+		'>=' => 2,
+		'=' => 2,
+		'<' => 3,
+		'>' => 2,
+
+		'+' => 3,
+		'-' => 3,
+		'*' => 4,
+		'/' => 4,
+		'%' => 4,
 	);
 
 	static protected $operators = array("+", "-", "*", "/", "%",
