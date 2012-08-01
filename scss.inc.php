@@ -2286,6 +2286,7 @@ class scss_parser {
 				$def = end($value[2]);
 				if ($def[0] == "keyword" && $def[1] == "!default") {
 					array_pop($value[2]);
+					$value = $this->flattenList($value);
 					$defaultVar = true;
 				}
 			}
@@ -3270,6 +3271,14 @@ class scss_parser {
 			return $m[1];
 		}
 		return "";
+	}
+
+	// turn list of length 1 into value type
+	protected function flattenList($value) {
+		if ($value[0] == "list" && count($value[2]) == 1) {
+			return $this->flattenList($value[2][0]);
+		}
+		return $value;
 	}
 }
 
