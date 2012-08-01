@@ -105,4 +105,18 @@ div {
     not: (not hello);
 }
 
+#string-test {
+    str: hi == "hi";
+    str: hi == "no";
+    str: 'yes' == 'yes';
+
+    $var1: "hello";
+    $var2: hello;
+
+    str: "#{$var1}" == '#{$var2}';
+
+    str: xhello#{$var1}x == "x#{$var2}hellox"; // xhellohellofalse
+
+    str: unit(10px) == px;
+}
 

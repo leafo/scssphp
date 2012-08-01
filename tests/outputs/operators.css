@@ -78,3 +78,11 @@ div {
   not: false;
   not: false;
   not: false; }
+
+#string-test {
+  str: true;
+  str: false;
+  str: true;
+  str: true;
+  str: xhellohellofalse;
+  str: true; }

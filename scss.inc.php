@@ -851,6 +851,12 @@ class scssc {
 	}
 
 	protected function op_eq($left, $right) {
+		if (($lStr = $this->coerceString($left)) && ($rStr = $this->coerceString($right))) {
+			$lStr[1] = "";
+			$rStr[1] = "";
+			return $this->toBool($this->compileValue($lStr) == $this->compileValue($rStr));
+		}
+
 		return $this->toBool($left == $right);
 	}
 
