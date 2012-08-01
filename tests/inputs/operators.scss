@@ -4,8 +4,8 @@ body {
     color: 1 + 2 + 5;
     color: 1 + 2 * 5 + 5;
     height: 10px/10px;
-    color: 10px/2px + 1;
-    color: (10px/2px);
+    color: 10px/2 + 1;
+    color: (10px/2);
 }
 
 div {
@@ -119,4 +119,10 @@ div {
 
     str: unit(10px) == px;
 }
+
+
+#special {
+  cancel-unit: (10px / 10px);
+}
+
 

@@ -86,3 +86,6 @@ div {
   str: true;
   str: xhellohellofalse;
   str: true; }
+
+#special {
+  cancel-unit: 1; }

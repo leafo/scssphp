@@ -623,9 +623,13 @@ class scssc {
 						$left[0] == "number" && $right[0] == "number")
 					{
 						$unitChange = true;
-						$targetUnit = $left[2];
-						$left = $this->normalizeNumber($left);
-						$right = $this->normalizeNumber($right);
+						if ($opName == "div" && $left[2] == $right[2]) {
+							$targetUnit = "";
+						} else {
+							$targetUnit = $left[2];
+							$left = $this->normalizeNumber($left);
+							$right = $this->normalizeNumber($right);
+						}
 					}
 
 					$shouldEval = $inParens || $inExp;
