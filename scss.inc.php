@@ -630,7 +630,7 @@ class scssc {
 
 				return $this->expToString($value);
 			case "unary":
-				list(, $op, $exp) = $value;
+				list(, $op, $exp, $inParens) = $value;
 				$exp = $this->reduce($exp);
 				if ($exp[0] == "number") {
 					switch ($op) {
@@ -641,6 +641,19 @@ class scssc {
 						return $exp;
 					}
 				}
+
+				if ($op == "not") {
+					if ($inExp || $inParens) {
+						if ($exp == self::$false) {
+							return self::$true;
+						} else {
+							return self::$false;
+						}
+					} else {
+						$op = $op . " ";
+					}
+				}
+
 				return array("string", "", array($op, $exp));
 			case "var":
 				list(, $name) = $value;
@@ -2549,10 +2562,18 @@ class scss_parser {
 	protected function value(&$out) {
 		$s = $this->seek();
 
+		if ($this->literal("not", false) && $this->whitespace() && $this->value($inner)) {
+			$out = array("unary", "not", $inner, $this->inParens);
+			return true;
+		} else {
+			$this->seek($s);
+		}
 
 		if ($this->literal("+") && $this->value($inner)) {
-			$out = array("unary", "+", $inner);
+			$out = array("unary", "+", $inner, $this->inParens);
 			return true;
+		} else {
+			$this->seek($s);
 		}
 
 		// negation
@@ -2561,7 +2582,7 @@ class scss_parser {
 			$this->unit($inner) ||
 			$this->parenValue($inner)))
 		{
-			$out = array("unary", "-", $inner);
+			$out = array("unary", "-", $inner, $this->inParens);
 			return true;
 		} else {
 			$this->seek($s);

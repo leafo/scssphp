@@ -47,7 +47,7 @@ div {
   b: 10 -100;
   b: -90; }
 
-#open {
+#bools-fail {
   and: false and two;
   and: one and two;
   and: one and false;
@@ -55,10 +55,26 @@ div {
   or: one or two;
   or: one or false; }
 
-#inner {
+#bools {
   and: false;
   and: two;
   and: false;
   or: two;
   or: one;
   or: one; }
+
+#nots-fail {
+  not: false2;
+  not: not false;
+  not: not 0;
+  not: not 1;
+  not: not "";
+  not: not hello; }
+
+#nots {
+  not: false2;
+  not: true;
+  not: false;
+  not: false;
+  not: false;
+  not: false; }
