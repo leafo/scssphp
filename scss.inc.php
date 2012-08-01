@@ -566,6 +566,20 @@ class scssc {
 		return array("string", "", $content);
 	}
 
+	// should $value cause its operand to eval
+	protected function shouldEval($value) {
+		switch ($value[0]) {
+		case "exp":
+			if ($value[1] == "/") {
+				return $this->shouldEval($value[2], $value[3]);
+			}
+		case "var":
+		case "fncall":
+			return true;
+		}
+		return false;
+	}
+
 	protected function reduce($value, $inExp = false) {
 		list($type) = $value;
 		switch ($type) {
@@ -573,11 +587,12 @@ class scssc {
 				list(, $op, $left, $right, $inParens) = $value;
 				$opName = isset(self::$operatorNames[$op]) ? self::$operatorNames[$op] : $op;
 
+				$inExp = $inExp || $this->shouldEval($left) || $this->shouldEval($right);
+
 				$left = $this->reduce($left, true);
 				$right = $this->reduce($right, true);
 
 				// only do division in special cases
-				// TODO: add variables type check here
 				if ($opName == "div" && !$inParens && !$inExp) {
 					if ($left[0] != "color" && $right[0] != "color") {
 						return $this->expToString($value);
@@ -631,6 +646,8 @@ class scssc {
 				return $this->expToString($value);
 			case "unary":
 				list(, $op, $exp, $inParens) = $value;
+				$inExp = $inExp || $this->shouldEval($exp);
+
 				$exp = $this->reduce($exp);
 				if ($exp[0] == "number") {
 					switch ($op) {
@@ -2057,7 +2074,7 @@ class scss_parser {
 		$this->eatWhiteDefault = true;
 		$this->insertComments = true;
 
-		$this->buffer = $this->removeComments($buffer);
+		$this->buffer = $buffer;
 
 		$this->whitespace();
 		while (false !== $this->parseChunk());
@@ -3256,10 +3273,6 @@ class scss_parser {
 		if ($where === null) return $this->count;
 		else $this->count = $where;
 		return true;
-	}
-
-	protected function removeComments($buffer) {
-		return $buffer; // TODO: this
 	}
 
 	static function preg_quote($what) {
