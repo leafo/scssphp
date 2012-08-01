@@ -571,7 +571,7 @@ class scssc {
 		switch ($type) {
 			case "exp":
 				list(, $op, $left, $right, $inParens) = $value;
-				$opName = self::$operatorNames[$op];
+				$opName = isset(self::$operatorNames[$op]) ? self::$operatorNames[$op] : $op;
 
 				$left = $this->reduce($left, true);
 				$right = $this->reduce($right, true);
@@ -613,10 +613,11 @@ class scssc {
 						$right = $this->normalizeNumber($right);
 					}
 
+					$shouldEval = $inParens || $inExp;
 					if (isset($passOp)) {
-						$out = $this->$fn($op, $left, $right);
+						$out = $this->$fn($op, $left, $right, $shouldEval);
 					} else {
-						$out = $this->$fn($left, $right);
+						$out = $this->$fn($left, $right, $shouldEval);
 					}
 
 					if (!is_null($out)) {
@@ -758,6 +759,18 @@ class scssc {
 			array_unshift($strRight[2], $left);
 			return $strRight;
 		}
+	}
+
+	protected function op_and($left, $right, $shouldEval) {
+		if (!$shouldEval) return;
+		if ($left != self::$false) return $right;
+		return $left;
+	}
+
+	protected function op_or($left, $right, $shouldEval) {
+		if (!$shouldEval) return;
+		if ($left != self::$false) return $left;
+		return $right;
 	}
 
 	protected function op_color_color($op, $left, $right) {
@@ -1978,13 +1991,15 @@ class scss_parser {
 
 		'+' => 1,
 		'-' => 1,
+		"or" => 1,
 		'*' => 2,
 		'/' => 2,
 		'%' => 2,
+		"and" => 1,
 	);
 
 	static protected $operators = array("+", "-", "*", "/", "%",
-		"==", "!=", "<=", ">=", "<", ">");
+		"==", "!=", "<=", ">=", "<", ">", "and", "or");
 
 	static protected $operatorStr;
 	static protected $whitePattern;

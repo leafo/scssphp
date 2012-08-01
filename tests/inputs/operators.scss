@@ -66,3 +66,24 @@ div {
     b: 10 - $num;
 }
 
+#open {
+    and: false and two;
+    and: one and two;
+    and: one and false;
+
+    or: false or two;
+    or: one or two;
+    or: one or false;
+}
+
+#inner {
+    and: (false and two);
+    and: (one and two);
+    and: (one and false);
+
+    or: (false or two);
+    or: (one or two);
+    or: (one or false);
+}
+
+
