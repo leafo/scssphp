@@ -54,6 +54,9 @@ class scssc {
 		$this->extends = array();
 		$this->extendsMap = array();
 
+		$locale = setlocale(LC_NUMERIC, 0);
+		setlocale(LC_NUMERIC, "C");
+
 		$this->parsedFiles = array();
 		$this->parser = new scss_parser($name);
 		$tree = $this->parser->parse($code);
@@ -68,7 +71,10 @@ class scssc {
 
 		ob_start();
 		$this->formatter->block($this->scope);
-		return ob_get_clean();
+		$out = ob_get_clean();
+
+		setlocale(LC_NUMERIC, $locale);
+		return $out;
 	}
 
 	protected function pushExtends($target, $origin) {
