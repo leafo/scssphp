@@ -35,10 +35,10 @@ class scssc {
 		)
 	);
 
-	static protected $true = array("keyword", "true");
-	static protected $false = array("keyword", "false");
+	static public $true = array("keyword", "true");
+	static public $false = array("keyword", "false");
 
-	static protected $defaultValue = array("keyword", "");
+	static public $defaultValue = array("keyword", "");
 	static public $selfSelector = array("self");
 
 	protected $importPaths = array("");
