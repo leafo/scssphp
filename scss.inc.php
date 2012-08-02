@@ -1213,15 +1213,20 @@ class scssc {
 	protected function findImport($url) {
 		if (preg_match('/\.css|^http:\/\/$/', $url)) return null;
 
-		foreach ((array)$this->importPaths as $dir) {
-			$full = $dir .
-				(!empty($dir) && substr($dir, -1) != '/' ? '/' : '') .
-				$url;
+		// try the _partial filename
+		$_url = preg_replace('/[^\/]+$/', '_\0', $url);
 
-			if ($this->fileExists($file = $full.'.scss') ||
-				$this->fileExists($file = $full))
-			{
-				return $file;
+		foreach ((array)$this->importPaths as $dir) {
+			foreach (array($url, $_url) as $full) {
+				$full = $dir .
+					(!empty($dir) && substr($dir, -1) != '/' ? '/' : '') .
+					$full;
+
+				if ($this->fileExists($file = $full.'.scss') ||
+					$this->fileExists($file = $full))
+				{
+					return $file;
+				}
 			}
 		}
 
