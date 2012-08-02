@@ -31,13 +31,7 @@ You can also find the latest source online:
 
 If you use [Packagist][2] for installing packages, then you can update your `composer.json` like so:
 
-    ```json
-    {
-      "require": {
-        "leafo/scssphp": "0.0.2"
-      }
-    }
-    ```
+$render{[[composer]]}
 
 <a name="quickstart"></a>
 ## Language Reference
@@ -112,9 +106,12 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
-  * SCSS server is aware of imports, added custom function interface,
-    compressed formatter, <a href="http://leafo.net/scssphp/docs/">documentation</a> (July 30th, 2012)
-  * Initial Release v0.0.1 (July 29th, 2012)
+* **0.0.3** -- Add missing and/or/not operators. Expression evaluation happens
+	correctly. Import file caching and _partial filename support. Misc bug
+	fixes. (August 2nd, 2012)
+* **0.0.2** -- SCSS server is aware of imports, added custom function interface,
+	compressed formatter, <a href="http://leafo.net/scssphp/docs/">documentation</a> (July 30th, 2012)
+* Initial Release v0.0.1 (July 29th, 2012)
 
 <a name="comments"></a>
 ## Comments
