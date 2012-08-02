@@ -42,6 +42,7 @@ class scssc {
 	static public $selfSelector = array("self");
 
 	protected $importPaths = array("");
+	protected $importCache = array();
 
 	protected $userFunctions = array();
 
@@ -1183,10 +1184,18 @@ class scssc {
 	}
 
 	protected function importFile($path, $out) {
-		$code = file_get_contents($path);
-		$parser = new scss_parser($path);
-		$tree = $parser->parse($code);
-		$this->parsedFiles[] = $path;
+		// see if tree is cached
+		$realPath = realpath($path);
+		if (isset($this->importCache[$realPath])) {
+			$tree = $this->importCache[$realPath];
+		} else {
+			$code = file_get_contents($path);
+			$parser = new scss_parser($path);
+			$tree = $parser->parse($code);
+			$this->parsedFiles[] = $path;
+
+			$this->importCache[$realPath] = $tree;
+		}
 
 		$pi = pathinfo($path);
 		array_unshift($this->importPaths, $pi['dirname']);
