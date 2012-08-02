@@ -1103,7 +1103,7 @@ class scssc {
 				$val = self::$defaultValue;
 			}
 
-			$this->set($name, $this->reduce($val));
+			$this->set($name, $this->reduce($val, true));
 		}
 	}
 
