@@ -54,7 +54,7 @@ Create a file, like `style.php`:
 
     ```php
     <?php
-    $directory = "styleshets";
+    $directory = "stylesheets";
 
     require "scssphp/scss.inc.php";
     scss_server::serveFrom($directory);

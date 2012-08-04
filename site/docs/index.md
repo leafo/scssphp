@@ -212,7 +212,7 @@ For example, create a file `style.php`:
 
     ```php
     <?php
-    $directory = "styleshets";
+    $directory = "stylesheets";
 
     require "scssphp/scss.inc.php";
     scss_server::serveFrom($directory);
