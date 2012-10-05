@@ -17,6 +17,22 @@ class ApiTest extends PHPUnit_Framework_TestCase {
 			$this->compile("result: add-two(10, 20);"),
 			"result: 30;");
 	}
+	
+	public function testImportMissing(){
+		$this->assertEquals(
+			$this->compile('@import "missing";'),
+			'@import "missing";');
+	}
+	
+	public function testImportCustomCallback(){
+		$this->scss->addImportPath(function($path) {
+			return 'inputs/' . str_replace('.css','.scss',$path);
+		});
+		
+		$this->assertEquals(
+			$this->compile('@import "variables.css";'),
+			trim(file_get_contents('outputs/variables.css')));
+	}
 
 	public function compile($str) {
 		return trim($this->scss->compile($str));
