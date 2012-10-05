@@ -66,6 +66,23 @@ The default import path is `array("")`, which means the current directory.
     echo $scss->compile('@import "mixins.scss"');
     ```
 
+Besides adding static import paths, it's also possible to add custom import
+functions. This allows you to load paths from a database, or HTTP, or using
+files that SCSS would otherwise not process (such as vanilla CSS imports).
+
+    ```php
+    <?php
+    require "scssphp/scss.inc.php";
+    $scss = new scssc();
+    $scss->addImportPath(function($path) {
+        if (!file_exists('stylesheets/'.$path)) return null;
+        return 'stylesheets/'.$path;
+    });
+
+    // will import `stylesheets/vanilla.css'
+    echo $scss->compile('@import "vanilla.css"');
+    ```
+
 ### Output Formatting
 
 It's possible to customize the formatting of the output CSS by changing the
