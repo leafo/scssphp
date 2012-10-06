@@ -1211,20 +1211,32 @@ class scssc {
 
 	// results the file path for an import url if it exists
 	protected function findImport($url) {
-		if (preg_match('/\.css|^http:\/\/$/', $url)) return null;
+		$urls = array();
+		
+		// for "normal" scss imports (ignore vanilla css and external requests)
+		if (!preg_match('/\.css|^http:\/\/$/', $url)) {
+			// try both normal and the _partial filename
+			$urls = array($url, preg_replace('/[^\/]+$/', '_\0', $url));
+		}
 
-		// try the _partial filename
-		$_url = preg_replace('/[^\/]+$/', '_\0', $url);
-
-		foreach ((array)$this->importPaths as $dir) {
-			foreach (array($url, $_url) as $full) {
-				$full = $dir .
-					(!empty($dir) && substr($dir, -1) != '/' ? '/' : '') .
-					$full;
-
-				if ($this->fileExists($file = $full.'.scss') ||
-					$this->fileExists($file = $full))
-				{
+		foreach ($this->importPaths as $dir) {
+			if (is_string($dir)) {
+				// check urls for normal import paths
+				foreach ($urls as $full) {
+					$full = $dir .
+						(!empty($dir) && substr($dir, -1) != '/' ? '/' : '') .
+						$full;
+	
+					if ($this->fileExists($file = $full.'.scss') ||
+						$this->fileExists($file = $full))
+					{
+						return $file;
+					}
+				}
+			} else {
+				// check custom callback for import path
+				$file = call_user_func($dir,$url,$this);
+				if ($file !== null) {
 					return $file;
 				}
 			}
