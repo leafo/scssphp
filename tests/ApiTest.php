@@ -26,12 +26,12 @@ class ApiTest extends PHPUnit_Framework_TestCase {
 	
 	public function testImportCustomCallback(){
 		$this->scss->addImportPath(function($path) {
-			return 'inputs/' . str_replace('.css','.scss',$path);
+			return __DIR__.'/inputs/' . str_replace('.css','.scss',$path);
 		});
 		
 		$this->assertEquals(
 			$this->compile('@import "variables.css";'),
-			trim(file_get_contents('outputs/variables.css')));
+			trim(file_get_contents(__DIR__.'/outputs/variables.css')));
 	}
 
 	public function compile($str) {
