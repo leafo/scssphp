@@ -1058,26 +1058,33 @@ class scssc {
 		return $setSelf ? $out : array_merge($parent, $child);
 	}
 
-	protected function multiplyMedia($env, $childMedia = null) {
+	protected function multiplyMedia($env, $childQueries = null) {
 		if (is_null($env) ||
 			!empty($env->block->type) && $env->block->type != "media")
 		{
-			return $childMedia;
+			return $childQueries;
 		}
 
 		// plain old block, skip
 		if (empty($env->block->type)) {
-			return $this->multiplyMedia($env->parent, $childMedia);
+			return $this->multiplyMedia($env->parent, $childQueries);
 		}
 
-		$query = $env->block->query;
-		if ($childMedia == null) {
-			$childMedia = $query;
+		$parentQueries = $env->block->query;
+		if ($childQueries == null) {
+			$childQueries = $parentQueries;
 		} else {
-			$childMedia = array_merge($query, $childMedia);
+			$originalQueries = $childQueries;
+			$childQueries = array();
+				
+			foreach ($parentQueries as $parentQuery){
+				foreach ($originalQueries as $childQuery) {
+					$childQueries []= array_merge($parentQuery, $childQuery);
+				}
+			}
 		}
 
-		return $this->multiplyMedia($env->parent, $childMedia);
+		return $this->multiplyMedia($env->parent, $childQueries);
 	}
 
 	// convert something to list
