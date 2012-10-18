@@ -355,26 +355,34 @@ class scssc {
 		}
 	}
 
-	protected function compileMediaQuery($query) {
-		$parts = array();
-		foreach ($query as $q) {
-			switch ($q[0]) {
-			case "mediaType":
-				$parts[] = implode(" ", array_slice($q, 1));
-				break;
-			case "mediaExp":
-				if (isset($q[2])) {
-					$parts[] = "($q[1]: " . $this->compileValue($q[2]) . ")";
-				} else {
-					$parts[] = "($q[1])";
-				}
-				break;
-			}
-		}
-
+	protected function compileMediaQuery($queryList) {
 		$out = "@media";
-		if (!empty($parts)) {
-			$out = $out . " " . implode(" and ", $parts);
+		$first = true;
+		foreach ($queryList as $query){
+			$parts = array();
+			foreach ($query as $q) {
+				switch ($q[0]) {
+					case "mediaType":
+						$parts[] = implode(" ", array_slice($q, 1));
+						break;
+					case "mediaExp":
+						if (isset($q[2])) {
+							$parts[] = "($q[1]" . $this->formatter->assignSeparator . $this->compileValue($q[2]) . ")";
+						} else {
+							$parts[] = "($q[1])";
+						}
+						break;
+				}
+			}
+			if (!empty($parts)) {
+				if ($first) {
+					$first = false;
+					$out .= " ";
+				} else {
+					$out .= $this->formatter->tagSeparator;
+				}
+				$out .= implode(" and ", $parts);
+			}
 		}
 		return $out;
 	}
