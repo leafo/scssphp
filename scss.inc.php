@@ -2137,9 +2137,9 @@ class scss_parser {
 
 		// the directives
 		if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == "@") {
-			if ($this->literal("@media") && $this->mediaQuery($mediaQuery) && $this->literal("{")) {
+			if ($this->literal("@media") && $this->mediaQueryList($mediaQueryList) && $this->literal("{")) {
 				$media = $this->pushSpecialBlock("media");
-				$media->query = $mediaQuery;
+				$media->query = $mediaQueryList[2];
 				return true;
 			} else {
 				$this->seek($s);
@@ -2479,7 +2479,7 @@ class scss_parser {
 	// high level parsers (they return parts of ast)
 
 	protected function mediaQueryList(&$out) {
-		return $this->genericList($out, "mediaQuery");
+		return $this->genericList($out, "mediaQuery", ",", false);
 	}
 
 	protected function mediaQuery(&$out) {
