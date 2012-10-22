@@ -1070,7 +1070,7 @@ class scssc {
 			return $this->multiplyMedia($env->parent, $childQueries);
 		}
 
-		$parentQueries = $env->block->query;
+		$parentQueries = $env->block->queryList;
 		if ($childQueries == null) {
 			$childQueries = $parentQueries;
 		} else {
@@ -2154,7 +2154,7 @@ class scss_parser {
 		if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == "@") {
 			if ($this->literal("@media") && $this->mediaQueryList($mediaQueryList) && $this->literal("{")) {
 				$media = $this->pushSpecialBlock("media");
-				$media->query = $mediaQueryList[2];
+				$media->queryList = $mediaQueryList[2];
 				return true;
 			} else {
 				$this->seek($s);
