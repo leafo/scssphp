@@ -355,26 +355,34 @@ class scssc {
 		}
 	}
 
-	protected function compileMediaQuery($query) {
-		$parts = array();
-		foreach ($query as $q) {
-			switch ($q[0]) {
-			case "mediaType":
-				$parts[] = implode(" ", array_slice($q, 1));
-				break;
-			case "mediaExp":
-				if (isset($q[2])) {
-					$parts[] = "($q[1]: " . $this->compileValue($q[2]) . ")";
-				} else {
-					$parts[] = "($q[1])";
-				}
-				break;
-			}
-		}
-
+	protected function compileMediaQuery($queryList) {
 		$out = "@media";
-		if (!empty($parts)) {
-			$out = $out . " " . implode(" and ", $parts);
+		$first = true;
+		foreach ($queryList as $query){
+			$parts = array();
+			foreach ($query as $q) {
+				switch ($q[0]) {
+					case "mediaType":
+						$parts[] = implode(" ", array_slice($q, 1));
+						break;
+					case "mediaExp":
+						if (isset($q[2])) {
+							$parts[] = "($q[1]" . $this->formatter->assignSeparator . $this->compileValue($q[2]) . ")";
+						} else {
+							$parts[] = "($q[1])";
+						}
+						break;
+				}
+			}
+			if (!empty($parts)) {
+				if ($first) {
+					$first = false;
+					$out .= " ";
+				} else {
+					$out .= $this->formatter->tagSeparator;
+				}
+				$out .= implode(" and ", $parts);
+			}
 		}
 		return $out;
 	}
@@ -1050,26 +1058,33 @@ class scssc {
 		return $setSelf ? $out : array_merge($parent, $child);
 	}
 
-	protected function multiplyMedia($env, $childMedia = null) {
+	protected function multiplyMedia($env, $childQueries = null) {
 		if (is_null($env) ||
 			!empty($env->block->type) && $env->block->type != "media")
 		{
-			return $childMedia;
+			return $childQueries;
 		}
 
 		// plain old block, skip
 		if (empty($env->block->type)) {
-			return $this->multiplyMedia($env->parent, $childMedia);
+			return $this->multiplyMedia($env->parent, $childQueries);
 		}
 
-		$query = $env->block->query;
-		if ($childMedia == null) {
-			$childMedia = $query;
+		$parentQueries = $env->block->queryList;
+		if ($childQueries == null) {
+			$childQueries = $parentQueries;
 		} else {
-			$childMedia = array_merge($query, $childMedia);
+			$originalQueries = $childQueries;
+			$childQueries = array();
+				
+			foreach ($parentQueries as $parentQuery){
+				foreach ($originalQueries as $childQuery) {
+					$childQueries []= array_merge($parentQuery, $childQuery);
+				}
+			}
 		}
 
-		return $this->multiplyMedia($env->parent, $childMedia);
+		return $this->multiplyMedia($env->parent, $childQueries);
 	}
 
 	// convert something to list
@@ -2137,9 +2152,9 @@ class scss_parser {
 
 		// the directives
 		if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == "@") {
-			if ($this->literal("@media") && $this->mediaQuery($mediaQuery) && $this->literal("{")) {
+			if ($this->literal("@media") && $this->mediaQueryList($mediaQueryList) && $this->literal("{")) {
 				$media = $this->pushSpecialBlock("media");
-				$media->query = $mediaQuery;
+				$media->queryList = $mediaQueryList[2];
 				return true;
 			} else {
 				$this->seek($s);
@@ -2479,7 +2494,7 @@ class scss_parser {
 	// high level parsers (they return parts of ast)
 
 	protected function mediaQueryList(&$out) {
-		return $this->genericList($out, "mediaQuery");
+		return $this->genericList($out, "mediaQuery", ",", false);
 	}
 
 	protected function mediaQuery(&$out) {

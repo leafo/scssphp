@@ -26,3 +26,12 @@
     color: red;
   div {
     color: red; } }
+
+@media a and c, b and c {
+  color: blue; }
+
+@media a and b, a and c {
+  color: blue; }
+
+@media a and c, a and d, b and c, b and d {
+  color: blue; }
