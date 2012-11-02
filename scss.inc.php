@@ -2601,10 +2601,24 @@ class scss_parser {
 	}
 
 	protected function expression(&$out) {
+		$s = $this->seek();
+		
+		if ($this->literal('(') && $this->literal(')')) {
+			$out = array("list", "", array());
+			return true;
+		}
+		$this->seek($s);
+		
+		if ($this->literal('(') && $this->valueList($out) && $this->literal(')') && 'list' == $out[0]) {
+			return true;
+		}
+		$this->seek($s);
+		
 		if ($this->value($lhs)) {
 			$out = $this->expHelper($lhs, 0);
 			return true;
 		}
+
 		return false;
 	}
 
