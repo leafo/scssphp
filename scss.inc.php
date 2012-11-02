@@ -1594,6 +1594,14 @@ class scssc {
 	protected function lib_scale_color($args) {
 		return $this->alter_color($args, "scale_color_helper");
 	}
+	
+	protected static $lib_ie_hex_str = array("color");
+	protected function lib_ie_hex_str($args) {
+		$color = $this->coerceColor($args[0]);
+		$color[4] = isset($color[4]) ? round(255*$color[4]) : 255;
+
+		return sprintf('#%02X%02X%02X%02X', $color[4], $color[1], $color[2], $color[3]);
+	}
 
 	protected static $lib_red = array("color");
 	protected function lib_red($args) {

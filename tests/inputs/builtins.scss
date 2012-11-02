@@ -64,6 +64,9 @@
 
     color: scale-color($color, $lightness: 55%);
     color: scale-color($color, $lightness: -55%);
+    
+    color: ie-hex-str($color);
+    color: ie-hex-str(#abc);
 }
 
 #string {
