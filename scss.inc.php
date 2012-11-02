@@ -32,6 +32,7 @@ class scssc {
 			"pc" => 6,
 			"cm" => 2.54,
 			"mm" => 25.4,
+			"px" => 96,
 		)
 	);
 
@@ -1836,6 +1837,60 @@ class scssc {
 		$num = $args[0];
 		$num[1] = ceil($num[1]);
 		return $num;
+	}
+
+	protected static $lib_abs = array("value");
+	protected function lib_abs($args) {
+		$num = $args[0];
+		$num[1] = abs($num[1]);
+		return $num;
+	}
+
+	protected function lib_min($args) {
+		$numbers = $this->getNormalizedNumbers($args);
+		$min = null;
+		foreach ($numbers as $key => $number) {
+			if (null === $min || $number <= $min[1]) {
+				$min = array($key, $number);
+			}
+		}
+
+		return $args[$min[0]];
+	}
+
+	protected function lib_max($args) {
+		$numbers = $this->getNormalizedNumbers($args);
+		$max = null;
+		foreach ($numbers as $key => $number) {
+			if (null === $max || $number >= $max[1]) {
+				$max = array($key, $number);
+			}
+		}
+
+		return $args[$max[0]];
+	}
+
+	protected function getNormalizedNumbers($args) {
+		$unit = null;
+		$originalUnit = null;
+		$numbers = array();
+		foreach ($args as $key => $item) {
+			if ('number' != $item[0]) {
+				throw new Exception(sprintf('%s is not a number', $item[0]));
+			}
+			$number = $this->normalizeNumber($item);
+			
+			if (null === $unit) {
+				$unit = $number[2];
+			} elseif ($unit !== $number[2]) {
+				throw new \Exception(sprintf('Incompatible units: "%s" and "%s".', $originalUnit, $item[2]));
+			}
+
+			$originalUnit = $item[2];
+			$numbers[$key] = $number[1];
+		}
+
+		return $numbers;
 	}
 
 	protected static $lib_length = array("list");

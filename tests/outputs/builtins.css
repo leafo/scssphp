@@ -53,7 +53,12 @@
   color: 250%;
   color: 3;
   color: 3;
-  color: 4; }
+  color: 4;
+  top: 10px;
+  top: 1ex;
+  width: 200%;
+  bottom: 10px;
+  padding: 3em 1in 96px 72pt; }
 
 #list {
   len: 3;
