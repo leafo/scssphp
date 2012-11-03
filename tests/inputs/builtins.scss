@@ -137,9 +137,15 @@
     u: unit(12px);
     u: unit(12em);
 
-
     l: unitless(23);
     l: unitless(23deg);
+
+    c: comparable(2px, 1px);
+    c: comparable(100px, 3em);
+    c: comparable(10cm, 3mm);
+    c: comparable(1, 4);
+    c: comparable(1ex, 4em);
+    c: comparable(2em, 5em);
 }
 
 #if {

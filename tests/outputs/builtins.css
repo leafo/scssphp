@@ -98,7 +98,13 @@
   u: "px";
   u: "em";
   l: true;
-  l: false; }
+  l: false;
+  c: true;
+  c: false;
+  c: true;
+  c: true;
+  c: false;
+  c: true; }
 
 #if {
   color: yes;
