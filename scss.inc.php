@@ -2788,13 +2788,11 @@ class scss_parser {
 		if ($this->keyword($name, false) &&
 			$this->literal("("))
 		{
-			if ($name != "expression") {
+			if ($name != "expression" && false == preg_match("/^(-[a-z]+-)?calc$/", $name)) {
 				$ss = $this->seek();
-				if ($name != "expression") {
-					if ($this->argValues($args) && $this->literal(")")) {
-						$func = array("fncall", $name, $args);
-						return true;
-					}
+				if ($this->argValues($args) && $this->literal(")")) {
+					$func = array("fncall", $name, $args);
+					return true;
 				}
 				$this->seek($ss);
 			}
