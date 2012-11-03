@@ -638,13 +638,34 @@ class scssc {
 					if (!isset($genOp) &&
 						$left[0] == "number" && $right[0] == "number")
 					{
+						if ($opName == "mod" && $right[2] != "") {
+							throw new \Exception(sprintf('Cannot modulo by a number with units: %s%s.', $right[1], $right[2]));
+						}
+
 						$unitChange = true;
-						if ($opName == "div" && $left[2] == $right[2]) {
-							$targetUnit = "";
-						} else {
-							$targetUnit = $left[2];
+						$emptyUnit = $left[2] == "" || $right[2] == "";
+						$targetUnit = "" != $left[2] ? $left[2] : $right[2];
+
+						if ($opName != "mul") {
+							$left[2] = "" != $left[2] ? $left[2] : $targetUnit;
+							$right[2] = "" != $right[2] ? $right[2] : $targetUnit;
+						}
+
+						if ($opName != "mod") {
 							$left = $this->normalizeNumber($left);
 							$right = $this->normalizeNumber($right);
+						}
+
+						if ($opName == "div" && !$emptyUnit && $left[2] == $right[2]) {
+							$targetUnit = "";
+						}
+
+						if ($opName == "mul") {
+							$left[2] = "" != $left[2] ? $left[2] : $right[2];
+							$right[2] = "" != $right[2] ? $right[2] : $left[2];
+						} elseif ($opName == "div" && $left[2] == $right[2]) {
+							$left[2] = "";
+							$right[2] = "";
 						}
 					}
 
