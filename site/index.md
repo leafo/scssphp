@@ -106,6 +106,13 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
+* **0.0.4** -- [Import path can be a function](docs/#import_paths) (Christian
+	Lück). Correctly parse media queries with more than one item (Christian
+	Lück). Add `ie_hex_str`, `abs`, `min`, `max` functions (Martin Hasoň), ignore
+	expressions inside of `calc()` (Martin Hasoň), Improve operator evaluation
+	(Martin Hasoň), Add
+	[`@content`](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixin-content)
+	support. Misc bug fixes. (Nov 3nd, 2012)
 * **0.0.3** -- Add missing and/or/not operators. Expression evaluation happens
 	correctly. Import file caching and _partial filename support. Misc bug
 	fixes. (August 2nd, 2012)
