@@ -116,7 +116,7 @@ body {
             @include autograd($btn_color);
 
             position: relative;
-            top: -1px * $height;
+            top: -1 * $height;
 
             padding: 8px 20px;
             border-radius: 8px;
@@ -137,7 +137,7 @@ body {
 
             &:active {
                 box-shadow: 0px $height - $depress 0px darken($btn_color, 30%), inset 0px -1px 0px rgba(255,255,255, 0.2), inset 0px 1px 0px rgba(0,0,0, 0.2);
-                top: -1px * ($height - $depress);
+                top: -1 * ($height - $depress);
             }
 
             .top {
@@ -168,7 +168,7 @@ body {
     }
 
     h2, h3 {
-        margin: 20px 0px 5px 0px;
+        margin: 20px 0;
     }
 
     h1, h2, h3 {
@@ -189,6 +189,10 @@ body {
         &:hover {
             color: lighten(#DB1C4A, 10%);
         }
+    }
+
+    pre {
+        margin: 20px 0;
     }
 }
 
