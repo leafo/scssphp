@@ -1076,7 +1076,7 @@ class scssc {
 		} else {
 			$originalQueries = $childQueries;
 			$childQueries = array();
-				
+
 			foreach ($parentQueries as $parentQuery){
 				foreach ($originalQueries as $childQuery) {
 					$childQueries []= array_merge($parentQuery, $childQuery);
@@ -1227,7 +1227,7 @@ class scssc {
 	// results the file path for an import url if it exists
 	protected function findImport($url) {
 		$urls = array();
-		
+
 		// for "normal" scss imports (ignore vanilla css and external requests)
 		if (!preg_match('/\.css|^http:\/\/$/', $url)) {
 			// try both normal and the _partial filename
@@ -1241,7 +1241,7 @@ class scssc {
 					$full = $dir .
 						(!empty($dir) && substr($dir, -1) != '/' ? '/' : '') .
 						$full;
-	
+
 					if ($this->fileExists($file = $full.'.scss') ||
 						$this->fileExists($file = $full))
 					{
@@ -1594,7 +1594,7 @@ class scssc {
 	protected function lib_scale_color($args) {
 		return $this->alter_color($args, "scale_color_helper");
 	}
-	
+
 	protected static $lib_ie_hex_str = array("color");
 	protected function lib_ie_hex_str($args) {
 		$color = $this->coerceColor($args[0]);
@@ -2610,18 +2610,20 @@ class scss_parser {
 
 	protected function expression(&$out) {
 		$s = $this->seek();
-		
-		if ($this->literal('(') && $this->literal(')')) {
-			$out = array("list", "", array());
-			return true;
+
+		if ($this->literal("(")) {
+			if ($this->literal(")")) {
+				$out = array("list", "", array());
+				return true;
+			}
+
+			if ($this->valueList($out) && $this->literal(')') && $out[0] == "list") {
+				return true;
+			}
+
+			$this->seek($s);
 		}
-		$this->seek($s);
-		
-		if ($this->literal('(') && $this->valueList($out) && $this->literal(')') && 'list' == $out[0]) {
-			return true;
-		}
-		$this->seek($s);
-		
+
 		if ($this->value($lhs)) {
 			$out = $this->expHelper($lhs, 0);
 			return true;
