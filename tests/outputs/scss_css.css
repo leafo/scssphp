@@ -67,10 +67,10 @@ sel {
 @foo "bar"
 
 foo {
-  a: 12px calc(29.333%);
-  b: 12px -moz-calc(29.333%);
-  b: 12px -webkit-calc(29.333%);
-  b: 12px -foobar-calc(29.333%); }
+  a: 12px calc(100%/3 - 2*1em - 2*1px);
+  b: 12px -moz-calc(100%/3 - 2*1em - 2*1px);
+  b: 12px -webkit-calc(100%/3 - 2*1em - 2*1px);
+  b: 12px -foobar-calc(100%/3 - 2*1em - 2*1px); }
 
 foo {
   bar: baz; }

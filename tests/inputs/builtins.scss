@@ -81,6 +81,12 @@
     color: round(3.4);
     color: floor(3.4);
     color: ceil(3.4);
+    
+    top: floor(10.4px);
+    top: ceil(.4ex);
+    width: percentage(100px / 50px); 
+    bottom: abs(-10px);
+    padding: min(5em, 3em, 4em) max(2px, 1in) min(1in, 96px) max(1in, 72pt);
 }
 
 #list {
