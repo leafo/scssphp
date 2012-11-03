@@ -1146,7 +1146,7 @@ class scssc {
 				$val = self::$defaultValue;
 			}
 
-			$this->set($name, $this->reduce($val, true));
+			$this->set($name, $this->reduce($val, true), true);
 		}
 	}
 
@@ -1165,9 +1165,13 @@ class scssc {
 		return str_replace("-", "_", $name);
 	}
 
-	protected function set($name, $value) {
+	protected function set($name, $value, $shadow=false) {
 		$name = $this->normalizeName($name);
-		$this->setExisting($name, $value);
+		if ($shadow) {
+			$this->setRaw($name, $value);
+		} else {
+			$this->setExisting($name, $value);
+		}
 	}
 
 	protected function setExisting($name, $value, $env = null) {
@@ -1179,6 +1183,10 @@ class scssc {
 		} else {
 			$this->env->store[$name] = $value;
 		}
+	}
+
+	protected function setRaw($name, $value) {
+		$this->env->store[$name] = $value;
 	}
 
 	protected function get($name, $defaultValue = null, $env = null) {

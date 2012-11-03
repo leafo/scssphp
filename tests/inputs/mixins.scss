@@ -42,3 +42,18 @@ del {
     @include hello-world;
 }
 
+
+// variable shadowing
+
+
+$color: white;
+@mixin colors($color: blue) {
+    color: $color;
+}
+
+div {
+    color: $color;
+    @include colors();
+    color: $color;
+}
+
