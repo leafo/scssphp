@@ -2037,10 +2037,17 @@ class scssc {
 		return $value[0] == "number" && empty($value[2]);
 	}
 
-
 	protected static $lib_comparable = array("number-1", "number-2");
 	protected function lib_comparable($args) {
-		return true; // TODO: THIS
+		list($number1, $number2) = $args;
+		if (!isset($number1[0]) || $number1[0] != "number" || !isset($number2[0]) || $number2[0] != "number") {
+			throw new Exception('Invalid argument(s) for "comparable"');
+		}
+
+		$number1 = $this->normalizeNumber($number1);
+		$number2 = $this->normalizeNumber($number2);
+
+		return $number1[2] == $number2[2] || $number1[2] == "" || $number2[2] == "";
 	}
 
 	static protected $cssColors = array(
