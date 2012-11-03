@@ -1,0 +1,45 @@
+
+@mixin apply-to-ie6-only {
+    * html {
+        @content;
+    }
+}
+@include apply-to-ie6-only {
+    #logo {
+        background-image: url(/logo.gif);
+    }
+}
+
+
+$color: white;
+@mixin colors($color: blue) {
+    background-color: $color;
+    @content;
+    border-color: $color;
+}
+.colors {
+    @include colors { color: $color; }
+}
+
+
+@mixin iphone {
+    @media only screen and (max-width: 480px) {
+        @content;
+    }
+}
+
+@include iphone {
+    body { color: red }
+}
+
+
+#sidebar {
+  $sidebar-width: 300px;
+  width: $sidebar-width;
+  @include iphone {
+    width: $sidebar-width / 3;
+  }
+}
+
+
+

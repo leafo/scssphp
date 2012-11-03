@@ -1,0 +1,15 @@
+  * html #logo {
+    background-image: url(/logo.gif); }
+
+.colors {
+  background-color: blue;
+  color: white;
+  border-color: blue; }
+  @media only screen and (max-width: 480px) {
+  body {
+    color: red; } }
+
+#sidebar {
+  width: 300px; }
+    @media only screen and (max-width: 480px) {
+      width: 100px; }

@@ -20,6 +20,7 @@ class scssc {
 	);
 
 	static protected $namespaces = array(
+		"special" => "%",
 		"mixin" => "@",
 		"function" => "^",
 	);
@@ -544,12 +545,20 @@ class scssc {
 			$this->compileChildren($prefixed, $out);
 			break;
 		case "include": // including a mixin
-			list(,$name, $argValues) = $child;
+			list(,$name, $argValues, $content) = $child;
 			$mixin = $this->get(self::$namespaces["mixin"] . $name, false);
 			if (!$mixin) break; // throw error?
 
+			$callingScope = $this->env;
+
 			// push scope, apply args
 			$this->pushEnv();
+
+			if (!is_null($content)) {
+				$content->scope = $callingScope;
+				$this->setRaw(self::$namespaces["special"] . "content", $content);
+			}
+
 			if (!is_null($mixin->args)) {
 				$this->applyArguments($mixin->args, $argValues);
 			}
@@ -560,6 +569,20 @@ class scssc {
 
 			$this->popEnv();
 
+			break;
+		case "mixin_content":
+			$content = $this->get(self::$namespaces["special"] . "content");
+			if (is_null($content)) {
+				throw new \Exception("Unexpected @content inside of mixin");
+			}
+
+			$this->storeEnv = $content->scope;
+
+			foreach ($content->children as $child) {
+				$this->compileChild($child, $out);
+			}
+
+			unset($this->storeEnv);
 			break;
 		case "debug":
 			list(,$value, $pos) = $child;
@@ -1165,6 +1188,10 @@ class scssc {
 		return str_replace("-", "_", $name);
 	}
 
+	protected function getStoreEnv() {
+		return isset($this->storeEnv) ? $this->storeEnv : $this->env;
+	}
+
 	protected function set($name, $value, $shadow=false) {
 		$name = $this->normalizeName($name);
 		if ($shadow) {
@@ -1174,8 +1201,10 @@ class scssc {
 		}
 	}
 
+	// todo: this is bugged?
 	protected function setExisting($name, $value, $env = null) {
-		if (is_null($env)) $env = $this->env;
+		if (is_null($env)) $env = $this->getStoreEnv();
+
 		if (isset($env->store[$name])) {
 			$env->store[$name] = $value;
 		} elseif (!is_null($env->parent)) {
@@ -1192,7 +1221,7 @@ class scssc {
 	protected function get($name, $defaultValue = null, $env = null) {
 		$name = $this->normalizeName($name);
 
-		if (is_null($env)) $env = $this->env;
+		if (is_null($env)) $env = $this->getStoreEnv();
 		if (is_null($defaultValue)) $defaultValue = self::$defaultValue;
 
 		if (isset($env->store[$name])) {
@@ -1916,7 +1945,7 @@ class scssc {
 				throw new Exception(sprintf('%s is not a number', $item[0]));
 			}
 			$number = $this->normalizeNumber($item);
-			
+
 			if (null === $unit) {
 				$unit = $number[2];
 			} elseif ($unit !== $number[2]) {
@@ -2270,11 +2299,19 @@ class scss_parser {
 				($this->literal("(") &&
 					($this->argValues($argValues) || true) &&
 					$this->literal(")") || true) &&
-				$this->end())
+				($this->end() ||
+					$this->literal("{") && $hasBlock = true))
 			{
-				$this->append(array("include",
-					$mixinName,
-					isset($argValues) ? $argValues : null));
+				$child = array("include",
+					$mixinName, isset($argValues) ? $argValues : null, null);
+
+				if (!empty($hasBlock)) {
+					$include = $this->pushSpecialBlock("include");
+					$include->child = $child;
+				} else {
+					$this->append($child);
+				}
+
 				return true;
 			} else {
 				$this->seek($s);
@@ -2377,6 +2414,13 @@ class scss_parser {
 				$this->valueList($value) &&
 				$this->end()) {
 				$this->append(array("debug", $value, $s));
+				return true;
+			} else {
+				$this->seek($s);
+			}
+
+			if ($this->literal("@content") && $this->end()) {
+				$this->append(array("mixin_content"));
 				return true;
 			} else {
 				$this->seek($s);
@@ -2507,7 +2551,12 @@ class scss_parser {
 		// closing a block
 		if ($this->literal("}")) {
 			$block = $this->popBlock();
-			if (empty($block->dontAppend)) {
+			if (isset($block->type) && $block->type == "include") {
+				$include = $block->child;
+				unset($block->child);
+				$include[3] = $block;
+				$this->append($include);
+			} else if (empty($block->dontAppend)) {
 				$type = isset($block->type) ? $block->type : "block";
 				$this->append(array($type, $block));
 			}
