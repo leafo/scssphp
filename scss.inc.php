@@ -2043,6 +2043,28 @@ class scssc {
 		return array("list", $sep, array_merge($list1[2], array($value)));
 	}
 
+	protected function lib_zip($args) {
+		foreach ($args as $arg) {
+			if (!isset($arg[0]) || $arg[0] != "list") {
+				throw new Exception('Function "zip" expects list');
+			}
+		}
+		$lists = array();
+		$firstList = array_shift($args);
+		foreach ($firstList[2] as $key => $item) {
+			$list = array("list", "", array($item));
+			foreach ($args as $arg) {
+				if (isset($arg[2][$key])) {
+					$list[2][] = $arg[2][$key];
+				} else {
+					break 2;
+				}
+			}
+			$lists[] = $list;
+		}
+
+		return array("list", ",", $lists);
+	}
 
 	protected static $lib_type_of = array("value");
 	protected function lib_type_of($args) {
