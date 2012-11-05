@@ -573,7 +573,7 @@ class scssc {
 		case "mixin_content":
 			$content = $this->get(self::$namespaces["special"] . "content");
 			if (is_null($content)) {
-				throw new \Exception("Unexpected @content inside of mixin");
+				throw new Exception("Unexpected @content inside of mixin");
 			}
 
 			$this->storeEnv = $content->scope;
@@ -662,7 +662,7 @@ class scssc {
 						$left[0] == "number" && $right[0] == "number")
 					{
 						if ($opName == "mod" && $right[2] != "") {
-							throw new \Exception(sprintf('Cannot modulo by a number with units: %s%s.', $right[1], $right[2]));
+							throw new Exception(sprintf('Cannot modulo by a number with units: %s%s.', $right[1], $right[2]));
 						}
 
 						$unitChange = true;
@@ -1949,7 +1949,7 @@ class scssc {
 			if (null === $unit) {
 				$unit = $number[2];
 			} elseif ($unit !== $number[2]) {
-				throw new \Exception(sprintf('Incompatible units: "%s" and "%s".', $originalUnit, $item[2]));
+				throw new Exception(sprintf('Incompatible units: "%s" and "%s".', $originalUnit, $item[2]));
 			}
 
 			$originalUnit = $item[2];
