@@ -25,8 +25,6 @@ div {
 
 span {
     @include something(blue);
-    @include something();
-    @include something;
 }
 
 html {
@@ -57,3 +55,13 @@ div {
     color: $color;
 }
 
+@mixin box-shadow($shadows...) {
+  -moz-box-shadow: $shadows;
+  -webkit-box-shadow: $shadows;
+  box-shadow: $shadows;
+}
+
+div {
+    @include box-shadow(10px 10px 5px #888);
+    @include box-shadow(inset 10px 10px #888, -10px -10px #f4f4f4);
+}
