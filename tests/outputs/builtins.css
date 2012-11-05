@@ -82,7 +82,9 @@
   world: one, two, three, great, job;
   world: one, two, three, great job;
   cool: one two three great job;
-  cool: great job one two three; }
+  cool: great job one two three;
+  zip: 1px solid, 2px dashed;
+  zip: 1px solid red, 2px dashed green; }
 
 #introspection {
   t: number;
