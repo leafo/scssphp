@@ -69,6 +69,16 @@
   hello: one, two, three, hello;
   hello: one, two, three, hello, world, what, is, going;
   hello: one, two, three, hello;
+  index: 2;
+  index: false;
+  index: 3;
+  index: 1;
+  index: false;
+  index: 1;
+  index: false;
+  index: 2;
+  index: 2;
+  index: 1;
   world: one, two, three, great, job;
   world: one, two, three, great job;
   cool: one two three great job;
