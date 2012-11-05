@@ -6,7 +6,7 @@
 }
 
 pre {
-    @include hello(alpha, $a: tree, $b: fort, beta, $d: palace);
+    @include hello(alpha, $d: palace, $b: fort);
 }
 
 

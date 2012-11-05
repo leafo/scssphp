@@ -5,13 +5,7 @@ div {
       height: 200px; }
 
 span {
-  color: blue;
-  color: ;
-  color: ; }
-    span div {
-      height: 20px; }
-    span div {
-      height: 20px; }
+  color: blue; }
     span div {
       height: 20px; }
 
@@ -28,3 +22,11 @@ div {
 
 div {
   background-image: linear-gradient(left top, red, green); }
+
+div {
+  -moz-box-shadow: 10px 10px 5px #888;
+  -webkit-box-shadow: 10px 10px 5px #888;
+  box-shadow: 10px 10px 5px #888;
+  -moz-box-shadow: inset 10px 10px #888, -10px -10px #f4f4f4;
+  -webkit-box-shadow: inset 10px 10px #888, -10px -10px #f4f4f4;
+  box-shadow: inset 10px 10px #888, -10px -10px #f4f4f4; }

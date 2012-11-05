@@ -1163,31 +1163,54 @@ class scssc {
 	}
 
 	protected function applyArguments($argDef, $argValues) {
-		$argValues = (array)$argValues;
+		$args = array();
+		foreach ($argDef as $i => $arg) {
+			list($name, $default, $isVariable) = $argDef[$i];
+			$args[$name] = array($i, $name, $default, $isVariable);
+		}
 
 		$keywordArgs = array();
 		$remaining = array();
-
 		// assign the keyword args
-		foreach ($argValues as $arg) {
+		foreach ((array) $argValues as $arg) {
 			if (!empty($arg[0])) {
+				if (!isset($args[$arg[0][1]])) {
+					throw new Exception(sprintf('Mixin or function doesn\'t have an argument named $%s.', $arg[0][1]));
+				} elseif ($args[$arg[0][1]][0] < count($remaining)) {
+					throw new Exception(sprintf('The argument $%s was passed both by position and by name.', $arg[0][1]));
+				}
 				$keywordArgs[$arg[0][1]] = $arg[1];
+			} elseif (count($keywordArgs)) {
+				throw new Exception('Positional arguments must come before keyword arguments.');
+			} elseif ($arg[2] == true) {
+				$val = $this->reduce($arg[1], true);
+				if ($val[0] == "list") {
+					foreach ($val[2] as $item) {
+						$remaining[] = $item;
+					}
+				} else {
+					$remaining[] = $val;
+				}
 			} else {
 				$remaining[] = $arg[1];
 			}
 		}
 
-		foreach ($argDef as $i => $arg) {
-			list($name, $default) = $arg;
-
-			if (isset($remaining[$i])) {
+		foreach ($args as $arg) {
+			list($i, $name, $default, $isVariable) = $arg;
+			if ($isVariable) {
+				$val = array("list", ",", array());
+				for ($count = count($remaining); $i < $count; $i++) {
+					$val[2][] = $remaining[$i];
+				}
+			} elseif (isset($remaining[$i])) {
 				$val = $remaining[$i];
 			} elseif (isset($keywordArgs[$name])) {
 				$val = $keywordArgs[$name];
 			} elseif (!empty($default)) {
 				$val = $default;
 			} else {
-				$val = self::$defaultValue;
+				throw new Exception(sprintf('There is missing argument $%s', $name));
 			}
 
 			$this->set($name, $this->reduce($val, true), true);
@@ -2770,7 +2793,13 @@ class scss_parser {
 		}
 
 		if ($this->genericList($value, "expression")) {
-			$out = array($keyword, $value);
+			$out = array($keyword, $value, false);
+			$s = $this->seek();
+			if ($this->literal("...")) {
+				$out[2] = true;
+			} else {
+				$this->seek($s);
+			}
 			return true;
 		}
 
@@ -2991,11 +3020,23 @@ class scss_parser {
 
 		$args = array();
 		while ($this->variable($var)) {
-			$arg = array($var[1], null);
+			$arg = array($var[1], null, false);
 
 			$ss = $this->seek();
 			if ($this->literal(":") && $this->genericList($defaultVal, "expression")) {
 				$arg[1] = $defaultVal;
+			} else {
+				$this->seek($ss);
+			}
+			
+			$ss = $this->seek();
+			if ($this->literal("...")) {
+				$sss = $this->seek();
+				if (!$this->literal(")")) {
+					throw new Exception('... has to be after the final argument');
+				}
+				$arg[2] = true;
+				$this->seek($sss);
 			} else {
 				$this->seek($ss);
 			}
