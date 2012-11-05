@@ -16,5 +16,11 @@
     ],
     "autoload": {
         "classmap": ["scss.inc.php"]
+    },
+    "require": {
+        "php": ">=5.2.0"
+    },
+    "require-dev": {
+        "php": ">=5.3.0"
     }
 }
