@@ -93,7 +93,7 @@ class scssc {
 	}
 
 	protected function makeOutputBlock($type, $selectors = null) {
-		$out = new stdclass;
+		$out = new stdClass;
 		$out->type = $type;
 		$out->lines = array();
 		$out->children = array();
@@ -591,7 +591,7 @@ class scssc {
 			fwrite(STDERR, "Line $line DEBUG: $value\n");
 			break;
 		default:
-			throw new exception("unknown child type: $child[0]");
+			throw new Exception("unknown child type: $child[0]");
 		}
 	}
 
@@ -887,12 +887,12 @@ class scssc {
 				break;
 			case '/':
 				if ($rval == 0) {
-					throw new exception("color: Can't divide by zero");
+					throw new Exception("color: Can't divide by zero");
 				}
 				$out[] = $lval / $rval;
 				break;
 			default:
-				throw new exception("color: unknow op $op");
+				throw new Exception("color: unknow op $op");
 			}
 		}
 
@@ -1018,7 +1018,7 @@ class scssc {
 
 			return $this->compileValue($reduced);
 		default:
-			throw new exception("unknown value type: $type");
+			throw new Exception("unknown value type: $type");
 		}
 	}
 
@@ -1174,7 +1174,7 @@ class scssc {
 	}
 
 	protected function pushEnv($block=null) {
-		$env = new stdclass;
+		$env = new stdClass;
 		$env->parent = $this->env;
 		$env->store = array();
 		$env->block = $block;
@@ -1440,12 +1440,12 @@ class scssc {
 
 	protected function assertColor($value) {
 		if ($color = $this->coerceColor($value)) return $color;
-		throw new exception("expecting color");
+		throw new Exception("expecting color");
 	}
 
 	protected function assertNumber($value) {
 		if ($value[0] != "number")
-			throw new exception("expecting number");
+			throw new Exception("expecting number");
 		return $value[1];
 	}
 
@@ -2594,7 +2594,7 @@ class scss_parser {
 	// tree builders
 
 	protected function pushBlock($selectors) {
-		$b = new stdclass;
+		$b = new stdClass;
 		$b->parent = $this->env; // not sure if we need this yet
 
 		$b->selectors = $selectors;
@@ -3433,9 +3433,9 @@ class scss_parser {
 		}
 
 		if ($this->peek("(.*?)(\n|$)", $m, $count)) {
-			throw new exception("$msg: failed at `$m[1]` $loc");
+			throw new Exception("$msg: failed at `$m[1]` $loc");
 		} else {
-			throw new exception("$msg: $loc");
+			throw new Exception("$msg: $loc");
 		}
 	}
 
