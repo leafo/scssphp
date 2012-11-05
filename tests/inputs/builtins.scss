@@ -100,7 +100,17 @@
     hello: join(one two three, hello world what is going, comma);
     hello: append(one two three, hello, comma);
 
-
+    index: index(1px solid red, solid);
+    index: index(1px solid red, dashed);
+    index: index(1px solid red, #f00);
+    index: index(96px solid red, 1in);
+    index: index((1in 2) a b, 1in);
+    index: index((1in 2) a b, (96px 2));
+    index: index((1in 2) a b, (1in, 2));
+    index: index((1px solid red), solid);
+    index: index(1px 3px + 3px, 4+2px);
+    $var: oo;
+    index: index(foo bar, f#{$var});
 
     $yes: one, two, three;
     $no: great job;
