@@ -9,3 +9,8 @@ div {
 
 del {
   color: 1000; }
+
+div {
+  hello: "hello foo and bar";
+  hello: "hello bar and default";
+  hello: "hello Alice, Bob, Tom"; }

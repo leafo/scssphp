@@ -22,10 +22,13 @@ div {
     @return $a#{$a} $b;
 }
 
-@function three($a, $b) {
+@function three($a, $b: default) {
     @return "hello #{$a} and #{$b}"
 }
 
+@function all($a...) {
+    @return "hello #{$a}"
+}
 
 div {
     hello: one(10, 55);
@@ -42,4 +45,9 @@ del {
     color: hello-world();
 }
 
-
+div {
+    $args: foo bar;
+    hello: three($args...);
+    hello: three(bar...);
+    hello: all(Alice, Bob, Tom);
+}
