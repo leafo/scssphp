@@ -24,12 +24,10 @@ class InputTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider fileNameProvider
 	 */
-	public function testInputFile($inFname) {
+	public function testInputFile($inFname, $outFname) {
 		if (getenv("BUILD")) {
-			return $this->buildInput($inFname);
+			return $this->buildInput($inFname,$outFname);
 		}
-
-		$outFname = self::outputNameFor($inFname);
 
 		if (!is_readable($outFname)) {
 			$this->fail("$outFname is missing, ".
@@ -43,14 +41,14 @@ class InputTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function fileNameProvider() {
-		return array_map(function($a) { return array($a); },
+		return array_map(function($a) { return array($a, InputTest::outputNameFor($a)); },
 			self::findInputNames());
 	}
 
 	// only run when env is set
-	public function buildInput($inFname) {
+	public function buildInput($inFname, $outFname) {
 		$css = $this->scss->compile(file_get_contents($inFname));
-		file_put_contents(self::outputNameFor($inFname), $css);
+		file_put_contents($outFname, $css);
 	}
 
 	static public function findInputNames($pattern="*") {
