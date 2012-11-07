@@ -25,3 +25,6 @@ div {
   color: white;
   color: blue;
   color: white; }
+
+div {
+  background-image: linear-gradient(left top, red, green); }

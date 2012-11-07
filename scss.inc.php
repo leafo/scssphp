@@ -2994,7 +2994,7 @@ class scss_parser {
 			$arg = array($var[1], null);
 
 			$ss = $this->seek();
-			if ($this->literal(":") && $this->expression($defaultVal)) {
+			if ($this->literal(":") && $this->genericList($defaultVal, "expression")) {
 				$arg[1] = $defaultVal;
 			} else {
 				$this->seek($ss);
