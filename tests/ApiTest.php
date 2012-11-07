@@ -14,14 +14,14 @@ class ApiTest extends PHPUnit_Framework_TestCase {
 		});
 
 		$this->assertEquals(
-			$this->compile("result: add-two(10, 20);"),
-			"result: 30;");
+			"result: 30;",
+			$this->compile("result: add-two(10, 20);"));
 	}
 	
 	public function testImportMissing(){
 		$this->assertEquals(
-			$this->compile('@import "missing";'),
-			'@import "missing";');
+			'@import "missing";',
+			$this->compile('@import "missing";'));
 	}
 	
 	public function testImportCustomCallback(){
@@ -30,8 +30,8 @@ class ApiTest extends PHPUnit_Framework_TestCase {
 		});
 		
 		$this->assertEquals(
-			$this->compile('@import "variables.css";'),
-			trim(file_get_contents(__DIR__.'/outputs/variables.css')));
+			trim(file_get_contents(__DIR__.'/outputs/variables.css')),
+			$this->compile('@import "variables.css";'));
 	}
 
 	public function compile($str) {
