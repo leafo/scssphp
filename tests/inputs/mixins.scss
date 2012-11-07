@@ -57,3 +57,10 @@ div {
     color: $color;
 }
 
+@mixin linear-gradient($from, $to, $pos: left top) {
+  background-image: linear-gradient($pos, $from, $to);
+}
+
+div {
+    @include linear-gradient(red, green);
+}
