@@ -104,6 +104,7 @@ For a more detailed guide consult <a href="$root/docs/">http://leafo.net/scssphp
 
 Find any issues? I'd love to fix them for you, post about them on [the issues tracker][3].
 
+<a name="changelog"></a>
 ## Changelog
 
 * **0.0.4** -- [Import path can be a function](docs/#import_paths) (Christian
