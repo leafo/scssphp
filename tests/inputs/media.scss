@@ -51,4 +51,17 @@
     }
 }
 
+$media: cree;
+$feature: -webkit-min-device-pixel-ratio;
+$value: 1.5;
+
+div {
+    color: blue;
+    @media s#{$media}n and ($feature: $value) {
+        .sidebar {
+            width: 500px;
+        }
+    }
+}
+
 

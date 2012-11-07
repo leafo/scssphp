@@ -365,13 +365,13 @@ class scssc {
 			foreach ($query as $q) {
 				switch ($q[0]) {
 					case "mediaType":
-						$parts[] = implode(" ", array_slice($q, 1));
+						$parts[] = implode(" ", array_map(array($this, "compileValue"), array_slice($q, 1)));
 						break;
 					case "mediaExp":
 						if (isset($q[2])) {
-							$parts[] = "($q[1]" . $this->formatter->assignSeparator . $this->compileValue($q[2]) . ")";
+							$parts[] = "(". $this->compileValue($q[1]) . $this->formatter->assignSeparator . $this->compileValue($q[2]) . ")";
 						} else {
-							$parts[] = "($q[1])";
+							$parts[] = "(" . $this->compileValue($q[1]) . ")";
 						}
 						break;
 				}
@@ -2736,20 +2736,25 @@ class scss_parser {
 		$expressions = null;
 		$parts = array();
 
-		if (($this->literal("only") && ($only = true) || $this->literal("not") && ($not = true) || true) && $this->keyword($mediaType)) {
+		if (($this->literal("only") && ($only = true) || $this->literal("not") && ($not = true) || true) && $this->mixedKeyword($mediaType)) {
 			$prop = array("mediaType");
-			if (isset($only)) $prop[] = "only";
-			if (isset($not)) $prop[] = "not";
-			$prop[] = $mediaType;
+			if (isset($only)) $prop[] = array("keyword", "only");
+			if (isset($not)) $prop[] = array("keyword", "not");
+			$media = array("list", "", array());
+			foreach ((array)$mediaType as $type) {
+				if (is_array($type)) {
+					$media[2][] = $type;
+				} else {
+					$media[2][] = array("keyword", $type);
+				}
+			}
+			$prop[] = $media;
 			$parts[] = $prop;
 		} else {
 			$this->seek($s);
 		}
 
-
-		if (!empty($mediaType) && !$this->literal("and")) {
-			// ~
-		} else {
+		if ($this->literal("and")) {
 			$this->genericList($expressions, "mediaExpression", "and", false);
 			if (is_array($expressions)) $parts = array_merge($parts, $expressions[2]);
 		}
@@ -2762,7 +2767,7 @@ class scss_parser {
 		$s = $this->seek();
 		$value = null;
 		if ($this->literal("(") &&
-			$this->keyword($feature) &&
+			$this->expression($feature) &&
 			($this->literal(":") && $this->expression($value) || true) &&
 			$this->literal(")"))
 		{
@@ -3165,6 +3170,10 @@ class scss_parser {
 		$this->eatWhiteDefault = $oldWhite;
 
 		if (count($parts) == 0) return false;
+
+		if ($this->eatWhiteDefault) {
+			$this->whitespace();
+		}
 
 		$out = $parts;
 		return true;
