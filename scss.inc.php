@@ -2045,10 +2045,9 @@ class scssc {
 
 	protected function lib_zip($args) {
 		foreach ($args as $arg) {
-			if (!isset($arg[0]) || $arg[0] != "list") {
-				throw new Exception('Function "zip" expects list');
-			}
+			$this->assertList($arg);
 		}
+
 		$lists = array();
 		$firstList = array_shift($args);
 		foreach ($firstList[2] as $key => $item) {
