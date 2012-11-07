@@ -35,3 +35,9 @@
 
 @media a and c, a and d, b and c, b and d {
   color: blue; }
+
+div {
+  color: blue; }
+  @media screen and (-webkit-min-device-pixel-ratio: 1.5) {
+  div .sidebar {
+    width: 500px; } }
