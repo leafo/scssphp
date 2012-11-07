@@ -796,6 +796,27 @@ class scssc {
 		}
 	}
 
+	public function normalizeValue($value) {
+		$value = $this->coerceForExpression($this->reduce($value));
+		list($type) = $value;
+
+		switch ($type) {
+		case "list":
+			$value = $this->extractInterpolation($value);
+			if ($value[0] != "list") {
+				return array("keyword", $this->compileValue($value));
+			}
+			foreach ($value[2] as $key => $item) {
+				$value[2][$key] = $this->normalizeValue($item);
+			}
+			return $value;
+		case "number":
+			return $this->normalizeNumber($value);
+		default:
+			return $value;
+		}
+	}
+
 	// just does physical lengths for now
 	protected function normalizeNumber($number) {
 		list(, $value, $unit) = $number;
@@ -1420,7 +1441,7 @@ class scssc {
 			$name = $value[1];
 			if (isset(self::$cssColors[$name])) {
 				list($r, $g, $b) = explode(',', self::$cssColors[$name]);
-				return array('color', $r, $g, $b);
+				return array('color', (int) $r, (int) $g, (int) $b);
 			}
 			return null;
 		}
@@ -1547,6 +1568,18 @@ class scssc {
 		list($cond,$t, $f) = $args;
 		if ($cond == self::$false) return $f;
 		return $t;
+	}
+	
+	protected static $lib_index = array("list", "value");
+	protected function lib_index($args) {
+		list($list, $value) = $args;
+		$values = array();
+		foreach ($list[2] as $item) {
+			$values[] = $this->normalizeValue($item);
+		}
+		$key = array_search($this->normalizeValue($value), $values);
+
+		return false === $key ? false : $key + 1;
 	}
 
 	protected static $lib_rgb = array("red", "green", "blue");
@@ -2002,6 +2035,28 @@ class scssc {
 		return array("list", $sep, array_merge($list1[2], array($value)));
 	}
 
+	protected function lib_zip($args) {
+		foreach ($args as $arg) {
+			if (!isset($arg[0]) || $arg[0] != "list") {
+				throw new Exception('Function "zip" expects list');
+			}
+		}
+		$lists = array();
+		$firstList = array_shift($args);
+		foreach ($firstList[2] as $key => $item) {
+			$list = array("list", "", array($item));
+			foreach ($args as $arg) {
+				if (isset($arg[2][$key])) {
+					$list[2][] = $arg[2][$key];
+				} else {
+					break 2;
+				}
+			}
+			$lists[] = $list;
+		}
+
+		return array("list", ",", $lists);
+	}
 
 	protected static $lib_type_of = array("value");
 	protected function lib_type_of($args) {
@@ -2037,10 +2092,17 @@ class scssc {
 		return $value[0] == "number" && empty($value[2]);
 	}
 
-
 	protected static $lib_comparable = array("number-1", "number-2");
 	protected function lib_comparable($args) {
-		return true; // TODO: THIS
+		list($number1, $number2) = $args;
+		if (!isset($number1[0]) || $number1[0] != "number" || !isset($number2[0]) || $number2[0] != "number") {
+			throw new Exception('Invalid argument(s) for "comparable"');
+		}
+
+		$number1 = $this->normalizeNumber($number1);
+		$number2 = $this->normalizeNumber($number2);
+
+		return $number1[2] == $number2[2] || $number1[2] == "" || $number2[2] == "";
 	}
 
 	static protected $cssColors = array(

@@ -69,10 +69,22 @@
   hello: one, two, three, hello;
   hello: one, two, three, hello, world, what, is, going;
   hello: one, two, three, hello;
+  index: 2;
+  index: false;
+  index: 3;
+  index: 1;
+  index: false;
+  index: 1;
+  index: false;
+  index: 2;
+  index: 2;
+  index: 1;
   world: one, two, three, great, job;
   world: one, two, three, great job;
   cool: one two three great job;
-  cool: great job one two three; }
+  cool: great job one two three;
+  zip: 1px solid, 2px dashed;
+  zip: 1px solid red, 2px dashed green; }
 
 #introspection {
   t: number;
@@ -86,7 +98,13 @@
   u: "px";
   u: "em";
   l: true;
-  l: false; }
+  l: false;
+  c: true;
+  c: false;
+  c: true;
+  c: true;
+  c: false;
+  c: true; }
 
 #if {
   color: yes;

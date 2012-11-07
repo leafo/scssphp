@@ -100,7 +100,17 @@
     hello: join(one two three, hello world what is going, comma);
     hello: append(one two three, hello, comma);
 
-
+    index: index(1px solid red, solid);
+    index: index(1px solid red, dashed);
+    index: index(1px solid red, #f00);
+    index: index(96px solid red, 1in);
+    index: index((1in 2) a b, 1in);
+    index: index((1in 2) a b, (96px 2));
+    index: index((1in 2) a b, (1in, 2));
+    index: index((1px solid red), solid);
+    index: index(1px 3px + 3px, 4+2px);
+    $var: oo;
+    index: index(foo bar, f#{$var});
 
     $yes: one, two, three;
     $no: great job;
@@ -109,6 +119,9 @@
 
     cool: join($yes, $no, space);
     cool: join($no, $yes);
+
+    zip: zip((1px, 2px), (solid dashed));
+    zip: zip(1px 2px 3px, solid dashed, red green blue);
 } 
 
 #introspection {
@@ -124,9 +137,15 @@
     u: unit(12px);
     u: unit(12em);
 
-
     l: unitless(23);
     l: unitless(23deg);
+
+    c: comparable(2px, 1px);
+    c: comparable(100px, 3em);
+    c: comparable(10cm, 3mm);
+    c: comparable(1, 4);
+    c: comparable(1ex, 4em);
+    c: comparable(2em, 5em);
 }
 
 #if {
