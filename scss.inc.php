@@ -1459,6 +1459,12 @@ class scssc {
 		return null;
 	}
 
+	protected function assertList($value) {
+		if ($value[0] != "list")
+			throw new exception("expecting list");
+		return $value;
+	}
+
 	protected function assertColor($value) {
 		if ($color = $this->coerceColor($value)) return $color;
 		throw new Exception("expecting color");
@@ -1573,6 +1579,8 @@ class scssc {
 	protected static $lib_index = array("list", "value");
 	protected function lib_index($args) {
 		list($list, $value) = $args;
+		$list = $this->assertList($list);
+
 		$values = array();
 		foreach ($list[2] as $item) {
 			$values[] = $this->normalizeValue($item);
