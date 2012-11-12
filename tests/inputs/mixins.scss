@@ -64,3 +64,27 @@ div {
 div {
     @include linear-gradient(red, green);
 }
+
+@mixin nested {
+    @include something(red);
+}
+
+div {
+    p  {
+        .class {
+            @include nested;
+        }
+
+        @include nested;
+
+        .top {
+            top: 0;
+            
+            div {
+                color: red;
+            }
+        }
+
+        color: blue;
+    }
+}

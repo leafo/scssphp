@@ -1,19 +1,19 @@
 div {
   color: blue;
   color: red; }
-    div pre {
-      height: 200px; }
+  div pre {
+    height: 200px; }
 
 span {
   color: blue;
   color: ;
   color: ; }
-    span div {
-      height: 20px; }
-    span div {
-      height: 20px; }
-    span div {
-      height: 20px; }
+  span div {
+    height: 20px; }
+  span div {
+    height: 20px; }
+  span div {
+    height: 20px; }
 
 html {
   height: 43px; }
@@ -28,3 +28,17 @@ div {
 
 div {
   background-image: linear-gradient(left top, red, green); }
+
+div p {
+  color: red;
+  color: blue; }
+  div p .class {
+    color: red; }
+    div p .class div {
+      height: 20px; }
+  div p div {
+    height: 20px; }
+  div p .top {
+    top: 0; }
+    div p .top div {
+      color: red; }
