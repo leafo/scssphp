@@ -547,12 +547,17 @@ class scssc {
 		case "include": // including a mixin
 			list(,$name, $argValues, $content) = $child;
 			$mixin = $this->get(self::$namespaces["mixin"] . $name, false);
-			if (!$mixin) break; // throw error?
+			if (!$mixin) {
+				throw new Exception(sprintf('Undefined mixin "%s"', $name));
+			}
 
 			$callingScope = $this->env;
 
 			// push scope, apply args
 			$this->pushEnv();
+			if ($this->env->depth > 0) {
+				$this->env->depth--;
+			}
 
 			if (!is_null($content)) {
 				$content->scope = $callingScope;
@@ -3697,6 +3702,21 @@ class scss_formatter_nested extends scss_formatter {
 			}
 			$children[] = $child;
 		}
+
+		$count = count($children);
+		for ($i = 0; $i < $count; $i++) {
+			$depth = $children[$i]->depth;
+			$j = $i + 1;
+			if (isset($children[$j]) && $depth < $children[$j]->depth) {
+				$childDepth =  $children[$j]->depth;
+				for (; $j < $count; $j++) {
+					if ($depth < $children[$j]->depth && $childDepth >= $children[$j]->depth) {
+						$children[$j]->depth = $depth + 1;
+					}
+				}
+			}
+		}
+
 		$block->children = $children;
 
 		// make relative to parent

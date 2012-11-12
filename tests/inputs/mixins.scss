@@ -73,3 +73,27 @@ div {
     @include box-shadow(10px 10px 5px #888);
     @include box-shadow(inset 10px 10px #888, -10px -10px #f4f4f4);
 }
+
+@mixin nested {
+    @include something(red);
+}
+
+div {
+    p  {
+        .class {
+            @include nested;
+        }
+
+        @include nested;
+
+        .top {
+            top: 0;
+            
+            div {
+                color: red;
+            }
+        }
+
+        color: blue;
+    }
+}
