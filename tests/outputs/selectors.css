@@ -135,3 +135,9 @@ div {
 
 .something div .what.world {
   color: blue; }
+
+div.foo div {
+  color: blue; }
+
+.nice-fonts .main .message div .title, .nice-fonts div .message div .title {
+  font-size: 24px; }
