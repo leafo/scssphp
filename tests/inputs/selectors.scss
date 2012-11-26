@@ -96,4 +96,19 @@ div {
     }
 }
 
+div {
+    &.foo & {
+        color: blue;
+    }
+}
+
+.main, div {
+    .message div {
+        .title {
+            .nice-fonts & {
+                font-size: 24px;
+            }
+        }
+    }
+}
 

@@ -1075,28 +1075,28 @@ class scssc {
 	}
 
 	// find the final set of selectors
-	protected function multiplySelectors($env, $childSelectors = null) {
-		if (is_null($env)) {
-			return $childSelectors;
-		}
+	protected function multiplySelectors($env) {
+		$envs = array();
+		while (null !== $env) {
+			if (!empty($env->selectors)) {
+				$envs[] = $env;
+			}
+			$env = $env->parent;
+		};
 
-		// skip env, has no selectors
-		if (empty($env->selectors)) {
-			return $this->multiplySelectors($env->parent, $childSelectors);
-		}
-
-		if (is_null($childSelectors)) {
-			$selectors = $env->selectors;
-		} else {
+		$selectors = array();
+		$parentSelectors = array(array());
+		while ($env = array_pop($envs)) {
 			$selectors = array();
-			foreach ($env->selectors as $parent) {
-				foreach ($childSelectors as $child) {
-					$selectors[] = $this->joinSelectors($parent, $child);
+			foreach ($env->selectors as $selector) {
+				foreach ($parentSelectors as $parent) {
+					$selectors[] = $this->joinSelectors($parent, $selector);
 				}
 			}
+			$parentSelectors = $selectors;
 		}
 
-		return $this->multiplySelectors($env->parent, $selectors);
+		return $selectors;
 	}
 
 	// looks for & to replace, or append parent before child
@@ -1603,7 +1603,7 @@ class scssc {
 		if ($cond == self::$false) return $f;
 		return $t;
 	}
-	
+
 	protected static $lib_index = array("list", "value");
 	protected function lib_index($args) {
 		list($list, $value) = $args;
