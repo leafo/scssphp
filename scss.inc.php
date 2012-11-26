@@ -203,7 +203,7 @@ class scssc {
 		}
 	}
 
-	protected function flattenSelectors($block) {
+	protected function flattenSelectors($block, $parentKey = null) {
 		if ($block->selectors) {
 			$selectors = array();
 			foreach ($block->selectors as $s) {
@@ -215,12 +215,24 @@ class scssc {
 				}
 			}
 
-			$selectors = array_map(array($this, "compileSelector"), $selectors);
-			$block->selectors = $selectors;
+			$block->selectors = array();
+			$placeholderSelector = false;
+			foreach ($selectors as $selector) {
+				if ($this->hasSelectorPlaceholder($selector)) {
+					$placeholderSelector = true;
+					continue;
+				}
+				$block->selectors[] = $this->compileSelector($selector);
+			}
+
+			if ($placeholderSelector && 0 == count($block->selectors) && null !== $parentKey) {
+				unset($block->parent->children[$parentKey]);
+				return;
+			}
 		}
 
-		foreach ($block->children as $child) {
-			$this->flattenSelectors($child);
+		foreach ($block->children as $key => $child) {
+			$this->flattenSelectors($child, $key);
 		}
 	}
 
@@ -289,7 +301,7 @@ class scssc {
 		foreach ($single as $part) {
 			if (empty($joined) ||
 				!is_string($part) ||
-				preg_match('/[.:#]/', $part))
+				preg_match('/[.:#%]/', $part))
 			{
 				$joined[] = $part;
 				continue;
@@ -348,6 +360,21 @@ class scssc {
 		}
 
 		return implode($piece);
+	}
+
+	protected function hasSelectorPlaceholder($selector)
+	{
+		if (!is_array($selector)) return false;
+
+		foreach ($selector as $parts) {
+			foreach ($parts as $part) {
+				if ('%' == $part[0]) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	protected function compileChildren($stms, $out) {
@@ -1575,7 +1602,7 @@ class scssc {
 		if ($cond == self::$false) return $f;
 		return $t;
 	}
-	
+
 	protected static $lib_index = array("list", "value");
 	protected function lib_index($args) {
 		list($list, $value) = $args;
@@ -3278,7 +3305,7 @@ class scss_parser {
 		return true;
 	}
 
-	// whitepsace separated list of selectorSingle
+	// whitespace separated list of selectorSingle
 	protected function selector(&$out) {
 		$selector = array();
 
@@ -3303,7 +3330,7 @@ class scss_parser {
 	}
 
 	// the parts that make up
-	// div[yes=no]#something.hello.world:nth-child(-2n+1)
+	// div[yes=no]#something.hello.world:nth-child(-2n+1)%placeholder
 	protected function selectorSingle(&$out) {
 		$oldWhite = $this->eatWhiteDefault;
 		$this->eatWhiteDefault = false;
@@ -3351,6 +3378,12 @@ class scss_parser {
 
 			if ($this->interpolation($inter)) {
 				$parts[] = $inter;
+				continue;
+			}
+
+			if ($this->literal('%', false) && $this->placeholder($placeholder)) {
+				$parts[] = '%';
+				$parts[] = $placeholder;
 				continue;
 			}
 
@@ -3459,6 +3492,14 @@ class scss_parser {
 			$m, $eatWhitespace))
 		{
 			$word = $m[1];
+			return true;
+		}
+		return false;
+	}
+
+	protected function placeholder(&$placeholder) {
+		if ($this->match('([\w\-_]+)', $m)) {
+			$placeholder = $m[1];
 			return true;
 		}
 		return false;
