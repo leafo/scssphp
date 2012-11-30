@@ -2700,16 +2700,17 @@ class scss_parser {
 	protected function literal($what, $eatWhitespace = null) {
 		if (is_null($eatWhitespace)) $eatWhitespace = $this->eatWhiteDefault;
 
-		// this is here mainly prevent notice from { } string accessor
-		if ($this->count >= strlen($this->buffer)) return false;
-
 		// shortcut on single letter
-		if (!$eatWhitespace && strlen($what) == 1) {
-			if ($this->buffer{$this->count} == $what) {
-				$this->count++;
-				return true;
+		if (!isset($what[1]) && isset($this->buffer[$this->count])) {
+			if ($this->buffer[$this->count] == $what) {
+				if (!$eatWhitespace) {
+					$this->count++;
+					return true;
+				}
+				// goes below...
+			} else {
+				return false;
 			}
-			else return false;
 		}
 
 		return $this->match($this->preg_quote($what), $m, $eatWhitespace);
