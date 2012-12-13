@@ -34,6 +34,24 @@ E[foo*="29302"] {
 E[foo|="239032"] {
   color: blue; }
 
+[foo="barbar"] {
+  color: blue; }
+
+[foo~="hello#$@%@$#^"] {
+  color: blue; }
+
+[foo^="color: green;"] {
+  color: blue; }
+
+[foo$="239023"] {
+  color: blue; }
+
+[foo*="29302"] {
+  color: blue; }
+
+[foo|="239032"] {
+  color: blue; }
+
 [foo|att=val] {
   color: blue; }
 
