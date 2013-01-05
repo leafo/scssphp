@@ -517,7 +517,7 @@ class scssc {
 			return $this->reduce($child[1], true);
 		case "each":
 			list(,$each) = $child;
-			$list = $this->reduce($this->coerceList($each->list));
+			$list = $this->coerceList($this->reduce($each->list));
 			foreach ($list[2] as $item) {
 				$this->pushEnv();
 				$this->set($each->var, $item);

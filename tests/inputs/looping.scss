@@ -1,12 +1,22 @@
 
 div {
-    @each $var in what is this {
-        color: $var;
-    }
+	@each $var in what is this {
+		color: $var;
+	}
 
-    @each $var in what, is, this {
-        font: $var;
-    }
+	@each $var in what, is, this {
+		font: $var;
+	}
+
+	$list: what is this;
+	@each $var in $list {
+	   background: $var;
+	}
+
+	$list: what, is, this;
+	@each $var in $list {
+		border: $var;
+	}
 }
 
 

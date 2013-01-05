@@ -4,7 +4,13 @@ div {
   color: this;
   font: what;
   font: is;
-  font: this; }
+  font: this;
+  background: what;
+  background: is;
+  background: this;
+  border: what;
+  border: is;
+  border: this; }
 
 span {
   color: 0;
