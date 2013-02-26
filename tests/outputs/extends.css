@@ -67,3 +67,6 @@ man {
 
 wassup {
   color: blue; }
+
+.foo .wassup {
+  color: blue; }
