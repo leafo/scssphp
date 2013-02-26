@@ -79,7 +79,21 @@ class scssc {
 		return $out;
 	}
 
+	protected function isSelfExtend($target, $origin) {
+		foreach ($origin as $sel) {
+			if (in_array($target, $sel)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	protected function pushExtends($target, $origin) {
+		if ($this->isSelfExtend($target, $origin)) {
+			return;
+		}
+
 		$i = count($this->extends);
 		$this->extends[] = array($target, $origin);
 

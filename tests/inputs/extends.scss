@@ -125,3 +125,9 @@ wassup {
     @extend wassup;
 }
 
+.foo {
+    .wassup {
+        @extend .wassup;
+        color: blue;
+    }
+}
