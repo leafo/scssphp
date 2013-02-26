@@ -57,6 +57,13 @@ a#{b}c#{d}e {
     color: red;
 }
 
+$scope: 2;
+
+div.element:nth-child(#{$scope}n)
+{
+    display: none;
+}
+
 // property interpolation
 
 div {

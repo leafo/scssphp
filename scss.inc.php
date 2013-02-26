@@ -69,7 +69,6 @@ class scssc {
 		$this->scope = null;
 
 		$this->compileRoot($tree);
-		$this->flattenSelectors($this->scope);
 
 		ob_start();
 		$this->formatter->block($this->scope);
@@ -239,7 +238,10 @@ class scssc {
 	protected function compileRoot($rootBlock) {
 		$this->pushEnv($rootBlock);
 		$this->scope = $this->makeOutputBlock("root");
+
 		$this->compileChildren($rootBlock->children, $this->scope);
+		$this->flattenSelectors($this->scope);
+
 		$this->popEnv();
 	}
 
@@ -1302,7 +1304,7 @@ class scssc {
 
 		if (isset($env->store[$name])) {
 			return $env->store[$name];
-		} elseif (!is_null($env->parent)) {
+		} elseif (isset($env->parent)) {
 			return $this->get($name, $defaultValue, $env->parent);
 		}
 
@@ -1412,7 +1414,7 @@ class scssc {
 				$val = $this->reduce($val, true);
 			}
 			$returnValue = call_user_func($f, $sorted, $this);
-		} else if (isset($this->userFunctions[$name])) {
+		} elseif (isset($this->userFunctions[$name])) {
 			// see if we can find a user function
 			$fn = $this->userFunctions[$name];
 
@@ -2680,7 +2682,7 @@ class scss_parser {
 				unset($block->child);
 				$include[3] = $block;
 				$this->append($include);
-			} else if (empty($block->dontAppend)) {
+			} elseif (empty($block->dontAppend)) {
 				$type = isset($block->type) ? $block->type : "block";
 				$this->append(array($type, $block));
 			}
@@ -3936,5 +3938,3 @@ class scss_server {
 		$server->serve();
 	}
 }
-
-

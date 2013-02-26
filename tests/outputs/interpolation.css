@@ -40,6 +40,9 @@ abcde {
 #abchelloyeah, .coolworldyes {
   color: red; }
 
+div.element:nth-child(2n) {
+  display: none; }
+
 div {
   hello: world;
   coolhello: world;
