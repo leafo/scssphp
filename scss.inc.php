@@ -459,7 +459,8 @@ class scssc {
 				return true;
 			}
 			return false;
-		} if ($rawPath[0] == "list") {
+		}
+		if ($rawPath[0] == "list") {
 			// handle a list of strings
 			if (count($rawPath[2]) == 0) return false;
 			foreach ($rawPath[2] as $path) {
@@ -1304,6 +1305,11 @@ class scssc {
 
 	protected function set($name, $value, $shadow=false) {
 		$name = $this->normalizeName($name);
+
+		if (is_array($value) && $value[0] === "keyword" && $value[1] == "null") {
+			$value = null;
+		}
+
 		if ($shadow) {
 			$this->setRaw($name, $value);
 		} else {
