@@ -1807,6 +1807,10 @@ class scssc {
 
 	protected static $lib_opacity = array("color");
 	protected function lib_opacity($args) {
+		$value = $args[0];
+		if ($value[0] === 'number') {
+			return array("function", 'opacity', array("list", ",", $args));
+		}
 		return $this->lib_alpha($args);
 	}
 
@@ -1881,7 +1885,6 @@ class scssc {
 		return array("number", $hsl[3], "%");
 	}
 
-
 	protected function adjustHsl($color, $idx, $amount) {
 		$hsl = $this->toHSL($color[1], $color[2], $color[3]);
 		$hsl[$idx] += $amount;
@@ -1913,7 +1916,12 @@ class scssc {
 
 	protected static $lib_saturate = array("color", "amount");
 	protected function lib_saturate($args) {
-		$color = $this->assertColor($args[0]);
+		$value = $args[0];
+		if ($value[0] === 'number') {
+			$args = array($value);
+			return array("function", 'saturate', array("list", ",", $args));
+		}
+		$color = $this->assertColor($value);
 		$amount = 100*$this->coercePercent($args[1]);
 		return $this->adjustHsl($color, 2, $amount);
 	}
@@ -1927,7 +1935,11 @@ class scssc {
 
 	protected static $lib_grayscale = array("color");
 	protected function lib_grayscale($args) {
-		return $this->adjustHsl($this->assertColor($args[0]), 2, -100);
+		$value = $args[0];
+		if ($value[0] === 'number') {
+			return array("function", 'grayscale', array("list", ",", $args));
+		}
+		return $this->adjustHsl($this->assertColor($value), 2, -100);
 	}
 
 	protected static $lib_complement = array("color");
@@ -1937,13 +1949,16 @@ class scssc {
 
 	protected static $lib_invert = array("color");
 	protected function lib_invert($args) {
-		$color = $this->assertColor($args[0]);
+		$value = $args[0];
+		if ($value[0] === 'number') {
+			return array("function", 'invert', array("list", ",", $args));
+		}
+		$color = $this->assertColor($value);
 		$color[1] = 255 - $color[1];
 		$color[2] = 255 - $color[2];
 		$color[3] = 255 - $color[3];
 		return $color;
 	}
-
 
 	// increases opacity by amount
 	protected static $lib_opacify = array("color", "amount");
