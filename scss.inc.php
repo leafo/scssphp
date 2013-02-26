@@ -344,6 +344,9 @@ class scssc {
 			case "interpolate":
 				$p = $this->compileValue($p);
 				break;
+			case "string":
+				$p = $this->compileValue($p);
+				break;
 			}
 		}
 
