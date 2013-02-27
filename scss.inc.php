@@ -130,6 +130,9 @@ class scssc {
 			}
 		}
 
+		$out_origin = array();
+		$found = false;
+
 		foreach ($counts as $idx => $count) {
 			list($target, $origin) = $this->extends[$idx];
 			// check count
@@ -137,13 +140,13 @@ class scssc {
 			// check if target is subset of single
 			if (array_diff(array_intersect($single, $target), $target)) continue;
 
-			$out_origin = $origin;
+			$out_origin = array_merge($out_origin, $origin);
 			$out_rem = array_diff($single, $target);
 
-			return true;
+			$found = true;
 		}
 
-		return false;
+		return $found;
 	}
 
 	protected function combineSelectorSingle($base, $other) {

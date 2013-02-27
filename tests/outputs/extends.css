@@ -70,3 +70,6 @@ wassup {
 
 .foo .wassup {
   color: blue; }
+
+#something, .x, .y {
+  color: red; }

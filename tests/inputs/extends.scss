@@ -131,3 +131,15 @@ wassup {
         color: blue;
     }
 }
+
+#something {
+    color: red;
+}
+
+.x {
+    @extend #something;
+}
+
+.y {
+    @extend #something;
+}
