@@ -16,7 +16,7 @@ hello {
 .blue, .me {
   color: purple; }
 
-:hover, .hoverlink, #demo .overview .fakelink:hover {
+a:hover, .hoverlink, #demo .overview .fakelink:hover {
   text-decoration: underline; }
 
 div.hello.world.hmm, pre div.okay.span.world.hmm, pre #butt .umm div.sure.span.world.hmm, #butt .umm pre div.sure.span.world.hmm, code div.okay.span.world.hmm, code #butt .umm div.sure.span.world.hmm, #butt .umm code div.sure.span.world.hmm {
@@ -73,3 +73,12 @@ wassup {
 
 #something, .x, .y {
   color: red; }
+
+.btn:hover, .edit .actions button:hover, .edit .new .actions button:hover, .btn:active, .edit .actions button:active, .edit .new .actions button:active, .btn.active, .edit .actions button.active, .edit .new .actions button.active, .btn.disabled, .edit .actions button.disabled, .edit .new .actions button.disabled, .btn[disabled], .edit .actions button[disabled], .edit .new .actions button[disabled] {
+  color: red; }
+
+.edit .actions button {
+  float: right; }
+
+.edit .new .actions {
+  padding: 0; }
