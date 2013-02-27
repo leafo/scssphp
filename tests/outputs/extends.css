@@ -16,7 +16,7 @@ hello {
 .blue, .me {
   color: purple; }
 
-a:hover, .hoverlink {
+:hover, .hoverlink, #demo .overview .fakelink:hover {
   text-decoration: underline; }
 
 div.hello.world.hmm, pre div.okay.span.world.hmm, pre #butt .umm div.sure.span.world.hmm, #butt .umm pre div.sure.span.world.hmm, code div.okay.span.world.hmm, code #butt .umm div.sure.span.world.hmm, #butt .umm code div.sure.span.world.hmm {
