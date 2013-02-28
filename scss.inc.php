@@ -480,9 +480,16 @@ class scssc {
 				break;
 			}
 
+			$compiledValue = $this->compileValue($child[2]);
+
+			// discard empty property
+			if ($name[0] == "string" && $compiledValue == "") {
+				break;
+			}
+
 			$out->lines[] = $this->formatter->property(
 				$this->compileValue($child[1]),
-				$this->compileValue($child[2]));
+				$compiledValue);
 			break;
 		case "comment":
 			$out->lines[] = $child[1];
@@ -1047,7 +1054,7 @@ class scssc {
 			foreach ($items as &$item) {
 				$item = $this->compileValue($item);
 			}
-			return implode("$delim ", $items);
+			return preg_replace(array('/\s+,/', '/,,+/'), ',', implode("$delim ", $items));
 		case "interpolated": # node created by extractInterpolation
 			list(, $interpolate, $left, $right) = $value;
 			list(,, $whiteLeft, $whiteRight) = $interpolate;
