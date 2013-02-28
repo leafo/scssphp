@@ -1,6 +1,6 @@
 <?php
 /**
- * SCSS compiler in PHP
+ * SCSS compiler written in PHP
  *
  * @copyright 2012-2013 Leaf Corcoran
  *
