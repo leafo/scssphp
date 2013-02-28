@@ -40,7 +40,7 @@ class scssc {
 		"function" => "^",
 	);
 
-	static protected $numberPrecision = 3;
+	static protected $numberPrecision = 5;
 	static protected $unitTable = array(
 		"in" => array(
 			"in" => 1,
