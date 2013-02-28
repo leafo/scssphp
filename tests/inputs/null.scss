@@ -2,6 +2,7 @@ $list: null;
 .div {
     one: null;
     two: a $list, b;
+    three: $list;
 }
 
 $value: null;
