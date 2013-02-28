@@ -1,6 +1,6 @@
 .div {
   one: null;
-  two: a , b; }
+  two: a, b; }
 
 p:before {
   content: "I ate  pies!"; }

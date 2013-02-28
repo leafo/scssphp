@@ -1,7 +1,7 @@
 $list: null;
 .div {
     one: null;
-    two: a $list, b;
+    two: a $list $list, $list, b;
     three: $list;
 }
 
