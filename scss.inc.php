@@ -1,5 +1,20 @@
 <?php
+/**
+ * SCSS compiler in PHP
+ *
+ * @copyright 2012-2013 Leaf Corcoran
+ *
+ * @license http://opensource.org/licenses/gpl-license GPL-3.0
+ * @license http://opensource.org/licenses/MIT MIT
+ *
+ * @link http://leafo.net/scssphp
+ */
 
+/**
+ * SCSS compiler
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scssc {
 	static public $VERSION = "v0.0.4";
 
@@ -2343,6 +2358,11 @@ class scssc {
 	);
 }
 
+/**
+ * SCSS parser
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scss_parser {
 	static protected $precedence = array(
 		"or" => 0,
@@ -3698,6 +3718,11 @@ class scss_parser {
 	}
 }
 
+/**
+ * SCSS base formatter
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scss_formatter {
 	public $indentChar = "  ";
 
@@ -3752,7 +3777,11 @@ class scss_formatter {
 	}
 }
 
-
+/**
+ * SCSS nested formatter
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scss_formatter_nested extends scss_formatter {
 	public $close = " }";
 
@@ -3839,6 +3868,11 @@ class scss_formatter_nested extends scss_formatter {
 	}
 }
 
+/**
+ * SCSS compressed formatter
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scss_formatter_compressed extends scss_formatter {
 	public $open = "{";
 	public $tagSeparator = ",";
@@ -3850,6 +3884,11 @@ class scss_formatter_compressed extends scss_formatter {
 	}
 }
 
+/**
+ * SCSS server
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scss_server {
 
 	protected function join($left, $right) {
