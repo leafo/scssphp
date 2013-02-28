@@ -1538,7 +1538,7 @@ class scssc {
 
 	protected function assertList($value) {
 		if ($value[0] != "list")
-			throw new exception("expecting list");
+			throw new Exception("expecting list");
 		return $value;
 	}
 
@@ -3924,7 +3924,7 @@ class scss_server {
 			if ($this->needsCompile($input, $output)) {
 				try {
 					echo $this->compile($input, $output);
-				} catch (exception $e) {
+				} catch (Exception $e) {
 					header('HTTP/1.1 500 Internal Server Error');
 					echo "Parse error: " . $e->getMessage() . "\n";
 				}
