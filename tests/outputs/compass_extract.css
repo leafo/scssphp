@@ -16,13 +16,13 @@
 
 #test-2 {
   border-style: solid;
-  border-width: 0.063em;
-  padding: 1.438em; }
+  border-width: 0.0625em;
+  padding: 1.4375em; }
 
 #test-3 {
   border-top-style: solid;
-  border-top-width: 0.063em;
-  padding-top: 1.438em;
+  border-top-width: 0.0625em;
+  padding-top: 1.4375em;
   border-bottom-style: solid;
-  border-bottom-width: 0.063em;
-  padding-bottom: 1.438em; }
+  border-bottom-width: 0.0625em;
+  padding-bottom: 1.4375em; }
