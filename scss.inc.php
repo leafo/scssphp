@@ -3298,7 +3298,7 @@ class scss_parser {
 
 		$content = array();
 		while ($this->match($patt, $m, false)) {
-			if (!empty($m[1])) {
+			if (isset($m[1]) && $m[1] !== '') {
 				$content[] = $m[1];
 				if ($nestingOpen) {
 					$nestingLevel += substr_count($m[1], $nestingOpen);
@@ -3442,6 +3442,8 @@ class scss_parser {
 			} elseif ($this->selectorSingle($part)) {
 				$selector[] = $part;
 				$this->whitespace();
+			} elseif ($this->match('\/[^\/]+\/', $m)) {
+				$selector[] = array($m[0]);
 			} else {
 				break;
 			}
