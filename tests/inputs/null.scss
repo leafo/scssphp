@@ -1,6 +1,9 @@
 $list: null;
 .div {
     one: null;
+    one: null world;
+    one: NULL world;
+    one: a null, b;
     two: a $list $list, $list, b;
     three: $list;
 }

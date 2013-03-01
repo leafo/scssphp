@@ -1,5 +1,8 @@
 .div {
   one: null;
+  one: world;
+  one: NULL world;
+  one: a, b;
   two: a, b; }
 
 p:before {

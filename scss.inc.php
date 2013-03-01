@@ -514,15 +514,18 @@ class scssc {
 				break;
 			}
 
-			$compiledValue = $this->compileValue($child[2]);
-
-			// discard empty property
-			if ($name[0] == "string" && $compiledValue == "") {
-				break;
+			// if the value reduces to null from something else then 
+			// the property should be discarded
+			if ($value[0] != "null") {
+				$value = $this->reduce($value);
+				if ($value[0] == "null") {
+					break;
+				}
 			}
 
+			$compiledValue = $this->compileValue($value);
 			$out->lines[] = $this->formatter->property(
-				$this->compileValue($child[1]),
+				$this->compileValue($name),
 				$compiledValue);
 			break;
 		case "comment":
@@ -1085,10 +1088,14 @@ class scssc {
 			if ($value[0] != "list") return $this->compileValue($value);
 
 			list(, $delim, $items) = $value;
-			foreach ($items as &$item) {
-				$item = $this->compileValue($item);
+
+			$filtered = array();
+			foreach ($items as $item) {
+				if ($item[0] == "null") continue;
+				$filtered[] = $this->compileValue($item);
 			}
-			return preg_replace(array('/\s+,/', '/,,+/'), ',', implode("$delim ", $items));
+
+			return implode("$delim ", $filtered);
 		case "interpolated": # node created by extractInterpolation
 			list(, $interpolate, $left, $right) = $value;
 			list(,, $whiteLeft, $whiteRight) = $interpolate;
@@ -1106,12 +1113,18 @@ class scssc {
 
 			// strip quotes if it's a string
 			$reduced = $this->reduce($exp);
-			if ($reduced[0] == "string") {
-				$reduced = array("keyword",
-					$this->compileStringContent($reduced));
+			switch ($reduced[0]) {
+				case "string":
+					$reduced = array("keyword",
+						$this->compileStringContent($reduced));
+					break;
+				case "null":
+					$reduced = array("keyword", "");
 			}
 
 			return $this->compileValue($reduced);
+		case "null":
+			return "null";
 		default:
 			throw new Exception("unknown value type: $type");
 		}
@@ -1312,10 +1325,6 @@ class scssc {
 
 	protected function set($name, $value, $shadow=false) {
 		$name = $this->normalizeName($name);
-
-		if (is_array($value) && $value[0] === "keyword" && $value[1] == "null") {
-			$value = null;
-		}
 
 		if ($shadow) {
 			$this->setRaw($name, $value);
@@ -3032,7 +3041,11 @@ class scss_parser {
 		if ($this->progid($out)) return true;
 
 		if ($this->keyword($keyword)) {
-			$out = array("keyword", $keyword);
+			if ($keyword == "null") {
+				$out = array("null");
+			} else {
+				$out = array("keyword", $keyword);
+			}
 			return true;
 		}
 
