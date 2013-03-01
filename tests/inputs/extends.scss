@@ -131,3 +131,43 @@ wassup {
         color: blue;
     }
 }
+
+// multi-extend
+
+#something {
+    color: red;
+}
+
+.x {
+    @extend #something;
+}
+
+.y {
+    @extend #something;
+}
+
+// multi-extend with nesting
+
+.btn:hover,
+.btn:active,
+.btn.active,
+.btn.disabled,
+.btn[disabled] {
+  color: red;
+}
+.edit .actions {
+  button {
+    float: right;
+    @extend .btn;
+  }
+}  
+.edit {
+  .new {
+   .actions {
+      padding: 0;
+   }
+   .actions button {
+      @extend .btn;
+   }
+ }
+}

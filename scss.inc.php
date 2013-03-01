@@ -132,7 +132,7 @@ class scssc {
 		return $out;
 	}
 
-	protected function matchExtendsSingle($single, &$out_origin, &$out_rem) {
+	protected function matchExtendsSingle($single, &$out_origin) {
 		$counts = array();
 		foreach ($single as $part) {
 			if (!is_string($part)) return false; // hmm
@@ -145,20 +145,30 @@ class scssc {
 			}
 		}
 
+		$out_origin = array();
+		$found = false;
+
 		foreach ($counts as $idx => $count) {
 			list($target, $origin) = $this->extends[$idx];
+
 			// check count
 			if ($count != count($target)) continue;
+
 			// check if target is subset of single
 			if (array_diff(array_intersect($single, $target), $target)) continue;
 
-			$out_origin = $origin;
-			$out_rem = array_diff($single, $target);
+			$rem = array_diff($single, $target);
 
-			return true;
+			foreach ($origin as $j => $new) {
+				$origin[$j][count($origin[$j]) - 1] = $this->combineSelectorSingle(end($new), $rem);
+			}
+
+			$out_origin = array_merge($out_origin, $origin);
+
+			$found = true;
 		}
 
-		return false;
+		return $found;
 	}
 
 	protected function combineSelectorSingle($base, $other) {
@@ -167,7 +177,7 @@ class scssc {
 
 		foreach (array($base, $other) as $single) {
 			foreach ($single as $part) {
-				if (preg_match('/^[^.#:]/', $part)) {
+				if (preg_match('/^[^\[.#:]/', $part)) {
 					$tag = $part;
 				} else {
 					$out[] = $part;
@@ -186,15 +196,13 @@ class scssc {
 		foreach ($selector as $i => $part) {
 			if ($i < $from) continue;
 
-			if ($this->matchExtendsSingle($part, $origin, $rem)) {
+			if ($this->matchExtendsSingle($part, $origin)) {
 				$before = array_slice($selector, 0, $i);
 				$after = array_slice($selector, $i + 1);
 
 				foreach ($origin as $new) {
-					$new[count($new) - 1] =
-						$this->combineSelectorSingle(end($new), $rem);
-
 					$k = 0;
+
 					// remove shared parts
 					if ($initial) {
 						foreach ($before as $k => $val) {
@@ -332,7 +340,7 @@ class scssc {
 		foreach ($single as $part) {
 			if (empty($joined) ||
 				!is_string($part) ||
-				preg_match('/[.:#%]/', $part))
+				preg_match('/[\[.:#%]/', $part))
 			{
 				$joined[] = $part;
 				continue;
@@ -1572,7 +1580,7 @@ class scssc {
 
 	protected function assertList($value) {
 		if ($value[0] != "list")
-			throw new exception("expecting list");
+			throw new Exception("expecting list");
 		return $value;
 	}
 
@@ -3988,7 +3996,7 @@ class scss_server {
 			if ($this->needsCompile($input, $output)) {
 				try {
 					echo $this->compile($input, $output);
-				} catch (exception $e) {
+				} catch (Exception $e) {
 					header('HTTP/1.1 500 Internal Server Error');
 					echo "Parse error: " . $e->getMessage() . "\n";
 				}
