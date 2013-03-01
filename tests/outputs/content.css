@@ -13,4 +13,5 @@
 #sidebar {
   width: 300px; }
   @media only screen and (max-width: 480px) {
-    width: 100px; }
+  #sidebar {
+    width: 100px; } }
