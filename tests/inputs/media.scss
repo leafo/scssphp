@@ -64,4 +64,24 @@ div {
     }
 }
 
+// @media + @mixin
+@mixin color {
+    color: red;
+    .success {
+         color: green;
+    }
+}
 
+div {
+    position: absolute;
+    $y: 2em;
+    @media screen {
+        top: 0;
+        $x: 5px;
+        p {
+            margin: $x;
+        }
+        bottom: 6em + $y;
+        @include color;
+    }
+}

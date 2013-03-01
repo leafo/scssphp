@@ -41,3 +41,15 @@ div {
   @media screen and (-webkit-min-device-pixel-ratio: 1.5) {
   div .sidebar {
     width: 500px; } }
+
+div {
+  position: absolute; }
+  @media screen {
+    div {
+      top: 0;
+      bottom: 8em;
+      color: red; }
+      div p {
+        margin: 5px; }
+      div .success {
+        color: green; } }
