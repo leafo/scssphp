@@ -459,7 +459,8 @@ class scssc {
 				return true;
 			}
 			return false;
-		} if ($rawPath[0] == "list") {
+		}
+		if ($rawPath[0] == "list") {
 			// handle a list of strings
 			if (count($rawPath[2]) == 0) return false;
 			foreach ($rawPath[2] as $path) {
@@ -513,9 +514,16 @@ class scssc {
 				break;
 			}
 
+			$compiledValue = $this->compileValue($child[2]);
+
+			// discard empty property
+			if ($name[0] == "string" && $compiledValue == "") {
+				break;
+			}
+
 			$out->lines[] = $this->formatter->property(
 				$this->compileValue($child[1]),
-				$this->compileValue($child[2]));
+				$compiledValue);
 			break;
 		case "comment":
 			$out->lines[] = $child[1];
@@ -1080,7 +1088,7 @@ class scssc {
 			foreach ($items as &$item) {
 				$item = $this->compileValue($item);
 			}
-			return implode("$delim ", $items);
+			return preg_replace(array('/\s+,/', '/,,+/'), ',', implode("$delim ", $items));
 		case "interpolated": # node created by extractInterpolation
 			list(, $interpolate, $left, $right) = $value;
 			list(,, $whiteLeft, $whiteRight) = $interpolate;
@@ -1304,6 +1312,11 @@ class scssc {
 
 	protected function set($name, $value, $shadow=false) {
 		$name = $this->normalizeName($name);
+
+		if (is_array($value) && $value[0] === "keyword" && $value[1] == "null") {
+			$value = null;
+		}
+
 		if ($shadow) {
 			$this->setRaw($name, $value);
 		} else {
