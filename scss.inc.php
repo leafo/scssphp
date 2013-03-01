@@ -2904,11 +2904,11 @@ class scss_parser {
 
 
 	protected function valueList(&$out) {
-		return $this->genericList($out, "commaList");
+		return $this->genericList($out, "spaceList", ",");
 	}
 
-	protected function commaList(&$out) {
-		return $this->genericList($out, "expression", ",");
+	protected function spaceList(&$out) {
+		return $this->genericList($out, "expression");
 	}
 
 	protected function genericList(&$out, $parseItem, $delim="", $flatten=true) {
