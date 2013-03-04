@@ -53,3 +53,14 @@ div {
         margin: 5px; }
       div .success {
         color: green; } }
+
+.button {
+  width: 300px;
+  height: 100px;
+  background: #eee; }
+  .button :hover {
+    background: #aaa; }
+  @media only screen and (max-width: 300px) {
+    .button {
+      width: 100px;
+      height: 100px; } }
