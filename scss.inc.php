@@ -1,6 +1,22 @@
 <?php
 require_once(__DIR__ . '/Exception/ScssException.php');
 
+/**
+ * SCSS compiler written in PHP
+ *
+ * @copyright 2012-2013 Leaf Corcoran
+ *
+ * @license http://opensource.org/licenses/gpl-license GPL-3.0
+ * @license http://opensource.org/licenses/MIT MIT
+ *
+ * @link http://leafo.net/scssphp
+ */
+
+/**
+ * SCSS compiler
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scssc {
 	static public $VERSION = "v0.0.4";
 
@@ -26,7 +42,7 @@ class scssc {
 		"function" => "^",
 	);
 
-	static protected $numberPrecision = 3;
+	static protected $numberPrecision = 5;
 	static protected $unitTable = array(
 		"in" => array(
 			"in" => 1,
@@ -70,7 +86,6 @@ class scssc {
 		$this->scope = null;
 
 		$this->compileRoot($tree);
-		$this->flattenSelectors($this->scope);
 
 		ob_start();
 		$this->formatter->block($this->scope);
@@ -80,7 +95,21 @@ class scssc {
 		return $out;
 	}
 
+	protected function isSelfExtend($target, $origin) {
+		foreach ($origin as $sel) {
+			if (in_array($target, $sel)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	protected function pushExtends($target, $origin) {
+		if ($this->isSelfExtend($target, $origin)) {
+			return;
+		}
+
 		$i = count($this->extends);
 		$this->extends[] = array($target, $origin);
 
@@ -105,7 +134,7 @@ class scssc {
 		return $out;
 	}
 
-	protected function matchExtendsSingle($single, &$out_origin, &$out_rem) {
+	protected function matchExtendsSingle($single, &$out_origin) {
 		$counts = array();
 		foreach ($single as $part) {
 			if (!is_string($part)) return false; // hmm
@@ -118,20 +147,30 @@ class scssc {
 			}
 		}
 
+		$out_origin = array();
+		$found = false;
+
 		foreach ($counts as $idx => $count) {
 			list($target, $origin) = $this->extends[$idx];
+
 			// check count
 			if ($count != count($target)) continue;
+
 			// check if target is subset of single
 			if (array_diff(array_intersect($single, $target), $target)) continue;
 
-			$out_origin = $origin;
-			$out_rem = array_diff($single, $target);
+			$rem = array_diff($single, $target);
 
-			return true;
+			foreach ($origin as $j => $new) {
+				$origin[$j][count($origin[$j]) - 1] = $this->combineSelectorSingle(end($new), $rem);
+			}
+
+			$out_origin = array_merge($out_origin, $origin);
+
+			$found = true;
 		}
 
-		return false;
+		return $found;
 	}
 
 	protected function combineSelectorSingle($base, $other) {
@@ -140,7 +179,7 @@ class scssc {
 
 		foreach (array($base, $other) as $single) {
 			foreach ($single as $part) {
-				if (preg_match('/^[^.#:]/', $part)) {
+				if (preg_match('/^[^\[.#:]/', $part)) {
 					$tag = $part;
 				} else {
 					$out[] = $part;
@@ -159,15 +198,13 @@ class scssc {
 		foreach ($selector as $i => $part) {
 			if ($i < $from) continue;
 
-			if ($this->matchExtendsSingle($part, $origin, $rem)) {
+			if ($this->matchExtendsSingle($part, $origin)) {
 				$before = array_slice($selector, 0, $i);
 				$after = array_slice($selector, $i + 1);
 
 				foreach ($origin as $new) {
-					$new[count($new) - 1] =
-						$this->combineSelectorSingle(end($new), $rem);
-
 					$k = 0;
+
 					// remove shared parts
 					if ($initial) {
 						foreach ($before as $k => $val) {
@@ -240,7 +277,10 @@ class scssc {
 	protected function compileRoot($rootBlock) {
 		$this->pushEnv($rootBlock);
 		$this->scope = $this->makeOutputBlock("root");
+
 		$this->compileChildren($rootBlock->children, $this->scope);
+		$this->flattenSelectors($this->scope);
+
 		$this->popEnv();
 	}
 
@@ -301,7 +341,7 @@ class scssc {
 		foreach ($single as $part) {
 			if (empty($joined) ||
 				!is_string($part) ||
-				preg_match('/[.:#%]/', $part))
+				preg_match('/[\[.:#%]/', $part))
 			{
 				$joined[] = $part;
 				continue;
@@ -328,6 +368,9 @@ class scssc {
 
 			switch ($p[0]) {
 			case "interpolate":
+				$p = $this->compileValue($p);
+				break;
+			case "string":
 				$p = $this->compileValue($p);
 				break;
 			}
@@ -425,7 +468,8 @@ class scssc {
 				return true;
 			}
 			return false;
-		} if ($rawPath[0] == "list") {
+		}
+		if ($rawPath[0] == "list") {
 			// handle a list of strings
 			if (count($rawPath[2]) == 0) return false;
 			foreach ($rawPath[2] as $path) {
@@ -479,9 +523,19 @@ class scssc {
 				break;
 			}
 
+			// if the value reduces to null from something else then
+			// the property should be discarded
+			if ($value[0] != "null") {
+				$value = $this->reduce($value);
+				if ($value[0] == "null") {
+					break;
+				}
+			}
+
+			$compiledValue = $this->compileValue($value);
 			$out->lines[] = $this->formatter->property(
-				$this->compileValue($child[1]),
-				$this->compileValue($child[2]));
+				$this->compileValue($name),
+				$compiledValue);
 			break;
 		case "comment":
 			$out->lines[] = $child[1];
@@ -1055,10 +1109,14 @@ class scssc {
 			if ($value[0] != "list") return $this->compileValue($value);
 
 			list(, $delim, $items) = $value;
-			foreach ($items as &$item) {
-				$item = $this->compileValue($item);
+
+			$filtered = array();
+			foreach ($items as $item) {
+				if ($item[0] == "null") continue;
+				$filtered[] = $this->compileValue($item);
 			}
-			return implode("$delim ", $items);
+
+			return implode("$delim ", $filtered);
 		case "interpolated": # node created by extractInterpolation
 			list(, $interpolate, $left, $right) = $value;
 			list(,, $whiteLeft, $whiteRight) = $interpolate;
@@ -1076,12 +1134,18 @@ class scssc {
 
 			// strip quotes if it's a string
 			$reduced = $this->reduce($exp);
-			if ($reduced[0] == "string") {
-				$reduced = array("keyword",
-					$this->compileStringContent($reduced));
+			switch ($reduced[0]) {
+				case "string":
+					$reduced = array("keyword",
+						$this->compileStringContent($reduced));
+					break;
+				case "null":
+					$reduced = array("keyword", "");
 			}
 
 			return $this->compileValue($reduced);
+		case "null":
+			return "null";
 		default:
 			throw Exception_ScssException::errorWithMessageCodeAndUserInfo("unknown value type: $type", 1358517391, array('value' => $value));
 		}
@@ -1298,6 +1362,7 @@ class scssc {
 
 	protected function set($name, $value, $shadow=false) {
 		$name = $this->normalizeName($name);
+
 		if ($shadow) {
 			$this->setRaw($name, $value);
 		} else {
@@ -1330,7 +1395,7 @@ class scssc {
 
 		if (isset($env->store[$name])) {
 			return $env->store[$name];
-		} elseif (!is_null($env->parent)) {
+		} elseif (isset($env->parent)) {
 			return $this->get($name, $defaultValue, $env->parent);
 		}
 
@@ -1440,7 +1505,7 @@ class scssc {
 				$val = $this->reduce($val, true);
 			}
 			$returnValue = call_user_func($f, $sorted, $this);
-		} else if (isset($this->userFunctions[$name])) {
+		} elseif (isset($this->userFunctions[$name])) {
 			// see if we can find a user function
 			$fn = $this->userFunctions[$name];
 
@@ -1829,6 +1894,8 @@ class scssc {
 
 	protected static $lib_opacity = array("color");
 	protected function lib_opacity($args) {
+		$value = $args[0];
+		if ($value[0] === 'number') return null;
 		return $this->lib_alpha($args);
 	}
 
@@ -1903,7 +1970,6 @@ class scssc {
 		return array("number", $hsl[3], "%");
 	}
 
-
 	protected function adjustHsl($color, $idx, $amount) {
 		$hsl = $this->toHSL($color[1], $color[2], $color[3]);
 		$hsl[$idx] += $amount;
@@ -1935,7 +2001,9 @@ class scssc {
 
 	protected static $lib_saturate = array("color", "amount");
 	protected function lib_saturate($args) {
-		$color = $this->assertColor($args[0]);
+		$value = $args[0];
+		if ($value[0] === 'number') return null;
+		$color = $this->assertColor($value);
 		$amount = 100*$this->coercePercent($args[1]);
 		return $this->adjustHsl($color, 2, $amount);
 	}
@@ -1949,7 +2017,9 @@ class scssc {
 
 	protected static $lib_grayscale = array("color");
 	protected function lib_grayscale($args) {
-		return $this->adjustHsl($this->assertColor($args[0]), 2, -100);
+		$value = $args[0];
+		if ($value[0] === 'number') return null;
+		return $this->adjustHsl($this->assertColor($value), 2, -100);
 	}
 
 	protected static $lib_complement = array("color");
@@ -1959,13 +2029,14 @@ class scssc {
 
 	protected static $lib_invert = array("color");
 	protected function lib_invert($args) {
-		$color = $this->assertColor($args[0]);
+		$value = $args[0];
+		if ($value[0] === 'number') return null;
+		$color = $this->assertColor($value);
 		$color[1] = 255 - $color[1];
 		$color[2] = 255 - $color[2];
 		$color[3] = 255 - $color[3];
 		return $color;
 	}
-
 
 	// increases opacity by amount
 	protected static $lib_opacify = array("color", "amount");
@@ -2367,6 +2438,11 @@ class scssc {
 	);
 }
 
+/**
+ * SCSS parser
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scss_parser {
 	static protected $precedence = array(
 		"or" => 0,
@@ -2729,7 +2805,7 @@ class scss_parser {
 				unset($block->child);
 				$include[3] = $block;
 				$this->append($include);
-			} else if (empty($block->dontAppend)) {
+			} elseif (empty($block->dontAppend)) {
 				$type = isset($block->type) ? $block->type : "block";
 				$this->append(array($type, $block));
 			}
@@ -2897,11 +2973,11 @@ class scss_parser {
 
 
 	protected function valueList(&$out) {
-		return $this->genericList($out, "commaList");
+		return $this->genericList($out, "spaceList", ",");
 	}
 
-	protected function commaList(&$out) {
-		return $this->genericList($out, "expression", ",");
+	protected function spaceList(&$out) {
+		return $this->genericList($out, "expression");
 	}
 
 	protected function genericList(&$out, $parseItem, $delim="", $flatten=true) {
@@ -3025,7 +3101,11 @@ class scss_parser {
 		if ($this->progid($out)) return true;
 
 		if ($this->keyword($keyword)) {
-			$out = array("keyword", $keyword);
+			if ($keyword == "null") {
+				$out = array("null");
+			} else {
+				$out = array("keyword", $keyword);
+			}
 			return true;
 		}
 
@@ -3282,7 +3362,7 @@ class scss_parser {
 
 		$content = array();
 		while ($this->match($patt, $m, false)) {
-			if (!empty($m[1])) {
+			if (isset($m[1]) && $m[1] !== '') {
 				$content[] = $m[1];
 				if ($nestingOpen) {
 					$nestingLevel += substr_count($m[1], $nestingOpen);
@@ -3426,6 +3506,8 @@ class scss_parser {
 			} elseif ($this->selectorSingle($part)) {
 				$selector[] = $part;
 				$this->whitespace();
+			} elseif ($this->match('\/[^\/]+\/', $m)) {
+				$selector[] = array($m[0]);
 			} else {
 				break;
 			}
@@ -3728,6 +3810,11 @@ class scss_parser {
 	}
 }
 
+/**
+ * SCSS base formatter
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scss_formatter {
 	public $indentChar = "  ";
 
@@ -3782,7 +3869,11 @@ class scss_formatter {
 	}
 }
 
-
+/**
+ * SCSS nested formatter
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scss_formatter_nested extends scss_formatter {
 	public $close = " }";
 
@@ -3869,6 +3960,11 @@ class scss_formatter_nested extends scss_formatter {
 	}
 }
 
+/**
+ * SCSS compressed formatter
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scss_formatter_compressed extends scss_formatter {
 	public $open = "{";
 	public $tagSeparator = ",";
@@ -3880,6 +3976,11 @@ class scss_formatter_compressed extends scss_formatter {
 	}
 }
 
+/**
+ * SCSS server
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class scss_server {
 
 	protected function join($left, $right) {
@@ -3991,5 +4092,3 @@ class scss_server {
 		$server->serve();
 	}
 }
-
-
