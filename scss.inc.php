@@ -515,6 +515,7 @@ class scssc {
 			break;
 		case "assign":
 			list(,$name, $value) = $child;
+
 			if ($name[0] == "var") {
 				$isDefault = !empty($child[3]);
 				if (!$isDefault || $this->get($name[1], true) === true) {
@@ -533,6 +534,7 @@ class scssc {
 			}
 
 			$compiledValue = $this->compileValue($value);
+
 			$out->lines[] = $this->formatter->property(
 				$this->compileValue($name),
 				$compiledValue);
@@ -1100,6 +1102,10 @@ class scssc {
 		case "number":
 			return round($value[1], self::$numberPrecision) . $value[2];
 		case "string":
+			// Check if the string contains a dollar
+			if (is_array($value[2]) && $value[2][0] && strpos($value[2][0], '$') !== FALSE) {
+				$value[2][0] = $this->replaceVariableInString($value[2][0]);
+			}
 			return $value[1] . $this->compileStringContent($value) . $value[1];
 		case "function":
 			$args = !empty($value[2]) ? $this->compileValue($value[2]) : "";
@@ -1109,6 +1115,13 @@ class scssc {
 			if ($value[0] != "list") return $this->compileValue($value);
 
 			list(, $delim, $items) = $value;
+
+			if (is_array($items[0])
+				&& $items[0][0] === 'string'
+				&& is_array($items[0][0][2])
+				&& $items[0][0][2][0][2] == 'opacity=$opacity') {
+				die;
+			}
 
 			$filtered = array();
 			foreach ($items as $item) {
@@ -1149,6 +1162,50 @@ class scssc {
 		default:
 			throw Exception_ScssException::errorWithMessageCodeAndUserInfo("unknown value type: $type", 1358517391, array('value' => $value));
 		}
+	}
+
+	/**
+	 * Find and replace variables in the given input string
+	 * @param  string $input
+	 * @return string        Returns the input string with the variable replaced
+	 */
+	protected function replaceVariableInString($input) {
+		if (!is_string($input) || strpos($input, '$') === FALSE) {
+			return $input;
+		}
+		$matches = array();
+		if (!preg_match_all('!\$[a-zA-Z0-9]+!', $input, $matches)) {
+			return $input;
+		}
+
+		$output = $input;
+		$matches = $matches[0];
+		$matches = array_unique($matches);
+		foreach ($matches as $variable) {
+			$variable = trim($variable);
+			if (!$variable || $variable === '$') {
+				continue;
+			}
+			// Strip the leading $
+			$variableIdentifier = substr($variable, 1);
+
+			$value = $this->get($variableIdentifier);
+			if (is_array($value)) {
+				// Output numbers correctly
+				if ('number' === $value[0]) {
+					$value = $this->normalizeNumber($value);
+				}
+				$value = $value[1];
+			}
+			#$this->pd($value, '!\\' . $variable . '\\b!');
+
+			// Stricter
+			// $output = preg_replace('!\\' . $variable . '\\b!', $value, $output);
+
+			// Faster
+			$output = str_replace($variable, $value, $output);
+		}
+		return $output;
 	}
 
 	protected function compileStringContent($string) {
@@ -2286,6 +2343,17 @@ class scssc {
 
 		return $number1[2] == $number2[2] || $number1[2] == "" || $number2[2] == "";
 	}
+
+	/**
+     * Dumps a given variable (or the given variables) wrapped into a 'pre' tag.
+     * @var mixed $var1
+     */
+    public function pd($var1 = '__iresults_pd_noValue') {
+    	$args = func_get_args();
+    	if (class_exists('Tx_Iresults')) {
+    		call_user_func_array(array('Tx_Iresults', 'pd'), $args);
+    	}
+    }
 
 	static protected $cssColors = array(
 		'aliceblue' => '240,248,255',
@@ -3808,6 +3876,17 @@ class scss_parser {
 		}
 		return $value;
 	}
+
+	/**
+     * Dumps a given variable (or the given variables) wrapped into a 'pre' tag.
+     * @var mixed $var1
+     */
+    public function pd($var1 = '__iresults_pd_noValue') {
+    	$args = func_get_args();
+    	if (class_exists('Tx_Iresults')) {
+    		call_user_func_array(array('Tx_Iresults', 'pd'), $args);
+    	}
+    }
 }
 
 /**
