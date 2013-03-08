@@ -1116,13 +1116,6 @@ class scssc {
 
 			list(, $delim, $items) = $value;
 
-			if (is_array($items[0])
-				&& $items[0][0] === 'string'
-				&& is_array($items[0][0][2])
-				&& $items[0][0][2][0][2] == 'opacity=$opacity') {
-				die;
-			}
-
 			$filtered = array();
 			foreach ($items as $item) {
 				if ($item[0] == "null") continue;
