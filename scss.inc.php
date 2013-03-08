@@ -1103,7 +1103,7 @@ class scssc {
 			return round($value[1], self::$numberPrecision) . $value[2];
 		case "string":
 			// Check if the string contains a dollar
-			if (is_array($value[2]) && $value[2][0] && strpos($value[2][0], '$') !== FALSE) {
+			if (is_array($value[2]) && is_string($value[2][0]) && strpos($value[2][0], '$') !== FALSE) {
 				$value[2][0] = $this->replaceVariableInString($value[2][0]);
 			}
 			return $value[1] . $this->compileStringContent($value) . $value[1];
