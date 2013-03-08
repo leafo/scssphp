@@ -4,3 +4,5 @@
 .sass-cache
 /sass/
 /compass/
+
+sftp-config.json

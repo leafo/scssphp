@@ -1,4 +1,6 @@
 <?php
+require_once(__DIR__ . '/Exception/ScssException.php');
+
 /**
  * SCSS compiler written in PHP
  *
@@ -285,7 +287,6 @@ class scssc {
 	protected function compileMedia($media) {
 		$this->pushEnv($media);
 		$parentScope = $this->mediaParent($this->scope);
-
 		$this->scope = $this->makeOutputBlock("media", array(
 			$this->compileMediaQuery($this->multiplyMedia($this->env)))
 		);
@@ -514,6 +515,7 @@ class scssc {
 			break;
 		case "assign":
 			list(,$name, $value) = $child;
+
 			if ($name[0] == "var") {
 				$isDefault = !empty($child[3]);
 				if (!$isDefault || $this->get($name[1], true) === true) {
@@ -522,7 +524,7 @@ class scssc {
 				break;
 			}
 
-			// if the value reduces to null from something else then 
+			// if the value reduces to null from something else then
 			// the property should be discarded
 			if ($value[0] != "null") {
 				$value = $this->reduce($value);
@@ -532,6 +534,7 @@ class scssc {
 			}
 
 			$compiledValue = $this->compileValue($value);
+
 			$out->lines[] = $this->formatter->property(
 				$this->compileValue($name),
 				$compiledValue);
@@ -628,7 +631,11 @@ class scssc {
 			list(,$name, $argValues, $content) = $child;
 			$mixin = $this->get(self::$namespaces["mixin"] . $name, false);
 			if (!$mixin) {
-				throw new Exception(sprintf('Undefined mixin "%s"', $name));
+				throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+					sprintf('Undefined mixin "%s"', $name),
+					1358520635,
+					array('child' => $child)
+				);
 			}
 
 			$callingScope = $this->env;
@@ -658,7 +665,11 @@ class scssc {
 		case "mixin_content":
 			$content = $this->get(self::$namespaces["special"] . "content");
 			if (is_null($content)) {
-				throw new Exception("Unexpected @content inside of mixin");
+				throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+					"Unexpected @content inside of mixin",
+					1358520684,
+					array('child' => $child)
+				);
 			}
 
 			$this->storeEnv = $content->scope;
@@ -676,7 +687,11 @@ class scssc {
 			fwrite(STDERR, "Line $line DEBUG: $value\n");
 			break;
 		default:
-			throw new Exception("unknown child type: $child[0]");
+			throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+				"unknown child type: $child[0]",
+				1358520695,
+				array('child' => $child)
+			);
 		}
 	}
 
@@ -747,7 +762,7 @@ class scssc {
 						$left[0] == "number" && $right[0] == "number")
 					{
 						if ($opName == "mod" && $right[2] != "") {
-							throw new Exception(sprintf('Cannot modulo by a number with units: %s%s.', $right[1], $right[2]));
+							throw Exception_ScssException::errorWithMessageCodeAndUserInfo(sprintf('Cannot modulo by a number with units: %s%s.', $right[1], $right[2]), 1358517317, array('right' => $right, 'value' => $value));
 						}
 
 						$unitChange = true;
@@ -993,12 +1008,12 @@ class scssc {
 				break;
 			case '/':
 				if ($rval == 0) {
-					throw new Exception("color: Can't divide by zero");
+					throw new Exception_ScssException("color: Can't divide by zero");
 				}
 				$out[] = $lval / $rval;
 				break;
 			default:
-				throw new Exception("color: unknow op $op");
+				throw new Exception_ScssException("color: unknow op $op");
 			}
 		}
 
@@ -1087,6 +1102,10 @@ class scssc {
 		case "number":
 			return round($value[1], self::$numberPrecision) . $value[2];
 		case "string":
+			// Check if the string contains a dollar
+			if (is_array($value[2]) && is_string($value[2][0]) && strpos($value[2][0], '$') !== FALSE) {
+				$value[2][0] = $this->replaceVariableInString($value[2][0]);
+			}
 			return $value[1] . $this->compileStringContent($value) . $value[1];
 		case "function":
 			$args = !empty($value[2]) ? $this->compileValue($value[2]) : "";
@@ -1134,8 +1153,52 @@ class scssc {
 		case "null":
 			return "null";
 		default:
-			throw new Exception("unknown value type: $type");
+			throw Exception_ScssException::errorWithMessageCodeAndUserInfo("unknown value type: $type", 1358517391, array('value' => $value));
 		}
+	}
+
+	/**
+	 * Find and replace variables in the given input string
+	 * @param  string $input
+	 * @return string        Returns the input string with the variable replaced
+	 */
+	protected function replaceVariableInString($input) {
+		if (!is_string($input) || strpos($input, '$') === FALSE) {
+			return $input;
+		}
+		$matches = array();
+		if (!preg_match_all('!\$[a-zA-Z0-9]+!', $input, $matches)) {
+			return $input;
+		}
+
+		$output = $input;
+		$matches = $matches[0];
+		$matches = array_unique($matches);
+		foreach ($matches as $variable) {
+			$variable = trim($variable);
+			if (!$variable || $variable === '$') {
+				continue;
+			}
+			// Strip the leading $
+			$variableIdentifier = substr($variable, 1);
+
+			$value = $this->get($variableIdentifier);
+			if (is_array($value)) {
+				// Output numbers correctly
+				if ('number' === $value[0]) {
+					$value = $this->normalizeNumber($value);
+				}
+				$value = $value[1];
+			}
+			#$this->pd($value, '!\\' . $variable . '\\b!');
+
+			// Stricter
+			// $output = preg_replace('!\\' . $variable . '\\b!', $value, $output);
+
+			// Faster
+			$output = str_replace($variable, $value, $output);
+		}
+		return $output;
 	}
 
 	protected function compileStringContent($string) {
@@ -1270,13 +1333,25 @@ class scssc {
 		foreach ((array) $argValues as $arg) {
 			if (!empty($arg[0])) {
 				if (!isset($args[$arg[0][1]])) {
-					throw new Exception(sprintf('Mixin or function doesn\'t have an argument named $%s.', $arg[0][1]));
+					throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+						sprintf('Mixin or function doesn\'t have an argument named $%s.', $arg[0][1]),
+						1358517429,
+						array('argument' => $arg)
+					);
 				} elseif ($args[$arg[0][1]][0] < count($remaining)) {
-					throw new Exception(sprintf('The argument $%s was passed both by position and by name.', $arg[0][1]));
+					throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+						sprintf('The argument $%s was passed both by position and by name.', $arg[0][1]),
+						1358517461,
+						array('argument' => $arg)
+					);
 				}
 				$keywordArgs[$arg[0][1]] = $arg[1];
 			} elseif (count($keywordArgs)) {
-				throw new Exception('Positional arguments must come before keyword arguments.');
+				throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+					'Positional arguments must come before keyword arguments.',
+					1358517486,
+					array('argument' => $arg)
+				);
 			} elseif ($arg[2] == true) {
 				$val = $this->reduce($arg[1], true);
 				if ($val[0] == "list") {
@@ -1305,7 +1380,11 @@ class scssc {
 			} elseif (!empty($default)) {
 				$val = $default;
 			} else {
-				throw new Exception(sprintf('There is missing argument $%s', $name));
+				throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+					sprintf('There is missing argument $%s', $name),
+					1358517511,
+					array('argument' => $arg)
+				);
 			}
 
 			$this->set($name, $this->reduce($val, true), true);
@@ -1580,18 +1659,31 @@ class scssc {
 
 	protected function assertList($value) {
 		if ($value[0] != "list")
-			throw new Exception("expecting list");
+			throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+				"expecting list",
+				1358517536,
+				array('value' => $value)
+			);
 		return $value;
 	}
 
 	protected function assertColor($value) {
 		if ($color = $this->coerceColor($value)) return $color;
-		throw new Exception("expecting color");
+
+		throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+			"expecting color",
+			1358517536,
+			array('value' => $value)
+		);
 	}
 
 	protected function assertNumber($value) {
 		if ($value[0] != "number")
-			throw new Exception("expecting number");
+			throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+				"expecting number",
+				1358517536,
+				array('value' => $value)
+			);
 		return $value[1];
 	}
 
@@ -2108,14 +2200,22 @@ class scssc {
 		$numbers = array();
 		foreach ($args as $key => $item) {
 			if ('number' != $item[0]) {
-				throw new Exception(sprintf('%s is not a number', $item[0]));
+				throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+					sprintf('%s is not a number', $item[0]),
+					1358517631,
+					array('key' => $key, 'item' => $item)
+				);
 			}
 			$number = $this->normalizeNumber($item);
 
 			if (null === $unit) {
 				$unit = $number[2];
 			} elseif ($unit !== $number[2]) {
-				throw new Exception(sprintf('Incompatible units: "%s" and "%s".', $originalUnit, $item[2]));
+				throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+					sprintf('Incompatible units: "%s" and "%s".', $originalUnit, $item[2]),
+					1358517663,
+					array('originalUnit' => $originalUnit, 'item' => $item)
+				);
 			}
 
 			$originalUnit = $item[2];
@@ -2228,7 +2328,7 @@ class scssc {
 	protected function lib_comparable($args) {
 		list($number1, $number2) = $args;
 		if (!isset($number1[0]) || $number1[0] != "number" || !isset($number2[0]) || $number2[0] != "number") {
-			throw new Exception('Invalid argument(s) for "comparable"');
+			throw new Exception_ScssException('Invalid argument(s) for "comparable"');
 		}
 
 		$number1 = $this->normalizeNumber($number1);
@@ -2236,6 +2336,17 @@ class scssc {
 
 		return $number1[2] == $number2[2] || $number1[2] == "" || $number2[2] == "";
 	}
+
+	/**
+     * Dumps a given variable (or the given variables) wrapped into a 'pre' tag.
+     * @var mixed $var1
+     */
+    public function pd($var1 = '__iresults_pd_noValue') {
+    	$args = func_get_args();
+    	if (class_exists('Tx_Iresults')) {
+    		call_user_func_array(array('Tx_Iresults', 'pd'), $args);
+    	}
+    }
 
 	static protected $cssColors = array(
 		'aliceblue' => '240,248,255',
@@ -2863,9 +2974,11 @@ class scss_parser {
 		}
 
 		if ($this->literal("and")) {
-			$this->genericList($expressions, "mediaExpression", "and", false);
-			if (is_array($expressions)) $parts = array_merge($parts, $expressions[2]);
+			// Yes there is an and
 		}
+
+		$this->genericList($expressions, "mediaExpression", "and", false);
+		if (is_array($expressions)) $parts = array_merge($parts, $expressions[2]);
 
 		$out = $parts;
 		return true;
@@ -3145,12 +3258,16 @@ class scss_parser {
 			} else {
 				$this->seek($ss);
 			}
-			
+
 			$ss = $this->seek();
 			if ($this->literal("...")) {
 				$sss = $this->seek();
 				if (!$this->literal(")")) {
-					throw new Exception('... has to be after the final argument');
+					throw Exception_ScssException::errorWithMessageCodeAndUserInfo(
+						'... has to be after the final argument',
+						1358517719,
+						array('var' => $var, 'argument' => $arg)
+					);
 				}
 				$arg[2] = true;
 				$this->seek($sss);
@@ -3680,9 +3797,9 @@ class scss_parser {
 		}
 
 		if ($this->peek("(.*?)(\n|$)", $m, $count)) {
-			throw new Exception("$msg: failed at `$m[1]` $loc");
+			throw new Exception_ScssException("$msg: failed at `$m[1]` $loc");
 		} else {
-			throw new Exception("$msg: $loc");
+			throw new Exception_ScssException("$msg: $loc");
 		}
 	}
 
@@ -3752,6 +3869,17 @@ class scss_parser {
 		}
 		return $value;
 	}
+
+	/**
+     * Dumps a given variable (or the given variables) wrapped into a 'pre' tag.
+     * @var mixed $var1
+     */
+    public function pd($var1 = '__iresults_pd_noValue') {
+    	$args = func_get_args();
+    	if (class_exists('Tx_Iresults')) {
+    		call_user_func_array(array('Tx_Iresults', 'pd'), $args);
+    	}
+    }
 }
 
 /**

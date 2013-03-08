@@ -1,8 +1,8 @@
 {
-    "name": "leafo/scssphp",
+    "name": "iresults/scssphp",
     "type": "library",
     "description": "scssphp is a compiler for SCSS written in PHP.",
-    "homepage": "http://leafo.net/scssphp/",
+    "homepage": "https://github.com/iresults/scssphp",
     "license": [
       "MIT",
       "GPL-3.0"
@@ -12,6 +12,11 @@
             "name": "Leaf Corcoran",
             "email": "leafot@gmail.com",
             "homepage": "http://leafo.net"
+        },
+        {
+            "name": "Daniel Corn",
+            "email": "cod@iresults.li",
+            "homepage": "http://iresults.li"
         }
     ],
     "autoload": {
