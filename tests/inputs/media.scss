@@ -18,6 +18,12 @@
     div { color: blue; }
 }
 
+$navbarCollapseWidth: 940px;
+
+@media (max-width: $navbarCollapseWidth) {
+  color: red;
+}
+
 // media bubbling
 @media not hello and (world) {
    color: blue;
