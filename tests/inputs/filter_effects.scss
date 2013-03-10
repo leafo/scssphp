@@ -23,3 +23,21 @@
                     blur(10px)
                     drop-shadow(10px -16px 30px purple);
 }
+
+@mixin opacity($opacity, $style: 0) {
+  @if ($opacity < 1) {
+    opacity: $opacity;
+    filter: alpha(opacity=$opacity * 100, style=$style);
+  } @else {
+    opacity: $opacity / 100;
+    filter: alpha(opacity=$opacity);
+  }
+}
+
+#decimal {
+  @include opacity(.5, 1);
+}
+
+#percent {
+  @include opacity(50);
+}

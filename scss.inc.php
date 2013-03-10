@@ -1847,7 +1847,7 @@ class scssc {
 		}
 
 		// this might be the IE function, so return value unchanged
-		return array("function", "alpha", array("list", ",", $args));
+		return null;
 	}
 
 	protected static $lib_opacity = array("color");
@@ -3105,7 +3105,12 @@ class scss_parser {
 		if ($this->keyword($name, false) &&
 			$this->literal("("))
 		{
-			if ($name != "expression" && false == preg_match("/^(-[a-z]+-)?calc$/", $name)) {
+			if ($name == "alpha" && $this->argumentList($args)) {
+				$func = array("function", $name, array("string", "", $args));
+				return true;
+			}
+
+			if ($name != "expression" && !preg_match("/^(-[a-z]+-)?calc$/", $name)) {
 				$ss = $this->seek();
 				if ($this->argValues($args) && $this->literal(")")) {
 					$func = array("fncall", $name, $args);
@@ -3131,6 +3136,37 @@ class scss_parser {
 		return false;
 	}
 
+	protected function argumentList(&$out) {
+		$s = $this->seek();
+		$this->literal("(");
+
+		$args = array();
+		while ($this->keyword($var)) {
+			$ss = $this->seek();
+
+			if ($this->literal("=") && $this->expression($exp)) {
+				$args[] = array("string", "", array($var."="));
+				$arg = $exp;
+			} else {
+				break;
+			}
+
+			$args[] = $arg;
+
+			if (!$this->literal(",")) break;
+
+			$args[] = array("string", "", array(", "));
+		}
+
+		if (!$this->literal(")")) {
+			$this->seek($s);
+			return false;
+		}
+
+		$out = $args;
+		return true;
+	}
+
 	protected function argumentDef(&$out) {
 		$s = $this->seek();
 		$this->literal("(");
@@ -3145,7 +3181,7 @@ class scss_parser {
 			} else {
 				$this->seek($ss);
 			}
-			
+
 			$ss = $this->seek();
 			if ($this->literal("...")) {
 				$sss = $this->seek();
@@ -3840,7 +3876,7 @@ class scss_formatter_nested extends scss_formatter {
 			$depth = $children[$i]->depth;
 			$j = $i + 1;
 			if (isset($children[$j]) && $depth < $children[$j]->depth) {
-				$childDepth =  $children[$j]->depth;
+				$childDepth = $children[$j]->depth;
 				for (; $j < $count; $j++) {
 					if ($depth < $children[$j]->depth && $childDepth >= $children[$j]->depth) {
 						$children[$j]->depth = $depth + 1;
