@@ -3117,13 +3117,12 @@ class scss_parser {
 
 		$args = array();
 		while ($this->keyword($var)) {
-			$ss = $this->seek();
-
 			if ($this->literal("=") && $this->expression($exp)) {
 				$args[] = array("string", "", array($var."="));
 				$arg = $exp;
 			} else {
-				break;
+				$this->seek($s);
+				return false;
 			}
 
 			$args[] = $arg;
