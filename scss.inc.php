@@ -2823,8 +2823,7 @@ class scss_parser {
 		$parts = array();
 
 		if ($this->literal("and")) {
-			$this->seek($s);
-			$this->throwParseError("invalid media query: unexpected and");
+			$this->throwParseError("invalid media query: unexpected and", $s);
 		}
 
 		if (($this->literal("only") && ($only = true) || $this->literal("not") && ($not = true) || true) && $this->mixedKeyword($mediaType)) {
@@ -2848,8 +2847,7 @@ class scss_parser {
 			if (is_array($expressions)) {
 				$parts = array_merge($parts, $expressions[2]);
 			} else {
-				$this->seek($s);
-				$this->throwParseError("invalid media query: expected expression");
+				$this->throwParseError("invalid media query: expected expression", $s);
 			}
 		} else {
 			$this->genericList($expressions, "mediaExpression", "and", false);
