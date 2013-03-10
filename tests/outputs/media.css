@@ -23,21 +23,21 @@
 
 @media not hello and (world) {
   color: blue;
-  pre {
-    color: blue; } }
+    pre {
+      color: blue; } }
   @media not hello and (world) and butt {
     color: red;
-  div {
-    color: red; } }
+      div {
+        color: red; } }
 
 @media a and c, b and c {
-  color: blue; }
+    color: blue; }
 
 @media a and b, a and c {
-  color: blue; }
+    color: blue; }
 
 @media a and c, a and d, b and c, b and d {
-  color: blue; }
+    color: blue; }
 
 div {
   color: blue; }
@@ -48,14 +48,15 @@ div {
 div {
   position: absolute; }
   @media screen {
-    div {
-      top: 0;
-      bottom: 8em;
-      color: red; }
-      div p {
-        margin: 5px; }
-      div .success {
-        color: green; } }
+  div {
+    top: 0;
+    bottom: 8em;
+    color: red; }
+    div p {
+      margin: 5px; }
+
+    div .success {
+      color: green; } }
 
 .button {
   width: 300px;
@@ -64,6 +65,6 @@ div {
   .button :hover {
     background: #aaa; }
   @media only screen and (max-width: 300px) {
-    .button {
-      width: 100px;
-      height: 100px; } }
+  .button {
+    width: 100px;
+    height: 100px; } }
