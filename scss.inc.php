@@ -292,12 +292,22 @@ class scssc {
 
 		$parentScope->children[] = $this->scope;
 
-		$type = $media->children[0][0];
-		if ($type !== 'block' && $type !== 'media' && $type !== 'directive') {
-  			$block = $this->makeOutputBlock("", array());
-  			$block->children = $media->children;
+		// top level properties in a media cause it to be wrapped
+		$needsWrap = false;
+		foreach ($media->children as $child) {
+			$type = $child[0];
+			if ($type !== 'block' && $type !== 'media' && $type !== 'directive') {
+				$needsWrap = true;
+				break;
+			}
+		}
 
-  			$media->children = array(array("block", $block));
+		if ($needsWrap) {
+			$wrapped = (object)array(
+				"selectors" => array(),
+				"children" => $media->children
+			);
+			$media->children = array(array("block", $wrapped));
 		}
 
 		$this->compileChildren($media->children, $this->scope);
@@ -530,7 +540,7 @@ class scssc {
 				break;
 			}
 
-			// if the value reduces to null from something else then 
+			// if the value reduces to null from something else then
 			// the property should be discarded
 			if ($value[0] != "null") {
 				$value = $this->reduce($value);
@@ -3153,7 +3163,7 @@ class scss_parser {
 			} else {
 				$this->seek($ss);
 			}
-			
+
 			$ss = $this->seek();
 			if ($this->literal("...")) {
 				$sss = $this->seek();

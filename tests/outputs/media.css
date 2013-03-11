@@ -65,3 +65,15 @@ div {
   .button {
     width: 100px;
     height: 100px; } }
+
+code {
+  position: absolute; }
+  @media screen {
+  code {
+    height: 10px; }
+    code pre {
+      height: 20px; } }
+
+@media screen {
+    @media (color: blue) {
+      height: 10px; } }

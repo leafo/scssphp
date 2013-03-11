@@ -100,3 +100,22 @@ div {
     height: 100px;
   }
 }
+
+code {
+    position: absolute;
+    @media screen {
+        pre {
+            height: 20px;
+        }
+        height: 10px;
+    }
+}
+
+dt {
+    @media screen {
+        @media (color: blue) {
+            height: 10px;
+        }
+    }
+}
+
