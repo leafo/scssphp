@@ -77,6 +77,6 @@ code {
     code pre {
       height: 20px; } }
 
-@media screen {
-    @media (color: blue) {
-      height: 10px; } }
+@media screen and (color: blue) {
+      dt {
+        height: 10px; } }
