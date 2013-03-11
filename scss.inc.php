@@ -292,6 +292,14 @@ class scssc {
 
 		$parentScope->children[] = $this->scope;
 
+		$type = $media->children[0][0];
+		if ($type !== 'block' && $type !== 'media' && $type !== 'directive') {
+  			$block = $this->makeOutputBlock("", array());
+  			$block->children = $media->children;
+
+  			$media->children = array(array("block", $block));
+		}
+
 		$this->compileChildren($media->children, $this->scope);
 
 		$this->scope = $this->scope->parent;
