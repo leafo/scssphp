@@ -2877,7 +2877,8 @@ class scss_parser {
 			$prop[] = $media;
 			$parts[] = $prop;
 		} else {
-			$this->seek($s);
+			$this->genericList($expressions, "mediaExpression", "and", false);
+			if (is_array($expressions)) $parts = array_merge($parts, $expressions[2]);
 		}
 
 		if ($this->literal("and")) {
