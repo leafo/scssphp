@@ -6,3 +6,11 @@
 
 #misc {
   -webkit-filter: hue-rotate(90deg) blur(10px) drop-shadow(10px -16px 30px purple); }
+
+#decimal {
+  opacity: 0.5;
+  filter: alpha(opacity=50, style=1); }
+
+#percent {
+  opacity: 0.5;
+  filter: alpha(opacity=50); }
