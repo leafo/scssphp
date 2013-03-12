@@ -505,6 +505,8 @@ class scssc {
 
 	// return a value to halt execution
 	protected function compileChild($child, $out) {
+		$this->sourcePos = isset($child[-1]) ? $child[-1] : -1;
+
 		switch ($child[0]) {
 		case "import":
 			list(,$rawPath) = $child;
@@ -646,7 +648,7 @@ class scssc {
 			list(,$name, $argValues, $content) = $child;
 			$mixin = $this->get(self::$namespaces["mixin"] . $name, false);
 			if (!$mixin) {
-				throw new Exception(sprintf('Undefined mixin "%s"', $name));
+				$this->throwError("Undefined mixin $name");
 			}
 
 			$callingScope = $this->env;
@@ -676,7 +678,7 @@ class scssc {
 		case "mixin_content":
 			$content = $this->get(self::$namespaces["special"] . "content");
 			if (is_null($content)) {
-				throw new Exception("Unexpected @content inside of mixin");
+				$this->throwError("Unexpected @content inside of mixin");
 			}
 
 			$this->storeEnv = $content->scope;
@@ -694,7 +696,7 @@ class scssc {
 			fwrite(STDERR, "Line $line DEBUG: $value\n");
 			break;
 		default:
-			throw new Exception("unknown child type: $child[0]");
+			$this->throwError("unknown child type: $child[0]");
 		}
 	}
 
@@ -765,7 +767,7 @@ class scssc {
 						$left[0] == "number" && $right[0] == "number")
 					{
 						if ($opName == "mod" && $right[2] != "") {
-							throw new Exception(sprintf('Cannot modulo by a number with units: %s%s.', $right[1], $right[2]));
+							$this->throwError("Cannot modulo by a number with units: $right[1]$right[2].");
 						}
 
 						$unitChange = true;
@@ -1011,12 +1013,12 @@ class scssc {
 				break;
 			case '/':
 				if ($rval == 0) {
-					throw new Exception("color: Can't divide by zero");
+					$this->throwError("color: Can't divide by zero");
 				}
 				$out[] = $lval / $rval;
 				break;
 			default:
-				throw new Exception("color: unknow op $op");
+				$this->throwError("color: unknow op $op");
 			}
 		}
 
@@ -1152,7 +1154,7 @@ class scssc {
 		case "null":
 			return "null";
 		default:
-			throw new Exception("unknown value type: $type");
+			$this->throwError("unknown value type: $type");
 		}
 	}
 
@@ -1288,13 +1290,13 @@ class scssc {
 		foreach ((array) $argValues as $arg) {
 			if (!empty($arg[0])) {
 				if (!isset($args[$arg[0][1]])) {
-					throw new Exception(sprintf('Mixin or function doesn\'t have an argument named $%s.', $arg[0][1]));
+					$this->throwError("Mixin or function doesn't have an argument named $%s.", $arg[0][1]);
 				} elseif ($args[$arg[0][1]][0] < count($remaining)) {
-					throw new Exception(sprintf('The argument $%s was passed both by position and by name.', $arg[0][1]));
+					$this->throwError("The argument $%s was passed both by position and by name.", $arg[0][1]);
 				}
 				$keywordArgs[$arg[0][1]] = $arg[1];
 			} elseif (count($keywordArgs)) {
-				throw new Exception('Positional arguments must come before keyword arguments.');
+				$this->throwError('Positional arguments must come before keyword arguments.');
 			} elseif ($arg[2] == true) {
 				$val = $this->reduce($arg[1], true);
 				if ($val[0] == "list") {
@@ -1323,7 +1325,7 @@ class scssc {
 			} elseif (!empty($default)) {
 				$val = $default;
 			} else {
-				throw new Exception(sprintf('There is missing argument $%s', $name));
+				$this->throwError("Missing argument $$name");
 			}
 
 			$this->set($name, $this->reduce($val, true), true);
@@ -1598,18 +1600,18 @@ class scssc {
 
 	protected function assertList($value) {
 		if ($value[0] != "list")
-			throw new Exception("expecting list");
+			$this->throwError("expecting list");
 		return $value;
 	}
 
 	protected function assertColor($value) {
 		if ($color = $this->coerceColor($value)) return $color;
-		throw new Exception("expecting color");
+		$this->throwError("expecting color");
 	}
 
 	protected function assertNumber($value) {
 		if ($value[0] != "number")
-			throw new Exception("expecting number");
+			$this->throwError("expecting number");
 		return $value[1];
 	}
 
@@ -2126,14 +2128,14 @@ class scssc {
 		$numbers = array();
 		foreach ($args as $key => $item) {
 			if ('number' != $item[0]) {
-				throw new Exception(sprintf('%s is not a number', $item[0]));
+				$this->throwError("%s is not a number", $item[0]);
 			}
 			$number = $this->normalizeNumber($item);
 
 			if (null === $unit) {
 				$unit = $number[2];
 			} elseif ($unit !== $number[2]) {
-				throw new Exception(sprintf('Incompatible units: "%s" and "%s".', $originalUnit, $item[2]));
+				$this->throwError('Incompatible units: "%s" and "%s".', $originalUnit, $item[2]);
 			}
 
 			$originalUnit = $item[2];
@@ -2246,13 +2248,25 @@ class scssc {
 	protected function lib_comparable($args) {
 		list($number1, $number2) = $args;
 		if (!isset($number1[0]) || $number1[0] != "number" || !isset($number2[0]) || $number2[0] != "number") {
-			throw new Exception('Invalid argument(s) for "comparable"');
+			$this->throwError('Invalid argument(s) for "comparable"');
 		}
 
 		$number1 = $this->normalizeNumber($number1);
 		$number2 = $this->normalizeNumber($number2);
 
 		return $number1[2] == $number2[2] || $number1[2] == "" || $number2[2] == "";
+	}
+
+	protected function throwError($msg = null) {
+		if (func_num_args() > 1) {
+			$msg = call_user_func_array("sprintf", func_get_args());
+		}
+
+		if ($this->sourcePos >= 0 && isset($this->parser)) {
+			$this->parser->throwParseError($msg, $this->sourcePos);
+		}
+
+		throw new Exception($msg);
 	}
 
 	static protected $cssColors = array(
@@ -2526,7 +2540,7 @@ class scss_parser {
 					$include = $this->pushSpecialBlock("include");
 					$include->child = $child;
 				} else {
-					$this->append($child);
+					$this->append($child, $s);
 				}
 
 				return true;
@@ -2538,7 +2552,7 @@ class scss_parser {
 				$this->valueList($importPath) &&
 				$this->end())
 			{
-				$this->append(array("import", $importPath));
+				$this->append(array("import", $importPath), $s);
 				return true;
 			} else {
 				$this->seek($s);
@@ -2548,7 +2562,7 @@ class scss_parser {
 				$this->selectors($selector) &&
 				$this->end())
 			{
-				$this->append(array("extend", $selector));
+				$this->append(array("extend", $selector), $s);
 				return true;
 			} else {
 				$this->seek($s);
@@ -2568,7 +2582,7 @@ class scss_parser {
 			}
 
 			if ($this->literal("@return") && $this->valueList($retVal) && $this->end()) {
-				$this->append(array("return", $retVal));
+				$this->append(array("return", $retVal), $s);
 				return true;
 			} else {
 				$this->seek($s);
@@ -2630,14 +2644,14 @@ class scss_parser {
 			if (($this->literal("@debug") || $this->literal("@warn")) &&
 				$this->valueList($value) &&
 				$this->end()) {
-				$this->append(array("debug", $value, $s));
+				$this->append(array("debug", $value, $s), $s);
 				return true;
 			} else {
 				$this->seek($s);
 			}
 
 			if ($this->literal("@content") && $this->end()) {
-				$this->append(array("mixin_content"));
+				$this->append(array("mixin_content"), $s);
 				return true;
 			} else {
 				$this->seek($s);
@@ -2667,7 +2681,7 @@ class scss_parser {
 			if ($this->literal("@charset") &&
 				$this->valueList($charset) && $this->end())
 			{
-				$this->append(array("charset", $charset));
+				$this->append(array("charset", $charset), $s);
 				return true;
 			} else {
 				$this->seek($s);
@@ -2696,7 +2710,7 @@ class scss_parser {
 			$this->end())
 		{
 			$name = array("string", "", array($name));
-			$this->append(array("assign", $name, $value));
+			$this->append(array("assign", $name, $value), $s);
 			return true;
 		} else {
 			$this->seek($s);
@@ -2717,7 +2731,7 @@ class scss_parser {
 					$defaultVar = true;
 				}
 			}
-			$this->append(array("assign", $name, $value, $defaultVar));
+			$this->append(array("assign", $name, $value, $defaultVar), $s);
 			return true;
 		} else {
 			$this->seek($s);
@@ -2744,7 +2758,7 @@ class scss_parser {
 		if ($this->propertyName($name) && $this->literal(":")) {
 			$foundSomething = false;
 			if ($this->valueList($value)) {
-				$this->append(array("assign", $name, $value));
+				$this->append(array("assign", $name, $value), $s);
 				$foundSomething = true;
 			}
 
@@ -2772,10 +2786,10 @@ class scss_parser {
 				$include = $block->child;
 				unset($block->child);
 				$include[3] = $block;
-				$this->append($include);
+				$this->append($include, $s);
 			} elseif (empty($block->dontAppend)) {
 				$type = isset($block->type) ? $block->type : "block";
-				$this->append(array($type, $block));
+				$this->append(array($type, $block), $s);
 			}
 			return true;
 		}
@@ -2839,7 +2853,8 @@ class scss_parser {
 		return $old;
 	}
 
-	protected function append($statement) {
+	protected function append($statement, $pos=null) {
+		if ($pos !== null) $statement[-1] = $pos;
 		$this->env->children[] = $statement;
 	}
 
@@ -3202,7 +3217,7 @@ class scss_parser {
 			if ($this->literal("...")) {
 				$sss = $this->seek();
 				if (!$this->literal(")")) {
-					throw new Exception('... has to be after the final argument');
+					$this->throwParseError("... has to be after the final argument");
 				}
 				$arg[2] = true;
 				$this->seek($sss);
@@ -3720,7 +3735,7 @@ class scss_parser {
 		return true;
 	}
 
-	protected function throwParseError($msg = "parse error", $count = null) {
+	public function throwParseError($msg = "parse error", $count = null) {
 		$count = is_null($count) ? $this->count : $count;
 
 		$line = $this->getLineNo($count);

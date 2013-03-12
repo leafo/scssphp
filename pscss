@@ -50,4 +50,4 @@ $scss = new scssc();
 if (has("f")) {
 	$scss->setFormatter($opts["f"]);
 }
-echo $scss->compile($data);
+echo $scss->compile($data, "STDIN");
