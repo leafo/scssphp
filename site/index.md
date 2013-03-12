@@ -81,7 +81,7 @@ require `scss.inc.php` and invoke the `scss` class:
     ```php
     <?php
     require "scssphp/scss.inc.php";
-    $scss = new scss();
+    $scss = new scssc();
 
     echo $scss->compile('
       $color: #abc;
