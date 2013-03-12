@@ -506,6 +506,7 @@ class scssc {
 	// return a value to halt execution
 	protected function compileChild($child, $out) {
 		$this->sourcePos = isset($child[-1]) ? $child[-1] : -1;
+		$this->sourceParser = isset($child[-2]) ? $child[-2] : $this->parser;
 
 		switch ($child[0]) {
 		case "import":
@@ -1430,7 +1431,7 @@ class scssc {
 			$tree = $this->importCache[$realPath];
 		} else {
 			$code = file_get_contents($path);
-			$parser = new scss_parser($path);
+			$parser = new scss_parser($path, false);
 			$tree = $parser->parse($code);
 			$this->parsedFiles[] = $path;
 
@@ -2262,8 +2263,8 @@ class scssc {
 			$msg = call_user_func_array("sprintf", func_get_args());
 		}
 
-		if ($this->sourcePos >= 0 && isset($this->parser)) {
-			$this->parser->throwParseError($msg, $this->sourcePos);
+		if ($this->sourcePos >= 0 && isset($this->sourceParser)) {
+			$this->sourceParser->throwParseError($msg, $this->sourcePos);
 		}
 
 		throw new Exception($msg);
@@ -2456,8 +2457,9 @@ class scss_parser {
 	static protected $commentMultiLeft = "/*";
 	static protected $commentMultiRight = "*/";
 
-	function __construct($sourceName = null) {
+	function __construct($sourceName = null, $rootParser = true) {
 		$this->sourceName = $sourceName;
+		$this->rootParser = $rootParser;
 
 		if (empty(self::$operatorStr)) {
 			self::$operatorStr = $this->makeOperatorStr(self::$operators);
@@ -2854,7 +2856,10 @@ class scss_parser {
 	}
 
 	protected function append($statement, $pos=null) {
-		if ($pos !== null) $statement[-1] = $pos;
+		if ($pos !== null) {
+			$statement[-1] = $pos;
+			if (!$this->rootParser) $statement[-2] = $this;
+		}
 		$this->env->children[] = $statement;
 	}
 
