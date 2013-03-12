@@ -1,6 +1,4 @@
 
-## About
-
 **scssphp** is a compiler for [SCSS][0] written in PHP.
 
 SCSS is a CSS preprocessor that adds many features like variables, mixins,

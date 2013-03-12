@@ -33,6 +33,7 @@ $btn_color: desaturate(#FF3D7F, 10%);
 
 body {
     background: $pink;
+    font-family: Lato, sans-serif;
 }
 
 .header, .footer, .body {
@@ -54,8 +55,8 @@ body {
     h1 {
         font-family: 'Quicksand', sans-serif;
         font-size: 40px;
+        line-height: 100px;
         font-weight: normal;
-        padding: 20px 0;
         margin: 0;
 
         a {
@@ -71,7 +72,7 @@ body {
 
     .nav {
         padding: 8px 0;
-        font-size: 14px;
+        font-size: 17px;
         text-shadow: none;
         background: darken($teal, 30%);
         color: $teal;
@@ -80,7 +81,6 @@ body {
         a {
             color: lighten($teal, 40%);
             text-decoration: none;
-            font-weight: bold;
 
             &:hover {
                 text-decoration: underline;
@@ -95,7 +95,7 @@ body {
 
     .download-area {
         float: right;
-        margin-top: 22px;
+        margin-top: 25px;
         background: rgba(255,255,255, 0.3);
         border-radius: 8px;
         padding: 5px;
@@ -160,15 +160,19 @@ body {
     background: $bg_color;
     overflow: hidden;
     color: $text_color;
-    font-size: 16px;
+    font-size: 18px;
     padding-bottom: 20px;
 
     .inner {
-        width: $site_width - 20px;
-    }
+        background: white;
+        margin-top: 20px;
+        padding: 30px 50px;
+        border: 1px solid lightGrey;
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.19);
 
-    h2, h3 {
-        margin: 20px 0;
+        h1, h2, h3 {
+            margin: 0 0 20px 0;
+        }
     }
 
     h1, h2, h3 {
@@ -177,7 +181,7 @@ body {
     }
 
     h3 {
-        color: #535237;
+        color: #4D4C3D;
     }
 
     p {
@@ -197,7 +201,7 @@ body {
 }
 
 .footer {
-    font-size: 14px;
+    font-size: 16px;
     color: lighten($pink, 20%);
     text-shadow: 0px 1px 0px darken($pink, 20%);
 
@@ -238,6 +242,8 @@ p {
 
 .index {
     line-height: 150%;
+    margin-bottom: 20px;
+
     ul {
         margin: 0;
     }
