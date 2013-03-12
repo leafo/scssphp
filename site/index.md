@@ -10,7 +10,7 @@ The entire compiler comes in a single class file ready for including in any
 kind of project in addition to a command line tool for running the compiler
 from the terminal.
 
-**scssphp** implements SCSS (3.1.20). It does not implement the SASS syntax,
+**scssphp** implements SCSS (3.2.7). It does not implement the SASS syntax,
 only the SCSS syntax.
 
 Follow the author on twitter: [@moonscript](http://twitter.com/moonscript).
@@ -107,18 +107,30 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <a name="changelog"></a>
 ## Changelog
 
+* **0.0.5** -- March 11, 2013
+  * Better compile time errors
+  * Fix top level properties inside of a nested `@media` (Anthon Pang)
+  * Fix some issues with `@extends` (Anthon Pang)
+  * Enhanced handling of `null` (Anthon Pang)
+  * Helper functions shouldn't mix with css builtins (Anthon Pang)
+  * Enhace selector parsing (Guilherme Blanco, Anthon Pang)
+  * Add Placeholder selector support (Martin Hasoň)
+  * Add variable argument support (Martin Hasoň)
+  * Add zip, index, comparable functions (Martin Hasoň)
+  * A bunch of parser and bug fixes
 * **0.0.4** -- [Import path can be a function](docs/#import_paths) (Christian
-	Lück). Correctly parse media queries with more than one item (Christian
-	Lück). Add `ie_hex_str`, `abs`, `min`, `max` functions (Martin Hasoň), ignore
-	expressions inside of `calc()` (Martin Hasoň), Improve operator evaluation
-	(Martin Hasoň), Add
-	[`@content`](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixin-content)
-	support. Misc bug fixes. (Nov 3nd, 2012)
+  Lück). Correctly parse media queries with more than one item (Christian
+  Lück). Add `ie_hex_str`, `abs`, `min`, `max` functions (Martin Hasoň), ignore
+  expressions inside of `calc()` (Martin Hasoň), Improve operator evaluation
+  (Martin Hasoň), Add
+  [`@content`](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixin-content)
+  support. Misc bug fixes. (Nov 3nd, 2012)
 * **0.0.3** -- Add missing and/or/not operators. Expression evaluation happens
-	correctly. Import file caching and _partial filename support. Misc bug
-	fixes. (August 2nd, 2012)
-* **0.0.2** -- SCSS server is aware of imports, added custom function interface,
-	compressed formatter, <a href="http://leafo.net/scssphp/docs/">documentation</a> (July 30th, 2012)
+  correctly. Import file caching and _partial filename support. Misc bug fixes.
+  (August 2nd, 2012)
+* **0.0.2** -- SCSS server is aware of imports, added custom function
+  interface, compressed formatter, <a
+  href="http://leafo.net/scssphp/docs/">documentation</a> (July 30th, 2012)
 * Initial Release v0.0.1 (July 29th, 2012)
 
 <a name="comments"></a>
