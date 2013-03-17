@@ -48,7 +48,7 @@ div p {
 #please-wait {
   background: url(/images/logo.png);
   position: absolute;
-  top: 3em;
+  top: 1em;
   right: 0;
   bottom: 3em;
-  left: 0; }
+  left: 4em; }

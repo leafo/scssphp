@@ -112,5 +112,5 @@ div {
 }
 
 #please-wait {
-  @include logo($top: 3em, $bottom: 3em);
+  @include logo(1em, $left: 4em, $bottom: 3em);
 }
