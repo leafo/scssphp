@@ -85,9 +85,7 @@ class scssc {
 
 		$this->compileRoot($tree);
 
-		ob_start();
-		$this->formatter->block($this->scope);
-		$out = ob_get_clean();
+		$out = $this->formatter->format($this->scope);
 
 		setlocale(LC_NUMERIC, $locale);
 		return $out;
@@ -3852,7 +3850,7 @@ class scss_formatter {
 		return $name . $this->assignSeparator . $value . ";";
 	}
 
-	public function block($block) {
+	protected function block($block) {
 		if (empty($block->lines) && empty($block->children)) return;
 
 		$inner = $pre = $this->indentStr();
@@ -3882,6 +3880,14 @@ class scss_formatter {
 			if (empty($block->children)) echo $this->break;
 			echo $pre . $this->close . $this->break;
 		}
+	}
+
+	public function format($block) {
+		ob_start();
+		$this->block($block);
+		$out = ob_get_clean();
+
+		return $out;
 	}
 }
 
@@ -3930,7 +3936,7 @@ class scss_formatter_nested extends scss_formatter {
 		}
 	}
 
-	public function block($block) {
+	protected function block($block) {
 		if ($block->type == "root") {
 			$this->adjustAllChildren($block);
 		}
@@ -3989,6 +3995,10 @@ class scss_formatter_compressed extends scss_formatter {
 
 	public function indentStr($n = 0) {
 		return "";
+	}
+
+	public function format($block) {
+		return preg_replace('@/\*.*?\*/@s', '', parent::format($block));
 	}
 }
 
