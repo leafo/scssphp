@@ -1018,8 +1018,10 @@ class scssc {
 				}
 				$out[] = $lval / $rval;
 				break;
+			case "==":
+				return $this->op_eq($left, $right);
 			default:
-				$this->throwError("color: unknow op $op");
+				$this->throwError("color: unknown op $op");
 			}
 		}
 
