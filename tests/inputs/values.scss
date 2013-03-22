@@ -37,3 +37,9 @@
     d: +foo(12px);
 }
 
+$small-screen: 48em !default;
+$small: "only screen and (min-width:"#{$small-screen}")" !default;
+
+@media #{$small} {
+    div {
+        display: none; } }
