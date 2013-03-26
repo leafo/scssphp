@@ -1650,7 +1650,7 @@ class scssc {
 		if ($min == $max) {
 			$S = $H = 0;
 		} else {
-			if ($L < 0.5)
+			if ($L <= 0.5)
 				$S = ($max - $min)/($max + $min);
 			else
 				$S = ($max - $min)/(2.0 - $max - $min);
@@ -1662,7 +1662,7 @@ class scssc {
 		}
 
 		return array('hsl',
-			($H < 0 ? $H + 6 : $H)*60,
+			round(($H < 0 ? $H + 6 : $H)*60),
 			$S*100,
 			$L*100,
 		);
@@ -1674,7 +1674,7 @@ class scssc {
 
 		if (6 * $comp < 1) return $temp1 + ($temp2 - $temp1) * 6 * $comp;
 		if (2 * $comp < 1) return $temp2;
-		if (3 * $comp < 2) return $temp1 + ($temp2 - $temp1)*((2/3) - $comp) * 6;
+		if (3 * $comp < 2) return $temp1 + ($temp2 - $temp1)*(4 - 6 * $comp);
 
 		return $temp1;
 	}
