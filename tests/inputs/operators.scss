@@ -134,6 +134,10 @@ div {
   cancel-unit: (10px / 10px);
 }
 
+// not expecting unary
 $form-spacing: 1em;
 
-.row { margin: 0 -$form-spacing / 2; }
+.row .a { margin: 0-$form-spacing / 2; }
+.row .b { margin: 0- $form-spacing / 2; }
+.row .c { margin: 0 - $form-spacing / 2; }
+.row .d { margin: 0 -$form-spacing / 2; }

@@ -100,5 +100,14 @@ div {
 #special {
   cancel-unit: 1; }
 
-.row {
+.row .a {
+  margin: -0.5em; }
+
+.row .b {
+  margin: -0.5em; }
+
+.row .c {
+  margin: -0.5em; }
+
+.row .d {
   margin: -0.5em; }
