@@ -576,12 +576,12 @@ class scssc {
 			break;
 		case "if":
 			list(, $if) = $child;
-			if (($cond = $this->reduce($if->cond, true)) != self::$false && $cond != self::$null) {
+			if ($this->isTruthy($this->reduce($if->cond, true))) {
 				return $this->compileChildren($if->children, $out);
 			} else {
 				foreach ($if->cases as $case) {
 					if ($case->type == "else" ||
-						$case->type == "elseif" && (($cond = $this->reduce($case->cond)) != self::$false) && $cond != self::$null)
+						$case->type == "elseif" && $this->isTruthy($case->cond))
 					{
 						return $this->compileChildren($case->children, $out);
 					}
@@ -603,7 +603,7 @@ class scssc {
 			break;
 		case "while":
 			list(,$while) = $child;
-			while (($cond = $this->reduce($while->cond, true)) != self::$false && $cond != self::$null) {
+			while ($this->isTruthy($this->reduce($while->cond, true))) {
 				$ret = $this->compileChildren($while->children, $out);
 				if ($ret) return $ret;
 			}
@@ -710,6 +710,10 @@ class scssc {
 		if ($whiteRight) $content[] = " ";
 		$content[] = $right;
 		return array("string", "", $content);
+	}
+
+	protected function isTruthy($value) {
+		return $value != self::$false && $value != self::$null;
 	}
 
 	// should $value cause its operand to eval
