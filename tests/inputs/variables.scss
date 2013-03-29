@@ -17,6 +17,13 @@ div {
     num: $b;
 }
 
+$cool_color: null;
+$cool_color: blue !default;
+
+pre {
+    color: $cool_color;
+}
+
 $something_man: 100px;
 cool: $something_man;
 

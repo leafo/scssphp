@@ -8,6 +8,9 @@ div {
 div {
   num: 2000; }
 
+pre {
+  color: blue; }
+
 del {
   color: red; }
   del div pre {

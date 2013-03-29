@@ -538,7 +538,13 @@ class scssc {
 			list(,$name, $value) = $child;
 			if ($name[0] == "var") {
 				$isDefault = !empty($child[3]);
-				if (!$isDefault || $this->get($name[1], true) === true) {
+
+				if ($isDefault) {
+					$existingValue = $this->get($name[1], true);
+					$shouldSet = $existingValue === true || $existingValue == self::$null;
+				}
+
+				if (!$isDefault || $shouldSet) {
 					$this->set($name[1], $this->reduce($value));
 				}
 				break;
