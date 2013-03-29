@@ -54,6 +54,7 @@ class scssc {
 
 	static public $true = array("keyword", "true");
 	static public $false = array("keyword", "false");
+	static public $null = array("null");
 
 	static public $defaultValue = array("keyword", "");
 	static public $selfSelector = array("self");
@@ -575,12 +576,12 @@ class scssc {
 			break;
 		case "if":
 			list(, $if) = $child;
-			if ($this->reduce($if->cond, true) != self::$false) {
+			if (($cond = $this->reduce($if->cond, true)) != self::$false && $cond != self::$null) {
 				return $this->compileChildren($if->children, $out);
 			} else {
 				foreach ($if->cases as $case) {
 					if ($case->type == "else" ||
-						$case->type == "elseif" && ($this->reduce($case->cond) != self::$false))
+						$case->type == "elseif" && (($cond = $this->reduce($case->cond)) != self::$false) && $cond != self::$null)
 					{
 						return $this->compileChildren($case->children, $out);
 					}
@@ -602,7 +603,7 @@ class scssc {
 			break;
 		case "while":
 			list(,$while) = $child;
-			while ($this->reduce($while->cond, true) != self::$false) {
+			while (($cond = $this->reduce($while->cond, true)) != self::$false && $cond != self::$null) {
 				$ret = $this->compileChildren($while->children, $out);
 				if ($ret) return $ret;
 			}

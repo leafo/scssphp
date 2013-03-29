@@ -44,3 +44,8 @@ pre {
 
 }
 
+$j: null;
+@while $j {
+  .item { width: 2em; }
+  $j: false;
+}

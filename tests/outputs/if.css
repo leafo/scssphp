@@ -3,7 +3,10 @@ div {
 
 pre {
   val-1: "red";
-  val-2: "blue"; }
+  val-2: "blue";
+  val-3: "blue";
+  val-4: "red";
+  val-5: "red"; }
 
 span {
   color: blue;
