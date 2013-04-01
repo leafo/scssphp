@@ -111,3 +111,51 @@ div {
 
 .row .d {
   margin: -0.5em; }
+
+.row .e {
+  margin: 0 -0.5em; }
+
+.alt .a {
+  margin: 0 -1em/2; }
+
+.alt .b {
+  margin: -0.5em; }
+
+.alt .c {
+  margin: -0.5em; }
+
+.alt .d {
+  margin: 0 -1em / 2; }
+
+.alt .e {
+  margin: 0 -0.5em; }
+
+.row .f {
+  margin: -2em; }
+
+.row .g {
+  margin: -2em; }
+
+.row .h {
+  margin: -2em; }
+
+.row .i {
+  margin: -2em; }
+
+.row .j {
+  margin: 0 -2em; }
+
+.alt .f {
+  margin: 0 -2em; }
+
+.alt .g {
+  margin: -2em; }
+
+.alt .h {
+  margin: -2em; }
+
+.alt .i {
+  margin: 0 -2em; }
+
+.alt .j {
+  margin: 0 -2em; }

@@ -141,3 +141,22 @@ $form-spacing: 1em;
 .row .b { margin: 0- $form-spacing / 2; }
 .row .c { margin: 0 - $form-spacing / 2; }
 .row .d { margin: 0 -$form-spacing / 2; }
+.row .e { margin: 0 (-$form-spacing / 2); }
+
+.alt .a { margin: 0-1em / 2; }
+.alt .b { margin: 0- 1em / 2; }
+.alt .c { margin: 0 - 1em / 2; }
+.alt .d { margin: 0 -1em / 2; }
+.alt .e { margin: 0 (-1em / 2); }
+
+.row .f { margin: 0-$form-spacing * 2; }
+.row .g { margin: 0- $form-spacing * 2; }
+.row .h { margin: 0 - $form-spacing * 2; }
+.row .i { margin: 0 -$form-spacing * 2; }
+.row .j { margin: 0 (-$form-spacing * 2); }
+
+.alt .f { margin: 0-1em * 2; }
+.alt .g { margin: 0- 1em * 2; }
+.alt .h { margin: 0 - 1em * 2; }
+.alt .i { margin: 0 -1em * 2; }
+.alt .j { margin: 0 (-1em * 2); }
