@@ -67,6 +67,8 @@ class scssc {
 	protected $formatter = "scss_formatter_nested";
 
 	function compile($code, $name=null) {
+		ini_set('precision', 15);
+
 		$this->indentLevel = -1;
 		$this->commentsSeen = array();
 		$this->extends = array();
@@ -1005,7 +1007,7 @@ class scssc {
 
 	protected function op_color_color($op, $left, $right) {
 		$out = array('color');
-		foreach (range(1, 3) as $i) {
+		for ($i = 1; $i <= 3; $i++ ){
 			$lval = isset($left[$i]) ? $left[$i] : 0;
 			$rval = isset($right[$i]) ? $right[$i] : 0;
 			switch ($op) {
@@ -1641,7 +1643,7 @@ class scssc {
 
 	// make sure a color's components don't go out of bounds
 	protected function fixColor($c) {
-		foreach (range(1, 3) as $i) {
+		for ($i = 1; $i <= 3; $i++) {
 			if ($c[$i] < 0) $c[$i] = 0;
 			if ($c[$i] > 255) $c[$i] = 255;
 		}
@@ -1649,74 +1651,71 @@ class scssc {
 		return $c;
 	}
 
-	function toHSL($r, $g, $b) {
-		$r = $r / 255;
-		$g = $g / 255;
-		$b = $b / 255;
+	function toHSL($red, $green, $blue) {
+		$r = $red / 255;
+		$g = $green / 255;
+		$b = $blue / 255;
 
 		$min = min($r, $g, $b);
 		$max = max($r, $g, $b);
+		$d = $max - $min;
+		$l = ($min + $max) / 2;
 
-		$L = ($min + $max) / 2;
 		if ($min == $max) {
-			$S = $H = 0;
+			$s = $h = 0;
 		} else {
-			if ($L < 0.5)
-				$S = ($max - $min)/($max + $min);
+			if ($l < 0.5)
+				$s = $d / (2 * $l);
 			else
-				$S = ($max - $min)/(2.0 - $max - $min);
+				$s = $d / (2 - 2 * $l);
 
-			if ($r == $max) $H = ($g - $b)/($max - $min);
-			elseif ($g == $max) $H = 2.0 + ($b - $r)/($max - $min);
-			elseif ($b == $max) $H = 4.0 + ($r - $g)/($max - $min);
-
+			if ($r == $max)
+				$h = 60 * ($g - $b) / $d;
+			elseif ($g == $max)
+				$h = 60 * ($b - $r) / $d + 120;
+			elseif ($b == $max)
+				$h = 60 * ($r - $g) / $d + 240;
 		}
 
-		return array('hsl',
-			($H < 0 ? $H + 6 : $H)*60,
-			$S*100,
-			$L*100,
-		);
+		return array('hsl', fmod($h, 360), $s * 100, $l * 100);
 	}
 
-	function toRGB_helper($comp, $temp1, $temp2) {
-		if ($comp < 0) $comp += 1.0;
-		elseif ($comp > 1) $comp -= 1.0;
+	function hueToRGB($m1, $m2, $h) {
+		if ($h < 0)
+			$h += 1;
+		elseif ($h > 1)
+			$h -= 1;
 
-		if (6 * $comp < 1) return $temp1 + ($temp2 - $temp1) * 6 * $comp;
-		if (2 * $comp < 1) return $temp2;
-		if (3 * $comp < 2) return $temp1 + ($temp2 - $temp1)*((2/3) - $comp) * 6;
+		if ($h * 6 < 1)
+			return $m1 + ($m2 - $m1) * $h * 6;
 
-		return $temp1;
+		if ($h * 2 < 1)
+			return $m2;
+
+		if ($h * 3 < 2)
+			return $m1 + ($m2 - $m1) * (2/3 - $h) * 6;
+
+		return $m1;
 	}
 
 	// H from 0 to 360, S and L from 0 to 100
-	function toRGB($H, $S, $L) {
-		$H = $H % 360;
-		if ($H < 0) $H += 360;
-
-		$S = min(100, max(0, $S));
-		$L = min(100, max(0, $L));
-
-		$H = $H / 360;
-		$S = $S / 100;
-		$L = $L / 100;
-
-		if ($S == 0) {
-			$r = $g = $b = $L;
-		} else {
-			$temp2 = $L < 0.5 ?
-				$L*(1.0 + $S) :
-				$L + $S - $L * $S;
-
-			$temp1 = 2.0 * $L - $temp2;
-
-			$r = $this->toRGB_helper($H + 1/3, $temp1, $temp2);
-			$g = $this->toRGB_helper($H, $temp1, $temp2);
-			$b = $this->toRGB_helper($H - 1/3, $temp1, $temp2);
+	function toRGB($hue, $saturation, $lightness) {
+		if ($hue < 0) {
+			$hue += 360;
 		}
 
-		$out = array('color', $r*255, $g*255, $b*255);
+		$h = $hue / 360;
+		$s = min(100, max(0, $saturation)) / 100;
+		$l = min(100, max(0, $lightness)) / 100;
+
+		$m2 = $l <= 0.5 ? $l * ($s + 1) : $l + $s - $l * $s;
+		$m1 = $l * 2 - $m2;
+
+		$r = $this->hueToRGB($m1, $m2, $h + 1/3) * 255;
+		$g = $this->hueToRGB($m1, $m2, $h) * 255;
+		$b = $this->hueToRGB($m1, $m2, $h - 1/3) * 255;
+
+		$out = array('color', $r, $g, $b);
 		return $out;
 	}
 

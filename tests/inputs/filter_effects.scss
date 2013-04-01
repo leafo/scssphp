@@ -41,3 +41,8 @@
 #percent {
   @include opacity(50);
 }
+
+.row {
+  background-color: darken(#2ba6cb, 40%);
+  color: darken(#2ba6cb, 10%);
+}
