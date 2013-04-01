@@ -14,3 +14,6 @@ div {
   hello: "hello foo and bar";
   hello: "hello bar and default";
   hello: "hello Alice, Bob, Tom"; }
+
+.foo {
+  test2: -moz-art; }

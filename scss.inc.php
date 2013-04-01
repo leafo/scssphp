@@ -708,11 +708,11 @@ class scssc {
 
 	protected function expToString($exp) {
 		list(, $op, $left, $right, $inParens, $whiteLeft, $whiteRight) = $exp;
-		$content = array($left);
+		$content = array($this->reduce($left));
 		if ($whiteLeft) $content[] = " ";
 		$content[] = $op;
 		if ($whiteRight) $content[] = " ";
-		$content[] = $right;
+		$content[] = $this->reduce($right);
 		return array("string", "", $content);
 	}
 
