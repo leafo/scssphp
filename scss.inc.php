@@ -765,12 +765,12 @@ class scssc {
 				// 3. op_[op name]
 				$fn = "op_${opName}_${ltype}_${rtype}";
 				if (is_callable(array($this, $fn)) ||
-					(($fn = "op_${ltype}_${rtype}") &&
-						is_callable(array($this, $fn)) &&
-						$passOp = true) ||
 					(($fn = "op_${opName}") &&
 						is_callable(array($this, $fn)) &&
-						$genOp = true))
+						$genOp = true) || 
+					(($fn = "op_${ltype}_${rtype}") &&
+						is_callable(array($this, $fn)) &&
+						$passOp = true))
 				{
 					$unitChange = false;
 					if (!isset($genOp) &&
