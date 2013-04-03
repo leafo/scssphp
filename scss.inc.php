@@ -585,7 +585,7 @@ class scssc {
 			} else {
 				foreach ($if->cases as $case) {
 					if ($case->type == "else" ||
-						$case->type == "elseif" && $this->isTruthy($case->cond))
+						$case->type == "elseif" && $this->isTruthy($this->reduce($case->cond)))
 					{
 						return $this->compileChildren($case->children, $out);
 					}
