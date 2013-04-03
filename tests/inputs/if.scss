@@ -35,6 +35,13 @@ span {
         color: 20px;
     }
 
+    @if false {
+        height: 10px;
+    } @elseif false {
+        color: 20px;
+    } @else {
+        width: 20px;
+    }
 }
 
 div {
