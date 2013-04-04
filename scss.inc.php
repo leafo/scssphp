@@ -67,8 +67,6 @@ class scssc {
 	protected $formatter = "scss_formatter_nested";
 
 	function compile($code, $name=null) {
-		ini_set('precision', 15);
-
 		$this->indentLevel = -1;
 		$this->commentsSeen = array();
 		$this->extends = array();
