@@ -51,3 +51,14 @@ div {
     hello: three(bar...);
     hello: all(Alice, Bob, Tom);
 }
+
+@function stringConcatCompassStyle($start,$last)
+{
+    // Compass still uses it like this
+    @return #{$start}-#{$last};
+}
+
+.foo
+{   
+    test2: stringConcatCompassStyle(-moz,art);
+}
