@@ -1065,6 +1065,28 @@ class scssc {
 	protected function op_neq($left, $right) {
 		return $this->toBool($left != $right);
 	}
+	
+	protected function op_neq_color_color($left, $right) {
+		foreach (range(1, 4) as $i) {
+			$lval = isset($left[$i]) ? $left[$i] : ($i==4?1:0);
+			$rval = isset($right[$i]) ? $right[$i] : ($i==4?1:0);
+			if($lval!=$rval)
+				return $this->toBool(true);
+		}
+		
+		return $this->toBool(false);
+	}
+	
+	protected function op_eq_color_color($left, $right) {
+		foreach (range(1, 4) as $i) {
+			$lval = isset($left[$i]) ? $left[$i] : ($i==4?1:0);
+			$rval = isset($right[$i]) ? $right[$i] : ($i==4?1:0);
+			if($lval!=$rval)
+				return $this->toBool(false);
+		}
+		
+		return $this->toBool(true);
+	}
 
 	protected function op_gte_number_number($left, $right) {
 		return $this->toBool($left[1] >= $right[1]);
