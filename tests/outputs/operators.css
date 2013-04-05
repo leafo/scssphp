@@ -36,7 +36,11 @@ div {
   color: rgba(1, 1, 2, 0.5);
   color: rgba(3, 4, 5, 0.5);
   color: rgba(0, 0, 1, 0.5);
-  color: #22f; }
+  color: #22f;
+  color: false;
+  color: true;
+  color: true;
+  color: false; }
 
 #preserve {
   hello: what -going;
