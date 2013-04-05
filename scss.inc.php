@@ -451,14 +451,15 @@ class scssc {
 			foreach ($query as $q) {
 				switch ($q[0]) {
 					case "mediaType":
-						$parts[] = implode(" ", array_map(array($this, "compileValue"), array_slice($q, 1)));
+						$parts[] = implode(" ", array_map(array($this, "unquote"), array_map(array($this, "compileValue"), array_slice($q, 1))));
 						break;
 					case "mediaExp":
 						if (isset($q[2])) {
-							$parts[] = "(". $this->compileValue($q[1]) . $this->formatter->assignSeparator . $this->compileValue($q[2]) . ")";
+							$part = $this->unquote($this->compileValue($q[1])) . $this->formatter->assignSeparator . $this->unquote($this->compileValue($q[2]));
 						} else {
-							$parts[] = "(" . $this->compileValue($q[1]) . ")";
+							$part = $this->unquote($this->compileValue($q[1]));
 						}
+						$parts[] = "(" . $part . ")";
 						break;
 				}
 			}
@@ -1086,6 +1087,19 @@ class scssc {
 		return $thing ? self::$true : self::$false;
 	}
 
+	protected function unquote($content) {
+		return $this->extractString($content, $dummy);
+	}
+
+	protected function extractString($content, &$quote) {
+		if (strlen($content) >= 2 && $content[0] == '"' && substr($content, -1) == '"') {
+			$quote = '"';
+			return substr($content, 1, -1);
+		}
+
+		return $content;
+	}
+
 	protected function compileValue($value) {
 		$value = $this->reduce($value);
 
@@ -1139,15 +1153,17 @@ class scssc {
 		case "interpolated": # node created by extractInterpolation
 			list(, $interpolate, $left, $right) = $value;
 			list(,, $whiteLeft, $whiteRight) = $interpolate;
+			$quote = "";
 
 			$left = count($left[2]) > 0 ?
-				$this->compileValue($left).$whiteLeft : "";
+				$this->extractString($this->compileValue($left), $quote).$whiteLeft : "";
 
 			$right = count($right[2]) > 0 ?
-				$whiteRight.$this->compileValue($right) : "";
+				$whiteRight.$this->extractString($this->compileValue($right), $quote) : "";
 
-			return $left.$this->compileValue($interpolate).$right;
+			$interpolate = $this->extractString($this->compileValue($interpolate), $quote);
 
+			return $quote.$left.$interpolate.$right.$quote;
 		case "interpolate": # raw parse node
 			list(, $exp) = $value;
 
