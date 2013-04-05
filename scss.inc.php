@@ -765,12 +765,12 @@ class scssc {
 				// 3. op_[op name]
 				$fn = "op_${opName}_${ltype}_${rtype}";
 				if (is_callable(array($this, $fn)) ||
-					(($fn = "op_${opName}") &&
-						is_callable(array($this, $fn)) &&
-						$genOp = true) || 
 					(($fn = "op_${ltype}_${rtype}") &&
 						is_callable(array($this, $fn)) &&
-						$passOp = true))
+						$passOp = true) ||
+					(($fn = "op_${opName}") &&
+						is_callable(array($this, $fn)) &&
+						$genOp = true))
 				{
 					$unitChange = false;
 					if (!isset($genOp) &&
@@ -1064,6 +1064,17 @@ class scssc {
 
 	protected function op_neq($left, $right) {
 		return $this->toBool($left != $right);
+	}
+	
+	protected function op_neq_color_color($left, $right) {
+		foreach (range(1, 4) as $i) {
+			$lval = isset($left[$i]) ? $left[$i] : 0;
+			$rval = isset($right[$i]) ? $right[$i] : 0;
+			if($lval!=$rval)
+				return $this->toBool(true);
+		}
+		
+		return $this->toBool(false);
 	}
 
 	protected function op_gte_number_number($left, $right) {
