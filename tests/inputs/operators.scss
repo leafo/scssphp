@@ -47,6 +47,12 @@ div {
     color: rgba(1,2,3, 0.5) - 2;
 
     color: blue + 34;
+
+    color: #fff == #000;
+    color: #fff == #fff;
+
+    color: #fff != #000;
+    color: #fff != #fff;
 }
 
 

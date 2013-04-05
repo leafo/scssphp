@@ -1029,6 +1029,8 @@ class scssc {
 				break;
 			case "==":
 				return $this->op_eq($left, $right);
+			case "!=":
+				return $this->op_neq($left, $right);
 			default:
 				$this->throwError("color: unknown op $op");
 			}
