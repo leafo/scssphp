@@ -2734,16 +2734,13 @@ class scss_parser {
 			$this->literal(":") &&
 			$this->valueList($value) && $this->end())
 		{
-			$defaultVar = false;
 			// check for !default
-			if ($value[0] == "list") {
-				$def = end($value[2]);
-				if ($def[0] == "keyword" && $def[1] == "!default") {
-					array_pop($value[2]);
-					$value = $this->flattenList($value);
-					$defaultVar = true;
-				}
+			$defaultVar = $value[0] == "list" && $this->stripDefault($value);
+			if (!$defaultVar && isset($value[2]) && is_array($value[2])) {
+				$nestedValue = end($value[2]);
+				$defaultVar = $nestedValue[0] == "list" && $this->stripDefault($value[2][2]);
 			}
+
 			$this->append(array("assign", $name, $value, $defaultVar), $s);
 			return true;
 		} else {
@@ -2811,6 +2808,17 @@ class scss_parser {
 		if ($this->literal(";") ||
 			$this->literal("<!--"))
 		{
+			return true;
+		}
+
+		return false;
+	}
+
+	protected function stripDefault(&$value) {
+		$def = end($value[2]);
+		if ($def[0] == "keyword" && $def[1] == "!default") {
+			array_pop($value[2]);
+			$value = $this->flattenList($value);
 			return true;
 		}
 
