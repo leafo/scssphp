@@ -684,7 +684,7 @@ class scssc {
 		case "mixin_content":
 			$content = $this->get(self::$namespaces["special"] . "content");
 			if (is_null($content)) {
-				$this->throwError("Unexpected @content inside of mixin");
+				$this->throwError("Expected @content inside of mixin");
 			}
 
 			$this->storeEnv = $content->scope;
@@ -1292,30 +1292,42 @@ class scssc {
 	}
 
 	protected function applyArguments($argDef, $argValues) {
+		$hasVariable = false;
 		$args = array();
 		foreach ($argDef as $i => $arg) {
 			list($name, $default, $isVariable) = $argDef[$i];
 			$args[$name] = array($i, $name, $default, $isVariable);
+			$hasVariable |= $isVariable;
 		}
 
 		$keywordArgs = array();
+		$deferredKeywordArgs = array();
 		$remaining = array();
 		// assign the keyword args
 		foreach ((array) $argValues as $arg) {
 			if (!empty($arg[0])) {
 				if (!isset($args[$arg[0][1]])) {
-					$this->throwError("Mixin or function doesn't have an argument named $%s.", $arg[0][1]);
+					if ($hasVariable) {
+						$deferredKeywordArgs[$arg[0][1]] = $arg[1];
+					} else {
+						$this->throwError("Mixin or function doesn't have an argument named $%s.", $arg[0][1]);
+					}
 				} elseif ($args[$arg[0][1]][0] < count($remaining)) {
 					$this->throwError("The argument $%s was passed both by position and by name.", $arg[0][1]);
+				} else {
+					$keywordArgs[$arg[0][1]] = $arg[1];
 				}
-				$keywordArgs[$arg[0][1]] = $arg[1];
 			} elseif (count($keywordArgs)) {
 				$this->throwError('Positional arguments must come before keyword arguments.');
 			} elseif ($arg[2] == true) {
 				$val = $this->reduce($arg[1], true);
 				if ($val[0] == "list") {
-					foreach ($val[2] as $item) {
-						$remaining[] = $item;
+					foreach ($val[2] as $name => $item) {
+						if (!is_numeric($name)) {
+							$keywordArgs[$name] = $item;
+						} else {
+							$remaining[] = $item;
+						}
 					}
 				} else {
 					$remaining[] = $val;
@@ -1331,6 +1343,9 @@ class scssc {
 				$val = array("list", ",", array());
 				for ($count = count($remaining); $i < $count; $i++) {
 					$val[2][] = $remaining[$i];
+				}
+				foreach ($deferredKeywordArgs as $itemName => $item) {
+					$val[2][$itemName] = $item;
 				}
 			} elseif (isset($remaining[$i])) {
 				$val = $remaining[$i];

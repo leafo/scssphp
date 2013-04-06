@@ -44,3 +44,11 @@ div p {
     top: 0; }
     div p .top div {
       color: red; }
+
+#please-wait {
+  background: url(/images/logo.png);
+  position: absolute;
+  top: 1em;
+  right: 0;
+  bottom: 3em;
+  left: 4em; }

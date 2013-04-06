@@ -97,3 +97,20 @@ div {
         color: blue;
     }
 }
+
+@mixin wallpaper($image, $top: 0, $right: 0, $bottom: 0, $left: 0) {
+  background: $image;
+  position: absolute;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}
+
+@mixin logo($offsets...) {
+  @include wallpaper(url(/images/logo.png), $offsets...);
+}
+
+#please-wait {
+  @include logo(1em, $left: 4em, $bottom: 3em);
+}
