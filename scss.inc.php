@@ -1292,10 +1292,12 @@ class scssc {
 	}
 
 	protected function applyArguments($argDef, $argValues) {
+		$hasVariable = false;
 		$args = array();
 		foreach ($argDef as $i => $arg) {
 			list($name, $default, $isVariable) = $argDef[$i];
 			$args[$name] = array($i, $name, $default, $isVariable);
+			$hasVariable |= $isVariable;
 		}
 
 		$keywordArgs = array();
@@ -1305,7 +1307,11 @@ class scssc {
 		foreach ((array) $argValues as $arg) {
 			if (!empty($arg[0])) {
 				if (!isset($args[$arg[0][1]])) {
-					$deferredKeywordArgs[$arg[0][1]] = $arg[1];
+					if ($hasVariable) {
+						$deferredKeywordArgs[$arg[0][1]] = $arg[1];
+					} else {
+						$this->throwError("Mixin or function doesn't have an argument named $%s.", $arg[0][1]);
+					}
 				} elseif ($args[$arg[0][1]][0] < count($remaining)) {
 					$this->throwError("The argument $%s was passed both by position and by name.", $arg[0][1]);
 				} else {
