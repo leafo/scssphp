@@ -691,7 +691,7 @@ class scssc {
 				$this->storeEnv = $content->scope;
 				if(count($content->children) > 0) {
 					foreach ($content->children as $child) {
-						if($child[0] == "include" || $child[0] == "block") {//} && !is_null($content->parent)) {
+						if($child[0] == "include" || $child[0] == "block") {
 							$this->storeEnv = @$content->parent;
 						}
 						$this->compileChild($child, $out);
