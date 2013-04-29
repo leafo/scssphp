@@ -4033,6 +4033,10 @@ class scss_server {
 		}
 	}
 
+	protected function passedEtag(){
+		return (isset($_SERVER["HTTP_IF_NONE_MATCH"])) ? $_SERVER["HTTP_IF_NONE_MATCH"] : null;
+	}	
+
 	protected function findInput() {
 		if ($input = $this->inputName()) {
 			$name = $this->join($this->dir, $input);
@@ -4045,24 +4049,36 @@ class scss_server {
 		return $this->join($this->cacheDir, md5($fname) . ".css");
 	}
 
-	protected function importsCacheName($out) {
-		return $out . ".imports";
+	// Changed from .imports:
+	//	a) to esnure any existing '.imports' files are regenerated to include the etag
+	//	b) to better infer what the file now contains
+	protected function metaCacheName($out) {
+		return $out . ".meta";
 	}
 
-	protected function needsCompile($in, $out) {
+	protected function loadMetaData( $out ){
+		$cache = $this->metaCacheName($out);
+		
+		if (is_readable($cache)) {
+			return unserialize(file_get_contents($cache));
+		}		
+
+		return null;
+	}
+
+	protected function needsCompile($in, $out, $meta) {
 		if (!is_file($out)) return true;
 
 		$mtime = filemtime($out);
 		if (filemtime($in) > $mtime) return true;
 
 		// look for modified imports
-		$icache = $this->importsCacheName($out);
-		if (is_readable($icache)) {
-			$imports = unserialize(file_get_contents($icache));
-			foreach ($imports as $import) {
+		if ( isset($meta['imports'] ) ) {
+			foreach ($meta['imports'] as $import) {
 				if (filemtime($import) > $mtime) return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -4075,10 +4091,13 @@ class scss_server {
 		$t = date("r");
 		$css = "/* compiled by scssphp $v on $t (${elapsed}s) */\n\n" . $css;
 
+		$etag = md5($css);
+
 		file_put_contents($out, $css);
-		file_put_contents($this->importsCacheName($out),
-			serialize($this->scss->getParsedFiles()));
-		return $css;
+		file_put_contents($this->metaCacheName($out), 
+			serialize( array('imports'=>$this->scss->getParsedFiles(),'etag'=>$etag) ) );
+
+		return array('css'=>$css, 'etag'=>$etag);
 	}
 
 	public function serve() {
@@ -4086,15 +4105,29 @@ class scss_server {
 			$output = $this->cacheName($input);
 			header("Content-type: text/css");
 
-			if ($this->needsCompile($input, $output)) {
+			$meta = $this->loadMetaData( $output );
+
+			if ($this->needsCompile($input, $output, $meta)) {
 				try {
-					echo $this->compile($input, $output);
+					$result = $this->compile($input, $output);
+					header("ETag: {$result['etag']}");
+					echo $result['css'];
 				} catch (Exception $e) {
 					header('HTTP/1.1 500 Internal Server Error');
 					echo "Parse error: " . $e->getMessage() . "\n";
 				}
 			} else {
 				header('X-SCSS-Cache: true');
+
+				if( isset($meta['etag']) ){
+					header("ETag: {$meta['etag']}");
+
+					if( $meta['etag'] == $this->passedEtag() ){
+						header('HTTP/1.0 304 Not Modified');
+						return;
+					}
+				}
+
 				echo file_get_contents($output);
 			}
 
