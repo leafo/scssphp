@@ -41,3 +41,14 @@ del {
     color: $something;
 }
 
+$font-family-simple: Arial !default;
+$font-family-spaces: Helvetica Nueue !default;
+$font-family-quotes: "Helvetica Nueue" !default;
+$font-family-commas: Helvetica, Arial, sans-serif !default;
+
+body {
+    font-family: $font-family-simple;
+    font-family: $font-family-spaces;
+    font-family: $font-family-quotes;
+    font-family: $font-family-commas;
+}
