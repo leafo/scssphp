@@ -18,6 +18,7 @@ del {
 
 body {
   font-family: Arial;
-  font-family: Helvetica Nueue;
-  font-family: "Helvetica Nueue";
-  font-family: Helvetica, Arial, sans-serif; }
+  font-family: Helvetica Neue;
+  font-family: "Helvetica Neue";
+  font-family: Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
