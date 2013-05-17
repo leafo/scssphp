@@ -73,3 +73,11 @@ div.mixin-content-with-arg {
   color: orange; }
   div.mixin-content-with-arg div {
     height: 20px; }
+
+#please-wait {
+  background: url(/images/logo.png);
+  position: absolute;
+  top: 1em;
+  right: 0;
+  bottom: 3em;
+  left: 4em; }
