@@ -1007,7 +1007,7 @@ class scssc {
 
 	protected function op_color_color($op, $left, $right) {
 		$out = array('color');
-		for ($i = 1; $i <= 3; $i++ ){
+		foreach (range(1, 3) as $i) {
 			$lval = isset($left[$i]) ? $left[$i] : 0;
 			$rval = isset($right[$i]) ? $right[$i] : 0;
 			switch ($op) {
@@ -1658,7 +1658,7 @@ class scssc {
 
 	// make sure a color's components don't go out of bounds
 	protected function fixColor($c) {
-		for ($i = 1; $i <= 3; $i++) {
+		foreach (range(1, 3) as $i) {
 			if ($c[$i] < 0) $c[$i] = 0;
 			if ($c[$i] > 255) $c[$i] = 255;
 		}
