@@ -44,3 +44,32 @@ div p {
     top: 0; }
     div p .top div {
       color: red; }
+
+div.mixin-content-simple {
+  color: red; }
+
+div.mixin-content-with-arg {
+  background: blue;
+  color: red; }
+
+div.mixin-content-with-arg {
+  background: purple;
+  height: 20px; }
+
+div.mixin-content-simple {
+  height: 43px; }
+
+div.mixin-content-simple {
+  color: orange; }
+  div.mixin-content-simple div {
+    height: 20px; }
+
+div.mixin-content-with-arg {
+  background: purple;
+  height: 43px; }
+
+div.mixin-content-with-arg {
+  background: purple;
+  color: orange; }
+  div.mixin-content-with-arg div {
+    height: 20px; }
