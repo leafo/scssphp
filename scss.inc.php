@@ -687,20 +687,15 @@ class scssc {
 				$this->throwError("Unexpected @content inside of mixin");
 			}
 
-			if(is_object($content)) {
-				$this->storeEnv = $content->scope;
-				if(count($content->children) > 0) {
-					foreach ($content->children as $child) {
-						if($child[0] == "include" || $child[0] == "block") {
-							$this->storeEnv = @$content->parent;
-						}
-						$this->compileChild($child, $out);
-						$this->storeEnv = $content->scope;
-					}
-				}
+			foreach ($content->children as $child) {
+				$this->storeEnv = ($child[0] == 'include' || $child[0] == 'block')
+					? null
+					: $content->scope;
 
-				unset($this->storeEnv);
+				$this->compileChild($child, $out);
 			}
+
+			unset($this->storeEnv);
 			break;
 		case "debug":
 			list(,$value, $pos) = $child;
