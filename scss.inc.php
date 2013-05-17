@@ -158,7 +158,7 @@ class scssc {
 		return $out;
 	}
 
-	protected function matchExtendsSingle($single, &$out_origin) {
+	protected function matchExtendsSingle($single, &$outOrigin) {
 		$counts = array();
 		foreach ($single as $part) {
 			if (!is_string($part)) return false; // hmm
@@ -171,7 +171,7 @@ class scssc {
 			}
 		}
 
-		$out_origin = array();
+		$outOrigin = array();
 		$found = false;
 
 		foreach ($counts as $idx => $count) {
@@ -189,7 +189,7 @@ class scssc {
 				$origin[$j][count($origin[$j]) - 1] = $this->combineSelectorSingle(end($new), $rem);
 			}
 
-			$out_origin = array_merge($out_origin, $origin);
+			$outOrigin = array_merge($outOrigin, $origin);
 
 			$found = true;
 		}
@@ -1976,11 +1976,11 @@ class scssc {
 			$weight = $this->coercePercent($weight);
 		}
 
-		$first_a = isset($first[4]) ? $first[4] : 1;
-		$second_a = isset($second[4]) ? $second[4] : 1;
+		$firstAlpha = isset($first[4]) ? $first[4] : 1;
+		$secondAlpha = isset($second[4]) ? $second[4] : 1;
 
 		$w = $weight * 2 - 1;
-		$a = $first_a - $second_a;
+		$a = $firstAlpha - $secondAlpha;
 
 		$w1 = (($w * $a == -1 ? $w : ($w + $a)/(1 + $w * $a)) + 1) / 2.0;
 		$w2 = 1.0 - $w1;
@@ -1991,8 +1991,8 @@ class scssc {
 			$w1 * $first[3] + $w2 * $second[3],
 		);
 
-		if ($first_a != 1.0 || $second_a != 1.0) {
-			$new[] = $first_a * $weight + $second_a * ($weight - 1);
+		if ($firstAlpha != 1.0 || $secondAlpha != 1.0) {
+			$new[] = $firstAlpha * $weight + $secondAlpha * ($weight - 1);
 		}
 
 		return $this->fixColor($new);
@@ -2695,12 +2695,12 @@ class scss_parser {
 			}
 
 			if ($this->literal("@function") &&
-				$this->keyword($fn_name) &&
+				$this->keyword($fnName) &&
 				$this->argumentDef($args) &&
 				$this->literal("{"))
 			{
 				$func = $this->pushSpecialBlock("function");
-				$func->name = $fn_name;
+				$func->name = $fnName;
 				$func->args = $args;
 				return true;
 			} else {
