@@ -14,3 +14,7 @@
 #percent {
   opacity: 0.5;
   filter: alpha(opacity=50); }
+
+.row {
+  background-color: #071c23;
+  color: #2284a1; }
