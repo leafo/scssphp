@@ -17,3 +17,6 @@ div {
 
 .foo {
   test2: -moz-art; }
+
+div span {
+  height: 3px; }

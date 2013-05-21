@@ -62,3 +62,20 @@ div {
 {   
     test2: stringConcatCompassStyle(-moz,art);
 }
+
+@mixin content_test {
+    span {
+        $color: green;
+        @content;
+    }
+}
+
+@function func_test($c) {
+    @return $c + 1;
+}
+
+div {
+    @include content_test {
+        height: func_test(2px);
+    }
+}
