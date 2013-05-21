@@ -3420,15 +3420,10 @@ class scss_parser {
 		}
 
 		$content = array();
-
-		// look for either ending delim , escape, or string interpolation
-		$patt = '([^\n]*?)(#\{|\\\\|' .
-			$this->preg_quote($delim).')';
-
 		$oldWhite = $this->eatWhiteDefault;
 		$this->eatWhiteDefault = false;
 
-		while ($this->match($patt, $m, false)) {
+		while ($this->matchString($m, $delim)) {
 			$content[] = $m[1];
 			if ($m[2] == "#{") {
 				$this->count -= strlen($m[2]);
@@ -3892,6 +3887,46 @@ class scss_parser {
 	public function getLineNo($pos) {
 		return 1 + substr_count(substr($this->buffer, 0, $pos), "\n");
 	}
+
+	/**
+	 * Match string looking for either ending delim, escape, or string interpolation
+	 *
+	 * {@internal This is a workaround for preg_match's 250K string match limit. }}
+	 *
+	 * @param array $m      Matches (passed by reference)
+	 * @param string $delim Delimeter
+	 *
+	 * @return boolean True if match; false otherwise
+	 */
+        protected function matchString(&$m, $delim) {
+		$token = null;
+
+		$end = strpos($this->buffer, "\n", $this->count);
+		if ($end === false)
+			$end = strlen($this->buffer);
+
+		// look for either ending delim , escape, or string interpolation
+		foreach (array('#{', '\\', $delim) as $lookahead) {
+			$pos = strpos($this->buffer, $lookahead, $this->count);
+			if ($pos !== false && $pos < $end) {
+				$end = $pos;
+				$token = $lookahead;
+			}
+		}
+
+		if (!isset($token))
+			return false;
+
+		$match = substr($this->buffer, $this->count, $end - $this->count);
+		$m = array(
+			$match . $token,
+			$match,
+			$token
+		);
+		$this->count = $end + strlen($token);
+
+		return true;
+        }
 
 	// try to match something on head of buffer
 	protected function match($regex, &$out, $eatWhitespace = null) {
