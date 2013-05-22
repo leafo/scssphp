@@ -1668,8 +1668,10 @@ class scssc {
 		case "keyword":
 			$name = $value[1];
 			if (isset(self::$cssColors[$name])) {
-				list($r, $g, $b) = explode(',', self::$cssColors[$name]);
-				return array('color', (int) $r, (int) $g, (int) $b);
+				@list($r, $g, $b, $a) = explode(',', self::$cssColors[$name]);
+				return isset($a)
+					? array('color', (int) $r, (int) $g, (int) $b, (int) $a)
+					: array('color', (int) $r, (int) $g, (int) $b);
 			}
 			return null;
 		}
@@ -1930,19 +1932,19 @@ class scssc {
 
 	protected static $lib_red = array("color");
 	protected function lib_red($args) {
-		list($color) = $args;
+		$color = $this->coerceColor($args[0]);
 		return $color[1];
 	}
 
 	protected static $lib_green = array("color");
 	protected function lib_green($args) {
-		list($color) = $args;
+		$color = $this->coerceColor($args[0]);
 		return $color[2];
 	}
 
 	protected static $lib_blue = array("color");
 	protected function lib_blue($args) {
-		list($color) = $args;
+		$color = $this->coerceColor($args[0]);
 		return $color[3];
 	}
 
@@ -2496,6 +2498,7 @@ class scssc {
 		'teal' => '0,128,128',
 		'thistle' => '216,191,216',
 		'tomato' => '255,99,71',
+		'transparent' => '0,0,0,0',
 		'turquoise' => '64,224,208',
 		'violet' => '238,130,238',
 		'wheat' => '245,222,179',
@@ -3325,7 +3328,7 @@ class scss_parser {
 			$args[] = array("string", "", array(", "));
 		}
 
-		if (!$this->literal(")")) {
+		if (!$this->literal(")") || !count($args)) {
 			$this->seek($s);
 			return false;
 		}
@@ -3893,7 +3896,7 @@ class scss_parser {
 	 *
 	 * {@internal This is a workaround for preg_match's 250K string match limit. }}
 	 *
-	 * @param array $m      Matches (passed by reference)
+	 * @param array  $m     Matches (passed by reference)
 	 * @param string $delim Delimeter
 	 *
 	 * @return boolean True if match; false otherwise
