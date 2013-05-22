@@ -378,10 +378,10 @@ class scssc {
 	 *
 	 * Compiling the block involves pushing a fresh environment on the stack,
 	 * and iterating through the props, compiling each one.
-         *
-         * @see scss::compileChild()
-         *
-         * @param \StdClass $block
+	 *
+	 * @see scss::compileChild()
+	 *
+	 * @param \StdClass $block
 	 */
 	protected function compileBlock($block) {
 		$env = $this->pushEnv($block);
@@ -3898,14 +3898,15 @@ class scss_parser {
 	 *
 	 * @return boolean True if match; false otherwise
 	 */
-        protected function matchString(&$m, $delim) {
+	protected function matchString(&$m, $delim) {
 		$token = null;
 
 		$end = strpos($this->buffer, "\n", $this->count);
-		if ($end === false)
+		if ($end === false) {
 			$end = strlen($this->buffer);
+		}
 
-		// look for either ending delim , escape, or string interpolation
+		// look for either ending delim, escape, or string interpolation
 		foreach (array('#{', '\\', $delim) as $lookahead) {
 			$pos = strpos($this->buffer, $lookahead, $this->count);
 			if ($pos !== false && $pos < $end) {
@@ -3914,8 +3915,9 @@ class scss_parser {
 			}
 		}
 
-		if (!isset($token))
+		if (!isset($token)) {
 			return false;
+		}
 
 		$match = substr($this->buffer, $this->count, $end - $this->count);
 		$m = array(
@@ -3926,7 +3928,7 @@ class scss_parser {
 		$this->count = $end + strlen($token);
 
 		return true;
-        }
+	}
 
 	// try to match something on head of buffer
 	protected function match($regex, &$out, $eatWhitespace = null) {
