@@ -1,4 +1,3 @@
-
 **scssphp** is a compiler for [SCSS][0] written in PHP.
 
 SCSS is a CSS preprocessor that adds many features like variables, mixins,
@@ -111,7 +110,7 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
   * Fix some issues with `@extends` (Anthon Pang)
   * Enhanced handling of `null` (Anthon Pang)
   * Helper functions shouldn't mix with css builtins (Anthon Pang)
-  * Enhace selector parsing (Guilherme Blanco, Anthon Pang)
+  * Enhance selector parsing (Guilherme Blanco, Anthon Pang)
   * Add Placeholder selector support (Martin Hasoň)
   * Add variable argument support (Martin Hasoň)
   * Add zip, index, comparable functions (Martin Hasoň)
