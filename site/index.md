@@ -7,7 +7,7 @@ The entire compiler comes in a single class file ready for including in any
 kind of project in addition to a command line tool for running the compiler
 from the terminal.
 
-**scssphp** implements SCSS (3.2.7). It does not implement the SASS syntax,
+**scssphp** implements SCSS (3.2.9). It does not implement the SASS syntax,
 only the SCSS syntax.
 
 Follow the author on twitter: [@moonscript](http://twitter.com/moonscript).
@@ -104,10 +104,7 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <a name="changelog"></a>
 ## Changelog
 
-* **0.0.7**
-  * Forgot to bump the version number.  Re-tagged as v0.0.7.
-
-* **0.0.6**
+* **0.0.7** -- May 24, 2013
   * Port various fixes from leafo/lessphp.
   * Improve filter precision.
   * Parsing large image data-urls does not work.
@@ -118,7 +115,6 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
   * Fix mixin content includes (James Shannon, Christian Brandt).
   * Fix passing of varargs to another mixin.
   * Fix interpolation bug in expToString() (Matti Jarvinen).
-
 * **0.0.5** -- March 11, 2013
   * Better compile time errors
   * Fix top level properties inside of a nested `@media` (Anthon Pang)
@@ -130,20 +126,25 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
   * Add variable argument support (Martin Hasoň)
   * Add zip, index, comparable functions (Martin Hasoň)
   * A bunch of parser and bug fixes
-* **0.0.4** -- [Import path can be a function](docs/#import_paths) (Christian
-  Lück). Correctly parse media queries with more than one item (Christian
-  Lück). Add `ie_hex_str`, `abs`, `min`, `max` functions (Martin Hasoň), ignore
-  expressions inside of `calc()` (Martin Hasoň), Improve operator evaluation
-  (Martin Hasoň), Add
-  [`@content`](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixin-content)
-  support. Misc bug fixes. (Nov 3nd, 2012)
-* **0.0.3** -- Add missing and/or/not operators. Expression evaluation happens
-  correctly. Import file caching and _partial filename support. Misc bug fixes.
-  (August 2nd, 2012)
-* **0.0.2** -- SCSS server is aware of imports, added custom function
-  interface, compressed formatter, <a
-  href="http://leafo.net/scssphp/docs/">documentation</a> (July 30th, 2012)
-* Initial Release v0.0.1 (July 29th, 2012)
+* **0.0.4** -- Nov 3nd, 2012
+  * [Import path can be a function](docs/#import_paths) (Christian Lück).
+  * Correctly parse media queries with more than one item (Christian Lück).
+  * Add `ie_hex_str`, `abs`, `min`, `max` functions (Martin Hasoň)
+  * Ignore expressions inside of `calc()` (Martin Hasoň)
+  * Improve operator evaluation (Martin Hasoň)
+  * Add [`@content`](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixin-content) support.
+  * Misc bug fixes.
+* **0.0.3** -- August 2nd, 2012
+  * Add missing and/or/not operators.
+  * Expression evaluation happens correctly.
+  * Import file caching and _partial filename support.
+  * Misc bug fixes.
+* **0.0.2** -- July 30th, 2012
+  * SCSS server is aware of imports
+  * added custom function interface
+  * compressed formatter
+  * wrote <a href="http://leafo.net/scssphp/docs/">documentation</a>
+* Initial Release v0.0.1 -- July 29th, 2012
 
 <a name="comments"></a>
 ## Comments
