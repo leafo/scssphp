@@ -2357,6 +2357,11 @@ class scssc {
 		throw new Exception($msg);
 	}
 
+	/**
+	 * CSS Colors
+	 *
+	 * @see http://www.w3.org/TR/css3-color
+	 */
 	static protected $cssColors = array(
 		'aliceblue' => '240,248,255',
 		'antiquewhite' => '250,235,215',
