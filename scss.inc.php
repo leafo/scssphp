@@ -1000,6 +1000,7 @@ class scssc {
 	}
 
 	protected function op_add_number_number($left, $right) {
+		list($left, $right) = $this->getNormalizedNumbers(array($left, $right));
 		return array("number", $left[1] + $right[1], $left[2]);
 	}
 
@@ -1008,6 +1009,7 @@ class scssc {
 	}
 
 	protected function op_sub_number_number($left, $right) {
+		list($left, $right) = $this->getNormalizedNumbers(array($left, $right));
 		return array("number", $left[1] - $right[1], $left[2]);
 	}
 
@@ -1116,18 +1118,22 @@ class scssc {
 	}
 
 	protected function op_gte_number_number($left, $right) {
+		list($left, $right) = $this->getNormalizedNumbers(array($left, $right));
 		return $this->toBool($left[1] >= $right[1]);
 	}
 
 	protected function op_gt_number_number($left, $right) {
+		list($left, $right) = $this->getNormalizedNumbers(array($left, $right));
 		return $this->toBool($left[1] > $right[1]);
 	}
 
 	protected function op_lte_number_number($left, $right) {
+		list($left, $right) = $this->getNormalizedNumbers(array($left, $right));
 		return $this->toBool($left[1] <= $right[1]);
 	}
 
 	protected function op_lt_number_number($left, $right) {
+		list($left, $right) = $this->getNormalizedNumbers(array($left, $right));
 		return $this->toBool($left[1] < $right[1]);
 	}
 
@@ -1414,7 +1420,7 @@ class scssc {
 			} elseif (!empty($default)) {
 				$val = $default;
 			} else {
-				$this->throwError("Missing argument $$name");
+				$this->throwError("Missing argument $name");
 			}
 
 			$this->set($name, $this->reduce($val, true), true);
@@ -2188,8 +2194,8 @@ class scssc {
 		$numbers = $this->getNormalizedNumbers($args);
 		$min = null;
 		foreach ($numbers as $key => $number) {
-			if (null === $min || $number <= $min[1]) {
-				$min = array($key, $number);
+			if (null === $min || $number[1] <= $min[1]) {
+				$min = array($key, $number[1]);
 			}
 		}
 
@@ -2200,8 +2206,8 @@ class scssc {
 		$numbers = $this->getNormalizedNumbers($args);
 		$max = null;
 		foreach ($numbers as $key => $number) {
-			if (null === $max || $number >= $max[1]) {
-				$max = array($key, $number);
+			if (null === $max || $number[1] >= $max[1]) {
+				$max = array($key, $number[1]);
 			}
 		}
 
@@ -2220,12 +2226,12 @@ class scssc {
 
 			if (null === $unit) {
 				$unit = $number[2];
+				$originalUnit = $item[2];
 			} elseif ($unit !== $number[2]) {
 				$this->throwError('Incompatible units: "%s" and "%s".', $originalUnit, $item[2]);
 			}
 
-			$originalUnit = $item[2];
-			$numbers[$key] = $number[1];
+			$numbers[$key] = $number;
 		}
 
 		return $numbers;
