@@ -43,7 +43,7 @@
  * @author Leaf Corcoran <leafot@gmail.com>
  */
 class scssc {
-	static public $VERSION = "v0.0.5";
+	static public $VERSION = "v0.0.7";
 
 	static protected $operatorNames = array(
 		'+' => "add",
@@ -4174,36 +4174,80 @@ class scss_formatter_compressed extends scss_formatter {
  * @author Leaf Corcoran <leafot@gmail.com>
  */
 class scss_server {
-
+	/**
+	 * Join path components
+	 *
+	 * @param string $left  Path component, left of the directory separator
+	 * @param string $right Path component, right of the directory separator
+	 *
+	 * @return string
+	 */
 	protected function join($left, $right) {
-		return rtrim($left, "/") . "/" . ltrim($right, "/");
+		return rtrim($left, '/\\') . DIRECTORY_SEPARATOR . ltrim($right, '/\\');
 	}
 
+	/**
+	 * Get name of requested .scss file
+	 *
+	 * @return string|null
+	 */
 	protected function inputName() {
-		if (isset($_GET["p"])) return $_GET["p"];
-
-		if (isset($_SERVER["PATH_INFO"])) return $_SERVER["PATH_INFO"];
-		if (isset($_SERVER["DOCUMENT_URI"])) {
-			return substr($_SERVER["DOCUMENT_URI"], strlen($_SERVER["SCRIPT_NAME"]));
+		switch (true) {
+			case isset($_GET['p']):
+				return $_GET['p'];
+			case isset($_SERVER['PATH_INFO']):
+				return $_SERVER['PATH_INFO'];
+			case isset($_SERVER['DOCUMENT_URI']):
+				return substr($_SERVER['DOCUMENT_URI'], strlen($_SERVER['SCRIPT_NAME']));
 		}
 	}
 
+	/**
+	 * Get path to requested .scss file
+	 *
+	 * @return string
+	 */
 	protected function findInput() {
-		if ($input = $this->inputName()) {
+		if ($input = $this->inputName()
+			&& strpos($input, '..') === false
+			&& substr($input, -5) === '.scss'
+		) {
 			$name = $this->join($this->dir, $input);
-			if (is_readable($name)) return $name;
+
+			if (is_file($name) && is_readable($name)) {
+				return $name;
+			}
 		}
+
 		return false;
 	}
 
+	/**
+	 * Get path to cached .css file
+	 *
+	 * @return string
+	 */
 	protected function cacheName($fname) {
-		return $this->join($this->cacheDir, md5($fname) . ".css");
+		return $this->join($this->cacheDir, md5($fname) . '.css');
 	}
 
+	/**
+	 * Get path to cached imports
+	 *
+	 * @return string
+	 */
 	protected function importsCacheName($out) {
-		return $out . ".imports";
+		return $out . '.imports';
 	}
 
+	/**
+	 * Determine whether .scss file needs to be re-compiled.
+	 *
+	 * @param string $in  Input path
+	 * @param string $out Output path
+	 *
+	 * @return boolean True if compile required.
+	 */
 	protected function needsCompile($in, $out) {
 		if (!is_file($out)) return true;
 
@@ -4221,13 +4265,21 @@ class scss_server {
 		return false;
 	}
 
+	/**
+	 * Compile .scss file
+	 *
+	 * @param string $in  Input path (.scss)
+	 * @param string $out Output path (.css)
+	 *
+	 * @return string
+	 */
 	protected function compile($in, $out) {
 		$start = microtime(true);
 		$css = $this->scss->compile(file_get_contents($in), $in);
 		$elapsed = round((microtime(true) - $start), 4);
 
 		$v = scssc::$VERSION;
-		$t = date("r");
+		$t = date('r');
 		$css = "/* compiled by scssphp $v on $t (${elapsed}s) */\n\n" . $css;
 
 		file_put_contents($out, $css);
@@ -4236,17 +4288,20 @@ class scss_server {
 		return $css;
 	}
 
+	/**
+	 * Compile requested scss and serve css.  Outputs HTTP response.
+	 */
 	public function serve() {
 		if ($input = $this->findInput()) {
 			$output = $this->cacheName($input);
-			header("Content-type: text/css");
+			header('Content-type: text/css');
 
 			if ($this->needsCompile($input, $output)) {
 				try {
 					echo $this->compile($input, $output);
 				} catch (Exception $e) {
 					header('HTTP/1.1 500 Internal Server Error');
-					echo "Parse error: " . $e->getMessage() . "\n";
+					echo 'Parse error: ' . $e->getMessage() . "\n";
 				}
 			} else {
 				header('X-SCSS-Cache: true');
@@ -4257,16 +4312,23 @@ class scss_server {
 		}
 
 		header('HTTP/1.0 404 Not Found');
-		header("Content-type: text");
+		header('Content-type: text');
 		$v = scssc::$VERSION;
 		echo "/* INPUT NOT FOUND scss $v */\n";
 	}
 
+	/**
+	 * Constructor
+	 *
+	 * @param string      $dir      Root directory to .scss files
+	 * @param string      $cacheDir Cache directory
+	 * @param \scssc|null $scss     SCSS compiler instance
+	 */
 	public function __construct($dir, $cacheDir=null, $scss=null) {
 		$this->dir = $dir;
 
 		if (is_null($cacheDir)) {
-			$cacheDir = $this->join($dir, "scss_cache");
+			$cacheDir = $this->join($dir, 'scss_cache');
 		}
 
 		$this->cacheDir = $cacheDir;
@@ -4279,6 +4341,11 @@ class scss_server {
 		$this->scss = $scss;
 	}
 
+	/**
+	 * Helper method to serve compiled scss
+	 *
+	 * @param string $path Root path
+	 */
 	static public function serveFrom($path) {
 		$server = new self($path);
 		$server->serve();

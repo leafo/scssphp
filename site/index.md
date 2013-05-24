@@ -104,6 +104,21 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <a name="changelog"></a>
 ## Changelog
 
+* **0.0.7**
+  * Forgot to bump the version number.  Re-tagged as v0.0.7.
+
+* **0.0.6**
+  * Port various fixes from leafo/lessphp.
+  * Improve filter precision.
+  * Parsing large image data-urls does not work.
+  * Add == and != ops for colors.
+  * @if and @while directives should treat null like false.
+  * Add pscss as bin in composer.json (Christian Lück).
+  * Fix !default bug (James Shannon, Alberto Aldegheri). 
+  * Fix mixin content includes (James Shannon, Christian Brandt).
+  * Fix passing of varargs to another mixin.
+  * Fix interpolation bug in expToString() (Matti Jarvinen).
+
 * **0.0.5** -- March 11, 2013
   * Better compile time errors
   * Fix top level properties inside of a nested `@media` (Anthon Pang)
