@@ -101,7 +101,7 @@ For a more detailed guide consult <a href="$root/docs/">http://leafo.net/scssphp
 
 Find any issues? I'd love to fix them for you, post about them on [the issues tracker][3].
 
-<a name="changelog"></a>
+<div id="changelog"></div>
 ## Changelog
 
 * **0.0.7** -- May 24, 2013
@@ -145,6 +145,21 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
   * compressed formatter
   * wrote <a href="http://leafo.net/scssphp/docs/">documentation</a>
 * Initial Release v0.0.1 -- July 29th, 2012
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+(function() {
+  var changelog = jQuery("#changelog").nextAll("ul:first");
+  var hidden = changelog.children("li").slice(1).hide();
+  if (hidden.length) {
+    var show_all = jQuery("<a href=''>Show All</a>").insertAfter(changelog).on("click", function() {
+      hidden.show();
+      show_all.remove();
+      return false;
+    });
+  }
+})();
+</script>
 
 <a name="comments"></a>
 ## Comments
