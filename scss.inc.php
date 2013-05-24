@@ -1118,18 +1118,22 @@ class scssc {
 	}
 
 	protected function op_gte_number_number($left, $right) {
+		list($left, $right) = $this->getNormalizedNumbers(array($left, $right));
 		return $this->toBool($left[1] >= $right[1]);
 	}
 
 	protected function op_gt_number_number($left, $right) {
+		list($left, $right) = $this->getNormalizedNumbers(array($left, $right));
 		return $this->toBool($left[1] > $right[1]);
 	}
 
 	protected function op_lte_number_number($left, $right) {
+		list($left, $right) = $this->getNormalizedNumbers(array($left, $right));
 		return $this->toBool($left[1] <= $right[1]);
 	}
 
 	protected function op_lt_number_number($left, $right) {
+		list($left, $right) = $this->getNormalizedNumbers(array($left, $right));
 		return $this->toBool($left[1] < $right[1]);
 	}
 

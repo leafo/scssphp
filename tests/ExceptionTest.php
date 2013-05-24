@@ -83,6 +83,14 @@ END_OF_SCSS
 ,
 				'Incompatible units'
 			),
+			array(<<<END_OF_SCSS
+@if 13px < 2em {
+  .test { color: red; }
+}
+END_OF_SCSS
+,
+				'Incompatible units'
+			),
 		);
 	}
 
