@@ -32,6 +32,26 @@ class ExceptionTest extends PHPUnit_Framework_TestCase {
 		return array(
 			array(<<<END_OF_SCSS
 .test {
+  foo : bar;
+END_OF_SCSS
+,
+				'unclosed block'
+			),
+			array(<<<END_OF_SCSS
+.test {
+}}
+END_OF_SCSS
+,
+				'unexpected }'
+			),
+			array(<<<END_OF_SCSS
+.test { color: #fff / 0; }
+END_OF_SCSS
+,
+				'color: Can\'t divide by zero'
+			),
+			array(<<<END_OF_SCSS
+.test {
   @include foo();
 }
 END_OF_SCSS
@@ -56,6 +76,20 @@ div {
 END_OF_SCSS
 ,
 				'expecting color'
+			),
+			array(<<<END_OF_SCSS
+.test { error: 4% + 5px; }
+END_OF_SCSS
+,
+				'Incompatible units'
+			),
+			array(<<<END_OF_SCSS
+@if 13px < 2em {
+  .test { color: red; }
+}
+END_OF_SCSS
+,
+				'Incompatible units'
 			),
 		);
 	}
