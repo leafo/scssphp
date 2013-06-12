@@ -155,4 +155,17 @@
     color: if(10px, yes, no);
 }
 
+.transparent {
+  r: red(transparent);
+  g: green(transparent);
+  b: blue(transparent);
+  a: alpha(transparent);
+}
 
+.alpha {
+  a: alpha(black);
+  a: alpha(#fff);
+  a: alpha(rgb(0, 0, 0));
+  a: alpha(rgba(0, 0, 0, 0.5));
+  a: alpha(currentColor);
+}
