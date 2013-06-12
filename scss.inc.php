@@ -2250,7 +2250,6 @@ class scssc {
 		return isset($list[2][$n]) ? $list[2][$n] : self::$defaultValue;
 	}
 
-
 	protected function listSeparatorForJoin($list1, $sep) {
 		if (is_null($sep)) return $list1[1];
 		switch ($this->compileValue($sep)) {
@@ -2347,6 +2346,16 @@ class scssc {
 		$number2 = $this->normalizeNumber($number2);
 
 		return $number1[2] == $number2[2] || $number1[2] == "" || $number2[2] == "";
+	}
+
+	/**
+	 * Workaround IE7's content counter bug.
+	 *
+	 * @param array $args
+	 */
+	protected function lib_counter($args) {
+		$list = array_map(array($this, 'compileValue'), $args);
+		return array('string', '', array('counter(' . implode(',', $list) . ')'));
 	}
 
 	protected function throwError($msg = null) {
