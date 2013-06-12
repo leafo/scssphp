@@ -4233,7 +4233,7 @@ class scss_server {
 	 *
 	 * @return string
 	 */
-	protected function cacheName($fname) {
+	public function cacheName($fname) {
 		return $this->join($this->cacheDir, md5($fname) . '.css');
 	}
 
@@ -4254,7 +4254,7 @@ class scss_server {
 	 *
 	 * @return boolean True if compile required.
 	 */
-	protected function needsCompile($in, $out) {
+	public function needsCompile($in, $out) {
 		if (!is_file($out)) return true;
 
 		$mtime = filemtime($out);
@@ -4279,7 +4279,7 @@ class scss_server {
 	 *
 	 * @return string
 	 */
-	protected function compile($in, $out) {
+	public function compile($in, $out) {
 		$start = microtime(true);
 		$css = $this->scss->compile(file_get_contents($in), $in);
 		$elapsed = round((microtime(true) - $start), 4);
