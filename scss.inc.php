@@ -1533,7 +1533,7 @@ class scssc {
 	}
 
 	// results the file path for an import url if it exists
-	protected function findImport($url) {
+	public function findImport($url) {
 		$urls = array();
 
 		// for "normal" scss imports (ignore vanilla css and external requests)
