@@ -4225,7 +4225,7 @@ class scss_server {
 	 * @return string
 	 */
 	protected function findInput() {
-		if ($input = $this->inputName()
+		if (($input = $this->inputName())
 			&& strpos($input, '..') === false
 			&& substr($input, -5) === '.scss'
 		) {
