@@ -74,6 +74,9 @@ wassup {
 #something, .x, .y {
   color: red; }
 
+.nav-justified, .nav-tabs.nav-justified {
+  text-align: justify; }
+
 .btn:hover, .edit .actions button:hover, .edit .new .actions button:hover, .btn:active, .edit .actions button:active, .edit .new .actions button:active, .btn.active, .edit .actions button.active, .edit .new .actions button.active, .btn.disabled, .edit .actions button.disabled, .edit .new .actions button.disabled, .btn[disabled], .edit .actions button[disabled], .edit .new .actions button[disabled] {
   color: red; }
 
