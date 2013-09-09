@@ -4349,7 +4349,7 @@ class scss_server {
 		}
 
 		$this->cacheDir = $cacheDir;
-		if (!is_dir($this->cacheDir)) mkdir($this->cacheDir);
+		if (!is_dir($this->cacheDir)) mkdir($this->cacheDir, 0755, true);
 
 		if (is_null($scss)) {
 			$scss = new scssc();
