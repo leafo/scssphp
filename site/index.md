@@ -7,7 +7,7 @@ The entire compiler comes in a single class file ready for including in any
 kind of project in addition to a command line tool for running the compiler
 from the terminal.
 
-**scssphp** implements SCSS (3.2.9). It does not implement the SASS syntax,
+**scssphp** implements SCSS (3.2.10). It does not implement the SASS syntax,
 only the SCSS syntax.
 
 Follow the author on twitter: [@moonscript](http://twitter.com/moonscript).
@@ -104,6 +104,11 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.0.8** -- September 16, 2013
+  * Avoid IE7 content: counter bug
+  * Support transparent as color name
+  * Recursively create cache dir (turksheadsw)
+  * Fix for INPUT NOT FOUND (morgen32)
 * **0.0.7** -- May 24, 2013
   * Port various fixes from leafo/lessphp.
   * Improve filter precision.

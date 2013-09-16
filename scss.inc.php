@@ -43,7 +43,7 @@
  * @author Leaf Corcoran <leafot@gmail.com>
  */
 class scssc {
-	static public $VERSION = "v0.0.7";
+	static public $VERSION = "v0.0.8";
 
 	static protected $operatorNames = array(
 		'+' => "add",
