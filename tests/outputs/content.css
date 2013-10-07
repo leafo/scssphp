@@ -15,3 +15,15 @@
   @media only screen and (max-width: 480px) {
   #sidebar {
     width: 100px; } }
+
+@media only screen and (min-width: 40em) {
+  .grid-1 {
+    width: 100%; }
+    .grid-2 {
+      width: 100%; } }
+
+@media only screen and (min-width: 40em) {
+  .grid-1 {
+    width: 100%; }
+    .grid-2 {
+      width: 100%; } }
