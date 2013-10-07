@@ -732,7 +732,7 @@ class scssc {
 				$this->throwError("Expected @content inside of mixin");
 			}
 
-			$strongTypes = array('include', 'block', 'for');
+			$strongTypes = array('include', 'block', 'for', 'while');
 			foreach ($content->children as $child) {
 				$this->storeEnv = (in_array($child[0], $strongTypes))
 					? null
