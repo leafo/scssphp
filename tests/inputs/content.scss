@@ -42,4 +42,12 @@ $color: white;
 }
 
 
+@mixin respond-to($width) {
+  @media only screen and (min-width: $width) { @content; }
+}
 
+@include respond-to(40em) {
+  @for $i from 1 through 2 {
+    .grid-#{$i} { width: 100%; }
+  }
+}
