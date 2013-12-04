@@ -1460,12 +1460,13 @@ class scssc {
 		} elseif (!is_null($env->parent)) {
 			$this->setExisting($name, $value, $env->parent);
 		} else {
-			$this->env->store[$name] = $value;
+			$env->store[$name] = $value;
 		}
 	}
 
 	protected function setRaw($name, $value) {
-		$this->env->store[$name] = $value;
+		$env = $this->getStoreEnv();
+		$env->store[$name] = $value;
 	}
 
 	protected function get($name, $defaultValue = null, $env = null) {
