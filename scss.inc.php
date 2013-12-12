@@ -584,7 +584,7 @@ class scssc {
 
 				if ($isDefault) {
 					$existingValue = $this->get($name[1], true);
-					$shouldSet = $existingValue === true || $existingValue == self::$null;
+					$shouldSet = $existingValue === true || $existingValue == static::$null;
 				}
 
 				if (!$isDefault || $shouldSet) {
@@ -613,7 +613,7 @@ class scssc {
 		case "mixin":
 		case "function":
 			list(,$block) = $child;
-			$this->set(self::$namespaces[$block->type] . $block->name, $block);
+			$this->set(static::$namespaces[$block->type] . $block->name, $block);
 			break;
 		case "extend":
 			list(, $selectors) = $child;
@@ -697,7 +697,7 @@ class scssc {
 			break;
 		case "include": // including a mixin
 			list(,$name, $argValues, $content) = $child;
-			$mixin = $this->get(self::$namespaces["mixin"] . $name, false);
+			$mixin = $this->get(static::$namespaces["mixin"] . $name, false);
 			if (!$mixin) {
 				$this->throwError("Undefined mixin $name");
 			}
@@ -712,7 +712,7 @@ class scssc {
 
 			if (!is_null($content)) {
 				$content->scope = $callingScope;
-				$this->setRaw(self::$namespaces["special"] . "content", $content);
+				$this->setRaw(static::$namespaces["special"] . "content", $content);
 			}
 
 			if (!is_null($mixin->args)) {
@@ -727,7 +727,7 @@ class scssc {
 
 			break;
 		case "mixin_content":
-			$content = $this->get(self::$namespaces["special"] . "content");
+			$content = $this->get(static::$namespaces["special"] . "content");
 			if (is_null($content)) {
 				$this->throwError("Expected @content inside of mixin");
 			}
@@ -765,7 +765,7 @@ class scssc {
 	}
 
 	protected function isTruthy($value) {
-		return $value != self::$false && $value != self::$null;
+		return $value != static::$false && $value != static::$null;
 	}
 
 	// should $value cause its operand to eval
@@ -787,7 +787,7 @@ class scssc {
 		switch ($type) {
 			case "exp":
 				list(, $op, $left, $right, $inParens) = $value;
-				$opName = isset(self::$operatorNames[$op]) ? self::$operatorNames[$op] : $op;
+				$opName = isset(static::$operatorNames[$op]) ? static::$operatorNames[$op] : $op;
 
 				$inExp = $inExp || $this->shouldEval($left) || $this->shouldEval($right);
 
@@ -888,10 +888,10 @@ class scssc {
 
 				if ($op == "not") {
 					if ($inExp || $inParens) {
-						if ($exp == self::$false) {
-							return self::$true;
+						if ($exp == static::$false) {
+							return static::$true;
 						} else {
-							return self::$false;
+							return static::$false;
 						}
 					} else {
 						$op = $op . " ";
@@ -921,7 +921,7 @@ class scssc {
 				list(,$name, $argValues) = $value;
 
 				// user defined function?
-				$func = $this->get(self::$namespaces["function"] . $name, false);
+				$func = $this->get(static::$namespaces["function"] . $name, false);
 				if ($func) {
 					$this->pushEnv();
 
@@ -938,7 +938,7 @@ class scssc {
 					$ret = $this->compileChildren($func->children, $tmp);
 					$this->popEnv();
 
-					return is_null($ret) ? self::$defaultValue : $ret;
+					return is_null($ret) ? static::$defaultValue : $ret;
 				}
 
 				// built in function
@@ -983,8 +983,8 @@ class scssc {
 	// just does physical lengths for now
 	protected function normalizeNumber($number) {
 		list(, $value, $unit) = $number;
-		if (isset(self::$unitTable["in"][$unit])) {
-			$conv = self::$unitTable["in"][$unit];
+		if (isset(static::$unitTable["in"][$unit])) {
+			$conv = static::$unitTable["in"][$unit];
 			return array("number", $value / $conv, "in");
 		}
 		return $number;
@@ -993,8 +993,8 @@ class scssc {
 	// $number should be normalized
 	protected function coerceUnit($number, $unit) {
 		list(, $value, $baseUnit) = $number;
-		if (isset(self::$unitTable[$baseUnit][$unit])) {
-			$value = $value * self::$unitTable[$baseUnit][$unit];
+		if (isset(static::$unitTable[$baseUnit][$unit])) {
+			$value = $value * static::$unitTable[$baseUnit][$unit];
 		}
 
 		return array("number", $value, $unit);
@@ -1041,13 +1041,13 @@ class scssc {
 
 	protected function op_and($left, $right, $shouldEval) {
 		if (!$shouldEval) return;
-		if ($left != self::$false) return $right;
+		if ($left != static::$false) return $right;
 		return $left;
 	}
 
 	protected function op_or($left, $right, $shouldEval) {
 		if (!$shouldEval) return;
-		if ($left != self::$false) return $left;
+		if ($left != static::$false) return $left;
 		return $right;
 	}
 
@@ -1133,7 +1133,7 @@ class scssc {
 	}
 
 	protected function toBool($thing) {
-		return $thing ? self::$true : self::$false;
+		return $thing ? static::$true : static::$false;
 	}
 
 	/**
@@ -1180,7 +1180,7 @@ class scssc {
 
 			return $h;
 		case "number":
-			return round($value[1], self::$numberPrecision) . $value[2];
+			return round($value[1], static::$numberPrecision) . $value[2];
 		case "string":
 			return $value[1] . $this->compileStringContent($value) . $value[1];
 		case "function":
@@ -1291,7 +1291,7 @@ class scssc {
 		foreach ($child as $part) {
 			$newPart = array();
 			foreach ($part as $p) {
-				if ($p == self::$selfSelector) {
+				if ($p == static::$selfSelector) {
 					$setSelf = true;
 					foreach ($parent as $i => $parentPart) {
 						if ($i > 0) {
@@ -1472,7 +1472,7 @@ class scssc {
 		$name = $this->normalizeName($name);
 
 		if (is_null($env)) $env = $this->getStoreEnv();
-		if (is_null($defaultValue)) $defaultValue = self::$defaultValue;
+		if (is_null($defaultValue)) $defaultValue = static::$defaultValue;
 
 		if (isset($env->store[$name])) {
 			return $env->store[$name];
@@ -1602,7 +1602,7 @@ class scssc {
 			if (is_numeric($returnValue)) {
 				$returnValue = array('number', $returnValue, "");
 			} elseif (is_bool($returnValue)) {
-				$returnValue = $returnValue ? self::$true : self::$false;
+				$returnValue = $returnValue ? static::$true : static::$false;
 			} elseif (!is_array($returnValue)) {
 				$returnValue = array('keyword', $returnValue);
 			}
@@ -1668,8 +1668,8 @@ class scssc {
 		case "color": return $value;
 		case "keyword":
 			$name = $value[1];
-			if (isset(self::$cssColors[$name])) {
-				@list($r, $g, $b, $a) = explode(',', self::$cssColors[$name]);
+			if (isset(static::$cssColors[$name])) {
+				@list($r, $g, $b, $a) = explode(',', static::$cssColors[$name]);
 				return isset($a)
 					? array('color', (int) $r, (int) $g, (int) $b, (int) $a)
 					: array('color', (int) $r, (int) $g, (int) $b);
@@ -1800,7 +1800,7 @@ class scssc {
 	protected static $lib_if = array("condition", "if-true", "if-false");
 	protected function lib_if($args) {
 		list($cond,$t, $f) = $args;
-		if ($cond == self::$false) return $f;
+		if ($cond == static::$false) return $f;
 		return $t;
 	}
 
@@ -2244,7 +2244,7 @@ class scssc {
 	protected function lib_nth($args) {
 		$list = $this->coerceList($args[0]);
 		$n = $this->assertNumber($args[1]) - 1;
-		return isset($list[2][$n]) ? $list[2][$n] : self::$defaultValue;
+		return isset($list[2][$n]) ? $list[2][$n] : static::$defaultValue;
 	}
 
 	protected function listSeparatorForJoin($list1, $sep) {
@@ -2303,7 +2303,7 @@ class scssc {
 		$value = $args[0];
 		switch ($value[0]) {
 		case "keyword":
-			if ($value == self::$true || $value == self::$false) {
+			if ($value == static::$true || $value == static::$false) {
 				return "bool";
 			}
 
@@ -2564,14 +2564,14 @@ class scss_parser {
 		$this->sourceName = $sourceName;
 		$this->rootParser = $rootParser;
 
-		if (empty(self::$operatorStr)) {
-			self::$operatorStr = $this->makeOperatorStr(self::$operators);
+		if (empty(static::$operatorStr)) {
+			static::$operatorStr = $this->makeOperatorStr(static::$operators);
 
-			$commentSingle = $this->preg_quote(self::$commentSingle);
-			$commentMultiLeft = $this->preg_quote(self::$commentMultiLeft);
-			$commentMultiRight = $this->preg_quote(self::$commentMultiRight);
-			self::$commentMulti = $commentMultiLeft.'.*?'.$commentMultiRight;
-			self::$whitePattern = '/'.$commentSingle.'[^\n]*\s*|('.self::$commentMulti.')\s*|\s+/Ais';
+			$commentSingle = $this->preg_quote(static::$commentSingle);
+			$commentMultiLeft = $this->preg_quote(static::$commentMultiLeft);
+			$commentMultiRight = $this->preg_quote(static::$commentMultiRight);
+			static::$commentMulti = $commentMultiLeft.'.*?'.$commentMultiRight;
+			static::$whitePattern = '/'.$commentSingle.'[^\n]*\s*|('.static::$commentMulti.')\s*|\s+/Ais';
 		}
 	}
 
@@ -3162,12 +3162,12 @@ class scss_parser {
 	}
 
 	protected function expHelper($lhs, $minP) {
-		$opstr = self::$operatorStr;
+		$opstr = static::$operatorStr;
 
 		$ss = $this->seek();
 		$whiteBefore = isset($this->buffer[$this->count - 1]) &&
 			ctype_space($this->buffer[$this->count - 1]);
-		while ($this->match($opstr, $m) && self::$precedence[$m[1]] >= $minP) {
+		while ($this->match($opstr, $m) && static::$precedence[$m[1]] >= $minP) {
 			$whiteAfter = isset($this->buffer[$this->count - 1]) &&
 				ctype_space($this->buffer[$this->count - 1]);
 
@@ -3181,8 +3181,8 @@ class scss_parser {
 			if (!$this->value($rhs)) break;
 
 			// peek and see if rhs belongs to next operator
-			if ($this->peek($opstr, $next) && self::$precedence[$next[1]] > self::$precedence[$op]) {
-				$rhs = $this->expHelper($rhs, self::$precedence[$next[1]]);
+			if ($this->peek($opstr, $next) && static::$precedence[$next[1]] > static::$precedence[$op]) {
+				$rhs = $this->expHelper($rhs, static::$precedence[$next[1]]);
 			}
 
 			$lhs = array("exp", $op, $lhs, $rhs, $this->inParens, $whiteBefore, $whiteAfter);
@@ -3514,7 +3514,7 @@ class scss_parser {
 
 		$stop = array("'", '"', "#{", $end);
 		$stop = array_map(array($this, "preg_quote"), $stop);
-		$stop[] = self::$commentMulti;
+		$stop[] = static::$commentMulti;
 
 		$patt = '(.*?)('.implode("|", $stop).')';
 
@@ -3622,7 +3622,7 @@ class scss_parser {
 		if (count($parts) == 0) return false;
 
 		// match comment hack
-		if (preg_match(self::$whitePattern,
+		if (preg_match(static::$whitePattern,
 			$this->buffer, $m, null, $this->count))
 		{
 			if (!empty($m[0])) {
@@ -3964,7 +3964,7 @@ class scss_parser {
 	// match some whitespace
 	protected function whitespace() {
 		$gotWhite = false;
-		while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
+		while (preg_match(static::$whitePattern, $this->buffer, $m, null, $this->count)) {
 			if ($this->insertComments) {
 				if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
 					$this->append(array("comment", $m[1]));
