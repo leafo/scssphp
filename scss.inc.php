@@ -67,7 +67,6 @@ class scssc {
 		"function" => "^",
 	);
 
-	static protected $numberPrecision = 5;
 	static protected $unitTable = array(
 		"in" => array(
 			"in" => 1,
@@ -90,6 +89,8 @@ class scssc {
 	protected $importCache = array();
 
 	protected $userFunctions = array();
+
+	protected $numberPrecision = 5;
 
 	protected $formatter = "scss_formatter_nested";
 
@@ -1180,7 +1181,7 @@ class scssc {
 
 			return $h;
 		case "number":
-			return round($value[1], self::$numberPrecision) . $value[2];
+			return round($value[1], $this->numberPrecision) . $value[2];
 		case "string":
 			return $value[1] . $this->compileStringContent($value) . $value[1];
 		case "function":
@@ -1499,6 +1500,10 @@ class scssc {
 
 	public function setImportPaths($path) {
 		$this->importPaths = (array)$path;
+	}
+
+	public function setNumberPrecision($numberPrecision) {
+		$this->numberPrecision = $numberPrecision;
 	}
 
 	public function setFormatter($formatterName) {
