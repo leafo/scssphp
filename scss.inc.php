@@ -187,11 +187,13 @@ class scssc {
 			$rem = array_diff($single, $target);
 
 			foreach ($origin as $j => $new) {
-				// fix for extend infinite loop
-				// note: I have no idea what I'm doing, but all tests pass
+				// prevent infinite loop when target extends itself
 				foreach ($new as $new_selector) {
-					if (!array_diff($single, $new_selector)) continue 2;
+					if (!array_diff($single, $new_selector)) {
+						continue 2;
+					}
 				}
+
 				$origin[$j][count($origin[$j]) - 1] = $this->combineSelectorSingle(end($new), $rem);
 			}
 
