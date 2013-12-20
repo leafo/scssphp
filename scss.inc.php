@@ -1451,16 +1451,13 @@ class scssc {
 		}
 	}
 
-	// todo: this is bugged?
 	protected function setExisting($name, $value, $env = null) {
 		if (is_null($env)) $env = $this->getStoreEnv();
 
-		if (isset($env->store[$name])) {
+		if (isset($env->store[$name]) || is_null($env->parent)) {
 			$env->store[$name] = $value;
-		} elseif (!is_null($env->parent)) {
-			$this->setExisting($name, $value, $env->parent);
 		} else {
-			$env->store[$name] = $value;
+			$this->setExisting($name, $value, $env->parent);
 		}
 	}
 
