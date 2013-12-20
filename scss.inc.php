@@ -1467,7 +1467,7 @@ class scssc {
 		$env->store[$name] = $value;
 	}
 
-	protected function get($name, $defaultValue = null, $env = null) {
+	public function get($name, $defaultValue = null, $env = null) {
 		$name = $this->normalizeName($name);
 
 		if (is_null($env)) $env = $this->getStoreEnv();
