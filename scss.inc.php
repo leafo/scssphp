@@ -94,7 +94,7 @@ class scssc {
 
 	protected $formatter = "scss_formatter_nested";
 
-	function compile($code, $name=null) {
+	public function compile($code, $name=null) {
 		$this->indentLevel = -1;
 		$this->commentsSeen = array();
 		$this->extends = array();
@@ -1737,7 +1737,7 @@ class scssc {
 		return $c;
 	}
 
-	function toHSL($red, $green, $blue) {
+	public function toHSL($red, $green, $blue) {
 		$r = $red / 255;
 		$g = $green / 255;
 		$b = $blue / 255;
@@ -1766,7 +1766,7 @@ class scssc {
 		return array('hsl', fmod($h, 360), $s * 100, $l * 100);
 	}
 
-	function hueToRGB($m1, $m2, $h) {
+	public function hueToRGB($m1, $m2, $h) {
 		if ($h < 0)
 			$h += 1;
 		elseif ($h > 1)
@@ -1785,7 +1785,7 @@ class scssc {
 	}
 
 	// H from 0 to 360, S and L from 0 to 100
-	function toRGB($hue, $saturation, $lightness) {
+	public function toRGB($hue, $saturation, $lightness) {
 		if ($hue < 0) {
 			$hue += 360;
 		}
@@ -2570,7 +2570,7 @@ class scss_parser {
 	static protected $commentMultiLeft = "/*";
 	static protected $commentMultiRight = "*/";
 
-	function __construct($sourceName = null, $rootParser = true) {
+	public function __construct($sourceName = null, $rootParser = true) {
 		$this->sourceName = $sourceName;
 		$this->rootParser = $rootParser;
 
@@ -2590,7 +2590,7 @@ class scss_parser {
 			$operators)).')';
 	}
 
-	function parse($buffer) {
+	public function parse($buffer) {
 		$this->count = 0;
 		$this->env = null;
 		$this->inParens = false;
