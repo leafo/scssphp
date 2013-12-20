@@ -1133,7 +1133,7 @@ class scssc {
 		return $this->toBool($left[1] < $right[1]);
 	}
 
-	protected function toBool($thing) {
+	public function toBool($thing) {
 		return $thing ? self::$true : self::$false;
 	}
 
@@ -1693,18 +1693,18 @@ class scssc {
 		return null;
 	}
 
-	protected function assertList($value) {
+	public function assertList($value) {
 		if ($value[0] != "list")
 			$this->throwError("expecting list");
 		return $value;
 	}
 
-	protected function assertColor($value) {
+	public function assertColor($value) {
 		if ($color = $this->coerceColor($value)) return $color;
 		$this->throwError("expecting color");
 	}
 
-	protected function assertNumber($value) {
+	public function assertNumber($value) {
 		if ($value[0] != "number")
 			$this->throwError("expecting number");
 		return $value[1];
@@ -2358,7 +2358,7 @@ class scssc {
 		return array('string', '', array('counter(' . implode(',', $list) . ')'));
 	}
 
-	protected function throwError($msg = null) {
+	public function throwError($msg = null) {
 		if (func_num_args() > 1) {
 			$msg = call_user_func_array("sprintf", func_get_args());
 		}
