@@ -1523,10 +1523,6 @@ class scssc {
 		unset($this->userFunctions[$this->normalizeName($name)]);
 	}
 
-    public function getVariable($name, $defaultValue = null, $env = null) {
-        return $this->get($name, $defaultValue, $env);
-    }
-
 	protected function importFile($path, $out) {
 		// see if tree is cached
 		$realPath = realpath($path);
@@ -4322,10 +4318,10 @@ class scss_server {
 
 	/**
 	 * Compile requested scss and serve css.  Outputs HTTP response.
-     *
-     * @param string $salt Prefix a string to the filename for creating the cache name hash
+	 *
+	 * @param string $salt Prefix a string to the filename for creating the cache name hash
 	 */
-	public function serve($salt = null) {
+	public function serve($salt = '') {
 		if ($input = $this->findInput()) {
 			$output = $this->cacheName($salt . $input);
 			header('Content-type: text/css');
