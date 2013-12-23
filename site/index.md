@@ -7,7 +7,7 @@ The entire compiler comes in a single class file ready for including in any
 kind of project in addition to a command line tool for running the compiler
 from the terminal.
 
-**scssphp** implements SCSS (3.2.10). It does not implement the SASS syntax,
+**scssphp** implements SCSS (3.2.12). It does not implement the SASS syntax,
 only the SCSS syntax.
 
 Follow the author on twitter: [@moonscript](http://twitter.com/moonscript).
@@ -104,6 +104,14 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.0.9** -- December 23, 2013
+  * fix @for/@while inside @content block (sergeylukin)
+  * fix functions in mixin_content (timonbaetz)
+  * fix infinite loop when target extends itself (oscherler)
+  * fix function arguments are lost inside of @content block
+  * allow setting number precision (kasperisager)
+  * add public function helpers (toBool, get, findImport, assertList, assertColor, assertNumber, throwError) (Burgov, atdt)
+  * add optional cache buster prefix to serve() method (iMoses)
 * **0.0.8** -- September 16, 2013
   * Avoid IE7 content: counter bug
   * Support transparent as color name
