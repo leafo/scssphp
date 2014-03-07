@@ -4051,9 +4051,14 @@ class scss_formatter {
 
 		$inner = $pre = $this->indentStr();
 
+		$tagSeparator = $this->tagSeparator;
+		if (false !== strpos($tagSeparator, "\n")) {
+			$tagSeparator .= $pre;
+		}
+
 		if (!empty($block->selectors)) {
 			echo $pre .
-				implode($this->tagSeparator, $block->selectors) .
+				implode($tagSeparator, $block->selectors) .
 				$this->open . $this->break;
 			$this->indentLevel++;
 			$inner = $this->indentStr();
