@@ -6,10 +6,7 @@
 @page test {
   @media yes {
     div {
-      color: red; } }
-    @media yes and no {
-    pre {
-      color: blue; } } }
+      color: red; } } }
 
 @media something {
   @page {

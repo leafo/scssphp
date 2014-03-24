@@ -125,3 +125,84 @@ dt {
     }
 }
 
+// nesting media queries
+@media screen {
+    .screen {
+        width: 12px;
+    }
+    @media only screen {
+        .only-screen {
+            height: 11px;
+        }    
+    }
+}
+
+@media only screen {
+    .only-screen {
+        width: 14px;
+    }
+    @media only screen {
+        .only-screen {
+            height: 16px;
+        }    
+    }
+}
+
+@media not screen {
+    @media screen {
+        .invalid {
+            height: 12px;
+        }
+    }
+}
+
+@media not screen {
+    @media print {
+        .only-print {
+            height: 12px;
+        }
+    }
+}
+
+@media screen {
+    @media not print {
+        .only-print {
+            height: 12px;
+        }
+    }
+}
+
+@media not screen {
+    @media not print {
+        .invalid {
+            height: 12px;
+        }
+    }
+}
+
+@media not screen {
+    @media not screen {
+        .not-screen {
+            height: 15px;
+        }
+    }
+}
+
+@media only screen {
+    @media print {
+        .invalid {
+            height: 15px;
+        }
+    }
+}
+
+@media only screen {
+    @media screen and (color: blue) {
+        @media screen and (width: 13) {
+            .only-screen {
+                height: 15px;
+            }
+        }
+    }
+}
+
