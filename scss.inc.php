@@ -1022,8 +1022,6 @@ class scssc {
 					}
 				}
 				return array("function", $name, array("list", ",", $listArgs));
-			case "null":
-				return array("keyword","false");
 			default:
 				return $value;
 		}
@@ -1871,6 +1869,7 @@ class scssc {
 	protected function lib_if($args) {
 		list($cond,$t, $f) = $args;
 		if ($cond == self::$false) return $f;
+		elseif ($cond == self::$null)  return $f;
 		return $t;
 	}
 
