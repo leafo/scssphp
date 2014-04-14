@@ -1022,6 +1022,8 @@ class scssc {
 					}
 				}
 				return array("function", $name, array("list", ",", $listArgs));
+			case "null":
+				return array("keyword","false");
 			default:
 				return $value;
 		}
