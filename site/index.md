@@ -104,6 +104,10 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.0.10** -- April 14, 2014
+  * fix media query merging (timonbaetz)
+  * inline if should treat null as false (wonderslug)
+  * optimizing toHSL() (jfsullivan)
 * **0.0.9** -- December 23, 2013
   * fix @for/@while inside @content block (sergeylukin)
   * fix functions in mixin_content (timonbaetz)
