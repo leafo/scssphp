@@ -1806,7 +1806,7 @@ class scssc {
 		if ($min == $max) {
 			$s = $h = 0;
 		} else {
-		        $d = $max - $min;
+			$d = $max - $min;
 
 			if ($l < 255)
 				$s = $d / $l;

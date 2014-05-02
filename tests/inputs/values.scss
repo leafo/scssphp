@@ -8,8 +8,12 @@
     height: url("http://google.com");
     dads: url(http://leafo.net);
     padding: 10px 10px 10px 10px, 3px 3px 3px;
+    textblock: "This is a \
+multiline block \
+#not { color: #eee;}";
     margin: 4,3,1;
-
+    content: "This is a \
+multiline string.";
     border-radius: -1px -1px -1px black;
 }
 
