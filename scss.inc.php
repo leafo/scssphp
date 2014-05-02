@@ -3988,7 +3988,7 @@ class scss_parser {
 		$token = null;
 
 		$end = strpos($this->buffer, "\n", $this->count);
-		if ($end === false || $this->buffer[$end - 2] == '\\') {
+		if ($end === false || $this->buffer[$end - 1] == '\\') {
 			$end = strlen($this->buffer);
 		}
 
