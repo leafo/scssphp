@@ -1649,7 +1649,7 @@ class scssc {
 		$libName = "lib_".$name;
 		$f = array($this, $libName);
 		if (is_callable($f)) {
-            $prototype = isset(self::$$libName) ? self::$$libName : null;
+			$prototype = isset(self::$$libName) ? self::$$libName : null;
 			$sorted = $this->sortArgs($prototype, $args);
 			foreach ($sorted as &$val) {
 				$val = $this->reduce($val, true);
