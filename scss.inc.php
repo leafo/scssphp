@@ -1574,10 +1574,12 @@ class scssc {
 				$name = substr($name, 1);
 			}
 
+			$parser->env             = null;
 			$parser->count           = 0;
 			$parser->buffer          = (string) $strValue;
+			$parser->inParens        = false;
 			$parser->eatWhiteDefault = true;
-
+			$parser->insertComments  = true;
 
 			if ( ! $parser->valueList($value)) {
 				throw new Exception("failed to parse passed in variable $name: $strValue");
