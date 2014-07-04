@@ -42,16 +42,34 @@ class ApiTest extends PHPUnit_Framework_TestCase
 		);
 	}
 
-	public function testSetVariables()
+	/**
+	 * @dataProvider provideSetVariables
+	 */
+	public function testSetVariables($expected, $scss, $variables)
 	{
-		$this->scss->setVariables(array(
-			'color' => 'red',
-			'base'  => '960px',
-		));
+		$this->scss->setVariables($variables);
 
-		$this->assertEquals(
-			".magic {\n  color: red;\n  width: 760px; }",
-			$this->compile('.magic { color: $color; width: $base - 200; }')
+		$this->assertEquals($expected, $this->compile($scss));
+	}
+
+	public function provideSetVariables()
+	{
+		return array(
+			array(
+				".magic {\n  color: red;\n  width: 760px; }",
+				'.magic { color: $color; width: $base - 200; }',
+				array(
+					'color' => 'red',
+					'base'  => '960px',
+				),
+			),
+			array(
+				".logo {\n  color: #808080; }",
+				'.logo { color: desaturate($primary, 100%); }',
+				array(
+					'primary' => '#ff0000',
+				),
+			),
 		);
 	}
 
