@@ -14,9 +14,9 @@
  * The scss compiler and parser.
  *
  * Converting SCSS to CSS is a three stage process. The incoming file is parsed
- * by `scssc_parser` into a syntax tree, then it is compiled into another tree
+ * by `scss_parser` into a syntax tree, then it is compiled into another tree
  * representing the CSS structure by `scssc`. The CSS tree is fed into a
- * formatter, like `scssc_formatter` which then outputs CSS as a string.
+ * formatter, like `scss_formatter` which then outputs CSS as a string.
  *
  * During the first compile, all values are *reduced*, which means that their
  * types are brought to the lowest form before being dump as strings. This
@@ -31,9 +31,9 @@
  * evaluation context, such as all available mixins and variables at any given
  * time.
  *
- * The `scssc_parser` class is only concerned with parsing its input.
+ * The `scss_parser` class is only concerned with parsing its input.
  *
- * The `scssc_formatter` takes a CSS tree, and dumps it to a formatted string,
+ * The `scss_formatter` takes a CSS tree, and dumps it to a formatted string,
  * handling things like indentation.
  */
 
@@ -43,7 +43,7 @@
  * @author Leaf Corcoran <leafot@gmail.com>
  */
 class scssc {
-	static public $VERSION = "v0.0.10";
+	static public $VERSION = 'v0.0.11-dev';
 
 	static protected $operatorNames = array(
 		'+' => "add",
@@ -89,34 +89,48 @@ class scssc {
 	protected $importCache = array();
 
 	protected $userFunctions = array();
+	protected $registeredVars = array();
 
 	protected $numberPrecision = 5;
 
 	protected $formatter = "scss_formatter_nested";
 
-	public function compile($code, $name=null) {
-		$this->indentLevel = -1;
+	/**
+	 * Compile scss
+	 *
+	 * @param string $code
+	 * @param string $name
+	 *
+	 * @return string
+	 */
+	public function compile($code, $name = null)
+	{
+		$this->indentLevel  = -1;
 		$this->commentsSeen = array();
-		$this->extends = array();
-		$this->extendsMap = array();
+		$this->extends      = array();
+		$this->extendsMap   = array();
+		$this->parsedFiles  = array();
+		$this->env          = null;
+		$this->scope        = null;
 
 		$locale = setlocale(LC_NUMERIC, 0);
 		setlocale(LC_NUMERIC, "C");
 
-		$this->parsedFiles = array();
 		$this->parser = new scss_parser($name);
+
 		$tree = $this->parser->parse($code);
 
 		$this->formatter = new $this->formatter();
 
-		$this->env = null;
-		$this->scope = null;
-
+		$this->pushEnv($tree);
+		$this->injectVariables($this->registeredVars);
 		$this->compileRoot($tree);
+		$this->popEnv();
 
 		$out = $this->formatter->format($this->scope);
 
 		setlocale(LC_NUMERIC, $locale);
+
 		return $out;
 	}
 
@@ -306,14 +320,12 @@ class scssc {
 		}
 	}
 
-	protected function compileRoot($rootBlock) {
-		$this->pushEnv($rootBlock);
-		$this->scope = $this->makeOutputBlock("root");
+	protected function compileRoot($rootBlock)
+	{
+		$this->scope = $this->makeOutputBlock('root');
 
 		$this->compileChildren($rootBlock->children, $this->scope);
 		$this->flattenSelectors($this->scope);
-
-		$this->popEnv();
 	}
 
 	protected function compileMedia($media) {
@@ -1549,6 +1561,50 @@ class scssc {
 		return $defaultValue; // found nothing
 	}
 
+	protected function injectVariables(array $args)
+	{
+		if (empty($args)) {
+			return;
+		}
+
+		$parser = new scss_parser(__METHOD__, false);
+
+		foreach ($args as $name => $strValue) {
+			if ($name[0] === '$') {
+				$name = substr($name, 1);
+			}
+
+			$parser->count  = 0;
+			$parser->buffer = (string) $strValue;
+
+			if ( ! $parser->valueList($value)) {
+				throw new Exception("failed to parse passed in variable $name: $strValue");
+			}
+
+			$this->set($name, $value);
+		}
+	}
+
+	/**
+	 * Set variables
+	 *
+	 * @param array $variables
+	 */
+	public function setVariables(array $variables)
+	{
+		$this->registeredVars = array_merge($this->registeredVars, $variables);
+	}
+
+	/**
+	 * Unset variable
+	 *
+	 * @param string $name
+	 */
+	public function unsetVariable($name)
+	{
+		unset($this->registeredVars[$name]);
+	}
+
 	protected function popEnv() {
 		$env = $this->env;
 		$this->env = $this->env->parent;
@@ -2627,6 +2683,12 @@ class scss_parser {
 	static protected $commentMultiLeft = "/*";
 	static protected $commentMultiRight = "*/";
 
+	/**
+	 * Constructor
+	 *
+	 * @param string  $sourceName
+	 * @param boolean $rootParser
+	 */
 	public function __construct($sourceName = null, $rootParser = true) {
 		$this->sourceName = $sourceName;
 		$this->rootParser = $rootParser;
@@ -2647,27 +2709,41 @@ class scss_parser {
 			$operators)).')';
 	}
 
-	public function parse($buffer) {
-		$this->count = 0;
-		$this->env = null;
-		$this->inParens = false;
-		$this->pushBlock(null); // root block
+	/**
+	 * Parser buffer
+	 *
+	 * @param string $buffer;
+	 *
+	 * @return \StdClass
+	 */
+	public function parse($buffer)
+	{
+		$this->count           = 0;
+		$this->env             = null;
+		$this->inParens        = false;
 		$this->eatWhiteDefault = true;
-		$this->insertComments = true;
+		$this->insertComments  = true;
+		$this->buffer          = $buffer;
 
-		$this->buffer = $buffer;
+		$oldVars = $this->registeredVars;
 
+		$this->pushBlock(null); // root block
 		$this->whitespace();
-		while (false !== $this->parseChunk());
 
-		if ($this->count != strlen($this->buffer))
+		while (false !== $this->parseChunk())
+			;
+
+		if ($this->count != strlen($this->buffer)) {
 			$this->throwParseError();
+		}
 
 		if (!empty($this->env->parent)) {
 			$this->throwParseError("unclosed block");
 		}
 
-		$this->env->isRoot = true;
+		$this->registeredVars = $oldVars;
+		$this->env->isRoot    = true;
+
 		return $this->env;
 	}
 
@@ -3171,13 +3247,21 @@ class scss_parser {
 		return false;
 	}
 
-
-	protected function valueList(&$out) {
-		return $this->genericList($out, "spaceList", ",");
+	/**
+	 * Parse list
+	 *
+	 * @param string $out
+	 *
+	 * @return boolean
+	 */
+	public function valueList(&$out)
+	{
+		return $this->genericList($out, 'spaceList', ',');
 	}
 
-	protected function spaceList(&$out) {
-		return $this->genericList($out, "expression");
+	protected function spaceList(&$out)
+	{
+		return $this->genericList($out, 'expression');
 	}
 
 	protected function genericList(&$out, $parseItem, $delim="", $flatten=true) {
