@@ -2725,8 +2725,6 @@ class scss_parser {
 		$this->insertComments  = true;
 		$this->buffer          = $buffer;
 
-		$oldVars = $this->registeredVars;
-
 		$this->pushBlock(null); // root block
 		$this->whitespace();
 
@@ -2741,7 +2739,6 @@ class scss_parser {
 			$this->throwParseError("unclosed block");
 		}
 
-		$this->registeredVars = $oldVars;
 		$this->env->isRoot    = true;
 
 		return $this->env;
@@ -4448,7 +4445,7 @@ class scss_server {
 		$elapsed = round((microtime(true) - $start), 4);
 
 		$v = scssc::$VERSION;
-		$t = date('r');
+		$t = @date('r');
 		$css = "/* compiled by scssphp $v on $t (${elapsed}s) */\n\n" . $css;
 
 		file_put_contents($out, $css);
