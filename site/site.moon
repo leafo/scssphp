@@ -3,7 +3,7 @@ require "sitegen"
 tools = require "sitegen.tools"
 
 sitegen.create_site =>
-  @current_version = "0.0.10"
+  @current_version = "0.0.11"
   @title = "SCSS Compiler in PHP"
 
   scssphp = tools.system_command "pscss < %s > %s", "css"

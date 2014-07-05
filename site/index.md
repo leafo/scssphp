@@ -104,6 +104,11 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.0.11** -- July 5, 2014
+  * support multi-line continuation character (backslash)per CSS2.1 and CSS3 spec (caiosm1005)
+  * imported partials should not be compiled (squarestar)
+  * add setVariables() and unsetVariable() to interface (leafo/lessphp)
+  * micro-optimizing is_null() (Yahasana)
 * **0.0.10** -- April 14, 2014
   * fix media query merging (timonbaetz)
   * inline if should treat null as false (wonderslug)
