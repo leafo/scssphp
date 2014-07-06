@@ -4483,6 +4483,7 @@ class scss_server {
 					echo 'Parse error: ' . $e->getMessage() . "\n";
 				}
 			} else {
+				header('HTTP/1.1 304 Not Modified');
 				header('X-SCSS-Cache: true');
 				echo file_get_contents($output);
 			}
