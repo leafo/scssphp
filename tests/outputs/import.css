@@ -2,13 +2,6 @@
 @import "foo" screen;
 @import "http://foo.com/bar";
 @import url(foo);
-
-#partial {
-    color: blue;
-}
-
-
-
 div {
   height: 200px;
   color: red; }
@@ -25,3 +18,6 @@ code div {
   code div {
     height: 200px;
     color: red; }
+
+#partial {
+  color: blue; }

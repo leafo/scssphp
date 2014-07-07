@@ -1650,13 +1650,6 @@ class scssc {
 			$tree = $this->importCache[$realPath];
 		} else {
 			$code = file_get_contents($path);
-			$tree = null;
-
-			if (substr(basename($path), 0, 1) === '_') {
-				$out->lines = array_merge($out->lines, explode("\n", $code));
-				return;
-			}
-
 			$parser = new scss_parser($path, false);
 			$tree = $parser->parse($code);
 			$this->parsedFiles[] = $path;
