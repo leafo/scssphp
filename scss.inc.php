@@ -4443,6 +4443,26 @@ class scss_server {
 	}
 
 	/**
+	 * Get If-Modified-Since header from client request
+	 *
+	 * @return string
+	 */
+	protected function getModifiedSinceHeader()
+	{
+		$modifiedSince = '';
+
+		if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+			$modifiedSince = $_SERVER['HTTP_IF_MODIFIED_SINCE'];
+
+			if (false !== ($semicolonPos = strpos($modifiedSince, ';'))) {
+				$modifiedSince = substr($modifiedSince, 0, $semicolonPos);
+			}
+		}
+
+		return $modifiedSince;
+	}
+
+	/**
 	 * Compile .scss file
 	 *
 	 * @param string $in  Input path (.scss)
@@ -4471,27 +4491,56 @@ class scss_server {
 	 * @param string $salt Prefix a string to the filename for creating the cache name hash
 	 */
 	public function serve($salt = '') {
+		$protocol = isset($_SERVER['SERVER_PROTOCOL'])
+			? $_SERVER['SERVER_PROTOCOL']
+			: 'HTTP/1.0';
+
 		if ($input = $this->findInput()) {
 			$output = $this->cacheName($salt . $input);
-			header('Content-type: text/css');
 
 			if ($this->needsCompile($input, $output)) {
 				try {
-					echo $this->compile($input, $output);
+					$css = $this->compile($input, $output);
+
+					$lastModified = gmdate('D, d M Y H:i:s', filemtime($output)) . ' GMT';
+
+					header('Last-Modified: ' . $lastModified);
+					header('Content-type: text/css');
+
+					echo $css;
+
+					return;
 				} catch (Exception $e) {
-					header('HTTP/1.1 500 Internal Server Error');
+					header($protocol . ' 500 Internal Server Error');
+					header('Content-type: text/plain');
+
 					echo 'Parse error: ' . $e->getMessage() . "\n";
 				}
-			} else {
-				header('X-SCSS-Cache: true');
-				echo file_get_contents($output);
 			}
+
+			header('X-SCSS-Cache: true');
+			header('Content-type: text/css');
+
+			$modifiedSince = $this->getModifiedSinceHeader();
+			$mtime = filemtime($output);
+
+			if (@strtotime($modifiedSince) === $mtime) {
+				header($protocol . ' 304 Not Modified');
+
+				return;
+			}
+
+			$lastModified  = gmdate('D, d M Y H:i:s', $mtime) . ' GMT';
+			header('Last-Modified: ' . $lastModified);
+
+			echo file_get_contents($output);
 
 			return;
 		}
 
-		header('HTTP/1.0 404 Not Found');
-		header('Content-type: text');
+		header($protocol . ' 404 Not Found');
+		header('Content-type: text/plain');
+
 		$v = scssc::$VERSION;
 		echo "/* INPUT NOT FOUND scss $v */\n";
 	}
