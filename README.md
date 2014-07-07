@@ -1,4 +1,4 @@
-# scssphp v0.0.11
+# scssphp v0.0.12
 ### <http://leafo.net/scssphp>
 
 [![Build Status](https://secure.travis-ci.org/leafo/scssphp.png)](http://travis-ci.org/leafo/scssphp)
