@@ -3,4 +3,8 @@
     color: blue;
 }
 
+$variable: #7C2;
 
+@mixin partial-mixin() {
+    background: gray;
+}

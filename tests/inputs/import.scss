@@ -16,3 +16,8 @@ code {
 }
 
 @import "imports/partial";
+
+body {
+    color: $variable;
+    @include partial-mixin();
+}
