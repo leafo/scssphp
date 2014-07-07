@@ -4402,47 +4402,65 @@ class scss_server {
 	}
 
 	/**
-	 * Get path to cached imports
+	 * Get path to meta data
 	 *
 	 * @return string
 	 */
-	protected function importsCacheName($out) {
-		return $out . '.imports';
+	protected function metadataName($out) {
+		return $out . '.meta';
 	}
 
 	/**
 	 * Determine whether .scss file needs to be re-compiled.
 	 *
-	 * @param string $in  Input path
-	 * @param string $out Output path
+	 * @param string $in   Input path
+	 * @param string $out  Output path
+	 * @param string $etag ETag
 	 *
 	 * @return boolean True if compile required.
 	 */
-	protected function needsCompile($in, $out) {
-		if (!is_file($out)) return true;
+	protected function needsCompile($in, $out, &$etag) {
+		if ( ! is_file($out)) {
+			return true;
+		}
 
 		$mtime = filemtime($out);
-		if (filemtime($in) > $mtime) return true;
 
-		// look for modified imports
-		$icache = $this->importsCacheName($out);
-		if (is_readable($icache)) {
-			$imports = unserialize(file_get_contents($icache));
-			foreach ($imports as $import) {
-				if (filemtime($import) > $mtime) return true;
-			}
+		if (filemtime($in) > $mtime) {
+			return true;
 		}
-		return false;
+
+		$metadataName = $this->metadataName($out);
+
+		if (is_readable($metadataName)) {
+			$metadata = unserialize(file_get_contents($metadataName));
+
+			if ($metadata['etag'] === $etag) {
+				return false;
+			}
+
+			foreach ($metadata['imports'] as $import) {
+				if (filemtime($import) > $mtime) {
+					return true;
+				}
+			}
+
+			$etag = $metadata['etag'];
+
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
 	 * Get If-Modified-Since header from client request
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	protected function getModifiedSinceHeader()
+	protected function getIfModifiedSinceHeader()
 	{
-		$modifiedSince = '';
+		$modifiedSince = null;
 
 		if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
 			$modifiedSince = $_SERVER['HTTP_IF_MODIFIED_SINCE'];
@@ -4456,26 +4474,50 @@ class scss_server {
 	}
 
 	/**
+	 * Get If-None-Match header from client request
+	 *
+	 * @return string|null
+	 */
+	protected function getIfNoneMatchHeader()
+	{
+		$noneMatch = null;
+
+		if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+			$noneMatch = $_SERVER['HTTP_IF_NONE_MATCH'];
+		}
+
+		return $noneMatch;
+	}
+
+	/**
 	 * Compile .scss file
 	 *
 	 * @param string $in  Input path (.scss)
 	 * @param string $out Output path (.css)
 	 *
-	 * @return string
+	 * @return array
 	 */
-	protected function compile($in, $out) {
-		$start = microtime(true);
-		$css = $this->scss->compile(file_get_contents($in), $in);
+	protected function compile($in, $out)
+	{
+		$start   = microtime(true);
+		$css     = $this->scss->compile(file_get_contents($in), $in);
 		$elapsed = round((microtime(true) - $start), 4);
 
-		$v = scssc::$VERSION;
-		$t = @date('r');
-		$css = "/* compiled by scssphp $v on $t (${elapsed}s) */\n\n" . $css;
+		$v    = scssc::$VERSION;
+		$t    = @date('r');
+		$css  = "/* compiled by scssphp $v on $t (${elapsed}s) */\n\n" . $css;
+		$etag = md5($css);
 
 		file_put_contents($out, $css);
-		file_put_contents($this->importsCacheName($out),
-			serialize($this->scss->getParsedFiles()));
-		return $css;
+		file_put_contents(
+			$this->metadataName($out),
+			serialize(array(
+				'etag'    => $etag,
+				'imports' => $this->scss->getParsedFiles(),
+			))
+		);
+
+		return array($css, $etag);
 	}
 
 	/**
@@ -4490,15 +4532,17 @@ class scss_server {
 
 		if ($input = $this->findInput()) {
 			$output = $this->cacheName($salt . $input);
+			$etag = $noneMatch = trim($this->getIfNoneMatchHeader(), '"');
 
-			if ($this->needsCompile($input, $output)) {
+			if ($this->needsCompile($input, $output, $etag)) {
 				try {
-					$css = $this->compile($input, $output);
+					list($css, $etag) = $this->compile($input, $output);
 
 					$lastModified = gmdate('D, d M Y H:i:s', filemtime($output)) . ' GMT';
 
 					header('Last-Modified: ' . $lastModified);
 					header('Content-type: text/css');
+					header('ETag: "' . $etag . '"');
 
 					echo $css;
 
@@ -4513,8 +4557,15 @@ class scss_server {
 
 			header('X-SCSS-Cache: true');
 			header('Content-type: text/css');
+			header('ETag: "' . $etag . '"');
 
-			$modifiedSince = $this->getModifiedSinceHeader();
+			if ($etag === $noneMatch) {
+				header($protocol . ' 304 Not Modified');
+
+				return;
+			}
+
+			$modifiedSince = $this->getIfModifiedSinceHeader();
 			$mtime = filemtime($output);
 
 			if (@strtotime($modifiedSince) === $mtime) {
