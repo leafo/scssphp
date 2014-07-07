@@ -104,6 +104,8 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.0.13** -- July 7, 2014
+  * handle If-None-Match in client request, and send ETag in response (NSmithUK)
 * **0.0.12** -- July 6, 2014
   * revert erroneous import-partials-fix (smuuf)
   * handle If-Modified-Since in client request, and send Last-Modified in response (braver)
