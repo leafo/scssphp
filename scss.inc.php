@@ -3326,15 +3326,15 @@ class scss_parser {
 			$op = $m[1];
 
 			// don't turn negative numbers into expressions
-			if ($op == "-" && $whiteBefore) {
-				if (!$whiteAfter) break;
-			}
+			$unaryMinus = $op == "-" && $whiteBefore && !$whiteAfter;
 
 			if (!$this->value($rhs)) break;
 
 			// peek and see if rhs belongs to next operator
 			if ($this->peek($opstr, $next) && self::$precedence[$next[1]] > self::$precedence[$op]) {
 				$rhs = $this->expHelper($rhs, self::$precedence[$next[1]]);
+			} elseif ($unaryMinus) {
+				break;
 			}
 
 			$lhs = array("exp", $op, $lhs, $rhs, $this->inParens, $whiteBefore, $whiteAfter);
