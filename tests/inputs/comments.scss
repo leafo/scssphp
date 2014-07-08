@@ -26,3 +26,19 @@ Here is a block comment
 	background: url(/*this is not a comment?*/); // uhh what happens here
 }
 
+// begin
+
+.dummy {
+    color: blue;
+}
+
+/* comment 1 */
+a {
+    /* comment 2 */
+    /* comment 3 */ color: red; /* comment 4 */
+    background-color: red; /* comment 5 */
+    /* comment 6 */
+}
+/* comment 7 */
+
+// end

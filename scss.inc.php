@@ -421,6 +421,13 @@ class scssc {
 		$this->popEnv();
 	}
 
+	// root level comment
+	protected function compileComment($block) {
+		$out = $this->makeOutputBlock('comment');
+		$out->lines[] = $block[1];
+		$this->scope->children[] = $out;
+	}
+
 	// joins together .classes and #ids
 	protected function flattenSelectorSingle($single) {
 		$joined = array();
@@ -688,6 +695,11 @@ class scssc {
 				$compiledValue);
 			break;
 		case "comment":
+			if ($out->type == 'root') {
+				$this->compileComment($child);
+				break;
+			}
+
 			$out->lines[] = $child[1];
 			break;
 		case "mixin":
@@ -2726,7 +2738,6 @@ class scss_parser {
 		$this->env             = null;
 		$this->inParens        = false;
 		$this->eatWhiteDefault = true;
-		$this->insertComments  = true;
 		$this->buffer          = $buffer;
 
 		$this->pushBlock(null); // root block
@@ -3023,16 +3034,12 @@ class scss_parser {
 		}
 
 		// opening css block
-		$oldComments = $this->insertComments;
-		$this->insertComments = false;
 		if ($this->selectors($selectors) && $this->literal("{")) {
-			$this->pushBlock($selectors);
-			$this->insertComments = $oldComments;
+			$b = $this->pushBlock($selectors);
 			return true;
 		} else {
 			$this->seek($s);
 		}
-		$this->insertComments = $oldComments;
 
 		// property assign, or nested assign
 		if ($this->propertyName($name) && $this->literal(":")) {
@@ -3125,7 +3132,18 @@ class scss_parser {
 		$b->parent = $this->env; // not sure if we need this yet
 
 		$b->selectors = $selectors;
-		$b->children = array();
+		$b->comments = array();
+
+		if (!$this->env) {
+			$b->children = array();
+		} elseif (empty($this->env->children)) {
+			$this->env->children = $this->env->comments;
+			$b->children = array();
+			$this->env->comments = array();
+		} else {
+			$b->children = $this->env->comments;
+			$this->env->comments = array();
+		}
 
 		$this->env = $b;
 		return $b;
@@ -3138,14 +3156,28 @@ class scss_parser {
 	}
 
 	protected function popBlock() {
-		if (empty($this->env->parent)) {
+		$block = $this->env;
+
+		if (empty($block->parent)) {
 			$this->throwParseError("unexpected }");
 		}
 
-		$old = $this->env;
-		$this->env = $this->env->parent;
-		unset($old->parent);
-		return $old;
+		$this->env = $block->parent;
+		unset($block->parent);
+
+		$comments = $block->comments;
+		if (count($comments)) {
+			$this->env->comments = $comments;
+			unset($block->comments);
+		}
+
+		return $block;
+	}
+
+	protected function appendComment($comment) {
+		$comment[1] = substr(preg_replace(array('/^\s+/m', '/^(.)/m'), array('', ' \1'), $comment[1]), 1);
+
+		$this->env->comments[] = $comment;
 	}
 
 	protected function append($statement, $pos=null) {
@@ -3153,7 +3185,14 @@ class scss_parser {
 			$statement[-1] = $pos;
 			if (!$this->rootParser) $statement[-2] = $this;
 		}
+
 		$this->env->children[] = $statement;
+
+		$comments = $this->env->comments;
+		if (count($comments)) {
+			$this->env->children = array_merge($this->env->children, $comments);
+			$this->env->comments = array();
+		}
 	}
 
 	// last child that was appended
@@ -3738,7 +3777,9 @@ class scss_parser {
 
 			$out = array("interpolate", $value, $left, $right);
 			$this->eatWhiteDefault = $oldWhite;
-			if ($this->eatWhiteDefault) $this->whitespace();
+			if ($this->eatWhiteDefault) {
+				$this->whitespace();
+			}
 			return true;
 		}
 
@@ -3817,7 +3858,7 @@ class scss_parser {
 				$selector[] = array($m[0]);
 			} elseif ($this->selectorSingle($part)) {
 				$selector[] = $part;
-				$this->whitespace();
+				$this->match('\s+', $m);
 			} elseif ($this->match('\/[^\/]+\/', $m)) {
 				$selector[] = array($m[0]);
 			} else {
@@ -4107,7 +4148,9 @@ class scss_parser {
 		$r = '/'.$regex.'/Ais';
 		if (preg_match($r, $this->buffer, $out, null, $this->count)) {
 			$this->count += strlen($out[0]);
-			if ($eatWhitespace) $this->whitespace();
+			if ($eatWhitespace) {
+				$this->whitespace();
+			}
 			return true;
 		}
 		return false;
@@ -4117,11 +4160,9 @@ class scss_parser {
 	protected function whitespace() {
 		$gotWhite = false;
 		while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
-			if ($this->insertComments) {
-				if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
-					$this->append(array("comment", $m[1]));
-					$this->commentsSeen[$this->count] = true;
-				}
+			if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
+				$this->appendComment(array("comment", $m[1]));
+				$this->commentsSeen[$this->count] = true;
 			}
 			$this->count += strlen($m[0]);
 			$gotWhite = true;
@@ -4190,6 +4231,16 @@ class scss_formatter {
 		return $name . $this->assignSeparator . $value . ";";
 	}
 
+	protected function blockLines($inner, $block)
+	{
+		$glue = $this->break.$inner;
+		echo $inner . implode($glue, $block->lines);
+
+		if (!empty($block->children)) {
+			echo $this->break;
+		}
+	}
+
 	protected function block($block) {
 		if (empty($block->lines) && empty($block->children)) return;
 
@@ -4204,11 +4255,7 @@ class scss_formatter {
 		}
 
 		if (!empty($block->lines)) {
-			$glue = $this->break.$inner;
-			echo $inner . implode($glue, $block->lines);
-			if (!empty($block->children)) {
-				echo $this->break;
-			}
+			$this->blockLines($inner, $block);
 		}
 
 		foreach ($block->children as $child) {
@@ -4291,9 +4338,7 @@ class scss_formatter_nested extends scss_formatter {
 		}
 
 		if (!empty($block->lines)) {
-			$glue = $this->break.$inner;
-			echo $inner . implode($glue, $block->lines);
-			if (!empty($block->children)) echo $this->break;
+			$this->blockLines($inner, $block);
 		}
 
 		foreach ($block->children as $i => $child) {
@@ -4335,6 +4380,58 @@ class scss_formatter_compressed extends scss_formatter {
 
 	public function indentStr($n = 0) {
 		return "";
+	}
+
+	public function blockLines($inner, $block)
+	{
+		$glue = $this->break.$inner;
+
+		foreach ($block->lines as $index => $line) {
+			if (substr($line, 0, 2) === '/*' && substr($line, 2, 1) !== '!') {
+				unset($block->lines[$index]);
+			} elseif (substr($line, 0, 3) === '/*!') {
+				$block->lines[$index] = '/*' . substr($line, 3);
+			}
+		}
+
+		echo $inner . implode($glue, $block->lines);
+
+		if (!empty($block->children)) {
+			echo $this->break;
+		}
+	}
+}
+
+/**
+ * SCSS crunched formatter
+ *
+ * @author Anthon Pang <anthon.pang@gmail.com>
+ */
+class scss_formatter_crunched extends scss_formatter {
+	public $open = "{";
+	public $tagSeparator = ",";
+	public $assignSeparator = ":";
+	public $break = "";
+
+	public function indentStr($n = 0) {
+		return "";
+	}
+
+	public function blockLines($inner, $block)
+	{
+		$glue = $this->break.$inner;
+
+		foreach ($block->lines as $index => $line) {
+			if (substr($line, 0, 2) === '/*') {
+				unset($block->lines[$index]);
+			}
+		}
+
+		echo $inner . implode($glue, $block->lines);
+
+		if (!empty($block->children)) {
+			echo $this->break;
+		}
 	}
 }
 
