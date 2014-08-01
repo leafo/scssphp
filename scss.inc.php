@@ -4284,8 +4284,6 @@ class scss_formatter {
  * @author Leaf Corcoran <leafot@gmail.com>
  */
 class scss_formatter_nested extends scss_formatter {
-	public $close = ' }';
-
 	// adjust the depths of all children, depth first
 	public function adjustAllChildren($block) {
 		// flatten empty nested blocks
@@ -4358,6 +4356,10 @@ class scss_formatter_nested extends scss_formatter {
 
 		if (!empty($block->selectors)) {
 			$this->indentLevel--;
+
+			echo $this->$break;
+			for ($i = 0; $i < $block->depth - 1; $i++)
+				echo $this->indentChar;
 			echo $this->close;
 		}
 
