@@ -103,7 +103,7 @@ class scssc {
 	 *
 	 * @return string
 	 */
-	public function compile($code, $name = null)
+	public function compile($code, $name = null, $formatterData = array())
 	{
 		$this->indentLevel  = -1;
 		$this->commentsSeen = array();
@@ -120,7 +120,7 @@ class scssc {
 
 		$tree = $this->parser->parse($code);
 
-		$this->formatter = new $this->formatter();
+		$this->formatter = new $this->formatter($formatterData);
 
 		$this->pushEnv($tree);
 		$this->injectVariables($this->registeredVars);
@@ -4219,8 +4219,15 @@ class scss_formatter {
 	public $tagSeparator = ', ';
 	public $assignSeparator = ': ';
 
-	public function __construct() {
+	public function __construct($data = array()) {
 		$this->indentLevel = 0;
+
+		if (!empty($data)) {
+			foreach ($data as $key => $value) {
+				if(isset($this->{$key}))
+					$this->{$key} = $value;
+			}
+		}
 	}
 
 	public function indentStr($n = 0) {
