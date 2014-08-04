@@ -39,25 +39,25 @@ sel {
 
 .foo {
   /* Foo
- Bar
- Baz */
+   Bar
+   Baz */
   a: b; }
 
 .foo {
   /* Foo
- Bar
- Baz */
+   Bar
+   Baz */
   a: b; }
 
 .foo {
   /* Foo
- Bar */
+   Bar */
   a: b; }
 
 .foo {
   /* Foo
- Bar
- Baz */
+   Bar
+   Baz */
   a: b; }
 
 @foo {
@@ -227,7 +227,7 @@ foo {
  * Bar */
 .foo {
   /* Foo
- * Bar */ }
+   * Bar */ }
 
 [foo] {
   a: b; }
@@ -400,9 +400,9 @@ foo {
 
 .foo {
   /* Foo
- * Bar */
+   * Bar */
   /* Baz
- * Bang */ }
+   * Bang */ }
 
 .foo {
   /* Foo Bar */
@@ -550,7 +550,7 @@ foo {
 
 .foo {
   /* Foo
- * Bar */
+   * Bar */
   a: b; }
 /* Foo */
 .foo {
@@ -599,8 +599,8 @@ E, F G, H {
 
 body {
   /*
- //comment here
- */ }
+   //comment here
+   */ }
 
 E > F {
   a: b; }

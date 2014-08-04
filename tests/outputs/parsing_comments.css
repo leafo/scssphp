@@ -1,0 +1,50 @@
+/* comment 1 */
+a {
+  /* comment 2 */
+  color: red;
+  /* comment 3 */
+  /* comment 4 */ }
+/* comment 5 */
+/*! comment 1 */
+b {
+  /*! comment 2 */
+  color: red;
+  /*! comment 3 */
+  /*! comment 4 */ }
+/*! comment 5 */
+/*
+ * multi-line comment 1
+ */
+c {
+  /*
+   * multi-line comment 2
+   */
+  color: red;
+  /*
+   * multi-line comment 3
+   */
+  /*
+   * multi-line comment 4
+   */ }
+/*
+ * multi-line comment 5
+ */
+/*!
+ * multi-line comment 1
+ */
+d {
+  /*!
+   * multi-line comment 2
+   */
+  color: red;
+  /*!
+   * multi-line comment 3
+   */
+  /*!
+   * multi-line comment 4
+   */ }
+/*!
+ * multi-line comment 5
+ */
+e {
+  color: red; }

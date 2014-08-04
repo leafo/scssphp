@@ -2741,7 +2741,10 @@ class scss_parser {
 		$this->buffer          = $buffer;
 
 		$this->pushBlock(null); // root block
+
 		$this->whitespace();
+		$this->pushBlock(null);
+		$this->popBlock();
 
 		while (false !== $this->parseChunk())
 			;
@@ -4325,6 +4328,23 @@ class scss_formatter_nested extends scss_formatter {
 		foreach ($block->children as $child) {
 			$this->adjustAllChildren($child);
 			$child->depth = $child->depth - $block->depth;
+		}
+	}
+
+	protected function blockLines($inner, $block)
+	{
+		$glue = $this->break . $inner;
+
+		foreach ($block->lines as $index => $line) {
+			if (substr($line, 0, 2) === '/*') {
+				$block->lines[$index] = preg_replace('/(\r|\n)+/', $glue, $line);
+			}
+		}
+
+		echo $inner . implode($glue, $block->lines);
+
+		if (!empty($block->children)) {
+			echo $this->break;
 		}
 	}
 
