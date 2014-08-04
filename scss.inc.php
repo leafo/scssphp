@@ -3911,6 +3911,11 @@ class scss_parser {
 				continue;
 			}
 
+			if ($this->match('\\\\\S', $m)) {
+				$parts[] = $m[0];
+				continue;
+			}
+
 			// for keyframes
 			if ($this->unit($unit)) {
 				$parts[] = $unit;
@@ -4034,7 +4039,7 @@ class scss_parser {
 	}
 
 	protected function keyword(&$word, $eatWhitespace = null) {
-		if ($this->match('([\w_\-\*!"\'\\\\][\w\-_"\'\\\\]*)',
+		if ($this->match('(([\w_\-\*!"\']|[\\\\].)([\w\-_"\']|[\\\\].)*)',
 			$m, $eatWhitespace))
 		{
 			$word = $m[1];

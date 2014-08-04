@@ -185,3 +185,11 @@ div {
     }
 }
 
+$name: escape;
+.#{$name}\% {
+    color: red;
+}
+
+.escape-plan\% {
+    color: green;
+}

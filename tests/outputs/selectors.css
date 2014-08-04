@@ -333,3 +333,9 @@ div.foo div {
 
 .nice-fonts .main .message div .title, .nice-fonts div .message div .title {
   font-size: 24px; }
+
+.escape\% {
+  color: red; }
+
+.escape-plan\% {
+  color: green; }
