@@ -81,3 +81,10 @@ div.mixin-content-with-arg {
   right: 0;
   bottom: 3em;
   left: 4em; }
+
+@-webkit-keyframes change-color {
+  0% {
+    color: green; }
+
+  100% {
+    color: red; } }

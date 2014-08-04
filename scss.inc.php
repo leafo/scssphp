@@ -2991,7 +2991,7 @@ class scss_parser {
 
 			// doesn't match built in directive, do generic one
 			if ($this->literal('@', false) && $this->keyword($dirName) &&
-				($this->openString('{', $dirValue) || true) &&
+				($this->variable($dirValue) || $this->openString('{', $dirValue) || true) &&
 				$this->literal('{'))
 			{
 				$directive = $this->pushSpecialBlock('directive');

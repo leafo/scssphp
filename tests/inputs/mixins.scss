@@ -156,3 +156,16 @@ div {
 #please-wait {
   @include logo(1em, $left: 4em, $bottom: 3em);
 }
+
+@mixin keyframes( $name )
+{
+    @-webkit-keyframes $name {
+        @content;
+    }
+}
+
+@include keyframes( change-color )
+{
+    0% { color: green; }
+    100% { color: red; }
+}
