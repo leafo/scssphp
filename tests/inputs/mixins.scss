@@ -157,6 +157,18 @@ div {
   @include logo(1em, $left: 4em, $bottom: 3em);
 }
 
+@mixin prefixer($property, $value) {
+-webkit-#{$property}: $value;
+}
+
+@mixin transform($property: none) {
+    @include prefixer(transform, $property);
+}
+
+div.parameter-name-scope {
+    @include transform(translateX(50px));
+}
+
 @mixin keyframes( $name )
 {
     @-webkit-keyframes $name {

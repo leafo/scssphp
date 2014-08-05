@@ -1490,7 +1490,7 @@ class scssc {
 			}
 		}
 
-		foreach ($args as $arg) {
+		for ($arg = end($args); $arg !== false; $arg = prev($args)) {
 			list($i, $name, $default, $isVariable) = $arg;
 			if ($isVariable) {
 				$val = array('list', ',', array());

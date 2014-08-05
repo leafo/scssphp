@@ -82,6 +82,9 @@ div.mixin-content-with-arg {
   bottom: 3em;
   left: 4em; }
 
+div.parameter-name-scope {
+  -webkit-transform: translateX(50px); }
+
 @-webkit-keyframes change-color {
   0% {
     color: green; }
