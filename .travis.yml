@@ -4,7 +4,7 @@ php:
   - 5.3
   - 5.4
   - 5.5
-  - hhvm
+#  - hhvm
 
 before_script:
     - wget http://getcomposer.org/composer.phar
