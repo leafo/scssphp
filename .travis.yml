@@ -1,7 +1,13 @@
 language: php
-script: phpunit tests
+
 php:
   - 5.3
   - 5.4
   - 5.5
   - hhvm
+
+before_script:
+    - wget http://getcomposer.org/composer.phar
+    - php composer.phar install --dev
+
+script: ./vendor/bin/phpunit tests
