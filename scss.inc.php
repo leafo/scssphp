@@ -103,8 +103,7 @@ class scssc {
 	 *
 	 * @return string
 	 */
-	public function compile($code, $name = null)
-	{
+	public function compile($code, $name = null) {
 		$this->indentLevel  = -1;
 		$this->commentsSeen = array();
 		$this->extends      = array();
@@ -320,8 +319,7 @@ class scssc {
 		}
 	}
 
-	protected function compileRoot($rootBlock)
-	{
+	protected function compileRoot($rootBlock) {
 		$this->scope = $this->makeOutputBlock('root');
 
 		$this->compileChildren($rootBlock->children, $this->scope);
@@ -498,8 +496,7 @@ class scssc {
 		return implode($piece);
 	}
 
-	protected function hasSelectorPlaceholder($selector)
-	{
+	protected function hasSelectorPlaceholder($selector) {
 		if (!is_array($selector)) return false;
 
 		foreach ($selector as $parts) {
@@ -1581,8 +1578,7 @@ class scssc {
 		return $defaultValue; // found nothing
 	}
 
-	protected function injectVariables(array $args)
-	{
+	protected function injectVariables(array $args) {
 		if (empty($args)) {
 			return;
 		}
@@ -1614,8 +1610,7 @@ class scssc {
 	 *
 	 * @param array $variables
 	 */
-	public function setVariables(array $variables)
-	{
+	public function setVariables(array $variables) {
 		$this->registeredVars = array_merge($this->registeredVars, $variables);
 	}
 
@@ -1624,8 +1619,7 @@ class scssc {
 	 *
 	 * @param string $name
 	 */
-	public function unsetVariable($name)
-	{
+	public function unsetVariable($name) {
 		unset($this->registeredVars[$name]);
 	}
 
@@ -2740,8 +2734,7 @@ class scss_parser {
 	 *
 	 * @return \StdClass
 	 */
-	public function parse($buffer)
-	{
+	public function parse($buffer) {
 		$this->count           = 0;
 		$this->env             = null;
 		$this->inParens        = false;
@@ -3305,13 +3298,11 @@ class scss_parser {
 	 *
 	 * @return boolean
 	 */
-	public function valueList(&$out)
-	{
+	public function valueList(&$out) {
 		return $this->genericList($out, 'spaceList', ',');
 	}
 
-	protected function spaceList(&$out)
-	{
+	protected function spaceList(&$out) {
 		return $this->genericList($out, 'expression');
 	}
 
@@ -4247,8 +4238,7 @@ class scss_formatter {
 		return $name . $this->assignSeparator . $value . ';';
 	}
 
-	protected function blockLines($inner, $block)
-	{
+	protected function blockLines($inner, $block) {
 		$glue = $this->break.$inner;
 		echo $inner . implode($glue, $block->lines);
 
@@ -4339,8 +4329,7 @@ class scss_formatter_nested extends scss_formatter {
 		}
 	}
 
-	protected function blockLines($inner, $block)
-	{
+	protected function blockLines($inner, $block) {
 		$glue = $this->break . $inner;
 
 		foreach ($block->lines as $index => $line) {
@@ -4415,8 +4404,7 @@ class scss_formatter_compressed extends scss_formatter {
 		return '';
 	}
 
-	public function blockLines($inner, $block)
-	{
+	public function blockLines($inner, $block) {
 		$glue = $this->break.$inner;
 
 		foreach ($block->lines as $index => $line) {
@@ -4450,8 +4438,7 @@ class scss_formatter_crunched extends scss_formatter {
 		return '';
 	}
 
-	public function blockLines($inner, $block)
-	{
+	public function blockLines($inner, $block) {
 		$glue = $this->break.$inner;
 
 		foreach ($block->lines as $index => $line) {
@@ -4588,8 +4575,7 @@ class scss_server {
 	 *
 	 * @return string|null
 	 */
-	protected function getIfModifiedSinceHeader()
-	{
+	protected function getIfModifiedSinceHeader() {
 		$modifiedSince = null;
 
 		if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
@@ -4608,8 +4594,7 @@ class scss_server {
 	 *
 	 * @return string|null
 	 */
-	protected function getIfNoneMatchHeader()
-	{
+	protected function getIfNoneMatchHeader() {
 		$noneMatch = null;
 
 		if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
@@ -4627,8 +4612,7 @@ class scss_server {
 	 *
 	 * @return array
 	 */
-	protected function compile($in, $out)
-	{
+	protected function compile($in, $out) {
 		$start   = microtime(true);
 		$css     = $this->scss->compile(file_get_contents($in), $in);
 		$elapsed = round((microtime(true) - $start), 4);
