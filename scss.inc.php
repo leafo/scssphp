@@ -1497,6 +1497,7 @@ class scssc {
 
 		foreach ($args as $arg) {
 			list($i, $name, $default, $isVariable) = $arg;
+
 			if ($isVariable) {
 				$val = array('list', ',', array());
 				for ($count = count($remaining); $i < $count; $i++) {
@@ -1510,7 +1511,7 @@ class scssc {
 			} elseif (isset($keywordArgs[$name])) {
 				$val = $keywordArgs[$name];
 			} elseif (!empty($default)) {
-				$val = $default;
+				continue;
 			} else {
 				$this->throwError("Missing argument $name");
 			}
@@ -1519,6 +1520,16 @@ class scssc {
 		}
 
 		$storeEnv->store = $env->store;
+
+		foreach ($args as $arg) {
+			list($i, $name, $default, $isVariable) = $arg;
+
+			if ($isVariable || isset($remaining[$i]) || isset($keywordArgs[$name]) || empty($default)) {
+				continue;
+			}
+
+			$this->set($name, $this->reduce($default, true), true);
+		}
 	}
 
 	protected function pushEnv($block=null) {

@@ -79,3 +79,11 @@ div {
         height: func_test(2px);
     }
 }
+
+@function test ($a, $b: $a/2) {
+    @return $b;
+}
+
+div {
+  width: test(4);
+}
