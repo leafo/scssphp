@@ -104,6 +104,8 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.0.15** -- Aug 6, 2014
+  * fix regression with default values in functions (torkiljohnsen)
 * **0.0.14** -- Aug 5, 2014
   * @keyframes $name - didn't work inside mixin (sergeylukin)
   * Bourbon transform(translateX()) didn't work (dovy and greynor)
