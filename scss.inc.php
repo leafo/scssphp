@@ -134,6 +134,38 @@ class scssc {
 		return $out;
 	}
 
+	public function compileFile($in, $out = null)
+	{
+		if (!is_readable($in)) {
+			throw new Exception('load error: failed to find '.$in);
+		}
+
+		$pi = pathinfo($in);
+
+		$oldImport = $this->importPaths;
+		$this->addImportPath($pi['dirname'].'/');
+
+		$compiled = $this->compile(file_get_contents($in), $in);
+
+		$this->importPaths = $oldImport;
+
+		if ($out !== null) {
+			return file_put_contents($out, $compiled);
+		}
+
+		return $compiled;
+	}
+
+	// compile only if changed input has changed or output doesn't exist
+	public function checkedCompile($in, $out)
+	{
+		if (!is_file($out) || filemtime($in) > filemtime($out)) {
+			$this->compileFile($in, $out);
+			return true;
+		}
+		return false;
+	}
+
 	protected function isSelfExtend($target, $origin) {
 		foreach ($origin as $sel) {
 			if (in_array($target, $sel)) {
