@@ -1362,7 +1362,7 @@ class Compiler
                     if ($rval == 0) {
                         $this->throwError("color: Can't divide by zero");
                     }
-                    $out[] = $lval / $rval;
+                    $out[] = (int) ($lval / $rval);
                     break;
                 case '==':
                     return $this->opEq($left, $right);
