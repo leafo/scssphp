@@ -1,3 +1,2 @@
-
 test:
-	phpunit --colors tests
+	vendor/bin/phpunit --colors tests
