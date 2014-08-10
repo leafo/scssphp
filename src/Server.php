@@ -13,6 +13,7 @@
 namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Compiler;
+use Leafo\ScssPhp\Version;
 
 /**
  * SCSS server
@@ -186,7 +187,7 @@ class Server
         $css     = $this->scss->compile(file_get_contents($in), $in);
         $elapsed = round((microtime(true) - $start), 4);
 
-        $v    = Compiler::$VERSION;
+        $v    = Version::VERSION;
         $t    = @date('r');
         $css  = "/* compiled by scssphp $v on $t (${elapsed}s) */\n\n" . $css;
         $etag = md5($css);
@@ -313,7 +314,7 @@ class Server
         header($protocol . ' 404 Not Found');
         header('Content-type: text/plain');
 
-        $v = Compiler::$VERSION;
+        $v = Version::VERSION;
         echo "/* INPUT NOT FOUND scss $v */\n";
     }
 

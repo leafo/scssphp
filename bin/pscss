@@ -7,6 +7,7 @@ include 'scss.inc.php';
 
 use Leafo\ScssPhp\Compiler;
 use Leafo\ScssPhp\Parser;
+use Leafo\ScssPhp\Version;
 
 $opts = getopt('hvTf:', array('help', 'version'));
 
@@ -40,7 +41,7 @@ EOT;
 }
 
 if (has("v", "version")) {
-    exit(Compiler::$VERSION . "\n");
+    exit(Version::VERSION . "\n");
 }
 
 $data = "";
