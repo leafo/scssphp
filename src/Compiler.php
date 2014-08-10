@@ -1923,7 +1923,9 @@ class Compiler
 
     public function addImportPath($path)
     {
-        $this->importPaths[] = $path;
+        if (!in_array($path, $this->importPaths)) {
+            $this->importPaths[] = $path;
+        }
     }
 
     public function setImportPaths($path)
