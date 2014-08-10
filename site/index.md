@@ -53,7 +53,7 @@ Create a file, like `style.php`:
     <?php
     $directory = "stylesheets";
 
-    require "scssphp/scss.inc.php";
+    require_once "scssphp/scss.inc.php";
 
     use Leafo\ScssPhp\Server;
 
@@ -83,7 +83,7 @@ invoke the `Compiler` class:
 
     ```php
     <?php
-    require "scssphp/scss.inc.php";
+    require_once "scssphp/scss.inc.php";
 
     use Leafo\ScssPhp\Compiler;
 
