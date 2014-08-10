@@ -33,7 +33,7 @@ Options include:
 
     -h, --help     Show this message
     -v, --version  Print the version
-    -f=format      Set the output format (compressed, crunched, expanded, or nested)
+    -f=format      Set the output format (compact, compressed, crunched, expanded, or nested)
     -T             Dump formatted parse tree
 
 EOT;
@@ -61,7 +61,7 @@ if (has("T")) {
 $scss = new Compiler();
 
 if (has("f")) {
-    $scss->setFormatter('Leafo\\ScssPhp\\' . ucfirst($opts["f"]));
+    $scss->setFormatter('Leafo\\ScssPhp\\Formatter\\' . ucfirst($opts["f"]));
 }
 
 echo $scss->compile($data, "STDIN");
