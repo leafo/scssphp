@@ -204,6 +204,50 @@ class Server
     }
 
     /**
+     * Compile .scss file
+     *
+     * @param string $in  Input file (.scss)
+     * @param string $out Output file (.css) optional
+     *
+     * @return string|bool
+     */
+    public function compileFile($in, $out = null)
+    {
+        if (!is_readable($in)) {
+            throw new \Exception('load error: failed to find '.$in);
+        }
+
+        $pi = pathinfo($in);
+
+        $this->scss->addImportPath($pi['dirname'].'/');
+
+        $compiled = $this->scss->compile(file_get_contents($in), $in);
+
+        if ($out !== null) {
+            return file_put_contents($out, $compiled);
+        }
+
+        return $compiled;
+    }
+
+    /**
+     * Check if file need compiling
+     *
+     * @param string $in  Input file (.scss)
+     * @param string $out Output file (.css)
+     *
+     * @return bool
+     */
+    public function checkedCompile($in, $out)
+    {
+        if (!is_file($out) || filemtime($in) > filemtime($out)) {
+            $this->compileFile($in, $out);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Compile requested scss and serve css.  Outputs HTTP response.
      *
      * @param string $salt Prefix a string to the filename for creating the cache name hash
