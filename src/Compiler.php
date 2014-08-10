@@ -49,7 +49,7 @@ use Leafo\ScssPhp\Parser;
  */
 class Compiler
 {
-    static public $VERSION = 'v0.0.16-dev';
+    static public $VERSION = 'v0.1.0';
 
     static protected $operatorNames = array(
         '+' => 'add',

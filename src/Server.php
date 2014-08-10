@@ -276,9 +276,9 @@ class Server
     /**
      * Constructor
      *
-     * @param string      $dir      Root directory to .scss files
-     * @param string      $cacheDir Cache directory
-     * @param \scssc|null $scss     SCSS compiler instance
+     * @param string                       $dir      Root directory to .scss files
+     * @param string                       $cacheDir Cache directory
+     * @param \Leafo\ScssPhp\Compiler|null $scss     SCSS compiler instance
      */
     public function __construct($dir, $cacheDir = null, $scss = null)
     {

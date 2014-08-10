@@ -9,8 +9,10 @@
 
 ### Including
 
-The entire project comes in a single file. Just include it somewhere to start
-using it:
+The project can be loaded through a `composer` generated auto-loader.
+
+Alternatively, the entire project can be loaded through a utility file.
+Just include it somewhere to start using it:
 
     ```php
     <?php
@@ -20,13 +22,16 @@ using it:
 ### Compiling
 
 In order to manually compile code from PHP you must create an instance of the
-`scssc` class. The typical flow is to create the instance, set any compile time
+`Compiler` class. The typical flow is to create the instance, set any compile time
 options, then run the compiler with the `compile` method.
 
     ```php
     <?php
     require "scssphp/scss.inc.php";
-    $scss = new scssc();
+
+    use Leafo\ScssPhp\Compiler;
+
+    $scss = new Compiler();
 
     echo $scss->compile('
       $color: #abc;
@@ -59,7 +64,10 @@ The default import path is `array("")`, which means the current directory.
     ```php
     <?php
     require "scssphp/scss.inc.php";
-    $scss = new scssc();
+
+    use Leafo\ScssPhp\Compiler;
+
+    $scss = new Compiler();
     $scss->setImportPaths("assets/stylesheets/");
 
     // will search for `assets/stylesheets/mixins.scss'
@@ -73,7 +81,10 @@ files that SCSS would otherwise not process (such as vanilla CSS imports).
     ```php
     <?php
     require "scssphp/scss.inc.php";
-    $scss = new scssc();
+
+    use Leafo\ScssPhp\Compiler;
+
+    $scss = new Compiler();
     $scss->addImportPath(function($path) {
         if (!file_exists('stylesheets/'.$path)) return null;
         return 'stylesheets/'.$path;
@@ -90,15 +101,15 @@ default formatter.
 
 Three formatters are included:
 
-* `scss_formatter`
-* `scss_formatter_nested` *(default)*
-* `scss_formatter_compressed`
+* `Leafo\ScssPhp\Formatter\Expanded`
+* `Leafo\ScssPhp\Formatter\Nested` *(default)*
+* `Leafo\ScssPhp\Formatter\Compressed`
 
 We can change the formatting using the `setFormatter` method.
 
 * <p>`setFormatter($formatterName)` sets the current formatter to `$formatterName`,
   the name of a class as a string that implements the formatting interface. See
-  the source for `scss_formatter` for an example.
+  the source for `Leafo\ScssPhp\Formatter\Expanded` for an example.
   </p>
 
 Given the following SCSS:
@@ -123,7 +134,7 @@ Given the following SCSS:
 
 The formatters will output,
 
-`scss_formatter`:
+`Leafo\ScssPhp\Formatter\Expanded`:
 
     ```css
     .navigation ul {
@@ -138,7 +149,7 @@ The formatters will output,
     }
     ```
 
-`scss_formatter_nested`:
+`Leafo\ScssPhp\Formatter\Nested`:
 
     ```css
     .navigation ul {
@@ -151,7 +162,7 @@ The formatters will output,
       color: silver; }
     ```
 
-`scss_formatter_compressed`:
+`Leafo\ScssPhp\Formatter\Compressed`:
 
     ```css
     .navigation ul{line-height:20px;color:blue;}.navigation ul a{color:red;}.footer .copyright{color:silver;}
@@ -198,7 +209,9 @@ together. PHP's anonymous function syntax is used to define the function.
 
     ```php
     <?php
-    $scss = new scssc();
+    use Leafo\ScssPhp\Compiler;
+
+    $scss = new Compiler();
 
     $scss->registerFunction("add-two", function($args) {
       list($a, $b) = $args;
@@ -223,7 +236,7 @@ files if they've been modified (or one of the imports has been modified).
 
 ### Using `serveFrom`
 
-`scss_server::serveFrom` is a simple to use function that should handle most cases.
+`Server::serveFrom` is a simple to use function that should handle most cases.
 
 For example, create a file `style.php`:
 
@@ -232,13 +245,16 @@ For example, create a file `style.php`:
     $directory = "stylesheets";
 
     require "scssphp/scss.inc.php";
-    scss_server::serveFrom($directory);
+
+    use Leafo\ScssPhp\Server;
+
+    Server::serveFrom($directory);
     ```
 
 Going to the URL `example.com/style.php/style.scss` will attempt to compile
 `style.scss` from the `stylesheets` directory, and serve it as CSS.
 
-* <p>`scss_server::serveFrom($directory)` will serve SCSS files out of
+* <p>`Server::serveFrom($directory)` will serve SCSS files out of
   `$directory`. It will attempt to get the path to the file out of
   `$_SERVER["PATH_INFO"]`. (It also looks at the GET parameter `p`)
   </p>
@@ -262,14 +278,14 @@ directory. It writes its cache in a special directory called `scss_cache`.
 Also, because SCSS server writes headers, make sure no output is written before
 it runs.
 
-### Using `scss_server`
+### Using `Leafo\ScssPhp\Server`
 
-Creating an instance of `scss_server` is just another way of accomplishing what
-`serveFrom` does. It let's us customize the cache directory and the instance
-of the `scssc` that is used to compile
+Creating an instance of `Server` is just another way of accomplishing what
+`serveFrom` does. It lets us customize the cache directory and the instance
+of the `Compiler` that is used to compile
 
 
-* <p>`new scss_server($sourceDir, $cacheDir, $scss)` creates a new server that
+* <p>`new Server($sourceDir, $cacheDir, $scss)` creates a new server that
   serves files from `$sourceDir`. The cache dir is where the cached compiled
   files are placed. When `null`, `$sourceDir . "/scss_cache"` is used. `$scss`
   is the instance of `scss` that is used to compile.
@@ -283,10 +299,13 @@ Here's an example of creating a SCSS server that outputs compressed CSS:
     <?php
     require "scssphp/scss.inc.php";
 
-    $scss = new scssc();
+    use Leafo\ScssPhp\Compiler;
+    use Leafo\ScssPhp\Server;
+
+    $scss = new Compiler();
     $scss->setFormatter("scss_formatter_compressed");
 
-    $server = new scss_server("stylesheets", null, $scss);
+    $server = new Server("stylesheets", null, $scss);
     $server->serve();
     ```
 
@@ -301,6 +320,6 @@ If passed the flag `-v`, input is ignored and the current version if returned.
 The flag `-f` can be used to set the [formatter](#Output_formatting):
 
     ```bash
-    $ ./pscss -f scss_formatter_compressed < styles.scss
+    $ bin/pscss -f scss_formatter_compressed < styles.scss
     ```
 

@@ -20,10 +20,10 @@ Follow the author on twitter: [@moonscript](http://twitter.com/moonscript).
 <a name="installing"></a>
 ## Installing
 
-You can always download the latest version here:  
+You can always download the latest version here:
 <a href="$root/src/scssphp-$current_version.tar.gz" id="download-link">scssphp-$current_version.tar.gz</a>
 
-You can also find the latest source online:  
+You can also find the latest source online:
 <https://github.com/leafo/scssphp/>
 
 If you use [Packagist][2] for installing packages, then you can update your `composer.json` like so:
@@ -54,7 +54,10 @@ Create a file, like `style.php`:
     $directory = "stylesheets";
 
     require "scssphp/scss.inc.php";
-    scss_server::serveFrom($directory);
+
+    use Leafo\ScssPhp\Server;
+
+    Server::serveFrom($directory);
 
     ```
 
@@ -74,13 +77,17 @@ must have permission to write in `scss_cache`.
 
 ### Compiler Interface
 
-If you're interested in directly using the compiler, then all you need to do is
-require `scss.inc.php` and invoke the `scss` class:
+If you're interested in directly using the compiler, then all you need to either
+require `scss.inc.php` or use your `composer` generated auto-laoder, and then
+invoke the `Compiler` class:
 
     ```php
     <?php
     require "scssphp/scss.inc.php";
-    $scss = new scssc();
+
+    use Leafo\ScssPhp\Compiler;
+
+    $scss = new Compiler();
 
     echo $scss->compile('
       $color: #abc;
@@ -104,6 +111,9 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.1.0** -- Aug 9, 2014
+  * raise PHP requirement (5.3+)
+  * reformat/reorganize source files to be PSR-2 compliant
 * **0.0.15** -- Aug 6, 2014
   * fix regression with default values in functions (torkiljohnsen)
 * **0.0.14** -- Aug 5, 2014
@@ -148,7 +158,7 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
   * Add == and != ops for colors.
   * @if and @while directives should treat null like false.
   * Add pscss as bin in composer.json (Christian Lück).
-  * Fix !default bug (James Shannon, Alberto Aldegheri). 
+  * Fix !default bug (James Shannon, Alberto Aldegheri).
   * Fix mixin content includes (James Shannon, Christian Brandt).
   * Fix passing of varargs to another mixin.
   * Fix interpolation bug in expToString() (Matti Jarvinen).
