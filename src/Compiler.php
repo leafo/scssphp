@@ -2019,7 +2019,14 @@ class Compiler
     {
         // try a lib function
         $name = $this->normalizeName($name);
-        $libName = 'lib_'.$name;
+        $libName = 'lib' . preg_replace_callback(
+            '/_(.)/',
+            function ($m) {
+                return ucfirst($m[1]);
+            },
+            ucfirst($name)
+        );
+
         $f = array($this, $libName);
 
         if (is_callable($f)) {
@@ -2281,8 +2288,8 @@ class Compiler
 
     // Built in functions
 
-    protected static $lib_if = array('condition', 'if-true', 'if-false');
-    protected function lib_if($args)
+    protected static $libIf = array('condition', 'if-true', 'if-false');
+    protected function libIf($args)
     {
         list($cond,$t, $f) = $args;
 
@@ -2293,8 +2300,8 @@ class Compiler
         return $t;
     }
 
-    protected static $lib_index = array('list', 'value');
-    protected function lib_index($args)
+    protected static $libIndex = array('list', 'value');
+    protected function libIndex($args)
     {
         list($list, $value) = $args;
 
@@ -2311,18 +2318,18 @@ class Compiler
         return false === $key ? false : $key + 1;
     }
 
-    protected static $lib_rgb = array('red', 'green', 'blue');
-    protected function lib_rgb($args)
+    protected static $libRgb = array('red', 'green', 'blue');
+    protected function libRgb($args)
     {
         list($r,$g,$b) = $args;
 
         return array('color', $r[1], $g[1], $b[1]);
     }
 
-    protected static $lib_rgba = array(
+    protected static $libRgba = array(
         array('red', 'color'),
         'green', 'blue', 'alpha');
-    protected function lib_rgba($args)
+    protected function libRgba($args)
     {
         if ($color = $this->coerceColor($args[0])) {
             $num = !isset($args[1]) ? $args[3] : $args[1];
@@ -2373,7 +2380,7 @@ class Compiler
         return $color;
     }
 
-    protected static $lib_adjust_color = array(
+    protected static $libAdjustColor = array(
         'color', 'red', 'green', 'blue',
         'hue', 'saturation', 'lightness', 'alpha'
     );
@@ -2381,12 +2388,12 @@ class Compiler
     {
         return $base += $alter;
     }
-    protected function lib_adjust_color($args)
+    protected function libAdjustColor($args)
     {
         return $this->alterColor($args, 'adjustColorHelper');
     }
 
-    protected static $lib_change_color = array(
+    protected static $libChangeColor = array(
         'color', 'red', 'green', 'blue',
         'hue', 'saturation', 'lightness', 'alpha'
     );
@@ -2394,12 +2401,12 @@ class Compiler
     {
         return $alter;
     }
-    protected function lib_change_color($args)
+    protected function libChangeColor($args)
     {
         return $this->alterColor($args, 'changeColorHelper');
     }
 
-    protected static $lib_scale_color = array(
+    protected static $libScaleColor = array(
         'color', 'red', 'green', 'blue',
         'hue', 'saturation', 'lightness', 'alpha'
     );
@@ -2432,13 +2439,13 @@ class Compiler
 
         return ($max - $base) * $scale + $base;
     }
-    protected function lib_scale_color($args)
+    protected function libScaleColor($args)
     {
         return $this->alterColor($args, 'scaleColorHelper');
     }
 
-    protected static $lib_ie_hex_str = array('color');
-    protected function lib_ie_hex_str($args)
+    protected static $libIeHexStr = array('color');
+    protected function libIeHexStr($args)
     {
         $color = $this->coerceColor($args[0]);
         $color[4] = isset($color[4]) ? round(255*$color[4]) : 255;
@@ -2446,32 +2453,32 @@ class Compiler
         return sprintf('#%02X%02X%02X%02X', $color[4], $color[1], $color[2], $color[3]);
     }
 
-    protected static $lib_red = array('color');
-    protected function lib_red($args)
+    protected static $libRed = array('color');
+    protected function libRed($args)
     {
         $color = $this->coerceColor($args[0]);
 
         return $color[1];
     }
 
-    protected static $lib_green = array('color');
-    protected function lib_green($args)
+    protected static $libGreen = array('color');
+    protected function libGreen($args)
     {
         $color = $this->coerceColor($args[0]);
 
         return $color[2];
     }
 
-    protected static $lib_blue = array('color');
-    protected function lib_blue($args)
+    protected static $libBlue = array('color');
+    protected function libBlue($args)
     {
         $color = $this->coerceColor($args[0]);
 
         return $color[3];
     }
 
-    protected static $lib_alpha = array('color');
-    protected function lib_alpha($args)
+    protected static $libAlpha = array('color');
+    protected function libAlpha($args)
     {
         if ($color = $this->coerceColor($args[0])) {
             return isset($color[4]) ? $color[4] : 1;
@@ -2481,8 +2488,8 @@ class Compiler
         return null;
     }
 
-    protected static $lib_opacity = array('color');
-    protected function lib_opacity($args)
+    protected static $libOpacity = array('color');
+    protected function libOpacity($args)
     {
         $value = $args[0];
 
@@ -2490,12 +2497,12 @@ class Compiler
             return null;
         }
 
-        return $this->lib_alpha($args);
+        return $this->libAlpha($args);
     }
 
     // mix two colors
-    protected static $lib_mix = array('color-1', 'color-2', 'weight');
-    protected function lib_mix($args)
+    protected static $libMix = array('color-1', 'color-2', 'weight');
+    protected function libMix($args)
     {
         list($first, $second, $weight) = $args;
         $first = $this->assertColor($first);
@@ -2529,17 +2536,17 @@ class Compiler
         return $this->fixColor($new);
     }
 
-    protected static $lib_hsl = array('hue', 'saturation', 'lightness');
-    protected function lib_hsl($args)
+    protected static $libHsl = array('hue', 'saturation', 'lightness');
+    protected function libHsl($args)
     {
         list($h, $s, $l) = $args;
 
         return $this->toRGB($h[1], $s[1], $l[1]);
     }
 
-    protected static $lib_hsla = array('hue', 'saturation',
+    protected static $libHsla = array('hue', 'saturation',
         'lightness', 'alpha');
-    protected function lib_hsla($args)
+    protected function libHsla($args)
     {
         list($h, $s, $l, $a) = $args;
 
@@ -2549,8 +2556,8 @@ class Compiler
         return $color;
     }
 
-    protected static $lib_hue = array('color');
-    protected function lib_hue($args)
+    protected static $libHue = array('color');
+    protected function libHue($args)
     {
         $color = $this->assertColor($args[0]);
         $hsl = $this->toHSL($color[1], $color[2], $color[3]);
@@ -2558,8 +2565,8 @@ class Compiler
         return array('number', $hsl[1], 'deg');
     }
 
-    protected static $lib_saturation = array('color');
-    protected function lib_saturation($args)
+    protected static $libSaturation = array('color');
+    protected function libSaturation($args)
     {
         $color = $this->assertColor($args[0]);
         $hsl = $this->toHSL($color[1], $color[2], $color[3]);
@@ -2567,8 +2574,8 @@ class Compiler
         return array('number', $hsl[2], '%');
     }
 
-    protected static $lib_lightness = array('color');
-    protected function lib_lightness($args)
+    protected static $libLightness = array('color');
+    protected function libLightness($args)
     {
         $color = $this->assertColor($args[0]);
         $hsl = $this->toHSL($color[1], $color[2], $color[3]);
@@ -2589,8 +2596,8 @@ class Compiler
         return $out;
     }
 
-    protected static $lib_adjust_hue = array('color', 'degrees');
-    protected function lib_adjust_hue($args)
+    protected static $libAdjustHue = array('color', 'degrees');
+    protected function libAdjustHue($args)
     {
         $color = $this->assertColor($args[0]);
         $degrees = $this->assertNumber($args[1]);
@@ -2598,8 +2605,8 @@ class Compiler
         return $this->adjustHsl($color, 1, $degrees);
     }
 
-    protected static $lib_lighten = array('color', 'amount');
-    protected function lib_lighten($args)
+    protected static $libLighten = array('color', 'amount');
+    protected function libLighten($args)
     {
         $color = $this->assertColor($args[0]);
         $amount = 100*$this->coercePercent($args[1]);
@@ -2607,8 +2614,8 @@ class Compiler
         return $this->adjustHsl($color, 3, $amount);
     }
 
-    protected static $lib_darken = array('color', 'amount');
-    protected function lib_darken($args)
+    protected static $libDarken = array('color', 'amount');
+    protected function libDarken($args)
     {
         $color = $this->assertColor($args[0]);
         $amount = 100*$this->coercePercent($args[1]);
@@ -2616,8 +2623,8 @@ class Compiler
         return $this->adjustHsl($color, 3, -$amount);
     }
 
-    protected static $lib_saturate = array('color', 'amount');
-    protected function lib_saturate($args)
+    protected static $libSaturate = array('color', 'amount');
+    protected function libSaturate($args)
     {
         $value = $args[0];
 
@@ -2631,8 +2638,8 @@ class Compiler
         return $this->adjustHsl($color, 2, $amount);
     }
 
-    protected static $lib_desaturate = array('color', 'amount');
-    protected function lib_desaturate($args)
+    protected static $libDesaturate = array('color', 'amount');
+    protected function libDesaturate($args)
     {
         $color = $this->assertColor($args[0]);
         $amount = 100*$this->coercePercent($args[1]);
@@ -2640,8 +2647,8 @@ class Compiler
         return $this->adjustHsl($color, 2, -$amount);
     }
 
-    protected static $lib_grayscale = array('color');
-    protected function lib_grayscale($args)
+    protected static $libGrayscale = array('color');
+    protected function libGrayscale($args)
     {
         $value = $args[0];
 
@@ -2652,14 +2659,14 @@ class Compiler
         return $this->adjustHsl($this->assertColor($value), 2, -100);
     }
 
-    protected static $lib_complement = array('color');
-    protected function lib_complement($args)
+    protected static $libComplement = array('color');
+    protected function libComplement($args)
     {
         return $this->adjustHsl($this->assertColor($args[0]), 1, 180);
     }
 
-    protected static $lib_invert = array('color');
-    protected function lib_invert($args)
+    protected static $libInvert = array('color');
+    protected function libInvert($args)
     {
         $value = $args[0];
 
@@ -2676,8 +2683,8 @@ class Compiler
     }
 
     // increases opacity by amount
-    protected static $lib_opacify = array('color', 'amount');
-    protected function lib_opacify($args)
+    protected static $libOpacify = array('color', 'amount');
+    protected function libOpacify($args)
     {
         $color = $this->assertColor($args[0]);
         $amount = $this->coercePercent($args[1]);
@@ -2688,15 +2695,15 @@ class Compiler
         return $color;
     }
 
-    protected static $lib_fade_in = array('color', 'amount');
-    protected function lib_fade_in($args)
+    protected static $libFadeIn = array('color', 'amount');
+    protected function libFadeIn($args)
     {
-        return $this->lib_opacify($args);
+        return $this->libOpacify($args);
     }
 
     // decreases opacity by amount
-    protected static $lib_transparentize = array('color', 'amount');
-    protected function lib_transparentize($args)
+    protected static $libTransparentize = array('color', 'amount');
+    protected function libTransparentize($args)
     {
         $color = $this->assertColor($args[0]);
         $amount = $this->coercePercent($args[1]);
@@ -2707,14 +2714,14 @@ class Compiler
         return $color;
     }
 
-    protected static $lib_fade_out = array('color', 'amount');
-    protected function lib_fade_out($args)
+    protected static $libFadeOut = array('color', 'amount');
+    protected function libFadeOut($args)
     {
-        return $this->lib_transparentize($args);
+        return $this->libTransparentize($args);
     }
 
-    protected static $lib_unquote = array('string');
-    protected function lib_unquote($args)
+    protected static $libUnquote = array('string');
+    protected function libUnquote($args)
     {
         $str = $args[0];
 
@@ -2725,8 +2732,8 @@ class Compiler
         return $str;
     }
 
-    protected static $lib_quote = array('string');
-    protected function lib_quote($args)
+    protected static $libQuote = array('string');
+    protected function libQuote($args)
     {
         $value = $args[0];
 
@@ -2737,16 +2744,16 @@ class Compiler
         return array('string', '"', array($value));
     }
 
-    protected static $lib_percentage = array('value');
-    protected function lib_percentage($args)
+    protected static $libPercentage = array('value');
+    protected function libPercentage($args)
     {
         return array('number',
             $this->coercePercent($args[0]) * 100,
             '%');
     }
 
-    protected static $lib_round = array('value');
-    protected function lib_round($args)
+    protected static $libRound = array('value');
+    protected function libRound($args)
     {
         $num = $args[0];
         $num[1] = round($num[1]);
@@ -2754,8 +2761,8 @@ class Compiler
         return $num;
     }
 
-    protected static $lib_floor = array('value');
-    protected function lib_floor($args)
+    protected static $libFloor = array('value');
+    protected function libFloor($args)
     {
         $num = $args[0];
         $num[1] = floor($num[1]);
@@ -2763,8 +2770,8 @@ class Compiler
         return $num;
     }
 
-    protected static $lib_ceil = array('value');
-    protected function lib_ceil($args)
+    protected static $libCeil = array('value');
+    protected function libCeil($args)
     {
         $num = $args[0];
         $num[1] = ceil($num[1]);
@@ -2772,8 +2779,8 @@ class Compiler
         return $num;
     }
 
-    protected static $lib_abs = array('value');
-    protected function lib_abs($args)
+    protected static $libAbs = array('value');
+    protected function libAbs($args)
     {
         $num = $args[0];
         $num[1] = abs($num[1]);
@@ -2781,7 +2788,7 @@ class Compiler
         return $num;
     }
 
-    protected function lib_min($args)
+    protected function libMin($args)
     {
         $numbers = $this->getNormalizedNumbers($args);
         $min = null;
@@ -2795,7 +2802,7 @@ class Compiler
         return $args[$min[0]];
     }
 
-    protected function lib_max($args)
+    protected function libMax($args)
     {
         $numbers = $this->getNormalizedNumbers($args);
         $max = null;
@@ -2835,16 +2842,16 @@ class Compiler
         return $numbers;
     }
 
-    protected static $lib_length = array('list');
-    protected function lib_length($args)
+    protected static $libLength = array('list');
+    protected function libLength($args)
     {
         $list = $this->coerceList($args[0]);
 
         return count($list[2]);
     }
 
-    protected static $lib_nth = array('list', 'n');
-    protected function lib_nth($args)
+    protected static $libNth = array('list', 'n');
+    protected function libNth($args)
     {
         $list = $this->coerceList($args[0]);
         $n = $this->assertNumber($args[1]) - 1;
@@ -2868,8 +2875,8 @@ class Compiler
         }
     }
 
-    protected static $lib_join = array('list1', 'list2', 'separator');
-    protected function lib_join($args)
+    protected static $libJoin = array('list1', 'list2', 'separator');
+    protected function libJoin($args)
     {
         list($list1, $list2, $sep) = $args;
 
@@ -2880,8 +2887,8 @@ class Compiler
         return array('list', $sep, array_merge($list1[2], $list2[2]));
     }
 
-    protected static $lib_append = array('list', 'val', 'separator');
-    protected function lib_append($args)
+    protected static $libAppend = array('list', 'val', 'separator');
+    protected function libAppend($args)
     {
         list($list1, $value, $sep) = $args;
 
@@ -2891,7 +2898,7 @@ class Compiler
         return array('list', $sep, array_merge($list1[2], array($value)));
     }
 
-    protected function lib_zip($args)
+    protected function libZip($args)
     {
         foreach ($args as $arg) {
             $this->assertList($arg);
@@ -2916,8 +2923,8 @@ class Compiler
         return array('list', ',', $lists);
     }
 
-    protected static $lib_type_of = array('value');
-    protected function lib_type_of($args)
+    protected static $libTypeOf = array('value');
+    protected function libTypeOf($args)
     {
         $value = $args[0];
 
@@ -2937,8 +2944,8 @@ class Compiler
         }
     }
 
-    protected static $lib_unit = array('number');
-    protected function lib_unit($args)
+    protected static $libUnit = array('number');
+    protected function libUnit($args)
     {
         $num = $args[0];
 
@@ -2949,16 +2956,16 @@ class Compiler
         return '';
     }
 
-    protected static $lib_unitless = array('number');
-    protected function lib_unitless($args)
+    protected static $libUnitless = array('number');
+    protected function libUnitless($args)
     {
         $value = $args[0];
 
         return $value[0] == 'number' && empty($value[2]);
     }
 
-    protected static $lib_comparable = array('number-1', 'number-2');
-    protected function lib_comparable($args)
+    protected static $libComparable = array('number-1', 'number-2');
+    protected function libComparable($args)
     {
         list($number1, $number2) = $args;
 
@@ -2977,7 +2984,7 @@ class Compiler
      *
      * @param array $args
      */
-    protected function lib_counter($args)
+    protected function libCounter($args)
     {
         $list = array_map(array($this, 'compileValue'), $args);
 
