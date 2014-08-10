@@ -1040,16 +1040,20 @@ class Compiler
                 $ltype = $left[0];
                 $rtype = $right[0];
 
+                $ucOpName = ucfirst($opName);
+                $ucLType  = ucfirst($ltype);
+                $ucRType  = ucfirst($rtype);
+
                 // this tries:
-                // 1. op_[op name]_[left type]_[right type]
-                // 2. op_[left type]_[right type] (passing the op as first arg
-                // 3. op_[op name]
-                $fn = "op_${opName}_${ltype}_${rtype}";
+                // 1. op[op name][left type][right type]
+                // 2. op[left type][right type] (passing the op as first arg
+                // 3. op[op name]
+                $fn = "op${ucOpName}${ucLType}${ucRType}";
                 if (is_callable(array($this, $fn)) ||
-                    (($fn = "op_${ltype}_${rtype}") &&
+                    (($fn = "op${ucLType}${ucRType}") &&
                         is_callable(array($this, $fn)) &&
                         $passOp = true) ||
-                    (($fn = "op_${opName}") &&
+                    (($fn = "op${ucOpName}") &&
                         is_callable(array($this, $fn)) &&
                         $genOp = true)
                 ) {
@@ -1258,33 +1262,33 @@ class Compiler
         return array('number', $value, $unit);
     }
 
-    protected function op_add_number_number($left, $right)
+    protected function opAddNumberNumber($left, $right)
     {
         return array('number', $left[1] + $right[1], $left[2]);
     }
 
-    protected function op_mul_number_number($left, $right)
+    protected function opMulNumberNumber($left, $right)
     {
         return array('number', $left[1] * $right[1], $left[2]);
     }
 
-    protected function op_sub_number_number($left, $right)
+    protected function opSubNumberNumber($left, $right)
     {
         return array('number', $left[1] - $right[1], $left[2]);
     }
 
-    protected function op_div_number_number($left, $right)
+    protected function opDivNumberNumber($left, $right)
     {
         return array('number', $left[1] / $right[1], $left[2]);
     }
 
-    protected function op_mod_number_number($left, $right)
+    protected function opModNumberNumber($left, $right)
     {
         return array('number', $left[1] % $right[1], $left[2]);
     }
 
     // adding strings
-    protected function op_add($left, $right)
+    protected function opAdd($left, $right)
     {
         if ($strLeft = $this->coerceString($left)) {
             if ($right[0] == 'string') {
@@ -1307,7 +1311,7 @@ class Compiler
         }
     }
 
-    protected function op_and($left, $right, $shouldEval)
+    protected function opAnd($left, $right, $shouldEval)
     {
         if (!$shouldEval) {
             return;
@@ -1320,7 +1324,7 @@ class Compiler
         return $left;
     }
 
-    protected function op_or($left, $right, $shouldEval)
+    protected function opOr($left, $right, $shouldEval)
     {
         if (!$shouldEval) {
             return;
@@ -1333,7 +1337,7 @@ class Compiler
         return $right;
     }
 
-    protected function op_color_color($op, $left, $right)
+    protected function opColorColor($op, $left, $right)
     {
         $out = array('color');
 
@@ -1361,9 +1365,9 @@ class Compiler
                     $out[] = $lval / $rval;
                     break;
                 case '==':
-                    return $this->op_eq($left, $right);
+                    return $this->opEq($left, $right);
                 case '!=':
-                    return $this->op_neq($left, $right);
+                    return $this->opNeq($left, $right);
                 default:
                     $this->throwError("color: unknown op $op");
             }
@@ -1378,29 +1382,29 @@ class Compiler
         return $this->fixColor($out);
     }
 
-    protected function op_color_number($op, $left, $right)
+    protected function opColorNumber($op, $left, $right)
     {
         $value = $right[1];
 
-        return $this->op_color_color(
+        return $this->opColorColor(
             $op,
             $left,
             array('color', $value, $value, $value)
         );
     }
 
-    protected function op_number_color($op, $left, $right)
+    protected function opNumberColor($op, $left, $right)
     {
         $value = $left[1];
 
-        return $this->op_color_color(
+        return $this->opColorColor(
             $op,
             array('color', $value, $value, $value),
             $right
         );
     }
 
-    protected function op_eq($left, $right)
+    protected function opEq($left, $right)
     {
         if (($lStr = $this->coerceString($left)) && ($rStr = $this->coerceString($right))) {
             $lStr[1] = '';
@@ -1412,27 +1416,27 @@ class Compiler
         return $this->toBool($left == $right);
     }
 
-    protected function op_neq($left, $right)
+    protected function opNeq($left, $right)
     {
         return $this->toBool($left != $right);
     }
 
-    protected function op_gte_number_number($left, $right)
+    protected function opGteNumberNumber($left, $right)
     {
         return $this->toBool($left[1] >= $right[1]);
     }
 
-    protected function op_gt_number_number($left, $right)
+    protected function opGtNumberNumber($left, $right)
     {
         return $this->toBool($left[1] > $right[1]);
     }
 
-    protected function op_lte_number_number($left, $right)
+    protected function opLteNumberNumber($left, $right)
     {
         return $this->toBool($left[1] <= $right[1]);
     }
 
-    protected function op_lt_number_number($left, $right)
+    protected function opLtNumberNumber($left, $right)
     {
         return $this->toBool($left[1] < $right[1]);
     }
