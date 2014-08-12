@@ -8,3 +8,6 @@ include __DIR__ . '/src/Formatter/Expanded.php';
 include __DIR__ . '/src/Formatter/Nested.php';
 include __DIR__ . '/src/Parser.php';
 include __DIR__ . '/src/Server.php';
+
+//added for backward compatibility
+include __DIR__ . '/classmap.php';
