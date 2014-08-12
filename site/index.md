@@ -111,6 +111,8 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.1.1** -- Aug 12, 2014
+  * add stub classes -- a backward compatibility layer (vladimmi)
 * **0.1.0** -- Aug 9, 2014
   * raise PHP requirement (5.3+)
   * reformat/reorganize source files to be PSR-2 compliant
