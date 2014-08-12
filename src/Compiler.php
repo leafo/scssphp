@@ -410,7 +410,7 @@ class Compiler
         return $scope;
     }
 
-    // TODO refactor compileNestedBlock and compileMedia into same thing
+    // TODO: refactor compileNestedBlock and compileMedia into same thing?
     protected function compileNestedBlock($block, $selectors)
     {
         $this->pushEnv($block);
@@ -843,7 +843,7 @@ class Compiler
                 foreach ($list[2] as $item) {
                     $this->pushEnv();
                     $this->set($each->var, $item);
-                    // TODO: allow return from here
+                    // TODO: allow return from here?
                     $this->compileChildren($each->children, $out);
                     $this->popEnv();
                 }
@@ -2066,7 +2066,7 @@ class Compiler
     }
 
     // sorts any keyword arguments
-    // TODO: merge with apply arguments
+    // TODO: merge with apply arguments?
     protected function sortArgs($prototype, $args)
     {
         $keyArgs = array();

@@ -1555,7 +1555,7 @@ class Parser
                 }
 
                 $this->seek($s);
-                // should just break here?
+                // TODO: should just break here?
             }
 
             break;
