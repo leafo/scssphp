@@ -71,7 +71,7 @@ The default import path is `array("")`, which means the current directory.
     $scss->setImportPaths("assets/stylesheets/");
 
     // will search for `assets/stylesheets/mixins.scss'
-    echo $scss->compile('@import "mixins.scss"');
+    echo $scss->compile('@import "mixins.scss";');
     ```
 
 Besides adding static import paths, it's also possible to add custom import
@@ -91,7 +91,7 @@ files that SCSS would otherwise not process (such as vanilla CSS imports).
     });
 
     // will import `stylesheets/vanilla.css'
-    echo $scss->compile('@import "vanilla.css"');
+    echo $scss->compile('@import "vanilla.css";');
     ```
 
 ### Output Formatting
