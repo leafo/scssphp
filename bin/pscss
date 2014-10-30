@@ -3,7 +3,7 @@
 
 error_reporting(E_ALL);
 
-include 'scss.inc.php';
+include __DIR__.'/../scss.inc.php';
 
 use Leafo\ScssPhp\Compiler;
 use Leafo\ScssPhp\Parser;
