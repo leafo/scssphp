@@ -60,7 +60,7 @@ if (has("T")) {
 $scss = new Compiler();
 
 if (has("f")) {
-    $scss->setFormatter('Leafo\\ScssPhp\\' . ucfirst($opts["f"]));
+    $scss->setFormatter('Leafo\\ScssPhp\\Formatter\\' . ucfirst($opts["f"]));
 }
 
 echo $scss->compile($data, "STDIN");
