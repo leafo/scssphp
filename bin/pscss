@@ -8,7 +8,7 @@ include __DIR__.'/../scss.inc.php';
 use Leafo\ScssPhp\Compiler;
 use Leafo\ScssPhp\Parser;
 
-$opts = getopt('hvTf:', array('help', 'version'));
+$opts = getopt('hvTi:f:', array('help', 'version'));
 
 function has() {
     global $opts;
@@ -34,6 +34,7 @@ Options include:
     -v, --version  Print the version
     -f=format      Set the output format (compressed, crunched, expanded, or nested)
     -T             Dump formatted parse tree
+    -i=path        Set import path
 
 EOT;
     exit($HELP);
@@ -59,8 +60,12 @@ if (has("T")) {
 
 $scss = new Compiler();
 
+if (has("i")) {
+    $scss->addImportPath($opts["i"]);
+}
+
 if (has("f")) {
-    $scss->setFormatter('Leafo\\ScssPhp\\' . ucfirst($opts["f"]));
+    $scss->setFormatter('Leafo\\ScssPhp\\Formatter\\' . ucfirst($opts["f"]));
 }
 
 echo $scss->compile($data, "STDIN");
