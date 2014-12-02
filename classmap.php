@@ -15,48 +15,62 @@
 /**
  * @deprecated since 0.1.0
  */
-class scssc extends \Leafo\ScssPhp\Compiler
-{
+if ( ! class_exists( 'scssc') ) {
+	class scssc extends \Leafo\ScssPhp\Compiler
+	{
+	}
 }
 
 /**
  * @deprecated since 0.1.0
  */
-class scss_parser extends \Leafo\ScssPhp\Parser
-{
+if ( ! class_exists( 'scss_parser') ) {
+	class scss_parser extends \Leafo\ScssPhp\Parser
+	{
+	}
 }
 
 /**
  * @deprecated since 0.1.0
  */
-class scss_formatter extends \Leafo\ScssPhp\Formatter\Expanded
-{
+if ( ! class_exists( 'scss_formatter') ) {
+	class scss_formatter extends \Leafo\ScssPhp\Formatter\Expanded
+	{
+	}
 }
 
 /**
  * @deprecated since 0.1.0
  */
-class scss_formatter_nested extends \Leafo\ScssPhp\Formatter\Nested
-{
+if ( ! class_exists( 'scss_formatter_nested') ) {
+	class scss_formatter_nested extends \Leafo\ScssPhp\Formatter\Nested
+	{
+	}
 }
 
 /**
  * @deprecated since 0.1.0
  */
-class scss_formatter_compressed extends \Leafo\ScssPhp\Formatter\Compressed
-{
+if ( ! class_exists( 'scss_formatter_compressed' ) ) {
+	class scss_formatter_compressed extends \Leafo\ScssPhp\Formatter\Compressed
+	{
+	}
 }
 
 /**
  * @deprecated since 0.1.0
  */
-class scss_formatter_crunched extends \Leafo\ScssPhp\Formatter\Crunched
-{
+if ( ! class_exists( 'scss_formatter_crunched') ) {
+	class scss_formatter_crunched extends \Leafo\ScssPhp\Formatter\Crunched
+	{
+	}
 }
 
 /**
  * @deprecated since 0.1.0
  */
-class scss_server extends \Leafo\ScssPhp\Server
-{
+if ( ! class_exists( 'scss_server') ) {
+	class scss_server extends \Leafo\ScssPhp\Server
+	{
+	}
 }
