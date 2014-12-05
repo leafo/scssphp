@@ -21,6 +21,15 @@ use Leafo\ScssPhp\Compiler;
  */
 class Server
 {
+	/** @var string */
+	public $dir;
+
+	/** @var string */
+	public $cacheDir;
+
+	/** @var Compiler */
+	public $scss;
+
     /**
      * Join path components
      *
@@ -272,6 +281,32 @@ class Server
         $v = Compiler::$VERSION;
         echo "/* INPUT NOT FOUND scss $v */\n";
     }
+
+	/**
+	 * Based on explicit input/output files does a full change check on cache before compiling.
+	 *
+	 * @param string $in
+	 * @param string $out
+	 * @param boolean $force
+	 * @return string Compiled CSS results
+	 * @throws Exception
+	 */
+	public function checkedCachedCompile($in, $out, $force = false) {
+		if (!is_file($in) || !is_readable($in)) {
+			throw new Exception('Invalid or unreadable input file specified.');
+		}
+		if (is_dir($out) || !is_writable(file_exists($out) ? $out : dirname($out))) {
+			throw new Exception('Invalid or unwritable output file specified.');
+		}
+
+		if ($force || $this->needsCompile($in, $out, $etag)) {
+			list($css, $etag) = $this->compile($in, $out);
+		} else {
+			$css = file_get_contents($out);
+		}
+
+		return $css;
+	}
 
     /**
      * Constructor
