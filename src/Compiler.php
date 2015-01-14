@@ -2127,7 +2127,7 @@ class Compiler
                 return $value;
 
             case 'keyword':
-                $name = $value[1];
+                $name = strtolower($value[1]);
 
                 if (isset(Colors::$cssColors[$name])) {
                     $rgba = explode(',', Colors::$cssColors[$name]);
