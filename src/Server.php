@@ -14,12 +14,14 @@ namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Compiler;
 use Leafo\ScssPhp\Version;
+use Leafo\ScssPhp\LineCommentator;
 
 /**
  * SCSS server
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */
+
 class Server
 {
     /**
@@ -51,7 +53,6 @@ class Server
                 return substr($_SERVER['DOCUMENT_URI'], strlen($_SERVER['SCRIPT_NAME']));
         }
     }
-
     /**
      * Get path to requested .scss file
      *
@@ -184,7 +185,8 @@ class Server
     protected function compile($in, $out)
     {
         $start   = microtime(true);
-        $css     = $this->scss->compile(file_get_contents($in), $in);
+        $scss    = LineCommentator::insertLineComments(file($in),$in);
+        $css     = $this->scss->compile($scss, $in);
         $elapsed = round((microtime(true) - $start), 4);
 
         $v    = Version::VERSION;

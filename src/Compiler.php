@@ -797,7 +797,13 @@ class Compiler
                 );
                 break;
             case 'comment':
+
                 if ($out->type == 'root') {
+                    $this->compileComment($child);
+                    break;
+                }
+                if (strpos($child[1], '/* line ') !==FALSE ) {
+                    $out->lines[] = "Block-Kommentar: ".$child[1];
                     $this->compileComment($child);
                     break;
                 }
