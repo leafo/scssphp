@@ -14,6 +14,7 @@ namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Colors;
 use Leafo\ScssPhp\Parser;
+use Leafo\ScssPhp\LineCommentator;
 
 /**
  * The scss compiler and parser.
@@ -99,6 +100,9 @@ class Compiler
 
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
 
+    protected $lineNumbers = FALSE;
+    protected $fileName;
+
     /**
      * Compile scss
      *
@@ -119,6 +123,17 @@ class Compiler
 
         $locale = setlocale(LC_NUMERIC, 0);
         setlocale(LC_NUMERIC, 'C');
+
+        if ($this->isLineNumbers()) {
+            if (!$name) {
+                //string given
+                $code = explode("\n", $code);
+                $code = LineCommentator::insertLineComments($code, $this->getFileName());
+            } else {
+                //filepath given
+                $code = LineCommentator::insertLineComments(file($name), $name);
+            }
+        }
 
         $this->parser = new Parser($name);
 
@@ -798,12 +813,15 @@ class Compiler
                 break;
             case 'comment':
 
-                if ($out->type == 'root') {
+                if (isset($out->type) && $out->type == 'root') {
                     $this->compileComment($child);
                     break;
                 }
-                if (strpos($child[1], '/* line ') !==FALSE ) {
-                    $out->lines[] = "Block-Kommentar: ".$child[1];
+
+                //do not nest line comments into the parrent block
+                //for further information on the issue see https://github.com/leafo/scssphp/issues/228
+
+               if (strpos($child[1], '/* line ') !==FALSE) {
                     $this->compileComment($child);
                     break;
                 }
@@ -1965,6 +1983,11 @@ class Compiler
             $tree = $this->importCache[$realPath];
         } else {
             $code = file_get_contents($path);
+
+            if ($this->isLineNumbers()) {
+                $code = LineCommentator::insertLineComments(file($path), $path);
+            }
+
             $parser = new Parser($path, false);
             $tree = $parser->parse($code);
             $this->parsedFiles[] = $path;
@@ -3009,4 +3032,45 @@ class Compiler
 
         throw new \Exception($msg);
     }
+
+    /*
+     * check if line number feature is active
+     * @return boolean
+     */
+    public function isLineNumbers()
+    {
+        return $this->lineNumbers;
+    }
+
+    /**
+     * use this function to turn line numbers on
+     * @param boolean $lineNumbers
+     * @param string $filename
+     * @return boolean 
+     */
+    public function setLineNumbers($lineNumbers, $filename = NULL)
+    {
+        $this->lineNumbers = $lineNumbers;
+
+        if ($filename) {
+            $this->setFileName($filename);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getFileName()
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * @param string $fileName
+     */
+    public function setFileName($fileName)
+    {
+        $this->fileName = $fileName;
+    }
+
 }

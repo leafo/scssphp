@@ -32,3 +32,55 @@ you can run the following command to rebuild all the tests:
     BUILD=true phpunit tests
 
 This will compile all the tests, and save results into `tests/outputs`.
+
+## (optional) Output SCSS line numbers
+
+Now you can output the original SCSS line numbers within the compiled CSS file for better frontend debugging.
+
+Works great in combination with frontend debugging tools like https://addons.mozilla.org/de/firefox/addon/firecompass-for-firebug/
+
+To activate this feature you need to call `->setLineNumbers(true)` after creating a new instance of class 'compiler'.
+
+code sample:
+
+    namespace Leafo\ScssPhp;
+
+    use Leafo\ScssPhp\Server;
+    use \Leafo\ScssPhp\Compiler;
+
+    require "lib/scssphp/scss.inc.php";
+    
+    $directory = "css";
+
+    $scss = new Compiler();
+    $scss->setLineNumbers(true);
+
+    $server = new Server($directory, null, $scss);
+    $server->serve();
+
+
+You can also call the 'compile' method directly (without using an instance of 'server' like above) 
+    
+    namespace Leafo\ScssPhp;
+    
+    use Leafo\ScssPhp\Server;
+    use \Leafo\ScssPhp\Compiler;
+    
+    require "lib/scssphp/scss.inc.php";
+    
+    $scss = new Compiler();
+    
+    //the name argument is optional
+    $scss->setLineNumbers(true,'anyname.scss');
+    
+    echo $scss->compile('
+      $color: #abc;
+      div { color: lighten($color, 20%); }
+    ');
+
+
+Performance impact is around 10% when a new CSS file is compiled with line numbers, compared to the same file without line numbers.
+
+**important note:** this feature has only been tested with the standard formatter ('Leafo\ScssPhp\Formatter\Nested'). 
+Using formatters like "compact" will remove line breaks and frontend debugging tools might have trouble to output the corresponding line from the comment.
+
