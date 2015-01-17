@@ -32,3 +32,32 @@ you can run the following command to rebuild all the tests:
     BUILD=true phpunit tests
 
 This will compile all the tests, and save results into `tests/outputs`.
+
+## (optional) output scss line numbers
+
+Now you can output the original SCSS line numbers within the compiled CSS file for better frontend debugging.
+
+Works great in combination with frontend debugging tools like https://addons.mozilla.org/de/firefox/addon/firecompass-for-firebug/
+
+To activate this feature you need to call `->setLineNumbers(true)` after creating a new instance of compiler.php
+
+code sample:
+
+    namespace Leafo\ScssPhp;
+
+    use Leafo\ScssPhp\Server;
+    use \Leafo\ScssPhp\Compiler;
+
+    $directory = "css";
+
+    require "lib/scssphp/scss.inc.php";
+
+
+    $scss = new Compiler();
+    $scss->setLineNumbers(true);
+
+    $server = new Server($directory, null, $scss);
+    $server->serve();
+
+
+Performance impact is around 10%.
