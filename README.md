@@ -42,7 +42,7 @@ Works great in combination with frontend debugging tools like https://addons.moz
 To activate this feature you need to call `->setLineNumbers(true)` after creating a new instance of compiler.php
 
 code sample:
-    ``` php
+
     namespace Leafo\ScssPhp;
 
     use Leafo\ScssPhp\Server;
