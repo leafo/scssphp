@@ -82,13 +82,15 @@ class LineCommentator
     }
 
     /*
-     * looking for selector block
+     * looking for selector block:
+     * the opening  bracket could be in the same line or in the next one (since we've cleaned empty lines)
+     * also we don't want to confuse a selector block with a property block or write the comment above the bracket
+     * itself (in case it's in a new line)
+     *
      * @return boolean
      */
     static function isSelector($line, $nextline = NULL)
     {
-
-        $bracket_position = strpos($nextline, self::block_indicator_start);
 
         if ((strpos($line, self::block_indicator_start) !== FALSE || strpos($nextline, self::block_indicator_start) === 0)
             && self::isProperty($line) === FALSE && strpos($line, self::block_indicator_start) !== 0
