@@ -33,7 +33,7 @@ you can run the following command to rebuild all the tests:
 
 This will compile all the tests, and save results into `tests/outputs`.
 
-## (optional) output scss line numbers
+## (optional) Output SCSS line numbers
 
 Now you can output the original SCSS line numbers within the compiled CSS file for better frontend debugging.
 
