@@ -58,6 +58,12 @@ code sample:
 
     $server = new Server($directory, null, $scss);
     $server->serve();
+    
+    
+Performance impact is around 10% when a new CSS file is compiled with line numbers.
+
+**important note: this feature has only been tested with the standard formatter ('Leafo\ScssPhp\Formatter\Nested').
+Using formatters like "compact" will remove line breaks and frontend debugging tools might have trouble finding the corresponding line in your scss file.**
 
 
-Performance impact is around 10%.
+
