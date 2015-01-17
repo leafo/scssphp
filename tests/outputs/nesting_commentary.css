@@ -1,0 +1,25 @@
+body {
+  color: red; }
+
+div {
+  color: red;
+  height: yes;
+  /*commentary for pre */ }
+  div pre {
+    color: blue; }
+
+div {
+  /*commentary for  font: 10px hello world*/
+  font: 10px hello world;
+  font-size: 10px;
+  font-color: blue;
+  /*commentary for border */
+  border-left: 1px solid blue;
+  border-right: 2px dashed green; }
+
+#nested-nesting {
+  bar: baz;
+  bang-bop: bar;
+  /*commentary for bip*/
+  bang-bip: 1px;
+  bang-blat-baf: bort; }
