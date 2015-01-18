@@ -50,7 +50,7 @@ class LineCommentator
         $lines = $scss;
         $new_scss_content = array();
 
-        $filepath = str_replace('\\','/',$filepath);
+        $filepath = str_replace('\\', '/', $filepath);
 
         foreach ($lines as $linenumber => $line) {
 
@@ -95,7 +95,6 @@ class LineCommentator
         if ((strpos($line, self::block_indicator_start) !== FALSE || strpos($nextline, self::block_indicator_start) === 0)
             && self::isProperty($line) === FALSE && strpos($line, self::block_indicator_start) !== 0
         ) {
-
             return true;
         }
 
