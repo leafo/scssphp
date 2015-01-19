@@ -23,10 +23,16 @@ class LineCommentator
 
     const block_indicator_start = '{';
     const block_indicator_end = '}';
-    const property_indicator = ': ';
 
     const html_comment_indicator_start = '<!--';
     const html_comment_indicator_end = '-->';
+
+    const function_indicator = '@function';
+    const return_indicator = '@return';
+
+    const mixin_indicator = '@mixin';
+
+    const include_indicator = '@include';
 
     //we use this to indicate that we are currently looping within a multiline comment
     static protected $inside_multiline;
@@ -63,8 +69,13 @@ class LineCommentator
                 continue;
             }
 
-            //only write line numbers for selectors to reduce overhead
-            if (self::isSelector($line, $nextline) == FALSE) {
+            //write line numbers for selectors only to reduce overhead
+            if (
+                self::isSelector($line, $nextline) == FALSE ||
+                self::isFunction($line) == TRUE ||
+                self::isMixin($line) == TRUE ||
+                self::isInclude($line) == TRUE
+            ) {
                 $new_scss_content[] = $line;
                 continue;
             }
@@ -92,8 +103,9 @@ class LineCommentator
     static function isSelector($line, $nextline = NULL)
     {
 
-        if ((strpos($line, self::block_indicator_start) !== FALSE || strpos($nextline, self::block_indicator_start) === 0)
-            && self::isProperty($line) === FALSE && strpos($line, self::block_indicator_start) !== 0
+        if (
+            (strpos($line, self::block_indicator_start) !== FALSE || strpos($nextline, self::block_indicator_start) === 0)
+            && strpos($line, self::block_indicator_start) !== 0
         ) {
             return true;
         }
@@ -103,17 +115,58 @@ class LineCommentator
     }
 
     /*
-     * check for property
+     * ignore mixins. mixins will spread inside selectors after compilation
      *
-     * @return boolean
+     * @return: boolean
      */
-    static function isProperty($line)
+
+    static function isMixin($line)
     {
-        if (strpos($line, self::property_indicator) !== FALSE) {
+        if (strpos($line, self::mixin_indicator) !== FALSE) {
             return true;
         }
 
         return false;
+    }
+
+
+    /*
+     * ignore functions
+     *
+     * @return: boolean
+     */
+
+    static function isFunction($line)
+    {
+
+        if
+        (
+            strpos($line, self::function_indicator) !== FALSE ||
+            strpos($line, self::return_indicator) !== FALSE
+        ) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+
+    /*
+     * ignore includes (the content included content however will have line numbers)
+     *
+     * @return: boolean
+     */
+
+    static function isInclude($line)
+    {
+
+        if (strpos($line, self::include_indicator) !== FALSE) {
+            return true;
+        }
+
+        return false;
+
     }
 
 
