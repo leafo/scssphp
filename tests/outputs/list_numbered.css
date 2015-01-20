@@ -1,0 +1,8 @@
+/* line 4, list.scss */
+div {
+  padding: 10px 20px 30px 40px;
+  margin: 0 10px 10px 10px;
+  background: linear-gradient(black, white); }
+/* line 13, list.scss */
+p {
+  background: linear-gradient(red, blue); }

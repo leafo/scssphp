@@ -1,0 +1,37 @@
+/* line 3, content.scss */
+* html {
+  /* line 8, content.scss */ }
+  * html #logo {
+    background-image: url(/logo.gif); }
+/* line 20, content.scss */
+.colors {
+  background-color: blue;
+  color: white;
+  border-color: blue; }
+/* line 26, content.scss */
+@media only screen and (max-width: 480px) {
+  /* line 32, content.scss */
+    body {
+      color: red; } }
+/* line 36, content.scss */
+#sidebar {
+  width: 300px;
+  /* line 26, content.scss */ }
+  @media only screen and (max-width: 480px) {
+  #sidebar {
+    width: 100px; } }
+/* line 46, content.scss */
+@media only screen and (min-width: 40em) {
+  /* line 51, content.scss */
+    .grid-1 {
+      width: 100%; }
+    .grid-2 {
+      width: 100%; } }
+/* line 46, content.scss */
+@media only screen and (min-width: 40em) {
+  /* line 58, content.scss */
+  /* line 58, content.scss */
+    .grid-1 {
+      width: 100%; }
+    .grid-2 {
+      width: 100%; } }

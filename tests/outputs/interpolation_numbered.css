@@ -1,0 +1,83 @@
+/* line 2, interpolation.scss */
+div {
+  /* line 3, interpolation.scss */
+  color: redwhite blue;
+  /* line 4, interpolation.scss */
+  color: red white blue;
+  /* line 5, interpolation.scss */
+  color: red whiteblue;
+  /* line 6, interpolation.scss */
+  color: redwhiteblue;
+  /* line 7, interpolation.scss */
+  color: ummyeahwhat;
+  /* line 8, interpolation.scss */
+  color: stacked;
+  /* line 10, interpolation.scss */
+  font-size: 10px/something;
+  /* line 11, interpolation.scss */
+  font-size: 10px / something;
+  /* line 13, interpolation.scss */
+  test: "whatworldwrong";
+  /* line 14, interpolation.scss */
+  test: "whatworldwrong";
+  /* line 15, interpolation.scss */
+  test: "whatworldwrong";
+  /* line 16, interpolation.scss */
+  test: "what"world"wrong";
+  /* line 18, interpolation.scss */
+  hi: "what is 16 end"; }
+/* line 24, interpolation.scss */
+pre {
+  /* line 27, interpolation.scss */
+  /* line 31, interpolation.scss */
+  /* line 35, interpolation.scss */ }
+  pre var {
+    color: red; }
+  pre var dad {
+    color: red; }
+  pre bedvardad {
+    color: red; }
+/* line 40, interpolation.scss */
+cool {
+  /* line 42, interpolation.scss */ }
+  cool .thing-1 {
+    color: red; }
+  cool .thing-2 {
+    color: red; }
+  cool .thing-3 {
+    color: red; }
+  cool .thing-4 {
+    color: red; }
+  cool .thing-5 {
+    color: red; }
+/* line 48, interpolation.scss */
+abcde {
+  color: red; }
+/* line 52, interpolation.scss */
+#hello, .world {
+  color: red; }
+/* line 56, interpolation.scss */
+#abchelloyeah, .coolworldyes {
+  color: red; }
+/* line 62, interpolation.scss */
+div.element:nth-child(2n) {
+  display: none; }
+/* line 69, interpolation.scss */
+div {
+  /* line 71, interpolation.scss */
+  hello: world;
+  coolhello: world;
+  /* line 72, interpolation.scss */
+  helloone: world;
+  /* line 73, interpolation.scss */
+  twohelloone: world;
+  /* line 74, interpolation.scss */
+  oneabtwo: cool;
+  /* line 76, interpolation.scss */
+  /* line 78, interpolation.scss */
+  /* line 79, interpolation.scss */
+  hello-world: red;
+  hello-mold: white;
+  /* line 80, interpolation.scss */
+  hello-hello: blue;
+  /* line 81, interpolation.scss */ }

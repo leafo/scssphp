@@ -1,0 +1,29 @@
+/* line 2, null.scss */
+.div {
+  one: null;
+  one: world;
+  one: NULL world;
+  one: a, b;
+  two: a, b; }
+/* line 12, null.scss */
+p:before {
+  /* line 13, null.scss */
+  content: "I ate  pies!"; }
+/* line 31, null.scss */
+.foo {
+  /* line 26, null.scss */
+  -webkit-border-radius: 10;
+  border-radius: 10;
+  /* line 27, null.scss */ }
+/* line 35, null.scss */
+.fu {
+  /* line 26, null.scss */
+  -webkit-border-radius: 20;
+  border-radius: 20;
+  /* line 27, null.scss */ }
+/* line 39, null.scss */
+.bar {
+  /* line 26, null.scss */
+  -webkit-border-top-left-radius: 30;
+  border-top-left-radius: 30;
+  /* line 27, null.scss */ }

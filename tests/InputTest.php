@@ -3,6 +3,7 @@
 namespace Leafo\ScssPhp\Tests;
 
 use Leafo\ScssPhp\Compiler;
+use Leafo\ScssPhp\LineCommentator;
 
 // Runs all the tests in inputs/ and compares their output to ouputs/
 
@@ -21,6 +22,10 @@ class InputTest extends \PHPUnit_Framework_TestCase
     protected static $inputDir = 'inputs';
     protected static $outputDir = 'outputs';
 
+    protected static $line_number_suffix = '_numbered';
+    protected static $tempfilename = 'tempfile.scss';
+
+
     public function setUp()
     {
         $this->scss = new Compiler();
@@ -32,13 +37,6 @@ class InputTest extends \PHPUnit_Framework_TestCase
      */
     public function testInputFile($inFname, $outFname)
     {
-
-        if (strpos($inFname, 'line_numbering.scss') !==FALSE) {
-            $this->scss->setLineNumbers(true);
-        } else {
-            $this->scss->setLineNumbers(false);
-        }
-
 
         if (getenv('BUILD')) {
             return $this->buildInput($inFname, $outFname);
@@ -52,7 +50,42 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $input = file_get_contents($inFname);
         $output = file_get_contents($outFname);
 
-        $this->assertEquals($output, $this->scss->compile($input, $inFname));
+        $this->assertEquals($output, $this->scss->compile($input));
+    }
+
+    /*
+     * run all tests with line numbering
+     */
+
+    /**
+     * @dataProvider fileNameProvider
+     */
+
+    public function testLineNumbering($inFname, $outFname) {
+
+
+        $outFname = self::lineNumberPath($outFname);
+
+        $scss = LineCommentator::insertLineComments(file($inFname),  self::fileName($inFname));
+
+        //(over)write temp scsss file with line numbers for each testfile
+        file_put_contents(__DIR__ . '/'.self::$inputDir.'/temp/'.self::$tempfilename, $scss);
+
+        if (getenv('BUILD')) {
+            $css = $this->scss->compile($scss);
+            file_put_contents($outFname, $css);
+        }
+
+        if (!is_readable($outFname)) {
+            $this->fail("$outFname is missing, consider building tests with BUILD=true");
+        }
+
+        $input = file_get_contents(__DIR__ . '/'.self::$inputDir.'/temp/'.self::$tempfilename);
+        $output = file_get_contents($outFname);
+
+        $this->assertEquals($output, $this->scss->compile($input));
+
+
     }
 
     public function fileNameProvider()
@@ -68,7 +101,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
     // only run when env is set
     public function buildInput($inFname, $outFname)
     {
-        $css = $this->scss->compile(file_get_contents($inFname), $inFname);
+        $css = $this->scss->compile(file_get_contents($inFname));
         file_put_contents($outFname, $css);
     }
 
@@ -103,5 +136,18 @@ class InputTest extends \PHPUnit_Framework_TestCase
 
         foreach ($files as $file) {
         }
+    }
+
+    public static function lineNumberPath($outFname) {
+
+        $outFname = preg_replace("/.css$/", self::$line_number_suffix.'.css', self::fileName($outFname));
+
+        return __DIR__ .'/'.self::$outputDir . '/' . $outFname;
+    }
+
+    public static function fileName($path) {
+
+        $filename = explode('/',$path);
+        return end($filename);
     }
 }
