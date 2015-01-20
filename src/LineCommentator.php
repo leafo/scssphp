@@ -34,6 +34,13 @@ class LineCommentator
 
     const include_indicator = '@include';
 
+    const if_statement_indicator = '@if';
+    const else_statement_indicator = '@else';
+
+    const loop_indicator_for = "@for";
+    const loop_indicator_while = "@while";
+    const loop_indicator_each = "@each";
+
     //we use this to indicate that we are currently looping within a multiline comment
     static protected $inside_multiline;
 
@@ -74,7 +81,9 @@ class LineCommentator
                 self::isSelector($line, $nextline) == FALSE ||
                 self::isFunction($line) == TRUE ||
                 self::isMixin($line) == TRUE ||
-                self::isInclude($line) == TRUE
+                self::isInclude($line) == TRUE ||
+                self::isCondition($line) == TRUE ||
+                self::isLoop($line) == TRUE
             ) {
                 $new_scss_content[] = $line;
                 continue;
@@ -153,7 +162,7 @@ class LineCommentator
 
 
     /*
-     * ignore includes (the content included content however will have line numbers)
+     * ignore includes (the included content however will have line numbers)
      *
      * @return: boolean
      */
@@ -166,6 +175,37 @@ class LineCommentator
         }
 
         return false;
+
+    }
+
+    /*
+     * dont't put a line number above if statement, since it will result in an empty line within the
+     * compiled scss
+     */
+    static function isCondition($line) {
+        if
+        (
+            strpos($line, self::if_statement_indicator) !== FALSE ||
+            strpos($line, self::else_statement_indicator) !== FALSE
+        ) {
+            return true;
+        }
+
+    }
+
+    /*
+    * dont't put a line number above loops, since it will result in an empty line within the
+    * compiled scss
+     */
+    static function isLoop($line) {
+        if
+        (
+            strpos($line, self::loop_indicator_for) !== FALSE ||
+            strpos($line, self::loop_indicator_each) !== FALSE ||
+            strpos($line, self::loop_indicator_while) !== FALSE
+        ) {
+            return true;
+        }
 
     }
 

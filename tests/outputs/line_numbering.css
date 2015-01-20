@@ -1,0 +1,129 @@
+cool: 100px;
+/* line 2, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/imports/_partial.scss */
+#partial {
+  color: blue; }
+/* line 3, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+body {
+  color: #7c2;
+  background: gray; }
+/* line 9, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+div {
+  color: red; }
+
+/* line 11, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+  @page yeah {
+/* line 12, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+  div pre {
+    height: 20px; } }
+/* line 18, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+@font-face {
+  color: red;
+  height: 20px; }
+/* line 24, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+div {
+  color: what;
+  color: is;
+  color: this;
+  font: what;
+  font: is;
+  font: this;
+  background: what;
+  background: is;
+  background: this;
+  border: what;
+  border: is;
+  border: this; }
+/* line 46, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+div {
+  height: red, two, three; }
+/* line 52, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+div {
+  num: 1000; }
+/* line 57, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+div {
+  num: 2000; }
+/* line 65, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+pre {
+  color: blue; }
+/* line 73, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+del {
+  color: ; }
+
+/* line 75, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+  del pre {
+    color: ; }
+/* line 88, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+body {
+  font-family: Arial;
+  font-family: Helvetica Neue;
+  font-family: "Helvetica Neue";
+  font-family: Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+/* line 108, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+span {
+  color: blue; }
+
+/* line 99, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+  span div {
+    height: 20px; }
+/* line 112, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+html {
+  height: 43px; }
+/* line 116, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+div {
+  color: blue; }
+/* comment 1 */
+/* line 123, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+a {
+  /* comment 2 */
+  color: red;
+  /* comment 3 */
+  /* comment 4 */ }
+/* comment 5 */
+/*! comment 1 */
+/* line 131, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+b {
+  /*! comment 2 */
+  color: red;
+  /*! comment 3 */
+  /*! comment 4 */ }
+/*! comment 5 */
+/*
+ * multi-line comment 1
+ */
+/* line 141, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+c {
+  /*
+   * multi-line comment 2
+   */
+  color: red;
+  /*
+   * multi-line comment 3
+   */
+  /*
+   * multi-line comment 4
+   */ }
+/*
+ * multi-line comment 5
+ */
+/*!
+ * multi-line comment 1
+ */
+/* line 159, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+d {
+  /*!
+   * multi-line comment 2
+   */
+  color: red;
+  /*!
+   * multi-line comment 3
+   */
+  /*!
+   * multi-line comment 4
+   */ }
+/*!
+ * multi-line comment 5
+ */
+/* line 175, C:/xampp/_webroot/scss/lib/scssphp/tests/inputs/line_numbering.scss */
+e {
+  color: red; }

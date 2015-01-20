@@ -32,6 +32,14 @@ class InputTest extends \PHPUnit_Framework_TestCase
      */
     public function testInputFile($inFname, $outFname)
     {
+
+        if (strpos($inFname, 'line_numbering.scss') !==FALSE) {
+            $this->scss->setLineNumbers(true);
+        } else {
+            $this->scss->setLineNumbers(false);
+        }
+
+
         if (getenv('BUILD')) {
             return $this->buildInput($inFname, $outFname);
         }
@@ -40,10 +48,11 @@ class InputTest extends \PHPUnit_Framework_TestCase
             $this->fail("$outFname is missing, consider building tests with BUILD=true");
         }
 
+
         $input = file_get_contents($inFname);
         $output = file_get_contents($outFname);
 
-        $this->assertEquals($output, $this->scss->compile($input));
+        $this->assertEquals($output, $this->scss->compile($input, $inFname));
     }
 
     public function fileNameProvider()
@@ -59,7 +68,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
     // only run when env is set
     public function buildInput($inFname, $outFname)
     {
-        $css = $this->scss->compile(file_get_contents($inFname));
+        $css = $this->scss->compile(file_get_contents($inFname), $inFname);
         file_put_contents($outFname, $css);
     }
 

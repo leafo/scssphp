@@ -1,0 +1,180 @@
+@import "imports/partial";
+
+body {
+  color: $variable;
+  @include partial-mixin();
+}
+
+
+div {
+  color: red;
+  @page yeah {
+    pre {
+      height: 20px;
+    }
+  }
+}
+
+@font-face {
+  color: red;
+  height: 20px;
+}
+
+
+div {
+  @each $var in what is this {
+    color: $var;
+  }
+
+  @each $var in what, is, this {
+    font: $var;
+  }
+
+  $list: what is this;
+  @each $var in $list {
+    background: $var;
+  }
+
+  $list: what, is, this;
+  @each $var in $list {
+    border: $var;
+  }
+}
+
+$color: red, two, three;
+
+div {
+  height: $color;
+}
+
+$a: 1000;
+
+div {
+  $a: 2000 !default;
+  num: $a;
+}
+
+div {
+  $b: 2000 !default;
+  num: $b;
+}
+
+$cool_color: null;
+$cool_color: blue !default;
+
+pre {
+  color: $cool_color;
+}
+
+$something_man: 100px;
+cool: $something_man;
+
+
+del {
+
+    pre {
+      color: $something;
+    }
+
+  color: $something;
+}
+
+$font-family-simple: Arial !default;
+$font-family-spaces: Helvetica Neue !default;
+$font-family-quotes: "Helvetica Neue" !default;
+$font-family-commas: Helvetica, Arial, sans-serif !default;
+$font-family-sans:      "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+
+body {
+  font-family: $font-family-simple;
+  font-family: $font-family-spaces;
+  font-family: $font-family-quotes;
+  font-family: $font-family-commas;
+  font-family: $font-family-sans;
+}
+
+@mixin something($color) {
+  color: $color;
+
+  div {
+    height: 20px;
+  }
+}
+
+@mixin cool($a, $b, $c) {
+  height: $a + $b + $c;
+}
+
+span {
+  @include something(blue);
+}
+
+html {
+  @include cool(10px, 12px, 21px);
+}
+
+div {
+  @if something {
+    color: blue;
+  }
+}
+
+/* comment 1 */
+a {
+  /* comment 2 */
+  color: red; /* comment 3 */
+  /* comment 4 */
+}
+/* comment 5 */
+
+/*! comment 1 */
+b {
+  /*! comment 2 */
+  color: red; /*! comment 3 */
+  /*! comment 4 */
+}
+/*! comment 5 */
+
+/*
+ * multi-line comment 1
+ */
+c {
+  /*
+   * multi-line comment 2
+   */
+  color: red; /*
+                 * multi-line comment 3
+                 */
+  /*
+   * multi-line comment 4
+   */
+}
+/*
+ * multi-line comment 5
+ */
+
+/*!
+ * multi-line comment 1
+ */
+d {
+  /*!
+   * multi-line comment 2
+   */
+  color: red; /*!
+                 * multi-line comment 3
+                 */
+  /*!
+   * multi-line comment 4
+   */
+}
+/*!
+ * multi-line comment 5
+ */
+
+// comment 1
+e {
+  // comment 2
+  color: red; // comment 3
+  // comment 4
+}
+// comment 5
