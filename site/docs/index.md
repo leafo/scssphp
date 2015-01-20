@@ -16,7 +16,7 @@ Just include it somewhere to start using it:
 
     ```php
     <?php
-    require "scssphp/scss.inc.php";
+    require_once "scssphp/scss.inc.php";
     ```
 
 ### Compiling
@@ -27,7 +27,7 @@ options, then run the compiler with the `compile` method.
 
     ```php
     <?php
-    require "scssphp/scss.inc.php";
+    require_once "scssphp/scss.inc.php";
 
     use Leafo\ScssPhp\Compiler;
 
@@ -63,7 +63,7 @@ The default import path is `array("")`, which means the current directory.
 
     ```php
     <?php
-    require "scssphp/scss.inc.php";
+    require_once "scssphp/scss.inc.php";
 
     use Leafo\ScssPhp\Compiler;
 
@@ -71,7 +71,7 @@ The default import path is `array("")`, which means the current directory.
     $scss->setImportPaths("assets/stylesheets/");
 
     // will search for `assets/stylesheets/mixins.scss'
-    echo $scss->compile('@import "mixins.scss"');
+    echo $scss->compile('@import "mixins.scss";');
     ```
 
 Besides adding static import paths, it's also possible to add custom import
@@ -80,7 +80,7 @@ files that SCSS would otherwise not process (such as vanilla CSS imports).
 
     ```php
     <?php
-    require "scssphp/scss.inc.php";
+    require_once "scssphp/scss.inc.php";
 
     use Leafo\ScssPhp\Compiler;
 
@@ -91,7 +91,7 @@ files that SCSS would otherwise not process (such as vanilla CSS imports).
     });
 
     // will import `stylesheets/vanilla.css'
-    echo $scss->compile('@import "vanilla.css"');
+    echo $scss->compile('@import "vanilla.css";');
     ```
 
 ### Output Formatting
@@ -244,7 +244,7 @@ For example, create a file `style.php`:
     <?php
     $directory = "stylesheets";
 
-    require "scssphp/scss.inc.php";
+    require_once "scssphp/scss.inc.php";
 
     use Leafo\ScssPhp\Server;
 
@@ -297,7 +297,7 @@ Here's an example of creating a SCSS server that outputs compressed CSS:
 
     ```php
     <?php
-    require "scssphp/scss.inc.php";
+    require_once "scssphp/scss.inc.php";
 
     use Leafo\ScssPhp\Compiler;
     use Leafo\ScssPhp\Server;

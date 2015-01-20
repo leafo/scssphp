@@ -802,17 +802,19 @@ class Parser
         $whiteBefore = isset($this->buffer[$this->count - 1]) &&
             ctype_space($this->buffer[$this->count - 1]);
 
-        while ($this->match($opstr, $m) && self::$precedence[$m[1]] >= $minP) {
-            $whiteAfter = isset($this->buffer[$this->count - 1]) &&
-                ctype_space($this->buffer[$this->count - 1]);
+        while ($this->match($opstr, $m, false) && self::$precedence[$m[1]] >= $minP) {
+            $whiteAfter = isset($this->buffer[$this->count]) &&
+                ctype_space($this->buffer[$this->count]);
+            $varAfter = isset($this->buffer[$this->count]) &&
+                $this->buffer[$this->count] === '$';
+
+            $this->whitespace();
 
             $op = $m[1];
 
             // don't turn negative numbers into expressions
-            if ($op == '-' && $whiteBefore) {
-                if (!$whiteAfter) {
-                    break;
-                }
+            if ($op === '-' && $whiteBefore && !$whiteAfter && !$varAfter) {
+                break;
             }
 
             if (!$this->value($rhs)) {
@@ -1553,7 +1555,7 @@ class Parser
                 }
 
                 $this->seek($s);
-                // should just break here?
+                // TODO: should just break here?
             }
 
             break;

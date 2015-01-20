@@ -14,6 +14,7 @@ namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Colors;
 use Leafo\ScssPhp\Parser;
+use Leafo\ScssPhp\LineCommentator;
 
 /**
  * The scss compiler and parser.
@@ -49,8 +50,6 @@ use Leafo\ScssPhp\Parser;
  */
 class Compiler
 {
-    static public $VERSION = 'v0.1.1';
-
     static protected $operatorNames = array(
         '+' => 'add',
         '-' => 'sub',
@@ -101,6 +100,8 @@ class Compiler
 
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
 
+    protected $lineNumbers = FALSE;
+
     /**
      * Compile scss
      *
@@ -121,6 +122,10 @@ class Compiler
 
         $locale = setlocale(LC_NUMERIC, 0);
         setlocale(LC_NUMERIC, 'C');
+
+        if ($this->isLineNumbers()) {
+            $code = LineCommentator::insertLineComments(file($name), $name);
+        }
 
         $this->parser = new Parser($name);
 
@@ -412,7 +417,7 @@ class Compiler
         return $scope;
     }
 
-    // TODO refactor compileNestedBlock and compileMedia into same thing
+    // TODO: refactor compileNestedBlock and compileMedia into same thing?
     protected function compileNestedBlock($block, $selectors)
     {
         $this->pushEnv($block);
@@ -799,7 +804,16 @@ class Compiler
                 );
                 break;
             case 'comment':
-                if ($out->type == 'root') {
+
+                if (isset($out->type) && $out->type == 'root') {
+                    $this->compileComment($child);
+                    break;
+                }
+
+                //do not nest line comments into the parrent block
+                //for further information on the issue see https://github.com/leafo/scssphp/issues/228
+
+               if ($this->isLineNumbers() && strpos($child[1], '/* line ') !==FALSE) {
                     $this->compileComment($child);
                     break;
                 }
@@ -845,7 +859,7 @@ class Compiler
                 foreach ($list[2] as $item) {
                     $this->pushEnv();
                     $this->set($each->var, $item);
-                    // TODO: allow return from here
+                    // TODO: allow return from here?
                     $this->compileChildren($each->children, $out);
                     $this->popEnv();
                 }
@@ -1362,7 +1376,7 @@ class Compiler
                     if ($rval == 0) {
                         $this->throwError("color: Can't divide by zero");
                     }
-                    $out[] = $lval / $rval;
+                    $out[] = (int) ($lval / $rval);
                     break;
                 case '==':
                     return $this->opEq($left, $right);
@@ -1923,7 +1937,9 @@ class Compiler
 
     public function addImportPath($path)
     {
-        $this->importPaths[] = $path;
+        if (!in_array($path, $this->importPaths)) {
+            $this->importPaths[] = $path;
+        }
     }
 
     public function setImportPaths($path)
@@ -1959,6 +1975,11 @@ class Compiler
             $tree = $this->importCache[$realPath];
         } else {
             $code = file_get_contents($path);
+
+            if ($this->isLineNumbers()) {
+                $code = LineCommentator::insertLineComments(file($path), $path);
+            }
+
             $parser = new Parser($path, false);
             $tree = $parser->parse($code);
             $this->parsedFiles[] = $path;
@@ -1978,7 +1999,7 @@ class Compiler
         $urls = array();
 
         // for "normal" scss imports (ignore vanilla css and external requests)
-        if (!preg_match('/\.css|^http:\/\/$/', $url)) {
+        if (!preg_match('/\.css$|^http:\/\//', $url)) {
             // try both normal and the _partial filename
             $urls = array($url, preg_replace('/[^\/]+$/', '_\0', $url));
         }
@@ -2066,7 +2087,7 @@ class Compiler
     }
 
     // sorts any keyword arguments
-    // TODO: merge with apply arguments
+    // TODO: merge with apply arguments?
     protected function sortArgs($prototype, $args)
     {
         $keyArgs = array();
@@ -2127,7 +2148,7 @@ class Compiler
                 return $value;
 
             case 'keyword':
-                $name = $value[1];
+                $name = strtolower($value[1]);
 
                 if (isset(Colors::$cssColors[$name])) {
                     $rgba = explode(',', Colors::$cssColors[$name]);
@@ -3003,4 +3024,26 @@ class Compiler
 
         throw new \Exception($msg);
     }
+
+    /*
+     * check if line number feature is active
+     * @return boolean
+     */
+    public function isLineNumbers()
+    {
+        return $this->lineNumbers;
+    }
+
+    /**
+     * use this function to turn line numbers on
+     * @return boolean 
+     */
+    public function setLineNumbers($lineNumbers)
+    {
+        $this->lineNumbers = $lineNumbers;
+    }
+
+
+
+
 }

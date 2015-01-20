@@ -7,6 +7,7 @@ include __DIR__.'/../scss.inc.php';
 
 use Leafo\ScssPhp\Compiler;
 use Leafo\ScssPhp\Parser;
+use Leafo\ScssPhp\Version;
 
 $opts = getopt('hvTi:f:', array('help', 'version'));
 
@@ -32,7 +33,7 @@ Options include:
 
     -h, --help     Show this message
     -v, --version  Print the version
-    -f=format      Set the output format (compressed, crunched, expanded, or nested)
+    -f=format      Set the output format (compact, compressed, crunched, expanded, or nested)
     -T             Dump formatted parse tree
     -i=path        Set import path
 
@@ -41,7 +42,7 @@ EOT;
 }
 
 if (has("v", "version")) {
-    exit(Compiler::$VERSION . "\n");
+    exit(Version::VERSION . "\n");
 }
 
 $data = "";
