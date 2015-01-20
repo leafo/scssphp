@@ -23,7 +23,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
     protected static $outputDir = 'outputs';
 
     protected static $line_number_suffix = '_numbered';
-    protected static $tempfilename = 'tempfile.scss';
+    protected static $numbered_folder = 'numbered';
 
 
     public function setUp()
@@ -64,24 +64,27 @@ class InputTest extends \PHPUnit_Framework_TestCase
     public function testLineNumbering($inFname, $outFname) {
 
 
-        $outFname = self::lineNumberPath($outFname);
+        $outPath = self::lineNumberPath($outFname);
+        $inPath = __DIR__ . '/'.self::$inputDir.'/'.self::$numbered_folder.'/'.self::fileName($inFname);
 
-        $scss = LineCommentator::insertLineComments(file($inFname),  self::fileName($inFname));
-
-        //(over)write temp scsss file with line numbers for each testfile
-        file_put_contents(__DIR__ . '/'.self::$inputDir.'/temp/'.self::$tempfilename, $scss);
+        //write scss
+        $scss = LineCommentator::insertLineComments(file($inFname),  self::$numbered_folder.'/'.self::fileName($inFname));
+        file_put_contents($inPath, $scss);
 
         if (getenv('BUILD')) {
+
+            //write css
             $css = $this->scss->compile($scss);
-            file_put_contents($outFname, $css);
+            file_put_contents($outPath, $css);
         }
 
-        if (!is_readable($outFname)) {
-            $this->fail("$outFname is missing, consider building tests with BUILD=true");
+        if (!is_readable($outPath)) {
+            $this->fail("$outPath is missing, consider building tests with BUILD=true");
         }
 
-        $input = file_get_contents(__DIR__ . '/'.self::$inputDir.'/temp/'.self::$tempfilename);
-        $output = file_get_contents($outFname);
+
+        $input = file_get_contents($inPath);
+        $output = file_get_contents($outPath);
 
         $this->assertEquals($output, $this->scss->compile($input));
 

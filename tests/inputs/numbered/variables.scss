@@ -1,34 +1,34 @@
 $color: red, two, three;
-/* line 4, variables.scss */
+/* line 4, numbered/variables.scss */
 div {
 height: $color;
 }
 $a: 1000;
-/* line 10, variables.scss */
+/* line 10, numbered/variables.scss */
 div {
 $a: 2000 !default;
 num: $a;
 }
-/* line 15, variables.scss */
+/* line 15, numbered/variables.scss */
 div {
 $b: 2000 !default;
 num: $b;
 }
 $cool_color: null;
 $cool_color: blue !default;
-/* line 23, variables.scss */
+/* line 23, numbered/variables.scss */
 pre {
 color: $cool_color;
 }
 $something_man: 100px;
 cool: $something_man;
-/* line 31, variables.scss */
+/* line 31, numbered/variables.scss */
 del {
 $something: blue;
-/* line 34, variables.scss */
+/* line 34, numbered/variables.scss */
 div {
 $something: red;
-/* line 36, variables.scss */
+/* line 36, numbered/variables.scss */
 pre {
 color: $something;
 }
@@ -40,7 +40,7 @@ $font-family-spaces: Helvetica Neue !default;
 $font-family-quotes: "Helvetica Neue" !default;
 $font-family-commas: Helvetica, Arial, sans-serif !default;
 $font-family-sans:      "Helvetica Neue", Helvetica, Arial, sans-serif !default;
-/* line 50, variables.scss */
+/* line 50, numbered/variables.scss */
 body {
 font-family: $font-family-simple;
 font-family: $font-family-spaces;

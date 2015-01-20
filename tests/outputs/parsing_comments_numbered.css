@@ -1,5 +1,5 @@
 /* comment 1 */
-/* line 2, parsing_comments.scss */
+/* line 2, numbered/parsing_comments.scss */
 a {
   /* comment 2 */
   color: red;
@@ -7,7 +7,7 @@ a {
   /* comment 4 */ }
 /* comment 5 */
 /*! comment 1 */
-/* line 10, parsing_comments.scss */
+/* line 10, numbered/parsing_comments.scss */
 b {
   /*! comment 2 */
   color: red;
@@ -17,7 +17,7 @@ b {
 /*
  * multi-line comment 1
  */
-/* line 20, parsing_comments.scss */
+/* line 20, numbered/parsing_comments.scss */
 c {
   /*
    * multi-line comment 2
@@ -35,7 +35,7 @@ c {
 /*!
  * multi-line comment 1
  */
-/* line 38, parsing_comments.scss */
+/* line 38, numbered/parsing_comments.scss */
 d {
   /*!
    * multi-line comment 2
@@ -50,6 +50,6 @@ d {
 /*!
  * multi-line comment 5
  */
-/* line 54, parsing_comments.scss */
+/* line 54, numbered/parsing_comments.scss */
 e {
   color: red; }

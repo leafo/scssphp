@@ -1,0 +1,118 @@
+@charset "hello-world";
+/* line 4, numbered/directives.scss */
+@page :left {
+/* line 5, numbered/directives.scss */
+div {
+color: red;
+}
+}
+/* line 10, numbered/directives.scss */
+@page test {
+/* line 11, numbered/directives.scss */
+@media yes {
+/* line 12, numbered/directives.scss */
+div {
+color: red;
+}
+/* line 16, numbered/directives.scss */
+@media no {
+/* line 17, numbered/directives.scss */
+pre {
+color: blue;
+}
+}
+}
+}
+/* line 24, numbered/directives.scss */
+@media something {
+/* line 25, numbered/directives.scss */
+@page {
+/* line 26, numbered/directives.scss */
+@media else {
+/* line 27, numbered/directives.scss */
+div {
+height: 200px;
+}
+}
+}
+}
+/* line 35, numbered/directives.scss */
+div {
+color: red;
+/* line 37, numbered/directives.scss */
+@page yeah {
+/* line 38, numbered/directives.scss */
+pre {
+height: 20px;
+}
+}
+}
+/* line 44, numbered/directives.scss */
+@font-face {
+color: red;
+height: 20px;
+}
+/* line 50, numbered/directives.scss */
+@keyframes 'bounce' {
+/* line 51, numbered/directives.scss */
+from {
+top: 100px;
+animation-timing-function: ease-out;
+}
+/* line 56, numbered/directives.scss */
+25% {
+top: 50px;
+animation-timing-function: ease-in;
+}
+/* line 61, numbered/directives.scss */
+50% {
+top: 100px;
+animation-timing-function: ease-out;
+}
+/* line 66, numbered/directives.scss */
+75% {
+top: 75px;
+animation-timing-function: ease-in;
+}
+/* line 71, numbered/directives.scss */
+to {
+top: 100px;
+}
+}
+/* line 76, numbered/directives.scss */
+@-webkit-keyframes flowouttoleft {
+/* line 77, numbered/directives.scss */
+0% { -webkit-transform: translateX(0) scale(1); }
+/* line 78, numbered/directives.scss */
+60%, 70% { -webkit-transform: translateX(0) scale(.7); }
+/* line 79, numbered/directives.scss */
+100% { -webkit-transform: translateX(-100%) scale(.7); }
+}
+/* line 82, numbered/directives.scss */
+div {
+animation-name: 'diagonal-slide';
+animation-duration: 5s;
+animation-iteration-count: 10;
+}
+/* line 88, numbered/directives.scss */
+@keyframes 'diagonal-slide' {
+/* line 90, numbered/directives.scss */
+from {
+left: 0;
+top: 0;
+}
+/* line 95, numbered/directives.scss */
+to {
+left: 100px;
+top: 100px;
+}
+}
+@document url(http://www.w3.org/),
+url-prefix(http://www.w3.org/Style/),
+domain(mozilla.org),
+/* line 105, numbered/directives.scss */
+regexp("https:.*")
+{
+/* line 107, numbered/directives.scss */
+body { color: purple; background: yellow; }
+}

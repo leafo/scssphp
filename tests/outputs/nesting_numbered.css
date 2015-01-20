@@ -1,28 +1,28 @@
 div: blue;
-/* line 3, nesting.scss */
+/* line 3, numbered/nesting.scss */
 body {
   color: red; }
-/* line 8, nesting.scss */
+/* line 8, numbered/nesting.scss */
 div {
   color: red;
   height: yes;
-  /* line 12, nesting.scss */ }
+  /* line 12, numbered/nesting.scss */ }
   div pre {
     color: blue; }
-/* line 21, nesting.scss */
+/* line 21, numbered/nesting.scss */
 div {
-  /* line 22, nesting.scss */
+  /* line 22, numbered/nesting.scss */
   font: 10px hello world;
   font-size: 10px;
   font-color: blue;
-  /* line 27, nesting.scss */
+  /* line 27, numbered/nesting.scss */
   border-left: 1px solid blue;
   border-right: 2px dashed green; }
-/* line 34, nesting.scss */
+/* line 34, numbered/nesting.scss */
 #nested-nesting {
   bar: baz;
-  /* line 36, nesting.scss */
+  /* line 36, numbered/nesting.scss */
   bang-bop: bar;
   bang-bip: 1px;
-  /* line 39, nesting.scss */
+  /* line 39, numbered/nesting.scss */
   bang-blat-baf: bort; }

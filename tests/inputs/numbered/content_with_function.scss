@@ -1,0 +1,15 @@
+$test-var: true;
+@mixin mixin-using-content() {
+@content;
+}
+@function test-function($value) {
+@return $value;
+}
+@include mixin-using-content {
+@if $test-var {
+/* line 13, numbered/content_with_function.scss */
+body {
+padding: test-function(1 px);
+}
+}
+}

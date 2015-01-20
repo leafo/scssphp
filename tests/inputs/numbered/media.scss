@@ -1,0 +1,246 @@
+// media syntax
+/* line 3, numbered/media.scss */
+@media {
+/* line 4, numbered/media.scss */
+div { color: blue; }
+}
+/* line 6, numbered/media.scss */
+@media what {
+/* line 7, numbered/media.scss */
+div { color: blue; }
+}
+/* line 10, numbered/media.scss */
+@media (cool) {
+/* line 11, numbered/media.scss */
+div { color: blue; }
+}
+/* line 13, numbered/media.scss */
+@media (cool: blue) {
+/* line 14, numbered/media.scss */
+div { color: blue; }
+}
+/* line 17, numbered/media.scss */
+@media hello and (world) and (butt: man) {
+/* line 18, numbered/media.scss */
+div { color: blue; }
+}
+$navbarCollapseWidth: 940px;
+/* line 23, numbered/media.scss */
+@media (max-width: $navbarCollapseWidth) {
+color: red;
+}
+// media bubbling
+/* line 28, numbered/media.scss */
+@media not hello and (world) {
+color: blue;
+/* line 30, numbered/media.scss */
+pre {
+color: blue;
+}
+/* line 34, numbered/media.scss */
+@media butt {
+color: red;
+/* line 36, numbered/media.scss */
+div {
+color: red;
+}
+}
+}
+/* line 42, numbered/media.scss */
+@media a, b {
+/* line 43, numbered/media.scss */
+@media c {
+color: blue;
+}
+}
+/* line 48, numbered/media.scss */
+@media a{
+/* line 49, numbered/media.scss */
+@media b, c {
+color: blue;
+}
+}
+/* line 54, numbered/media.scss */
+@media a, b{
+/* line 55, numbered/media.scss */
+@media c, d {
+color: blue;
+}
+}
+$media: cree;
+$feature: -webkit-min-device-pixel-ratio;
+$value: 1.5;
+/* line 64, numbered/media.scss */
+div {
+color: blue;
+/* line 66, numbered/media.scss */
+@media s#{$media}n and ($feature: $value) {
+/* line 67, numbered/media.scss */
+.sidebar {
+width: 500px;
+}
+}
+}
+// @media + @mixin
+@mixin color {
+color: red;
+/* line 76, numbered/media.scss */
+.success {
+color: green;
+}
+}
+/* line 81, numbered/media.scss */
+div {
+position: absolute;
+$y: 2em;
+/* line 84, numbered/media.scss */
+@media screen {
+top: 0;
+$x: 5px;
+/* line 87, numbered/media.scss */
+p {
+margin: $x;
+}
+bottom: 6em + $y;
+@include color;
+}
+}
+/* line 95, numbered/media.scss */
+.button {
+width: 300px;
+height: 100px;
+background: #eee;
+/* line 100, numbered/media.scss */
+:hover {
+background: #aaa;
+}
+/* line 104, numbered/media.scss */
+@media only screen and (max-width : 300px){
+width: 100px;
+height: 100px;
+}
+}
+/* line 110, numbered/media.scss */
+code {
+position: absolute;
+/* line 112, numbered/media.scss */
+@media screen {
+/* line 113, numbered/media.scss */
+pre {
+height: 20px;
+}
+height: 10px;
+}
+}
+/* line 120, numbered/media.scss */
+dt {
+/* line 121, numbered/media.scss */
+@media screen {
+/* line 122, numbered/media.scss */
+@media (color: blue) {
+height: 10px;
+}
+}
+}
+// nesting media queries
+/* line 129, numbered/media.scss */
+@media screen {
+/* line 130, numbered/media.scss */
+.screen {
+width: 12px;
+}
+/* line 133, numbered/media.scss */
+@media only screen {
+/* line 134, numbered/media.scss */
+.only-screen {
+height: 11px;
+}
+}
+}
+/* line 140, numbered/media.scss */
+@media only screen {
+/* line 141, numbered/media.scss */
+.only-screen {
+width: 14px;
+}
+/* line 144, numbered/media.scss */
+@media only screen {
+/* line 145, numbered/media.scss */
+.only-screen {
+height: 16px;
+}
+}
+}
+/* line 151, numbered/media.scss */
+@media not screen {
+/* line 152, numbered/media.scss */
+@media screen {
+/* line 153, numbered/media.scss */
+.invalid {
+height: 12px;
+}
+}
+}
+/* line 159, numbered/media.scss */
+@media not screen {
+/* line 160, numbered/media.scss */
+@media print {
+/* line 161, numbered/media.scss */
+.only-print {
+height: 12px;
+}
+}
+}
+/* line 167, numbered/media.scss */
+@media screen {
+/* line 168, numbered/media.scss */
+@media not print {
+/* line 169, numbered/media.scss */
+.only-print {
+height: 12px;
+}
+}
+}
+/* line 175, numbered/media.scss */
+@media not screen {
+/* line 176, numbered/media.scss */
+@media not print {
+/* line 177, numbered/media.scss */
+.invalid {
+height: 12px;
+}
+}
+}
+/* line 183, numbered/media.scss */
+@media not screen {
+/* line 184, numbered/media.scss */
+@media not screen {
+/* line 185, numbered/media.scss */
+.not-screen {
+height: 15px;
+}
+}
+}
+/* line 191, numbered/media.scss */
+@media only screen {
+/* line 192, numbered/media.scss */
+@media print {
+/* line 193, numbered/media.scss */
+.invalid {
+height: 15px;
+}
+}
+}
+/* line 199, numbered/media.scss */
+@media only screen {
+/* line 200, numbered/media.scss */
+@media screen and (color: blue) {
+/* line 201, numbered/media.scss */
+@media screen and (width: 13) {
+/* line 202, numbered/media.scss */
+.only-screen {
+height: 15px;
+}
+}
+}
+}

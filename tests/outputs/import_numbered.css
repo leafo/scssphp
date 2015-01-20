@@ -5,13 +5,13 @@
 div {
   height: 200px;
   color: red; }
-/* line 9, import.scss */
+/* line 9, numbered/import.scss */
 pre {
   color: red; }
   pre div {
     height: 200px;
     color: red; }
-/* line 14, import.scss */
+/* line 14, numbered/import.scss */
 code div {
   height: 200px;
   color: red; }
@@ -21,7 +21,7 @@ code div {
 
 #partial {
   color: blue; }
-/* line 20, import.scss */
+/* line 20, numbered/import.scss */
 body {
   color: #7c2;
   background: gray; }

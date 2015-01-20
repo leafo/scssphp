@@ -1,0 +1,77 @@
+@function hello($x) {
+@return $x + 4;
+}
+@function add($a, $b) {
+@return $a + $b;
+}
+/* line 10, numbered/functions.scss */
+div {
+color: hello(10px);
+sum: add(11, 12);
+}
+// make sure values are being reduced before being passed up to previous scope
+@function one($a, $b) {
+@return $a $b;
+}
+@function two($a, $b) {
+@return $a#{$a} $b;
+}
+@function three($a, $b: default) {
+@return "hello #{$a} and #{$b}"
+}
+@function all($a...) {
+@return "hello #{$a}"
+}
+/* line 33, numbered/functions.scss */
+div {
+hello: one(10, 55);
+hello: two(10, 55);
+hello: three(10, 55);
+}
+@function hello_world() {
+@return 1000;
+}
+/* line 44, numbered/functions.scss */
+del {
+color: hello-world();
+}
+/* line 48, numbered/functions.scss */
+div {
+$args: foo bar;
+hello: three($args...);
+hello: three(bar...);
+hello: all(Alice, Bob, Tom);
+}
+@function stringConcatCompassStyle($start,$last)
+{
+// Compass still uses it like this
+@return #{$start}-#{$last};
+}
+/* line 61, numbered/functions.scss */
+.foo
+{
+test2: stringConcatCompassStyle(-moz,art);
+}
+@mixin content_test {
+/* line 67, numbered/functions.scss */
+span {
+$color: green;
+@content;
+}
+}
+@function func_test($c) {
+@return $c + 1;
+}
+/* line 77, numbered/functions.scss */
+div {
+@include content_test {
+height: func_test(2px);
+}
+}
+@function test ($a, $b: $a/2) {
+@return $b;
+}
+/* line 87, numbered/functions.scss */
+div {
+width: test(4);
+}

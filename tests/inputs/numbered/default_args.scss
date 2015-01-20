@@ -1,0 +1,11 @@
+@mixin cool($color: blue) {
+margin: 100px;
+}
+@function what($height: red) {
+@return $height;
+}
+/* line 11, numbered/default_args.scss */
+div {
+height: what();
+@include cool;
+}

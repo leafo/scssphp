@@ -1,28 +1,28 @@
-/* line 10, functions.scss */
+/* line 10, numbered/functions.scss */
 div {
   color: 14px;
   sum: 23; }
-/* line 33, functions.scss */
+/* line 33, numbered/functions.scss */
 div {
   hello: 10 55;
   hello: 1010 55;
   hello: "hello 10 and 55"; }
-/* line 44, functions.scss */
+/* line 44, numbered/functions.scss */
 del {
   color: 1000; }
-/* line 48, functions.scss */
+/* line 48, numbered/functions.scss */
 div {
   hello: "hello foo and bar";
   hello: "hello bar and default";
   hello: "hello Alice, Bob, Tom"; }
-/* line 61, functions.scss */
+/* line 61, numbered/functions.scss */
 .foo {
   test2: -moz-art; }
-/* line 77, functions.scss */
+/* line 77, numbered/functions.scss */
 div {
-  /* line 67, functions.scss */ }
+  /* line 67, numbered/functions.scss */ }
   div span {
     height: 3px; }
-/* line 87, functions.scss */
+/* line 87, numbered/functions.scss */
 div {
   width: 2; }
