@@ -16,11 +16,11 @@ div {
   what-ever: 100px;
   background: url();
   /*this is not a comment?*/ }
-/* line 31, numbered/comments.scss */
+/* line 31, comments.scss */
 .dummy {
   color: blue; }
 /* comment 1 */
-/* line 36, numbered/comments.scss */
+/* line 36, comments.scss */
 a {
   /* comment 2 */
   /* comment 3 */

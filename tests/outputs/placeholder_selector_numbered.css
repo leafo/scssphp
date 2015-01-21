@@ -1,11 +1,11 @@
-/* line 1, numbered/placeholder_selector.scss */
+/* line 1, placeholder_selector.scss */
 p a.notice span, p a.error span, #context a.notice span, #context a.error span {
   color: blue;
   font-weight: bold;
   font-size: 2em; }
-/* line 7, numbered/placeholder_selector.scss */
-/* line 9, numbered/placeholder_selector.scss */
-/* line 13, numbered/placeholder_selector.scss */
+/* line 7, placeholder_selector.scss */
+/* line 9, placeholder_selector.scss */
+/* line 13, placeholder_selector.scss */
 p {
   padding: 2em; }
-/* line 18, numbered/placeholder_selector.scss */
+/* line 18, placeholder_selector.scss */

@@ -1,4 +1,4 @@
-/* line 2, numbered/builtins.scss */
+/* line 2, builtins.scss */
 #color {
   color: #22ea18;
   red: 34;
@@ -11,14 +11,14 @@
   rgba: rgba(170, 119, 204, 0.4);
   rgba: rgba(170, 119, 204, 0.4);
   green: 139; }
-/* line 21, numbered/builtins.scss */
+/* line 21, builtins.scss */
 #hsl {
   color: #79c653;
   color: rgba(121, 198, 83, 0.5);
   hue: 100deg;
   sat: 50%;
   lig: 55%; }
-/* line 30, numbered/builtins.scss */
+/* line 30, builtins.scss */
 #more-color {
   light: #7e3d9e;
   dark: #432154;
@@ -27,7 +27,7 @@
   gray: #545454;
   comp: #48792f;
   inv: #9fd086; }
-/* line 44, numbered/builtins.scss */
+/* line 44, builtins.scss */
 #more-more-color {
   op: 0.5;
   opacify: rgba(1, 2, 3, 0.6);
@@ -35,7 +35,7 @@
   transparentize: rgba(1, 2, 3, 0.4);
   transparentize: rgba(1, 2, 3, 0.4);
   transparentize: rgba(52, 130, 3, 0.9); }
-/* line 56, numbered/builtins.scss */
+/* line 56, builtins.scss */
 #more-more-more-color {
   color: rgba(65, 110, 79, 0.4);
   color: rgba(20, 255, 216, 0);
@@ -47,12 +47,12 @@
   color: rgba(5, 5, 5, 0);
   color: #000A0A0A;
   color: #FFAABBCC; }
-/* line 74, numbered/builtins.scss */
+/* line 74, builtins.scss */
 #string {
   color: hello what is going on;
   color: "yeah";
   color: "I do?"; }
-/* line 81, numbered/builtins.scss */
+/* line 81, builtins.scss */
 #number {
   color: 250%;
   color: 3;
@@ -63,7 +63,7 @@
   width: 200%;
   bottom: 10px;
   padding: 3em 1in 96px 72pt; }
-/* line 94, numbered/builtins.scss */
+/* line 94, builtins.scss */
 #list {
   len: 3;
   len: 1;
@@ -80,7 +80,7 @@
   index: false;
   index: 2;
   index: 2;
-  /* line 115, numbered/builtins.scss */
+  /* line 115, builtins.scss */
   index: 1;
   world: one, two, three, great, job;
   world: one, two, three, great job;
@@ -88,7 +88,7 @@
   cool: great job one two three;
   zip: 1px solid, 2px dashed;
   zip: 1px solid red, 2px dashed green; }
-/* line 129, numbered/builtins.scss */
+/* line 129, builtins.scss */
 #introspection {
   t: number;
   t: string;
@@ -108,19 +108,19 @@
   c: true;
   c: false;
   c: true; }
-/* line 153, numbered/builtins.scss */
+/* line 153, builtins.scss */
 #if {
   color: yes;
   color: no;
   color: yes;
   color: yes; }
-/* line 160, numbered/builtins.scss */
+/* line 160, builtins.scss */
 .transparent {
   r: 0;
   g: 0;
   b: 0;
   a: 0; }
-/* line 167, numbered/builtins.scss */
+/* line 167, builtins.scss */
 .alpha {
   a: 1;
   a: 1;

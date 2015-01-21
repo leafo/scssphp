@@ -1,8 +1,0 @@
-@function testfunc($pseudo: null) {
-$output: if($pseudo, "green", "red");
-@return $output;
-}
-/* line 6, numbered/if_on_null.scss */
-body {
-background-color: testfunc();
-}

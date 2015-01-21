@@ -1,25 +1,25 @@
 cool: 100px;
-/* line 4, numbered/variables.scss */
+/* line 4, variables.scss */
 div {
   height: red, two, three; }
-/* line 10, numbered/variables.scss */
+/* line 10, variables.scss */
 div {
   num: 1000; }
-/* line 15, numbered/variables.scss */
+/* line 15, variables.scss */
 div {
   num: 2000; }
-/* line 23, numbered/variables.scss */
+/* line 23, variables.scss */
 pre {
   color: blue; }
-/* line 31, numbered/variables.scss */
+/* line 31, variables.scss */
 del {
-  /* line 34, numbered/variables.scss */
+  /* line 34, variables.scss */
   color: red; }
   del div {
-    /* line 36, numbered/variables.scss */ }
+    /* line 36, variables.scss */ }
     del div pre {
       color: red; }
-/* line 50, numbered/variables.scss */
+/* line 50, variables.scss */
 body {
   font-family: Arial;
   font-family: Helvetica Neue;

@@ -1,4 +1,4 @@
-/* line 2, numbered/looping.scss */
+/* line 2, looping.scss */
 div {
   color: what;
   color: is;
@@ -12,7 +12,7 @@ div {
   border: what;
   border: is;
   border: this; }
-/* line 23, numbered/looping.scss */
+/* line 23, looping.scss */
 span {
   color: 0;
   color: 1;
@@ -25,7 +25,7 @@ span {
   color: 8;
   color: 9;
   color: 10; }
-/* line 31, numbered/looping.scss */
+/* line 31, looping.scss */
 pre {
   color: 1;
   color: 2;

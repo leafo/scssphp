@@ -23,7 +23,6 @@ class InputTest extends \PHPUnit_Framework_TestCase
     protected static $outputDir = 'outputs';
 
     protected static $line_number_suffix = '_numbered';
-    protected static $numbered_folder = 'numbered';
 
 
     public function setUp()
@@ -63,16 +62,12 @@ class InputTest extends \PHPUnit_Framework_TestCase
 
     public function testLineNumbering($inFname, $outFname) {
 
-
         $outPath = self::lineNumberPath($outFname);
-        $inPath = __DIR__ . '/'.self::$inputDir.'/'.self::$numbered_folder.'/'.self::fileName($inFname);
 
-        //write scss
-        $scss = LineCommentator::insertLineComments(file($inFname),  self::$numbered_folder.'/'.self::fileName($inFname));
-        file_put_contents($inPath, $scss);
+        //insert line numbers
+        $scss = LineCommentator::insertLineComments(file($inFname), self::fileName($inFname));
 
         if (getenv('BUILD')) {
-
             //write css
             $css = $this->scss->compile($scss);
             file_put_contents($outPath, $css);
@@ -82,13 +77,9 @@ class InputTest extends \PHPUnit_Framework_TestCase
             $this->fail("$outPath is missing, consider building tests with BUILD=true");
         }
 
-
-        $input = file_get_contents($inPath);
         $output = file_get_contents($outPath);
 
-        $this->assertEquals($output, $this->scss->compile($input));
-
-
+        $this->assertEquals($output, $this->scss->compile($scss));
     }
 
     public function fileNameProvider()

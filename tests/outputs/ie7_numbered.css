@@ -1,9 +1,9 @@
-/* line 2, numbered/ie7.scss */
+/* line 2, ie7.scss */
 #foo:before {
   content: counter(item,".") ": "; }
-/* line 6, numbered/ie7.scss */
+/* line 6, ie7.scss */
 #bar:before {
   content: counter(item,"."); }
-/* line 10, numbered/ie7.scss */
+/* line 10, ie7.scss */
 #fu:before {
   content: counter(item); }
