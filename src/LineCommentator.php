@@ -98,7 +98,7 @@ class LineCommentator
         }
 
 
-        return implode("\r\n", $new_scss_content);
+        return implode("\n", $new_scss_content);
     }
 
     /*
