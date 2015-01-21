@@ -62,7 +62,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
 
     public function testLineNumbering($inFname, $outFname) {
 
-        $outPath = self::lineNumberPath($outFname);
+        $outPath = self::lineNumberOutPath($outFname);
 
         //insert line numbers
         $scss = LineCommentator::insertLineComments(file($inFname), self::fileName($inFname));
@@ -124,6 +124,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
         return __DIR__ . '/' . $out;
     }
 
+
     public static function buildTests($pattern)
     {
         $files = self::findInputNames($pattern);
@@ -132,12 +133,27 @@ class InputTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public static function lineNumberPath($outFname) {
+    /*
+     * return output filename inlcuding line_number_suffix
+     *
+     * @return string
+     */
+
+
+    public static function lineNumberOutPath($outFname) {
 
         $outFname = preg_replace("/.css$/", self::$line_number_suffix.'.css', self::fileName($outFname));
 
         return __DIR__ .'/'.self::$outputDir . '/' . $outFname;
     }
+
+
+    /*
+     * return filename from path
+     *
+     * @return string
+     */
+
 
     public static function fileName($path) {
 
