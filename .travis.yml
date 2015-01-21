@@ -8,3 +8,5 @@ php:
 
 script:
   - phpunit tests
+
+env: BUILD=true
