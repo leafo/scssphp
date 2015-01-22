@@ -39,7 +39,7 @@ Now you can output the original SCSS line numbers within the compiled CSS file f
 
 Works great in combination with frontend debugging tools like https://addons.mozilla.org/de/firefox/addon/firecompass-for-firebug/
 
-To activate this feature you need to call `->setLineNumbers(true)` after creating a new instance of compiler.php
+To activate this feature you need to call `->setLineNumbers(true)` after creating a new instance of class 'compiler'.
 
 code sample:
 
@@ -48,10 +48,9 @@ code sample:
     use Leafo\ScssPhp\Server;
     use \Leafo\ScssPhp\Compiler;
 
-    $directory = "css";
-
     require "lib/scssphp/scss.inc.php";
-
+    
+    $directory = "css";
 
     $scss = new Compiler();
     $scss->setLineNumbers(true);
@@ -60,8 +59,8 @@ code sample:
     $server->serve();
 
 
-Performance impact is around 10% when a new CSS file is compiled with line numbers.
+Performance impact is around 10% when a new CSS file is compiled with line numbers, compared to the same file without line numbers.
 
 **important note:** this feature has only been tested with the standard formatter ('Leafo\ScssPhp\Formatter\Nested'). 
-Using formatters like "compact" will remove line breaks and frontend debugging tools might have trouble finding the corresponding line in your scss file.
+Using formatters like "compact" will remove line breaks and frontend debugging tools might have trouble to output the corresponding line from the comment.
 

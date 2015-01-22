@@ -53,12 +53,6 @@ class LineCommentator
 
     static function insertLineComments($scss, $filepath)
     {
-        //delete emtpy lines from array
-        $scss = array_filter($scss,
-            function ($value) {
-                $value = trim($value);
-                return !empty($value);
-            });
 
         $lines = $scss;
         $new_scss_content = array();
@@ -69,6 +63,11 @@ class LineCommentator
 
             $line = trim($line);
             $nextline = trim(next($lines));
+
+            //check if empty
+            if (empty($line)) {
+                continue;
+            }
 
             //check if line is a commment
             if (self::isComment($line) || self::$inside_multiline) {
@@ -162,7 +161,7 @@ class LineCommentator
 
 
     /*
-     * ignore includes (the included content however will have line numbers)
+     * ignore include
      *
      * @return: boolean
      */
@@ -191,6 +190,8 @@ class LineCommentator
             return true;
         }
 
+        return false;
+
     }
 
     /*
@@ -198,6 +199,7 @@ class LineCommentator
     * compiled scss
      */
     static function isLoop($line) {
+
         if
         (
             strpos($line, self::loop_indicator_for) !== FALSE ||
@@ -206,6 +208,8 @@ class LineCommentator
         ) {
             return true;
         }
+
+        return false;
 
     }
 
