@@ -61,7 +61,7 @@ if (has("T")) {
 $scss = new Compiler();
 
 if (has("i")) {
-    $scss->addImportPath($opts["i"]);
+    $scss->setImportPaths($opts["i"]);
 }
 
 if (has("f")) {
