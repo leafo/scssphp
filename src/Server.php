@@ -275,13 +275,14 @@ class Server
 
                     echo $css;
 
-                    return;
                 } catch (\Exception $e) {
                     header($protocol . ' 500 Internal Server Error');
                     header('Content-type: text/plain');
 
                     echo 'Parse error: ' . $e->getMessage() . "\n";
                 }
+
+                return;
             }
 
             header('X-SCSS-Cache: true');
