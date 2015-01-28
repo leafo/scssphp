@@ -51,7 +51,7 @@ class LineCommentator
      */
 
 
-    static function insertLineComments($scss, $filepath)
+    static function insertLineComments($scss, $filepath = '')
     {
 
         $lines = $scss;

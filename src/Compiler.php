@@ -101,6 +101,7 @@ class Compiler
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
 
     protected $lineNumbers = FALSE;
+    protected $fileName;
 
     /**
      * Compile scss
@@ -124,7 +125,14 @@ class Compiler
         setlocale(LC_NUMERIC, 'C');
 
         if ($this->isLineNumbers()) {
-            $code = LineCommentator::insertLineComments(file($name), $name);
+            if (!$name) {
+                $code = explode("\n", $code);
+                $code = LineCommentator::insertLineComments($code, $this->getFileName());
+
+            } else {
+                $code = LineCommentator::insertLineComments(file($name), $name);
+            }
+
         }
 
         $this->parser = new Parser($name);
@@ -3036,12 +3044,36 @@ class Compiler
 
     /**
      * use this function to turn line numbers on
+     * @param boolean $lineNumbers
+     * @param string $filename
      * @return boolean 
      */
-    public function setLineNumbers($lineNumbers)
+    public function setLineNumbers($lineNumbers, $filename = NULL)
     {
         $this->lineNumbers = $lineNumbers;
+
+        if ($filename) {
+            $this->setFileName($filename);
+        }
     }
+
+    /**
+     * @return string
+     */
+    public function getFileName()
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * @param string $fileName
+     */
+    public function setFileName($fileName)
+    {
+        $this->fileName = $fileName;
+    }
+
+
 
 
 

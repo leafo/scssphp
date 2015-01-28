@@ -59,6 +59,26 @@ code sample:
     $server->serve();
 
 
+You can also call the 'compile' method directly (without using an instance of 'server' like above) 
+    
+    namespace Leafo\ScssPhp;
+    
+    use Leafo\ScssPhp\Server;
+    use \Leafo\ScssPhp\Compiler;
+    
+    require "lib/scssphp/scss.inc.php";
+    
+    $scss = new Compiler();
+    
+    //the name argument is optional
+    $scss->setLineNumbers(true,'anyname.scss');
+    
+    echo $scss->compile('
+      $color: #abc;
+      div { color: lighten($color, 20%); }
+    ');
+
+
 Performance impact is around 10% when a new CSS file is compiled with line numbers, compared to the same file without line numbers.
 
 **important note:** this feature has only been tested with the standard formatter ('Leafo\ScssPhp\Formatter\Nested'). 
