@@ -1997,7 +1997,7 @@ class Compiler
                         return $file;
                     }
                 }
-            } else {
+            } elseif (is_callable($dir)) {
                 // check custom callback for import path
                 $file = call_user_func($dir, $url, $this);
 
