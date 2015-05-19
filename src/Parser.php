@@ -783,6 +783,10 @@ class Parser
             }
 
             $this->seek($s);
+
+            if ($this->map($out)) {
+                return true;
+            }
         }
 
         if ($this->value($lhs)) {
@@ -1068,6 +1072,32 @@ class Parser
         }
 
         $out = $args;
+
+        return true;
+    }
+
+    protected function map(&$out)
+    {
+        $s = $this->seek();
+        $this->literal('(');
+
+        $map = array();
+
+        while ($this->keyword($key) && $this->literal(':') && $this->genericList($value, 'expression')) {
+            $map[$key] = $value;
+
+            if (!$this->literal(',')) {
+                break;
+            }
+        }
+
+        if (!count($map) || !$this->literal(')')) {
+            $this->seek($s);
+
+            return false;
+        }
+
+        $out = array('map', $map);
 
         return true;
     }

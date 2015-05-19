@@ -17,6 +17,14 @@ div {
 	@each $var in $list {
 		border: $var;
 	}
+
+	@each $var in what what, is is, this this {
+		background: $var;
+	}
+
+	@each $var in (what: what, is: is, this: this) {
+		background: $var;
+	}
 }
 
 

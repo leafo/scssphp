@@ -10,7 +10,13 @@ div {
   background: this;
   border: what;
   border: is;
-  border: this; }
+  border: this;
+  background: what what;
+  background: is is;
+  background: this this;
+  background: what what;
+  background: is is;
+  background: this this; }
 
 span {
   color: 0;
