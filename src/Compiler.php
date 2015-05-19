@@ -844,7 +844,14 @@ class Compiler
                 $list = $this->coerceList($this->reduce($each->list));
                 foreach ($list[2] as $item) {
                     $this->pushEnv();
-                    $this->set($each->var, $item);
+                    if (count($each->vars) == 1) {
+                        $this->set($each->vars[0], $item);
+                    } else {
+                        list(,,$values) = $this->coerceList($item);
+                        foreach ($each->vars as $i => $var) {
+                            $this->set($var, isset($values[$i]) ? $values[$i] : self::$null);
+                        }
+                    }
                     // TODO: allow return from here
                     $this->compileChildren($each->children, $out);
                     $this->popEnv();

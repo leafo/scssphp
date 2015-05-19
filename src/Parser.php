@@ -254,13 +254,15 @@ class Parser
             $this->seek($s);
 
             if ($this->literal('@each') &&
-                $this->variable($varName) &&
+                $this->genericList($varNames, 'variable', ',', false) &&
                 $this->literal('in') &&
                 $this->valueList($list) &&
                 $this->literal('{')
             ) {
                 $each = $this->pushSpecialBlock('each');
-                $each->var = $varName[1];
+                foreach ($varNames[2] as $varName) {
+                    $each->vars[] = $varName[1];
+                }
                 $each->list = $list;
 
                 return true;

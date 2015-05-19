@@ -25,6 +25,13 @@ div {
 	@each $var in (what: what, is: is, this: this) {
 		background: $var;
 	}
+
+	@each $header, $size, $nonexistent in (h1: 2em, h2: 1.5em, h3: 1.2em) {
+ 		#{$header} {
+ 			font-size: $size;
+ 			border: $nonexistent;
+ 		}
+ 	}
 }
 
 

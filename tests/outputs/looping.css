@@ -17,6 +17,12 @@ div {
   background: what what;
   background: is is;
   background: this this; }
+  div h1 {
+    font-size: 2em; }
+  div h2 {
+    font-size: 1.5em; }
+  div h3 {
+    font-size: 1.2em; }
 
 span {
   color: 0;
