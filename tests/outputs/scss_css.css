@@ -5,6 +5,8 @@
 @import url(foo.css);
 @import "foo.css" screen;
 @import "foo.css" screen, print;
+@import "foo.css" screen, print and (foo: 0);
+@import "foo.css" screen, only print, screen and (foo: 0);
 @charset "UTF-8";
 [foo~=bar] {
   a: b; }
@@ -202,10 +204,6 @@ foo {
 foo {
   a: foo-bar(12);
   b: -foo-bar-baz(13, 14 15); }
-
-@import "foo.css" screen, print and (foo: 0);
-
-@import "foo.css" screen, only print, screen and (foo: 0);
 
 foo {
   a: foo !important;

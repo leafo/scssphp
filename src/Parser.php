@@ -254,13 +254,15 @@ class Parser
             $this->seek($s);
 
             if ($this->literal('@each') &&
-                $this->variable($varName) &&
+                $this->genericList($varNames, 'variable', ',', false) &&
                 $this->literal('in') &&
                 $this->valueList($list) &&
                 $this->literal('{')
             ) {
                 $each = $this->pushSpecialBlock('each');
-                $each->var = $varName[1];
+                foreach ($varNames[2] as $varName) {
+                    $each->vars[] = $varName[1];
+                }
                 $each->list = $list;
 
                 return true;
@@ -783,6 +785,10 @@ class Parser
             }
 
             $this->seek($s);
+
+            if ($this->map($out)) {
+                return true;
+            }
         }
 
         if ($this->value($lhs)) {
@@ -1068,6 +1074,32 @@ class Parser
         }
 
         $out = $args;
+
+        return true;
+    }
+
+    protected function map(&$out)
+    {
+        $s = $this->seek();
+        $this->literal('(');
+
+        $map = array();
+
+        while ($this->keyword($key) && $this->literal(':') && $this->genericList($value, 'expression')) {
+            $map[$key] = $value;
+
+            if (!$this->literal(',')) {
+                break;
+            }
+        }
+
+        if (!count($map) || !$this->literal(')')) {
+            $this->seek($s);
+
+            return false;
+        }
+
+        $out = array('map', $map);
 
         return true;
     }

@@ -1,0 +1,26 @@
+$map: (
+    color: black,
+    color2: red,
+    color3: #00FF00
+);
+$map2: (
+    color: rgb(255, 255, 255),
+    length: 40em
+);
+
+// Map functions
+div {
+    color: map_get($map, color);
+    color: map_get($map, 'color#{2}');
+    foo: map_values($map);
+    bar: map_keys($map2);
+    baz: map_merge($map, $map2);
+    foo: map_remove($map2, color);
+    bar: if(map_has_key($map, color), true, false);
+}
+
+// List functions
+div {
+    foo: nth($map, 1);
+    bar: nth(nth($map, 1), 1);
+}
