@@ -111,6 +111,9 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.1.3** -- May 31, 2015
+  * map support (okj579)
+  * misc bug fixes (etu, bgarret, aaukt)
 * **0.1.1** -- Aug 12, 2014
   * add stub classes -- a backward compatibility layer (vladimmi)
 * **0.1.0** -- Aug 9, 2014
