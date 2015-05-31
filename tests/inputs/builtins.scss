@@ -74,6 +74,12 @@
     // color: quote(yeah you know it); // **
     color: quote(yeah);
     color: quote("I do?");
+    color: str_index(abc, b);
+    color: str_insert(string, insert, 2);
+    color: str_length(string);
+    color: str_slice(string, 2, 4);
+    color: to_lower_case('StRiNg');
+    color: to_upper_case(StRiNg);
 }
 
 #number {
