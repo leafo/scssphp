@@ -59,6 +59,8 @@ if (has("T")) {
     exit();
 }
 
+setlocale(LC_NUMERIC, 'C');
+
 $scss = new Compiler();
 
 if (has("i")) {
