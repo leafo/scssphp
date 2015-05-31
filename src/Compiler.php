@@ -3068,6 +3068,81 @@ class Compiler
         return $number1[2] == $number2[2] || $number1[2] == '' || $number2[2] == '';
     }
 
+    protected static $libStrIndex = array('string', 'substring');
+    protected function libStrIndex($args)
+    {
+        $string = $this->coerceString($args[0]);
+        $stringContent = $this->compileStringContent($string);
+
+        $substring = $this->coerceString($args[1]);
+        $substringContent = $this->compileStringContent($substring);
+
+        $result = strpos($stringContent, $substringContent);
+
+        return $result === false ? self::$null : array('number', $result + 1, '');
+    }
+
+    protected static $libStrInsert = array('string', 'insert', 'index');
+    protected function libStrInsert($args)
+    {
+        $string = $this->coerceString($args[0]);
+        $stringContent = $this->compileStringContent($string);
+
+        $insert = $this->coerceString($args[1]);
+        $insertContent = $this->compileStringContent($insert);
+
+        list(,$index,) = $args[2];
+
+        $string[2] = array(substr_replace($stringContent, $insertContent, $index - 1, 0));
+
+        return $string;
+    }
+
+    protected static $libStrLength = array('string');
+    protected function libStrLength($args)
+    {
+        $string = $this->coerceString($args[0]);
+        $stringContent = $this->compileStringContent($string);
+
+        return array('number', strlen($stringContent), '');
+    }
+
+    protected static $libStrSlice = array('string', 'start-at', 'end-at');
+    protected function libStrSlice($args)
+    {
+        $string = $this->coerceString($args[0]);
+        $stringContent = $this->compileStringContent($string);
+
+        list(,$start,) = $args[1];
+        list(,$end,) = $args[2];
+
+        $string[2] = array(substr($stringContent, $start - 1, $end - $start + 1));
+
+        return $string;
+    }
+
+    protected static $libToLowerCase = array('string');
+    protected function libToLowerCase($args)
+    {
+        $string = $this->coerceString($args[0]);
+        $stringContent = $this->compileStringContent($string);
+
+        $string[2] = array(mb_strtolower($stringContent));
+
+        return $string;
+    }
+
+    protected static $libToUpperCase = array('string');
+    protected function libToUpperCase($args)
+    {
+        $string = $this->coerceString($args[0]);
+        $stringContent = $this->compileStringContent($string);
+
+        $string[2] = array(mb_strtoupper($stringContent));
+
+        return $string;
+    }
+
     /**
      * Workaround IE7's content counter bug.
      *

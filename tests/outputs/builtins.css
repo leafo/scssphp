@@ -50,7 +50,13 @@
 #string {
   color: hello what is going on;
   color: "yeah";
-  color: "I do?"; }
+  color: "I do?";
+  color: 2;
+  color: sinserttring;
+  color: 6;
+  color: tri;
+  color: 'string';
+  color: STRING; }
 
 #number {
   color: 250%;
