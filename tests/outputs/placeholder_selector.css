@@ -5,3 +5,6 @@ p a.notice span, p a.error span, #context a.notice span, #context a.error span {
 
 p {
   padding: 2em; }
+
+.layout {
+  color: red; }

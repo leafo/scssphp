@@ -1636,7 +1636,7 @@ class Parser
 
     protected function placeholder(&$placeholder)
     {
-        if ($this->match('([\w\-_]+)', $m)) {
+        if ($this->match('([\w\-_]+|#[{][$][\w\-_]+[}])', $m)) {
             $placeholder = $m[1];
 
             return true;

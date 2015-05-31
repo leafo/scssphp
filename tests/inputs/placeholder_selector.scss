@@ -16,3 +16,13 @@ p {
 }
 
 div { @extend .hidden; }
+
+$layout-namespace: 'test';
+
+%#{$layout-namespace}layout {
+  color: red;
+}
+
+.layout {
+  @extend %#{$layout-namespace}layout;
+}
