@@ -1032,11 +1032,9 @@ class Compiler
                 $left = $this->reduce($left, true);
                 $right = $this->reduce($right, true);
 
-                // only do division in special cases
-                if ($opName == 'div' && !$inParens && !$inExp) {
-                    if ($left[0] != 'color' && $right[0] != 'color') {
-                        return $this->expToString($value);
-                    }
+                // special case: looks like css short-hand
+                if ($opName == 'div' && !$inParens && !$inExp && $right[2] != '') {
+                    return $this->expToString($value);
                 }
 
                 $left = $this->coerceForExpression($left);
