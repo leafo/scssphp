@@ -1033,7 +1033,7 @@ class Compiler
                 $right = $this->reduce($right, true);
 
                 // special case: looks like css short-hand
-                if ($opName == 'div' && !$inParens && !$inExp && $right[2] != '') {
+                if ($opName == 'div' && !$inParens && !$inExp && isset($right[2]) &&  $right[2] != '') {
                     return $this->expToString($value);
                 }
 
