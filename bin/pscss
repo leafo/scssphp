@@ -28,6 +28,7 @@ $loadPaths = null;
 $precision = null;
 $dumpTree = false;
 $inputFile = null;
+$changeDir = false;
 
 function parseArgument($argument, $options) {
     if (preg_match('/^(?:' . implode('|', (array) $options) . ')=?(.*)/', $argument, $matches)) {
@@ -94,6 +95,13 @@ EOT;
 
 if ($inputFile) {
     $data = file_get_contents($inputFile);
+
+    $newWorkingDir = dirname(realpath($inputFile));
+    $oldWorkingDir = getcwd();
+
+    if ($oldWorkingDir !== $newWorkingDir) {
+        $changeDir = chdir($newWorkingDir);
+    }
 } else {
     $data = '';
 
@@ -125,3 +133,7 @@ if ($precision) {
 }
 
 echo $scss->compile($data, $inputFile ?: 'STDIN');
+
+if ($changeDir) {
+    chdir($oldWorkingDir);
+}
