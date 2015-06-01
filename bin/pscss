@@ -1,59 +1,109 @@
 #!/usr/bin/env php
 <?php
+/**
+ * SCSSPHP
+ *
+ * @copyright 2012-2015 Leaf Corcoran
+ *
+ * @license http://opensource.org/licenses/gpl-license GPL-3.0
+ * @license http://opensource.org/licenses/MIT MIT
+ *
+ * @link http://leafo.net/scssphp
+ */
 
 error_reporting(E_ALL);
 
-include __DIR__.'/../scss.inc.php';
+if (version_compare(PHP_VERSION, '5.3') < 0) {
+    die('Requires PHP 5.3 or above');
+}
+
+include __DIR__ . '/../scss.inc.php';
 
 use Leafo\ScssPhp\Compiler;
 use Leafo\ScssPhp\Parser;
 use Leafo\ScssPhp\Version;
 
-$opts = getopt('hvTi:f:p:', array('help', 'version'));
+$style = null;
+$loadPaths = null;
+$precision = null;
+$dumpTree = false;
+$inputFile = null;
 
-function has() {
-    global $opts;
-
-    foreach (func_get_args() as $arg) {
-        if (isset($opts[$arg])) {
-            return true;
-        }
+function parseArgument($argument, $options) {
+    if (preg_match('/^(?:' . implode('|', (array) $options) . ')=?(.*)/', $argument, $matches)) {
+        return $matches[1] === '' ? false : $matches[1];
     }
-
-    return false;
 }
 
-if (has('h', 'help')) {
-    $exe = array_shift($argv);
+for ($i = 1; $i < $argc; $i++) {
+    if ($argv[$i] === '-h' || $argv[$i] === '--help') {
+        $exe = $argv[0];
 
-$HELP = <<<EOT
-Usage: $exe [options] < input-file
+        $HELP = <<<EOT
+Usage: $exe [options] [input-file]
 
 Options include:
 
     -h, --help     Show this message
-    -v, --version  Print the version
     -f=format      Set the output format (compact, compressed, crunched, expanded, or nested)
+    -i=path        Set import path
     -p=precision   Set decimal number precision (default 5)
     -T             Dump formatted parse tree
-    -i=path        Set import path
+    -v, --version  Print the version
 
 EOT;
-    exit($HELP);
+        exit($HELP);
+    }
+
+    if ($argv[$i] === 'T') {
+        $dumpTree = true;
+        continue;
+    }
+
+    if ($argv[$i] === '-v' || $argv[$i] === '--version') {
+        exit(Version::VERSION . "\n");
+    }
+
+    $value = parseArgument($argv[$i], array('-f', '--style'));
+
+    if (isset($value)) {
+        $style = $value;
+        continue;
+    }
+
+    $value = parseArgument($argv[$i], array('-i', '--load_paths'));
+
+    if (isset($value)) {
+        $loadPaths = $value;
+        continue;
+    }
+
+    $value = parseArgument($argv[$i], array('-p', '--precision'));
+
+    if (isset($value)) {
+        $precision = $value;
+        continue;
+    }
+
+    if (file_exists($argv[$i])) {
+        $inputFile = $argv[$i];
+        continue;
+    }
 }
 
-if (has('v', 'version')) {
-    exit(Version::VERSION . "\n");
+
+if ($inputFile) {
+    $data = file_get_contents($inputFile);
+} else {
+    $data = '';
+
+    while (!feof(STDIN)) {
+        $data .= fread(STDIN, 8192);
+    }
 }
 
-$data = '';
-
-while (!feof(STDIN)) {
-    $data .= fread(STDIN, 8192);
-}
-
-if (has('T')) {
-    $parser = new Parser('STDIN');
+if ($dumpTree) {
+    $parser = new Parser($inputFile ?: 'STDIN');
 
     print_r($parser->parse($data));
 
@@ -62,16 +112,16 @@ if (has('T')) {
 
 $scss = new Compiler();
 
-if (has('i')) {
-    $scss->addImportPath($opts['i']);
+if ($loadPaths) {
+    $scss->setImportPaths(explode(PATH_SEPARATOR, $loadPaths));
 }
 
-if (has('f')) {
-    $scss->setFormatter('Leafo\\ScssPhp\\Formatter\\' . ucfirst($opts['f']));
+if ($style) {
+    $scss->setFormatter('Leafo\\ScssPhp\\Formatter\\' . ucfirst($style));
 }
 
-if (has('p')) {
-    $scss->setNumberPrecision($opts['p']);
+if ($precision) {
+    $scss->setNumberPrecision($precision);
 }
 
-echo $scss->compile($data, 'STDIN');
+echo $scss->compile($data, $inputFile ?: 'STDIN');
