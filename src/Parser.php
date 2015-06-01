@@ -220,6 +220,17 @@ class Parser
 
             $this->seek($s);
 
+            if ($this->literal('@import') &&
+                $this->url($importPath) &&
+                $this->end()
+            ) {
+                $this->append(array('import', $importPath), $s);
+
+                return true;
+            }
+
+            $this->seek($s);
+
             if ($this->literal('@extend') &&
                 $this->selectors($selector) &&
                 $this->end()
@@ -1638,6 +1649,16 @@ class Parser
     {
         if ($this->match('([\w\-_]+|#[{][$][\w\-_]+[}])', $m)) {
             $placeholder = $m[1];
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function url(&$out) {
+        if ($this->match('(url\(\s*(["\']?)([^)]+)\2\s*\))', $m)) {
+            $out = array('string', '', array('url(' . $m[2] . $m[3] . $m[2] . ')'));
 
             return true;
         }
