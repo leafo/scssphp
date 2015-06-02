@@ -95,7 +95,7 @@ class Compiler
     protected $userFunctions = array();
     protected $registeredVars = array();
 
-    protected $numberPrecision = 5;
+    protected $numberPrecision = 10;
 
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
 
