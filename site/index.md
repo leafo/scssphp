@@ -111,6 +111,11 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.1.4** -- June 2, 2015
+  * add new string functions (okj579)
+  * add compileFile() and checkCompile() (NoxNebula, saas786, panique)
+  * fix regular expression in findImport() (lucvn)
+  * needsCompile() shouldn't compare meta-etag with browser etag (edwinveldhuizen)
 * **0.1.3** -- May 31, 2015
   * map support (okj579)
   * misc bug fixes (etu, bgarret, aaukt)
