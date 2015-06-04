@@ -56,7 +56,7 @@ EOT;
         exit($HELP);
     }
 
-    if ($argv[$i] === 'T') {
+    if ($argv[$i] === '-T') {
         $dumpTree = true;
         continue;
     }

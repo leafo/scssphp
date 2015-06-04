@@ -16,7 +16,7 @@ Just include it somewhere to start using it:
 
     ```php
     <?php
-    require_once "scssphp/scss.inc.php";
+    require_once 'scssphp/scss.inc.php';
     ```
 
 ### Compiling
@@ -27,7 +27,7 @@ options, then run the compiler with the `compile` method.
 
     ```php
     <?php
-    require_once "scssphp/scss.inc.php";
+    require_once 'scssphp/scss.inc.php';
 
     use Leafo\ScssPhp\Compiler;
 
@@ -59,16 +59,16 @@ you want, so there are two methods for manipulating the import path:
   isn't one already.
 
 If the import path is set to `array()` then importing is effectively disabled.
-The default import path is `array("")`, which means the current directory.
+The default import path is `array('')`, which means the current directory.
 
     ```php
     <?php
-    require_once "scssphp/scss.inc.php";
+    require_once 'scssphp/scss.inc.php';
 
     use Leafo\ScssPhp\Compiler;
 
     $scss = new Compiler();
-    $scss->setImportPaths("assets/stylesheets/");
+    $scss->setImportPaths('assets/stylesheets/');
 
     // will search for `assets/stylesheets/mixins.scss'
     echo $scss->compile('@import "mixins.scss";');
@@ -80,7 +80,7 @@ files that SCSS would otherwise not process (such as vanilla CSS imports).
 
     ```php
     <?php
-    require_once "scssphp/scss.inc.php";
+    require_once 'scssphp/scss.inc.php';
 
     use Leafo\ScssPhp\Compiler;
 
@@ -99,11 +99,13 @@ files that SCSS would otherwise not process (such as vanilla CSS imports).
 It's possible to customize the formatting of the output CSS by changing the
 default formatter.
 
-Three formatters are included:
+Five formatters are included:
 
 * `Leafo\ScssPhp\Formatter\Expanded`
 * `Leafo\ScssPhp\Formatter\Nested` *(default)*
 * `Leafo\ScssPhp\Formatter\Compressed`
+* `Leafo\ScssPhp\Formatter\Compact`
+* `Leafo\ScssPhp\Formatter\Crunched`
 
 We can change the formatting using the `setFormatter` method.
 
@@ -115,6 +117,7 @@ We can change the formatting using the `setFormatter` method.
 Given the following SCSS:
 
     ```scss
+    /*! Comment */
     .navigation {
         ul {
             line-height: 20px;
@@ -132,11 +135,12 @@ Given the following SCSS:
     }
     ```
 
-The formatters will output,
+The formatters output the following:
 
 `Leafo\ScssPhp\Formatter\Expanded`:
 
     ```css
+    /*! Comment */
     .navigation ul {
       line-height: 20px;
       color: blue;
@@ -152,6 +156,7 @@ The formatters will output,
 `Leafo\ScssPhp\Formatter\Nested`:
 
     ```css
+    /*! Comment */
     .navigation ul {
       line-height: 20px;
       color: blue; }
@@ -162,7 +167,24 @@ The formatters will output,
       color: silver; }
     ```
 
+`Leafo\ScssPhp\Formatter\Compact`:
+
+    ```css
+    /*! Comment */
+    .navigation ul { line-height:20px; color:blue; }
+
+    .navigation ul a { color:red; }
+
+    .footer .copyright { color:silver; }
+    ```
+
 `Leafo\ScssPhp\Formatter\Compressed`:
+
+    ```css
+    /* Comment*/.navigation ul{line-height:20px;color:blue;}.navigation ul a{color:red;}.footer .copyright{color:silver;}
+    ```
+
+`Leafo\ScssPhp\Formatter\Crunched`:
 
     ```css
     .navigation ul{line-height:20px;color:blue;}.navigation ul a{color:red;}.footer .copyright{color:silver;}
@@ -196,7 +218,7 @@ The *SCSS typed arguments* are actually just arrays that represent SCSS values.
 SCSS has different types than PHP, and this is how **scssphp** represents them
 internally.
 
-For example, the value `10px` in PHP would be `array("number", 1, "px")`. There
+For example, the value `10px` in PHP would be `array('number', 1, 'px')`. There
 is a large variety of types. Experiment with a debugging function like `print_r`
 to examine the possible inputs.
 
@@ -213,7 +235,7 @@ together. PHP's anonymous function syntax is used to define the function.
 
     $scss = new Compiler();
 
-    $scss->registerFunction("add-two", function($args) {
+    $scss->registerFunction('add-two', function($args) {
       list($a, $b) = $args;
       return $a[1] + $b[1];
     });
@@ -242,9 +264,9 @@ For example, create a file `style.php`:
 
     ```php
     <?php
-    $directory = "stylesheets";
+    $directory = 'stylesheets';
 
-    require_once "scssphp/scss.inc.php";
+    require_once 'scssphp/scss.inc.php';
 
     use Leafo\ScssPhp\Server;
 
@@ -256,7 +278,7 @@ Going to the URL `example.com/style.php/style.scss` will attempt to compile
 
 * <p>`Server::serveFrom($directory)` will serve SCSS files out of
   `$directory`. It will attempt to get the path to the file out of
-  `$_SERVER["PATH_INFO"]`. (It also looks at the GET parameter `p`)
+  `$_SERVER['PATH_INFO']`. (It also looks at the GET parameter `p`)
   </p>
 
 If it can not find the file it will return an HTTP 404 page:
@@ -287,7 +309,7 @@ of the `Compiler` that is used to compile
 
 * <p>`new Server($sourceDir, $cacheDir, $scss)` creates a new server that
   serves files from `$sourceDir`. The cache dir is where the cached compiled
-  files are placed. When `null`, `$sourceDir . "/scss_cache"` is used. `$scss`
+  files are placed. When `null`, `$sourceDir . '/scss_cache'` is used. `$scss`
   is the instance of `scss` that is used to compile.
   </p>
 
@@ -297,15 +319,15 @@ Here's an example of creating a SCSS server that outputs compressed CSS:
 
     ```php
     <?php
-    require_once "scssphp/scss.inc.php";
+    require_once 'scssphp/scss.inc.php';
 
     use Leafo\ScssPhp\Compiler;
     use Leafo\ScssPhp\Server;
 
     $scss = new Compiler();
-    $scss->setFormatter("scss_formatter_compressed");
+    $scss->setFormatter('Leafo\ScssPhp\Formatter\Compressed');
 
-    $server = new Server("stylesheets", null, $scss);
+    $server = new Server('stylesheets', null, $scss);
     $server->serve();
     ```
 
@@ -313,13 +335,26 @@ Here's an example of creating a SCSS server that outputs compressed CSS:
 ## Command Line Tool
 
 A really basic command line tool is included for integration with scripts. It
-is called `pscss`. It reads a SCSS file from standard out and returns the CSS.
+is called `pscss`. It reads SCSS from either a named input file or standard in,
+and returns the CSS to standard out.
 
-If passed the flag `-v`, input is ignored and the current version if returned.
+Usage: bin/pscss [options] [input-file]
 
-The flag `-f` can be used to set the [formatter](#Output_formatting):
+### Options
+
+If passed the flag `-h` (or `--help`), input is ignored and a summary of the command's usage is returned.
+
+If passed the flag `-v` (or `--version`), input is ignored and the current version is returned.
+
+If passed the flag `-T`, a formatted parse tree is returned instead of the compiled CSS..
+
+The flag `-f` (or `--style`) can be used to set the [formatter](#Output_formatting):
 
     ```bash
-    $ bin/pscss -f scss_formatter_compressed < styles.scss
+    $ bin/pscss -f compressed < styles.scss
     ```
 
+The flag `-i` (or `--load_paths`) can be used to set import paths for the loader. On Unix/Linux systems,
+the paths are colon separated.
+
+The flag `-p` (or `--precision`) can be used to set the decimal number precision. The default is 5.
