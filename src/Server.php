@@ -22,7 +22,10 @@ use Leafo\ScssPhp\Version;
  */
 class Server
 {
-    protected $showErrorsAsCSS = false;
+    /**
+     * @var boolean
+     */
+    private $showErrorsAsCSS;
 
     /**
      * @var string
@@ -238,12 +241,14 @@ class Server
     }
 
     /**
-     * Render errors as a psuedo-element within valid CSS, displaying the errors on any
+     * Render errors as a pseudo-element within valid CSS, displaying the errors on any
      * page that includes this CSS.
+     *
+     * @param boolean $show
      */
-    public function showErrorsAsCSS()
+    public function showErrorsAsCSS($show = true)
     {
-        $this->showErrorsAsCSS = true;
+        $this->showErrorsAsCSS = $show;
     }
 
     /**
@@ -285,8 +290,10 @@ class Server
     {
         if ( ! is_file($out) || filemtime($in) > filemtime($out)) {
             $this->compileFile($in, $out);
+
             return true;
         }
+
         return false;
     }
 
@@ -320,10 +327,12 @@ class Server
                 } catch (\Exception $e) {
                     if ($this->showErrorsAsCSS) {
                         header('Content-type: text/css');
+
                         echo $this->createErrorCSS($e);
                     } else {
                         header($protocol . ' 500 Internal Server Error');
                         header('Content-type: text/plain');
+
                         echo 'Parse error: ' . $e->getMessage() . "\n";
                     }
 
@@ -423,6 +432,7 @@ class Server
         }
 
         $this->scss = $scss;
+        $this->showErrorsAsCSS = false;
     }
 
     /**
