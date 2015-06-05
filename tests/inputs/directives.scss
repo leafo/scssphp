@@ -1,11 +1,11 @@
 
-@charset "hello-world";
-
 @page :left {
     div {
         color: red;
     }
 }
+
+@charset "hello-world";
 
 @page test {
     @media yes {
@@ -20,6 +20,8 @@
         }
     }
 }
+
+@charset "aloha-world";
 
 @media something {
     @page {

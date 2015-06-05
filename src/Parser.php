@@ -61,6 +61,7 @@ class Parser
     {
         $this->sourceName = $sourceName;
         $this->rootParser = $rootParser;
+        $this->charset = null;
 
         if (empty(self::$operatorStr)) {
             self::$operatorStr = $this->makeOperatorStr(self::$operators);
@@ -111,6 +112,10 @@ class Parser
 
         if (!empty($this->env->parent)) {
             $this->throwParseError('unclosed block');
+        }
+
+        if ($this->charset) {
+            array_unshift($this->env->children, array('charset', $this->charset));
         }
 
         $this->env->isRoot    = true;
@@ -367,7 +372,9 @@ class Parser
             if ($this->literal('@charset') &&
                 $this->valueList($charset) && $this->end()
             ) {
-                $this->append(array('charset', $charset), $s);
+                if (! isset($this->charset)) {
+                    $this->charset = $charset;
+                }
 
                 return true;
             }
