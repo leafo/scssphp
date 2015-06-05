@@ -22,6 +22,8 @@ use Leafo\ScssPhp\Version;
  */
 class Server
 {
+    protected $showErrorsAsCSS = false;
+
     /**
      * @var string
      */
@@ -215,6 +217,35 @@ class Server
         return array($css, $etag);
     }
 
+    protected function createErrorCSS($error)
+    {
+        $message = str_replace(
+            array("'", "\n"),
+            array("\\'", "\\A"),
+            $error->getfile() . ":\n\n" . $error->getMessage()
+        );
+
+        return "body { display: none !important; }
+                html:after {
+                    background: white;
+                    color: black;
+                    content: '$message';
+                    display: block !important;
+                    font-family: mono;
+                    padding: 1em;
+                    white-space: pre;
+                }";
+    }
+
+    /**
+     * Render errors as a psuedo-element within valid CSS, displaying the errors on any
+     * page that includes this CSS.
+     */
+    public function showErrorsAsCSS()
+    {
+        $this->showErrorsAsCSS = true;
+    }
+
     /**
      * Compile .scss file
      *
@@ -287,10 +318,15 @@ class Server
                     echo $css;
 
                 } catch (\Exception $e) {
-                    header($protocol . ' 500 Internal Server Error');
-                    header('Content-type: text/plain');
+                    if ($this->showErrorsAsCSS) {
+                        header('Content-type: text/css');
+                        echo $this->createErrorCSS($e);
+                    } else {
+                        header($protocol . ' 500 Internal Server Error');
+                        header('Content-type: text/plain');
+                        echo 'Parse error: ' . $e->getMessage() . "\n";
+                    }
 
-                    echo 'Parse error: ' . $e->getMessage() . "\n";
                 }
 
                 return;
