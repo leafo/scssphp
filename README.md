@@ -24,6 +24,7 @@ There are two kinds of tests in the `tests/` directory:
 * `ExceptionTest.php` contains unit tests that test for exceptions thrown by the parser and compiler.
 * `InputTest.php` compiles every `.scss` file in the `tests/inputs` directory
   then compares to the respective `.css` file in the `tests/outputs` directory.
+* `ServerTest.php` contains functional tests for the `Server` class.
 
 When changing any of the tests in `tests/inputs`, the tests will most likely
 fail because the output has changed. Once you verify that the output is correct

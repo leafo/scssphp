@@ -22,14 +22,20 @@ use Leafo\ScssPhp\Version;
  */
 class Server
 {
-	/** @var string */
-	public $dir;
+    /**
+     * @var string
+     */
+    private $dir;
 
-	/** @var string */
-	public $cacheDir;
+    /**
+     * @var string
+     */
+    private $cacheDir;
 
-	/** @var Compiler */
-	public $scss;
+    /**
+     * @var \Leafo\ScssPhp\Compiler
+     */
+    private $scss;
 
     /**
      * Join path components
@@ -113,7 +119,7 @@ class Server
      */
     protected function needsCompile($in, $out, &$etag)
     {
-        if (! is_file($out)) {
+        if ( ! is_file($out)) {
             return true;
         }
 
@@ -219,13 +225,13 @@ class Server
      */
     public function compileFile($in, $out = null)
     {
-        if (!is_readable($in)) {
-            throw new \Exception('load error: failed to find '.$in);
+        if ( ! is_readable($in)) {
+            throw new \Exception('load error: failed to find ' . $in);
         }
 
         $pi = pathinfo($in);
 
-        $this->scss->addImportPath($pi['dirname'].'/');
+        $this->scss->addImportPath($pi['dirname'] . '/');
 
         $compiled = $this->scss->compile(file_get_contents($in), $in);
 
@@ -246,7 +252,7 @@ class Server
      */
     public function checkedCompile($in, $out)
     {
-        if (!is_file($out) || filemtime($in) > filemtime($out)) {
+        if ( ! is_file($out) || filemtime($in) > filemtime($out)) {
             $this->compileFile($in, $out);
             return true;
         }
@@ -324,31 +330,35 @@ class Server
         echo "/* INPUT NOT FOUND scss $v */\n";
     }
 
-	/**
-	 * Based on explicit input/output files does a full change check on cache before compiling.
-	 *
-	 * @param string $in
-	 * @param string $out
-	 * @param boolean $force
-	 * @return string Compiled CSS results
-	 * @throws Exception
-	 */
-	public function checkedCachedCompile($in, $out, $force = false) {
-		if (!is_file($in) || !is_readable($in)) {
-			throw new Exception('Invalid or unreadable input file specified.');
-		}
-		if (is_dir($out) || !is_writable(file_exists($out) ? $out : dirname($out))) {
-			throw new Exception('Invalid or unwritable output file specified.');
-		}
+    /**
+     * Based on explicit input/output files does a full change check on cache before compiling.
+     *
+     * @param string  $in
+     * @param string  $out
+     * @param boolean $force
+     *
+     * @return string Compiled CSS results
+     *
+     * @throws \Exception
+     */
+    public function checkedCachedCompile($in, $out, $force = false)
+    {
+        if ( ! is_file($in) || ! is_readable($in)) {
+            throw new \Exception('Invalid or unreadable input file specified.');
+        }
 
-		if ($force || $this->needsCompile($in, $out, $etag)) {
-			list($css, $etag) = $this->compile($in, $out);
-		} else {
-			$css = file_get_contents($out);
-		}
+        if (is_dir($out) || ! is_writable(file_exists($out) ? $out : dirname($out))) {
+            throw new \Exception('Invalid or unwritable output file specified.');
+        }
 
-		return $css;
-	}
+        if ($force || $this->needsCompile($in, $out, $etag)) {
+            list($css, $etag) = $this->compile($in, $out);
+        } else {
+            $css = file_get_contents($out);
+        }
+
+        return $css;
+    }
 
     /**
      * Constructor
@@ -361,17 +371,17 @@ class Server
     {
         $this->dir = $dir;
 
-        if (!isset($cacheDir)) {
+        if ( ! isset($cacheDir)) {
             $cacheDir = $this->join($dir, 'scss_cache');
         }
 
         $this->cacheDir = $cacheDir;
 
-        if (!is_dir($this->cacheDir)) {
+        if ( ! is_dir($this->cacheDir)) {
             mkdir($this->cacheDir, 0755, true);
         }
 
-        if (!isset($scss)) {
+        if ( ! isset($scss)) {
             $scss = new Compiler();
             $scss->setImportPaths($this->dir);
         }
