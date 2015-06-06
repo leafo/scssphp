@@ -781,6 +781,21 @@ class Compiler
                     break;
                 }
 
+                $compiledName = $this->compileValue($name);
+
+                // handle shorthand syntax: size / line-height
+                if ($compiledName === 'font') {
+                    if ($value[0] === 'exp' && $value[1] === '/') {
+                        $value = $this->expToString($value);
+                    } elseif ($value[0] === 'list') {
+                        foreach ($value[2] as &$item) {
+                            if ($item[0] === 'exp' && $item[1] === '/') {
+                               $item = $this->expToString($item);
+                            }
+                        }
+                    }
+                }
+
                 // if the value reduces to null from something else then
                 // the property should be discarded
                 if ($value[0] != 'null') {
@@ -791,8 +806,9 @@ class Compiler
                 }
 
                 $compiledValue = $this->compileValue($value);
+
                 $out->lines[] = $this->formatter->property(
-                    $this->compileValue($name),
+                    $compiledName,
                     $compiledValue
                 );
                 break;
@@ -1033,7 +1049,7 @@ class Compiler
                 $right = $this->reduce($right, true);
 
                 // special case: looks like css short-hand
-                if ($opName == 'div' && !$inParens && !$inExp && isset($right[2]) &&  $right[2] != '') {
+                if ($opName == 'div' && !$inParens && !$inExp && isset($right[2]) && $right[2] != '') {
                     return $this->expToString($value);
                 }
 
