@@ -2238,12 +2238,11 @@ class Compiler
         $max = max($red, $green, $blue);
 
         $l = $min + $max;
+        $d = $max - $min;
 
-        if ($min == $max) {
-            $s = $h = 0;
+        if ((int) $d == 0) {
+            $h = $s = 0;
         } else {
-            $d = $max - $min;
-
             if ($l < 255) {
                 $s = $d / $l;
             } else {
