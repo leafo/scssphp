@@ -1,3 +1,4 @@
+@charset "UTF-8";
 @import "foo.css";
 @import 'foo.css';
 @import url("foo.css");
@@ -7,7 +8,6 @@
 @import "foo.css" screen, print;
 @import "foo.css" screen, print and (foo: 0);
 @import "foo.css" screen, only print, screen and (foo: 0);
-@charset "UTF-8";
 [foo~=bar] {
   a: b; }
 
