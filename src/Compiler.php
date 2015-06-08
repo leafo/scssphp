@@ -1282,6 +1282,10 @@ class Compiler
 
     protected function opDivNumberNumber($left, $right)
     {
+        if ($right[1] == 0) {
+            $this->throwError('Division by zero');
+        }
+
         return array('number', $left[1] / $right[1], $left[2]);
     }
 
