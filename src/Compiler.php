@@ -91,6 +91,7 @@ class Compiler
 
     protected $importPaths = array('');
     protected $importCache = array();
+	protected $importOnce = false;
 
     protected $userFunctions = array();
     protected $registeredVars = array();
@@ -1957,6 +1958,11 @@ class Compiler
         $this->importPaths = (array)$path;
     }
 
+    public function setImportOnce($importOnce = false)
+    {
+        $this->importOnce = $importOnce;
+    }
+
     public function setNumberPrecision($numberPrecision)
     {
         $this->numberPrecision = $numberPrecision;
@@ -1982,6 +1988,8 @@ class Compiler
         // see if tree is cached
         $realPath = realpath($path);
         if (isset($this->importCache[$realPath])) {
+			if ( $this->importOnce )
+				return;
             $tree = $this->importCache[$realPath];
         } else {
             $code = file_get_contents($path);
