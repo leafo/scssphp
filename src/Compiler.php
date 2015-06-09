@@ -1282,6 +1282,10 @@ class Compiler
 
     protected function opDivNumberNumber($left, $right)
     {
+        if ($right[1] == 0) {
+            $this->throwError('Division by zero');
+        }
+
         return array('number', $left[1] / $right[1], $left[2]);
     }
 
@@ -2238,12 +2242,11 @@ class Compiler
         $max = max($red, $green, $blue);
 
         $l = $min + $max;
+        $d = $max - $min;
 
-        if ($min == $max) {
-            $s = $h = 0;
+        if ((int) $d == 0) {
+            $h = $s = 0;
         } else {
-            $d = $max - $min;
-
             if ($l < 255) {
                 $s = $d / $l;
             } else {

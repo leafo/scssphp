@@ -57,6 +57,12 @@ END_OF_SCSS
                 'color: Can\'t divide by zero'
             ),
             array(<<<END_OF_SCSS
+.test { left: 300px/0; }
+END_OF_SCSS
+                ,
+                'Division by zero'
+            ),
+            array(<<<END_OF_SCSS
 .test {
   @include foo();
 }
