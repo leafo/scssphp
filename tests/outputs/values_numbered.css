@@ -28,8 +28,9 @@ multiline string.";
   var: -90; }
 /* line 34, values.scss */
 #special {
-  /* line 35, values.scss */
   a: 12px expression(1 + (3 / Foo.bar("baz" + "bang") + function() {return 12;}) % 12); }
+
+/* line 35, values.scss */
 /* line 38, values.scss */
 #unary {
   b: 0.5em;

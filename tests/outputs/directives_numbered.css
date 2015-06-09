@@ -1,32 +1,34 @@
 @charset "hello-world";
 /* line 4, directives.scss */
 @page :left {
-  /* line 5, directives.scss */
+/* line 5, directives.scss */
   div {
     color: red; } }
 /* line 10, directives.scss */
 @page test {
-  /* line 11, directives.scss */
+/* line 11, directives.scss */
   @media yes {
     /* line 12, directives.scss */
-    /* line 16, directives.scss */
       div {
-        color: red; } } }
+        color: red; }
+
+    /* line 16, directives.scss */ } }
 /* line 24, directives.scss */
 @media something {
   /* line 25, directives.scss */
     @page {
-      /* line 26, directives.scss */
+  /* line 26, directives.scss */
     @media else {
       /* line 27, directives.scss */
         div {
           height: 200px; } } } }
 /* line 35, directives.scss */
 div {
-  color: red;
-  /* line 37, directives.scss */ }
+  color: red; }
+
+/* line 37, directives.scss */
   @page yeah {
-    /* line 38, directives.scss */
+/* line 38, directives.scss */
   div pre {
     height: 20px; } }
 /* line 44, directives.scss */
@@ -35,40 +37,34 @@ div {
   height: 20px; }
 /* line 50, directives.scss */
 @keyframes 'bounce' {
-  /* line 51, directives.scss */
-  /* line 56, directives.scss */
-  /* line 61, directives.scss */
-  /* line 66, directives.scss */
-  /* line 71, directives.scss */
+/* line 51, directives.scss */
   from {
     top: 100px;
     animation-timing-function: ease-out; }
-
+/* line 56, directives.scss */
   25% {
     top: 50px;
     animation-timing-function: ease-in; }
-
+/* line 61, directives.scss */
   50% {
     top: 100px;
     animation-timing-function: ease-out; }
-
+/* line 66, directives.scss */
   75% {
     top: 75px;
     animation-timing-function: ease-in; }
-
+/* line 71, directives.scss */
   to {
     top: 100px; } }
 /* line 76, directives.scss */
 @-webkit-keyframes flowouttoleft {
-  /* line 77, directives.scss */
-  /* line 78, directives.scss */
-  /* line 79, directives.scss */
+/* line 77, directives.scss */
   0% {
     -webkit-transform: translateX(0) scale(1); }
-
+/* line 78, directives.scss */
   60%, 70% {
     -webkit-transform: translateX(0) scale(0.7); }
-
+/* line 79, directives.scss */
   100% {
     -webkit-transform: translateX(-100%) scale(0.7); } }
 /* line 82, directives.scss */
@@ -78,12 +74,11 @@ div {
   animation-iteration-count: 10; }
 /* line 88, directives.scss */
 @keyframes 'diagonal-slide' {
-  /* line 90, directives.scss */
-  /* line 95, directives.scss */
+/* line 90, directives.scss */
   from {
     left: 0;
     top: 0; }
-
+/* line 95, directives.scss */
   to {
     left: 100px;
     top: 100px; } }
@@ -93,7 +88,7 @@ url-prefix(http://www.w3.org/Style/),
 domain(mozilla.org),
 /* line 105, directives.scss */
 regexp("https:.*") {
-  /* line 107, directives.scss */
+/* line 107, directives.scss */
   body {
     color: purple;
     background: yellow; } }

@@ -80,7 +80,6 @@
   index: false;
   index: 2;
   index: 2;
-  /* line 115, builtins.scss */
   index: 1;
   world: one, two, three, great, job;
   world: one, two, three, great job;
@@ -88,6 +87,8 @@
   cool: great job one two three;
   zip: 1px solid, 2px dashed;
   zip: 1px solid red, 2px dashed green; }
+
+/* line 115, builtins.scss */
 /* line 129, builtins.scss */
 #introspection {
   t: number;

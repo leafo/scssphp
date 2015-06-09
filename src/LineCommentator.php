@@ -41,19 +41,18 @@ class LineCommentator
     const loop_indicator_while = "@while";
     const loop_indicator_each = "@each";
 
+    const map_indicator = 'map_get';
+
     //we use this to indicate that we are currently looping within a multiline comment
     static protected $inside_multiline;
-
 
     /* insert line number as commentary within the SCSS file
      *
      * @return string;
      */
 
-
     static function insertLineComments($scss, $filepath = '')
     {
-
         $lines = $scss;
         $new_scss_content = array();
 
@@ -82,20 +81,17 @@ class LineCommentator
                 self::isMixin($line) == TRUE ||
                 self::isInclude($line) == TRUE ||
                 self::isCondition($line) == TRUE ||
-                self::isLoop($line) == TRUE
+                self::isLoop($line) == TRUE ||
+                self::isMap($line) == TRUE
             ) {
                 $new_scss_content[] = $line;
                 continue;
             }
 
-
             //output line commment
             $new_scss_content[] = self::comment_indicator_start . ' line ' . ($linenumber + 1) . ', ' . $filepath . ' ' . self::comment_indicator_end;
-
             $new_scss_content[] = $line;
-
         }
-
 
         return implode("\n", $new_scss_content);
     }
@@ -108,9 +104,9 @@ class LineCommentator
      *
      * @return boolean
      */
+
     static function isSelector($line, $nextline = NULL)
     {
-
         if (
             (strpos($line, self::block_indicator_start) !== FALSE || strpos($nextline, self::block_indicator_start) === 0)
             && strpos($line, self::block_indicator_start) !== 0
@@ -137,7 +133,6 @@ class LineCommentator
         return false;
     }
 
-
     /*
      * ignore functions
      *
@@ -146,7 +141,6 @@ class LineCommentator
 
     static function isFunction($line)
     {
-
         if
         (
             strpos($line, self::function_indicator) !== FALSE ||
@@ -159,7 +153,6 @@ class LineCommentator
 
     }
 
-
     /*
      * ignore include
      *
@@ -168,7 +161,6 @@ class LineCommentator
 
     static function isInclude($line)
     {
-
         if (strpos($line, self::include_indicator) !== FALSE) {
             return true;
         }
@@ -180,8 +172,12 @@ class LineCommentator
     /*
      * dont't put a line number above if statement, since it will result in an empty line within the
      * compiled scss
+     *
+     * @return boolean
      */
-    static function isCondition($line) {
+
+    static function isCondition($line)
+    {
         if
         (
             strpos($line, self::if_statement_indicator) !== FALSE ||
@@ -197,9 +193,12 @@ class LineCommentator
     /*
     * dont't put a line number above loops, since it will result in an empty line within the
     * compiled scss
-     */
-    static function isLoop($line) {
+    *
+    * @return boolean
+    */
 
+    static function isLoop($line)
+    {
         if
         (
             strpos($line, self::loop_indicator_for) !== FALSE ||
@@ -210,9 +209,7 @@ class LineCommentator
         }
 
         return false;
-
     }
-
 
     /*
      * we don't want to mess around with existing comments since this can easily lead to parsing errors.
@@ -222,7 +219,6 @@ class LineCommentator
 
     static function isComment($line)
     {
-
         /* a comment has started, but did not end in the same line */
         if (strpos($line, self::comment_indicator_start) !== FALSE && strpos($line, self::comment_indicator_end) === FALSE) {
             self::$inside_multiline = TRUE;
@@ -243,6 +239,27 @@ class LineCommentator
 
         } else if (strpos($line, self::comment_indicator_end) !== FALSE) {
             self::$inside_multiline = FALSE;
+            return true;
+        }
+
+        return false;
+    }
+
+    /*
+     * we don't want to confuse map_get statements with selectors
+     * this could happen fairly easy when the scss contains map_get statements
+     * that select the value by index (e.g. color: map_get($map, 'color#{2}')), because
+     * of the curly brackets.
+     *
+     * in case the selector and the map_get statement are all in one line, you will not
+     * receive a line commentary for that particularly line.
+     *
+     * @return boolean
+     */
+
+    static function isMap($line)
+    {
+        if (strpos($line, self::map_indicator) !== FALSE) {
             return true;
         }
 

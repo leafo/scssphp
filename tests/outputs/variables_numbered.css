@@ -13,10 +13,10 @@ pre {
   color: blue; }
 /* line 31, variables.scss */
 del {
-  /* line 34, variables.scss */
   color: red; }
-  del div {
-    /* line 36, variables.scss */ }
+
+/* line 34, variables.scss */
+  /* line 36, variables.scss */
     del div pre {
       color: red; }
 /* line 50, variables.scss */

@@ -126,13 +126,13 @@ class Compiler
 
         if ($this->isLineNumbers()) {
             if (!$name) {
+                //string given
                 $code = explode("\n", $code);
                 $code = LineCommentator::insertLineComments($code, $this->getFileName());
-
             } else {
+                //filepath given
                 $code = LineCommentator::insertLineComments(file($name), $name);
             }
-
         }
 
         $this->parser = new Parser($name);
@@ -821,7 +821,7 @@ class Compiler
                 //do not nest line comments into the parrent block
                 //for further information on the issue see https://github.com/leafo/scssphp/issues/228
 
-               if ($this->isLineNumbers() && strpos($child[1], '/* line ') !==FALSE) {
+               if (strpos($child[1], '/* line ') !==FALSE) {
                     $this->compileComment($child);
                     break;
                 }
@@ -3072,10 +3072,5 @@ class Compiler
     {
         $this->fileName = $fileName;
     }
-
-
-
-
-
 
 }

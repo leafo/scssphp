@@ -62,8 +62,8 @@ sel {
   a: b; }
 /* line 64, scss_css.scss */
 @foo {
-  /* line 65, scss_css.scss */
   a: b;
+/* line 65, scss_css.scss */
   rule {
     a: b; } }
 /* line 71, scss_css.scss */
@@ -71,8 +71,8 @@ sel {
   a: b; }
 
 @bar {
-  /* line 72, scss_css.scss */
-  a: b; }
+  a: b;
+/* line 72, scss_css.scss */ }
 
 @foo "bar"
 /* line 77, scss_css.scss */
@@ -190,8 +190,9 @@ foo {
   a: b; }
 /* line 199, scss_css.scss */
 foo {
-  /* line 200, scss_css.scss */
   a: 12px expression(1 + (3 / Foo.bar("baz" + "bang") + function() {return 12;}) % 12); }
+
+/* line 200, scss_css.scss */
 /* line 203, scss_css.scss */
 :foo("bar") {
   a: b; }
@@ -354,17 +355,19 @@ foo {
 /* line 424, scss_css.scss */
 @media all {
   /* line 425, scss_css.scss */
-  /* line 428, scss_css.scss */
     rule1 {
       prop: val; }
+
+  /* line 428, scss_css.scss */
     rule2 {
       prop: val; } }
 /* line 432, scss_css.scss */
 @media screen, print {
   /* line 433, scss_css.scss */
-  /* line 436, scss_css.scss */
     rule1 {
       prop: val; }
+
+  /* line 436, scss_css.scss */
     rule2 {
       prop: val; } }
 /* line 440, scss_css.scss */
@@ -388,7 +391,7 @@ url-prefix(http://www.w3.org/Style/),
 domain(mozilla.org),
 /* line 463, scss_css.scss */
 regexp("^https:.*") {
-  /* line 464, scss_css.scss */
+/* line 464, scss_css.scss */
   .foo {
     a: b; } }
 /* line 468, scss_css.scss */
@@ -495,8 +498,9 @@ foo|* {
   a: b; }
 /* line 605, scss_css.scss */
 foo {
-  /* line 606, scss_css.scss */
   a: "bang 1 bar  bip"; }
+
+/* line 606, scss_css.scss */
 /* line 609, scss_css.scss */
 :nth-child(-n) {
   a: b; }
@@ -605,16 +609,19 @@ E*:hover {
   a: b; }
 
 E, F {
-  /* line 745, scss_css.scss */
   a: b; }
+
+/* line 745, scss_css.scss */
 
 E F {
-  /* line 750, scss_css.scss */
   a: b; }
 
+/* line 750, scss_css.scss */
+
 E, F G, H {
-  /* line 755, scss_css.scss */
   a: b; }
+
+/* line 755, scss_css.scss */
 /* line 759, scss_css.scss */
 body {
   /*
@@ -757,12 +764,12 @@ E ~ F {
   a: b; }
 /* line 940, scss_css.scss */
 @supports (a: b) and (c: d) or (not (d: e)) and ((not (f: g)) or (not ((h: i) and (j: k)))) {
-  /* line 941, scss_css.scss */
+/* line 941, scss_css.scss */
   .foo {
     a: b; } }
 /* line 947, scss_css.scss */
 @-prefix-supports (a: b) and (c: d) or (not (d: e)) and ((not (f: g)) or (not ((h: i) and (j: k)))) {
-  /* line 948, scss_css.scss */
+/* line 948, scss_css.scss */
   .foo {
     a: b; } }
 /* line 954, scss_css.scss */

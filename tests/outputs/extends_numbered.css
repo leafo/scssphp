@@ -3,14 +3,14 @@ error, pre seriousError, span seriousError, other, hello {
   border: 1px #f00;
   background-color: #fdd; }
 /* line 7, extends.scss */
-pre, span {
-  /* line 8, extends.scss */ }
+/* line 8, extends.scss */
   pre seriousError, span seriousError {
     font-size: 20px; }
 /* line 14, extends.scss */
 hello {
-  color: green;
-  /* line 17, extends.scss */ }
+  color: green; }
+
+/* line 17, extends.scss */
   hello div {
     margin: 10px; }
 /* line 22, extends.scss */
@@ -30,8 +30,7 @@ a:hover, .hoverlink, #demo .overview .fakelink:hover {
 div.hello.world.hmm, pre div.okay.span.world.hmm, pre #butt .umm div.sure.span.world.hmm, #butt .umm pre div.sure.span.world.hmm, code div.okay.span.world.hmm, code #butt .umm div.sure.span.world.hmm, #butt .umm code div.sure.span.world.hmm {
   color: blue; }
 /* line 44, extends.scss */
-pre, code {
-  /* line 45, extends.scss */ }
+/* line 45, extends.scss */
   /* line 51, extends.scss */
 
 .xxxxx .xxxxx .xxxxx, code .xxxxx .xxxxx, code code .xxxxx, code code code, code .xxxxx code, .xxxxx code .xxxxx, .xxxxx code code, .xxxxx .xxxxx code {
@@ -95,8 +94,7 @@ man {
 wassup {
   color: blue; }
 /* line 128, extends.scss */
-.foo {
-  /* line 129, extends.scss */ }
+/* line 129, extends.scss */
   .foo .wassup {
     color: blue; }
 /* line 137, extends.scss */
@@ -107,26 +105,23 @@ wassup {
 
 /* line 151, extends.scss */
 
-.nav-tabs {
-  /* line 152, extends.scss */ }
+/* line 152, extends.scss */
   /* line 156, extends.scss */
 
 .nav-justified, .nav-tabs.nav-justified {
   text-align: justify; }
 
 .btn:hover, .edit .actions button:hover, .edit .new .actions button:hover, .btn:active, .edit .actions button:active, .edit .new .actions button:active, .btn.active, .edit .actions button.active, .edit .new .actions button.active, .btn.disabled, .edit .actions button.disabled, .edit .new .actions button.disabled, .btn[disabled], .edit .actions button[disabled], .edit .new .actions button[disabled] {
-  /* line 166, extends.scss */
   color: red; }
+
+/* line 166, extends.scss */
 /* line 169, extends.scss */
-.edit .actions {
-  /* line 170, extends.scss */ }
+/* line 170, extends.scss */
   .edit .actions button {
     float: right; }
 /* line 175, extends.scss */
-.edit {
-  /* line 176, extends.scss */ }
-  .edit .new {
-    /* line 177, extends.scss */
-    /* line 180, extends.scss */ }
+/* line 176, extends.scss */
+  /* line 177, extends.scss */
     .edit .new .actions {
       padding: 0; }
+  /* line 180, extends.scss */

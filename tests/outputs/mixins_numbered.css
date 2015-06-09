@@ -1,14 +1,16 @@
 /* line 9, mixins.scss */
 div {
   color: blue;
-  color: red;
-  /* line 4, mixins.scss */ }
+  color: red; }
+
+/* line 4, mixins.scss */
   div pre {
     height: 200px; }
 /* line 26, mixins.scss */
 span {
-  color: blue;
-  /* line 17, mixins.scss */ }
+  color: blue; }
+
+/* line 17, mixins.scss */
   span div {
     height: 20px; }
 /* line 30, mixins.scss */
@@ -34,24 +36,23 @@ div {
   -webkit-box-shadow: inset 10px 10px #888, -10px -10px #f4f4f4;
   box-shadow: inset 10px 10px #888, -10px -10px #f4f4f4; }
 /* line 81, mixins.scss */
-div {
-  /* line 82, mixins.scss */ }
+/* line 82, mixins.scss */
   div p {
-    /* line 83, mixins.scss */
     color: red;
-    /* line 17, mixins.scss */
-    /* line 89, mixins.scss */
     color: blue; }
+  /* line 83, mixins.scss */
     div p .class {
-      color: red;
-      /* line 17, mixins.scss */ }
+      color: red; }
+    /* line 17, mixins.scss */
       div p .class div {
         height: 20px; }
+  /* line 17, mixins.scss */
     div p div {
       height: 20px; }
+  /* line 89, mixins.scss */
     div p .top {
-      top: 0;
-      /* line 92, mixins.scss */ }
+      top: 0; }
+    /* line 92, mixins.scss */
       div p .top div {
         color: red; }
 /* line 103, mixins.scss */
@@ -70,8 +71,9 @@ div.mixin-content-simple {
   height: 43px; }
 /* line 103, mixins.scss */
 div.mixin-content-simple {
-  color: orange;
-  /* line 17, mixins.scss */ }
+  color: orange; }
+
+/* line 17, mixins.scss */
   div.mixin-content-simple div {
     height: 20px; }
 /* line 109, mixins.scss */
@@ -81,8 +83,9 @@ div.mixin-content-with-arg {
 /* line 109, mixins.scss */
 div.mixin-content-with-arg {
   background: purple;
-  color: orange;
-  /* line 17, mixins.scss */ }
+  color: orange; }
+
+/* line 17, mixins.scss */
   div.mixin-content-with-arg div {
     height: 20px; }
 /* line 156, mixins.scss */
@@ -95,14 +98,14 @@ div.mixin-content-with-arg {
   left: 4em; }
 /* line 168, mixins.scss */
 div.parameter-name-scope {
-  /* line 161, mixins.scss */
   -webkit-transform: translateX(50px); }
+
+/* line 161, mixins.scss */
 /* line 174, mixins.scss */
 @-webkit-keyframes change-color {
-  /* line 181, mixins.scss */
-  /* line 182, mixins.scss */
+/* line 181, mixins.scss */
   0% {
     color: green; }
-
+/* line 182, mixins.scss */
   100% {
     color: red; } }

@@ -309,50 +309,47 @@ E::selection {
   color: blue; }
 /* line 126, selectors.scss */
 div {
-  /* line 127, selectors.scss */
-  /* line 131, selectors.scss */
   font: something;
   font-size: 30em; }
+
+/* line 127, selectors.scss */
   div font:something {
     size: 30em; }
+
+/* line 131, selectors.scss */
 /* line 139, selectors.scss */
-.something {
-  /* line 140, selectors.scss */
-  /* line 144, selectors.scss */
-  /* line 148, selectors.scss */ }
+/* line 140, selectors.scss */
   .something.world {
     color: blue; }
+
+/* line 144, selectors.scss */
   .something .mold {
     height: 200px; }
+
+/* line 148, selectors.scss */
   .dog .something {
     color: blue; }
 /* line 153, selectors.scss */
-.simple {
-  /* line 154, selectors.scss */
-  /* line 158, selectors.scss */ }
+/* line 154, selectors.scss */
   .dad .simple .wolf {
     color: blue; }
+
+/* line 158, selectors.scss */
   .rad.simple.bad {
     color: blue; }
 /* line 164, selectors.scss */
-div {
-  /* line 165, selectors.scss */ }
-  .something div .what {
-    /* line 166, selectors.scss */ }
+/* line 165, selectors.scss */
+  /* line 166, selectors.scss */
     .something div .what.world {
       color: blue; }
 /* line 172, selectors.scss */
-div {
-  /* line 173, selectors.scss */ }
+/* line 173, selectors.scss */
   div.foo div {
     color: blue; }
 /* line 178, selectors.scss */
-.main, div {
-  /* line 179, selectors.scss */ }
-  .main .message div, div .message div {
-    /* line 180, selectors.scss */ }
-    .main .message div .title, div .message div .title {
-      /* line 181, selectors.scss */ }
+/* line 179, selectors.scss */
+  /* line 180, selectors.scss */
+    /* line 181, selectors.scss */
       .nice-fonts .main .message div .title, .nice-fonts div .message div .title {
         font-size: 24px; }
 /* line 189, selectors.scss */
