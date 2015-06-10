@@ -85,19 +85,29 @@ class Compiler
     static public $true = array('keyword', 'true');
     static public $false = array('keyword', 'false');
     static public $null = array('null');
-
     static public $defaultValue = array('keyword', '');
     static public $selfSelector = array('self');
 
     protected $importPaths = array('');
     protected $importCache = array();
-
     protected $userFunctions = array();
     protected $registeredVars = array();
 
     protected $numberPrecision = 5;
 
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
+
+    private $indentLevel;
+    private $commentsSeen;
+    private $extends;
+    private $extendsMap;
+    private $parsedFiles;
+    private $env;
+    private $scope;
+    private $parser;
+    private $sourcePos;
+    private $sourceParser;
+    private $storeEnv;
 
     /**
      * Compile scss
@@ -734,8 +744,8 @@ class Compiler
     // return a value to halt execution
     protected function compileChild($child, $out)
     {
-        $this->sourcePos = isset($child[-1]) ? $child[-1] : -1;
-        $this->sourceParser = isset($child[-2]) ? $child[-2] : $this->parser;
+        $this->sourcePos = isset($child[Parser::SOURCE_POSITION]) ? $child[Parser::SOURCE_POSITION] : -1;
+        $this->sourceParser = isset($child[Parser::SOURCE_PARSER]) ? $child[Parser::SOURCE_PARSER] : $this->parser;
 
         switch ($child[0]) {
             case 'import':

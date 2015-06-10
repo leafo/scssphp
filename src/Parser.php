@@ -21,6 +21,9 @@ use Leafo\ScssPhp\Compiler;
  */
 class Parser
 {
+    const SOURCE_POSITION = -1;
+    const SOURCE_PARSER   = -2;
+
     protected static $precedence = array(
         'or' => 0,
         'and' => 1,
@@ -628,10 +631,10 @@ class Parser
     protected function append($statement, $pos = null)
     {
         if ($pos !== null) {
-            $statement[-1] = $pos;
+            $statement[self::SOURCE_POSITION] = $pos;
 
             if ( ! $this->rootParser) {
-                $statement[-2] = $this;
+                $statement[self::SOURCE_PARSER] = $this;
             }
         }
 
