@@ -1,0 +1,27 @@
+@import "foo.css";
+@import "foo" screen;
+@import "http://foo.com/bar";
+@import url(foo);
+div {
+  height: 200px;
+  color: red; }
+/* line 9, import.scss */
+pre {
+  color: red; }
+  pre div {
+    height: 200px;
+    color: red; }
+/* line 14, import.scss */
+code div {
+  height: 200px;
+  color: red; }
+  code div {
+    height: 200px;
+    color: red; }
+
+#partial {
+  color: blue; }
+/* line 20, import.scss */
+body {
+  color: #7c2;
+  background: gray; }

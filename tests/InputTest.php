@@ -3,6 +3,7 @@
 namespace Leafo\ScssPhp\Tests;
 
 use Leafo\ScssPhp\Compiler;
+use Leafo\ScssPhp\LineCommentator;
 
 // Runs all the tests in inputs/ and compares their output to ouputs/
 
@@ -21,6 +22,9 @@ class InputTest extends \PHPUnit_Framework_TestCase
     protected static $inputDir = 'inputs';
     protected static $outputDir = 'outputs';
 
+    protected static $line_number_suffix = '_numbered';
+
+
     public function setUp()
     {
         $this->scss = new Compiler();
@@ -32,6 +36,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
      */
     public function testInputFile($inFname, $outFname)
     {
+
         if (getenv('BUILD')) {
             return $this->buildInput($inFname, $outFname);
         }
@@ -40,10 +45,41 @@ class InputTest extends \PHPUnit_Framework_TestCase
             $this->fail("$outFname is missing, consider building tests with BUILD=true");
         }
 
+
         $input = file_get_contents($inFname);
         $output = file_get_contents($outFname);
 
         $this->assertEquals($output, $this->scss->compile($input));
+    }
+
+    /*
+     * run all tests with line numbering
+     */
+
+    /**
+     * @dataProvider fileNameProvider
+     */
+
+    public function testLineNumbering($inFname, $outFname) {
+
+        $outPath = self::lineNumberOutPath($outFname);
+
+        //insert line numbers
+        $scss = LineCommentator::insertLineComments(file($inFname), self::fileName($inFname));
+
+        if (getenv('BUILD')) {
+            //write css
+            $css = $this->scss->compile($scss);
+            file_put_contents($outPath, $css);
+        }
+
+        if (!is_readable($outPath)) {
+            $this->fail("$outPath is missing, consider building tests with BUILD=true");
+        }
+
+        $output = file_get_contents($outPath);
+
+        $this->assertEquals($output, $this->scss->compile($scss));
     }
 
     public function fileNameProvider()
@@ -88,11 +124,40 @@ class InputTest extends \PHPUnit_Framework_TestCase
         return __DIR__ . '/' . $out;
     }
 
+
     public static function buildTests($pattern)
     {
         $files = self::findInputNames($pattern);
 
         foreach ($files as $file) {
         }
+    }
+
+    /*
+     * return output filename inlcuding line_number_suffix
+     *
+     * @return string
+     */
+
+
+    public static function lineNumberOutPath($outFname) {
+
+        $outFname = preg_replace("/.css$/", self::$line_number_suffix.'.css', self::fileName($outFname));
+
+        return __DIR__ .'/'.self::$outputDir . '/' . $outFname;
+    }
+
+
+    /*
+     * return filename from path
+     *
+     * @return string
+     */
+
+
+    public static function fileName($path) {
+
+        $filename = explode('/',$path);
+        return end($filename);
     }
 }

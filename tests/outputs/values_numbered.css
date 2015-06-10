@@ -1,0 +1,38 @@
+/* line 2, values.scss */
+#values {
+  color: #eee;
+  color: #eee;
+  height: 20px;
+  width: 80%;
+  color: "hello world";
+  height: url("http://google.com");
+  dads: url(http://leafo.net);
+  padding: 10px 10px 10px 10px, 3px 3px 3px;
+  textblock: "This is a \
+multiline block \
+/* line 13, values.scss */
+#not { color: #eee;}";
+  margin: 4, 3, 1;
+  content: "This is a \
+multiline string.";
+  border-radius: -1px -1px -1px black; }
+/* line 20, values.scss */
+#subtraction {
+  lit: 10 -11;
+  lit: -1;
+  lit: -1;
+  lit: -1;
+  var: -90;
+  var: -90;
+  var: -90;
+  var: -90; }
+/* line 34, values.scss */
+#special {
+  a: 12px expression(1 + (3 / Foo.bar("baz" + "bang") + function() {return 12;}) % 12); }
+
+/* line 35, values.scss */
+/* line 38, values.scss */
+#unary {
+  b: 0.5em;
+  c: -foo(12px);
+  d: +foo(12px); }

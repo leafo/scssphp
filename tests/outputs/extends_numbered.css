@@ -1,0 +1,127 @@
+/* line 2, extends.scss */
+error, pre seriousError, span seriousError, other, hello {
+  border: 1px #f00;
+  background-color: #fdd; }
+/* line 7, extends.scss */
+/* line 8, extends.scss */
+  pre seriousError, span seriousError {
+    font-size: 20px; }
+/* line 14, extends.scss */
+hello {
+  color: green; }
+
+/* line 17, extends.scss */
+  hello div {
+    margin: 10px; }
+/* line 22, extends.scss */
+.cool, .me {
+  color: red; }
+/* line 26, extends.scss */
+.blue, .me {
+  color: purple; }
+/* line 30, extends.scss */
+/* line 34, extends.scss */
+
+/* line 35, extends.scss */
+
+a:hover, .hoverlink, #demo .overview .fakelink:hover {
+  text-decoration: underline; }
+/* line 40, extends.scss */
+div.hello.world.hmm, pre div.okay.span.world.hmm, pre #butt .umm div.sure.span.world.hmm, #butt .umm pre div.sure.span.world.hmm, code div.okay.span.world.hmm, code #butt .umm div.sure.span.world.hmm, #butt .umm code div.sure.span.world.hmm {
+  color: blue; }
+/* line 44, extends.scss */
+/* line 45, extends.scss */
+  /* line 51, extends.scss */
+
+.xxxxx .xxxxx .xxxxx, code .xxxxx .xxxxx, code code .xxxxx, code code code, code .xxxxx code, .xxxxx code .xxxxx, .xxxxx code code, .xxxxx .xxxxx code {
+  color: green; }
+/* line 55, extends.scss */
+code {
+  color: red; }
+/* line 63, extends.scss */
+.alpha, .beta, .gama {
+  color: red; }
+/* line 67, extends.scss */
+.beta, .gama {
+  color: white; }
+/* line 72, extends.scss */
+.gama {
+  color: blue; }
+/* line 79, extends.scss */
+#admin .tabbar a, #admin .tabbar #demo .overview .fakelink, #demo .overview #admin .tabbar .fakelink {
+  font-weight: bold; }
+/* line 80, extends.scss */
+/* line 82, extends.scss */
+
+a1 b1 c1 d1, x1 y1 z1 w1 b1 c1 d1 {
+  color: red; }
+/* line 83, extends.scss */
+/* line 85, extends.scss */
+
+a2 b2 c2 d2, a2 x2 y2 z2 w2 c2 d2, x2 y2 z2 a2 w2 c2 d2 {
+  color: red; }
+/* line 86, extends.scss */
+/* line 89, extends.scss */
+
+a3 b3 c3 d3, a3 b3 x3 y3 z3 w3 d3, x3 y3 z3 a3 b3 w3 d3 {
+  color: red; }
+/* line 90, extends.scss */
+/* line 93, extends.scss */
+
+a4 b4 c4 d4, a4 b4 c4 x4 y4 z4 w4, x4 y4 z4 a4 b4 c4 w4 {
+  color: red; }
+/* line 94, extends.scss */
+/* line 98, extends.scss */
+
+#butt .yeah .okay, #butt .yeah .umm .sure, #butt .umm .yeah .sure {
+  font-weight: bold; }
+/* line 99, extends.scss */
+/* line 101, extends.scss */
+
+a9 b9 s9 t9 v9, a9 b9 s9 t9 x9 y9 z9, a9 b9 x9 y9 s9 t9 z9 {
+  color: red; }
+/* line 103, extends.scss */
+/* line 109, extends.scss */
+
+@media print {
+  /* line 110, extends.scss */
+    horse, man {
+      color: blue; } }
+/* line 115, extends.scss */
+man {
+  color: red; }
+/* line 123, extends.scss */
+wassup {
+  color: blue; }
+/* line 128, extends.scss */
+/* line 129, extends.scss */
+  .foo .wassup {
+    color: blue; }
+/* line 137, extends.scss */
+#something, .x, .y {
+  color: red; }
+/* line 141, extends.scss */
+/* line 145, extends.scss */
+
+/* line 151, extends.scss */
+
+/* line 152, extends.scss */
+  /* line 156, extends.scss */
+
+.nav-justified, .nav-tabs.nav-justified {
+  text-align: justify; }
+
+.btn:hover, .edit .actions button:hover, .edit .new .actions button:hover, .btn:active, .edit .actions button:active, .edit .new .actions button:active, .btn.active, .edit .actions button.active, .edit .new .actions button.active, .btn.disabled, .edit .actions button.disabled, .edit .new .actions button.disabled, .btn[disabled], .edit .actions button[disabled], .edit .new .actions button[disabled] {
+  color: red; }
+
+/* line 166, extends.scss */
+/* line 169, extends.scss */
+/* line 170, extends.scss */
+  .edit .actions button {
+    float: right; }
+/* line 175, extends.scss */
+/* line 176, extends.scss */
+  /* line 177, extends.scss */
+    .edit .new .actions {
+      padding: 0; }
+  /* line 180, extends.scss */

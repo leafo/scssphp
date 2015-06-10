@@ -11,5 +11,6 @@ if ( ! class_exists('scssc')) {
     include_once __DIR__ . '/src/Parser.php';
     include_once __DIR__ . '/src/Version.php';
     include_once __DIR__ . '/src/Server.php';
+    include_once __DIR__ . '/src/LineCommentator.php';
     include_once __DIR__ . '/classmap.php';
 }
