@@ -126,7 +126,7 @@ class Compiler
 
         $this->formatter = new $this->formatter();
 
-        $this->pushEnv($tree);
+        $this->rootEnv = $this->pushEnv($tree);
         $this->injectVariables($this->registeredVars);
         $this->compileRoot($tree);
         $this->popEnv();
@@ -768,7 +768,15 @@ class Compiler
                 list(,$name, $value) = $child;
 
                 if ($name[0] == 'var') {
-                    $isDefault = ! empty($child[3]);
+                    $flag = isset($child[3]) ? $child[3] : null;
+                    $isDefault = $flag === '!default';
+                    $isGlobal = $flag === '!global';
+
+                    if ($isGlobal) {
+                        $this->set($name[1], $this->reduce($value), false, $this->rootEnv);
+
+                        break;
+                    }
 
                     if ($isDefault) {
                         $existingValue = $this->get($name[1], true);
