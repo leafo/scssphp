@@ -450,9 +450,9 @@ class Parser
             $this->literal(':') &&
             $this->valueList($value) && $this->end()
         ) {
-            // check for !default
-            $defaultVar = $value[0] == 'list' && $this->stripDefault($value);
-            $this->append(array('assign', $name, $value, $defaultVar), $s);
+            // check for '!flag'
+            $assignmentFlag = $value[0] === 'list' && $this->stripAssignmentFlag($value);
+            $this->append(array('assign', $name, $value, $assignmentFlag), $s);
 
             return true;
         }
@@ -523,22 +523,26 @@ class Parser
         return false;
     }
 
-    protected function stripDefault(&$value)
+    /**
+     * Strip assignment flag from the list
+     *
+     * @param array $value
+     *
+     * @return boolean
+     */
+    protected function stripAssignmentFlag(&$value)
     {
-        $def = end($value[2]);
+        $lastNode = end($value[2]);
 
-        if ($def[0] == 'keyword' && $def[1] == '!default') {
+        if ($lastNode[0] === 'keyword' && $lastNode[1] === '!default') {
             array_pop($value[2]);
+
             $value = $this->flattenList($value);
 
             return true;
         }
 
-        if ($def[0] == 'list') {
-            return $this->stripDefault($value[2][count($value[2]) - 1]);
-        }
-
-        return false;
+        return $lastNode[0] === 'list' && $this->stripAssignmentFlag($value[2][count($value[2]) - 1]);
     }
 
     protected function literal($what, $eatWhitespace = null)
