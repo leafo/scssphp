@@ -91,7 +91,7 @@ class Nested extends Formatter
 
         echo $inner . implode($glue, $block->lines);
 
-        if (!empty($block->children)) {
+        if (! empty($block->children)) {
             echo $this->break;
         }
     }
@@ -106,7 +106,7 @@ class Nested extends Formatter
         }
 
         $inner = $pre = $this->indentStr($block->depth - 1);
-        if (!empty($block->selectors)) {
+        if (! empty($block->selectors)) {
             echo $pre .
                 implode($this->tagSeparator, $block->selectors) .
                 $this->open . $this->break;
@@ -114,13 +114,13 @@ class Nested extends Formatter
             $inner = $this->indentStr($block->depth - 1);
         }
 
-        if (!empty($block->lines)) {
+        if (! empty($block->lines)) {
             $this->blockLines($inner, $block);
         }
 
         foreach ($block->children as $i => $child) {
-            // echo '*** block: ' . $block->depth . ' child: ' . $child->depth . "\n";
             $this->block($child);
+
             if ($i < count($block->children) - 1) {
                 echo $this->break;
 
@@ -133,7 +133,7 @@ class Nested extends Formatter
             }
         }
 
-        if (!empty($block->selectors)) {
+        if (! empty($block->selectors)) {
             $this->indentLevel--;
             echo $this->close;
         }

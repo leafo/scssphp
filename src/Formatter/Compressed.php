@@ -45,6 +45,18 @@ class Compressed extends Formatter
     /**
      * {@inheritdoc}
      */
+    public function stripSemicolon(&$lines)
+    {
+        if (($count = count($lines))
+            && substr($lines[$count - 1], -1) === ';'
+        ) {
+            $lines[$count - 1] = substr($lines[$count - 1], 0, -1);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function blockLines($inner, $block)
     {
         $glue = $this->break . $inner;
@@ -59,7 +71,7 @@ class Compressed extends Formatter
 
         echo $inner . implode($glue, $block->lines);
 
-        if (!empty($block->children)) {
+        if (! empty($block->children)) {
             echo $this->break;
         }
     }

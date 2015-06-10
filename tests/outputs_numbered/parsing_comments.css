@@ -1,0 +1,55 @@
+/* comment 1 */
+/* line 2, inputs/parsing_comments.scss */
+a {
+  /* comment 2 */
+  color: red;
+  /* comment 3 */
+  /* comment 4 */ }
+/* comment 5 */
+/*! comment 1 */
+/* line 10, inputs/parsing_comments.scss */
+b {
+  /*! comment 2 */
+  color: red;
+  /*! comment 3 */
+  /*! comment 4 */ }
+/*! comment 5 */
+/*
+ * multi-line comment 1
+ */
+/* line 20, inputs/parsing_comments.scss */
+c {
+  /*
+   * multi-line comment 2
+   */
+  color: red;
+  /*
+   * multi-line comment 3
+   */
+  /*
+   * multi-line comment 4
+   */ }
+/*
+ * multi-line comment 5
+ */
+/*!
+ * multi-line comment 1
+ */
+/* line 38, inputs/parsing_comments.scss */
+d {
+  /*!
+   * multi-line comment 2
+   */
+  color: red;
+  /*!
+   * multi-line comment 3
+   */
+  /*!
+   * multi-line comment 4
+   */ }
+/*!
+ * multi-line comment 5
+ */
+/* line 54, inputs/parsing_comments.scss */
+e {
+  color: red; }

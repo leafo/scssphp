@@ -1,0 +1,22 @@
+/* line 2, inputs/null.scss */
+.div {
+  one: null;
+  one: world;
+  one: NULL world;
+  one: a, b;
+  two: a, b; }
+/* line 12, inputs/null.scss */
+p:before {
+  content: "I ate  pies!"; }
+/* line 31, inputs/null.scss */
+.foo {
+  -webkit-border-radius: 10;
+  border-radius: 10; }
+/* line 35, inputs/null.scss */
+.fu {
+  -webkit-border-radius: 20;
+  border-radius: 20; }
+/* line 39, inputs/null.scss */
+.bar {
+  -webkit-border-top-left-radius: 30;
+  border-top-left-radius: 30; }

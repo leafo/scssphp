@@ -1,0 +1,788 @@
+@charset "UTF-8";
+@import "foo.css";
+@import 'foo.css';
+@import url("foo.css");
+@import url('foo.css');
+@import url(foo.css);
+@import "foo.css" screen;
+@import "foo.css" screen, print;
+@import "foo.css" screen, print and (foo: 0);
+@import "foo.css" screen, only print, screen and (foo: 0);
+/* line 1, inputs/scss_css.scss */
+[foo~=bar] {
+  a: b; }
+/* line 5, inputs/scss_css.scss */
+[foo^=bar] {
+  a: b; }
+/* line 9, inputs/scss_css.scss */
+[foo$=bar] {
+  a: b; }
+/* line 13, inputs/scss_css.scss */
+[foo*=bar] {
+  a: b; }
+/* line 17, inputs/scss_css.scss */
+[foo|=en] {
+  a: b; }
+/* line 21, inputs/scss_css.scss */
+foo {
+  a: 2;
+  b: 2.3em;
+  c: 50%;
+  d: "fraz bran";
+  e: flanny-blanny-blan;
+  f: url(http://sass-lang.com);
+  h: #abc; }
+/* line 32, inputs/scss_css.scss */
+selector {
+  property: value;
+  property2: value; }
+/* line 37, inputs/scss_css.scss */
+sel {
+  p: v; }
+/* line 39, inputs/scss_css.scss */
+.foo {
+  /* Foo
+   Bar
+   Baz */
+  a: b; }
+/* line 46, inputs/scss_css.scss */
+.foo {
+  /* Foo
+   Bar
+   Baz */
+  a: b; }
+/* line 53, inputs/scss_css.scss */
+.foo {
+  /* Foo
+   Bar */
+  a: b; }
+/* line 58, inputs/scss_css.scss */
+.foo {
+  /* Foo
+   Bar
+   Baz */
+  a: b; }
+
+@foo {
+  a: b;
+/* line 65, inputs/scss_css.scss */
+rule {
+  a: b; } }
+
+@foo {
+  a: b; }
+
+@bar {
+  a: b; }
+
+@foo "bar"
+
+foo {
+  a: 12px calc(100%/3 - 2*1em - 2*1px);
+  b: 12px -moz-calc(100%/3 - 2*1em - 2*1px);
+  b: 12px -webkit-calc(100%/3 - 2*1em - 2*1px);
+  b: 12px -foobar-calc(100%/3 - 2*1em - 2*1px); }
+/* line 84, inputs/scss_css.scss */
+foo {
+  bar: baz; }
+/* line 86, inputs/scss_css.scss */
+bar {
+  bar: baz; }
+/* line 88, inputs/scss_css.scss */
+baz {
+  bar: baz; }
+/*
+ * foo
+ */
+/* line 94, inputs/scss_css.scss */
+bar {
+  baz: bang; }
+/* line 97, inputs/scss_css.scss */
+E, F {
+  a: b; }
+/* line 101, inputs/scss_css.scss */
+E F, G H {
+  a: b; }
+/* line 105, inputs/scss_css.scss */
+E > F, G > H {
+  a: b; }
+/* This is a CSS comment. */
+/* line 110, inputs/scss_css.scss */
+.one {
+  color: green; }
+/* Another comment */
+/* The following should not be used:
+ .two {color: red;} */
+/* line 113, inputs/scss_css.scss */
+.three {
+  color: green;
+  /* color: red; */ }
+/**
+ .four {color: red;} */
+/* line 116, inputs/scss_css.scss */
+.five {
+  color: green; }
+/**/
+/* line 118, inputs/scss_css.scss */
+.six {
+  color: green; }
+/*********/
+/* line 120, inputs/scss_css.scss */
+.seven {
+  color: green; }
+/* a comment **/
+/* line 122, inputs/scss_css.scss */
+.eight {
+  color: green; }
+/* line 125, inputs/scss_css.scss */
+foo {
+  a: \foo bar;
+  b: foo\ bar;
+  c: \2022 \0020;
+  d: foo\\bar;
+  e: foo\"\'bar; }
+/* line 133, inputs/scss_css.scss */
+foo {
+  a: "\foo bar";
+  b: "foo\ bar";
+  c: "\2022 \0020";
+  d: "foo\\bar";
+  e: "foo\"'bar"; }
+/* line 141, inputs/scss_css.scss */
+foo {
+  _name: val;
+  *name: val;
+  :name: val;
+  .name: val;
+  #name: val;
+  name/**/: val;
+  name/*\**/: val;
+  name: val; }
+
+@foo "bar"  ;
+
+foo {
+  a: -moz-element(#foo);
+  b: -webkit-element(#foo);
+  b: -foobar-element(#foo); }
+
+@foo ;
+
+foo {
+  bar: baz; }
+
+/* line 179, inputs/scss_css.scss */
+
+0% {
+  a: b; }
+/* line 183, inputs/scss_css.scss */
+60% {
+  a: b; }
+/* line 187, inputs/scss_css.scss */
+100% {
+  a: b; }
+/* line 191, inputs/scss_css.scss */
+12px {
+  a: b; }
+/* line 195, inputs/scss_css.scss */
+"foo" {
+  a: b; }
+/* line 199, inputs/scss_css.scss */
+foo {
+  a: 12px expression(1 + (3 / Foo.bar("baz" + "bang") + function() {return 12;}) % 12); }
+/* line 203, inputs/scss_css.scss */
+:foo("bar") {
+  a: b; }
+/* line 207, inputs/scss_css.scss */
+:foo(bar) {
+  a: b; }
+/* line 211, inputs/scss_css.scss */
+:foo(12px) {
+  a: b; }
+/* line 215, inputs/scss_css.scss */
+:foo(+) {
+  a: b; }
+/* line 219, inputs/scss_css.scss */
+:foo(-) {
+  a: b; }
+/* line 223, inputs/scss_css.scss */
+:foo(+"bar") {
+  a: b; }
+/* line 227, inputs/scss_css.scss */
+:foo(-++--baz-"bar"12px) {
+  a: b; }
+/* line 231, inputs/scss_css.scss */
+foo {
+  a: foo-bar(12);
+  b: -foo-bar-baz(13, 14 15); }
+/* line 254, inputs/scss_css.scss */
+foo {
+  a: foo !important;
+  b: foo bar !important;
+  b: foo, bar !important; }
+/* line 260, inputs/scss_css.scss */
+foo {
+  a: -moz-bar-baz;
+  b: foo -o-bar-baz; }
+/* line 265, inputs/scss_css.scss */
+foo {
+  a: d;
+  /* b; c: */ }
+/* line 268, inputs/scss_css.scss */
+foo {
+  a : d;
+  /*: b; c */ }
+/* Foo
+ * Bar */
+/* line 275, inputs/scss_css.scss */
+.foo {
+  /* Foo
+   * Bar */ }
+/* line 280, inputs/scss_css.scss */
+[foo] {
+  a: b; }
+/* line 284, inputs/scss_css.scss */
+[foo="bar"] {
+  a: b; }
+/* line 288, inputs/scss_css.scss */
+[foo~="bar"] {
+  a: b; }
+/* line 292, inputs/scss_css.scss */
+[foo^="bar"] {
+  a: b; }
+/* line 296, inputs/scss_css.scss */
+[foo$="bar"] {
+  a: b; }
+/* line 300, inputs/scss_css.scss */
+[foo*="bar"] {
+  a: b; }
+/* line 304, inputs/scss_css.scss */
+[foo|="en"] {
+  a: b; }
+/* line 308, inputs/scss_css.scss */
+:root {
+  a: b; }
+/* line 312, inputs/scss_css.scss */
+:nth-child(n) {
+  a: b; }
+/* line 316, inputs/scss_css.scss */
+:nth-last-child(n) {
+  a: b; }
+/* line 320, inputs/scss_css.scss */
+:nth-of-type(n) {
+  a: b; }
+/* line 324, inputs/scss_css.scss */
+:nth-last-of-type(n) {
+  a: b; }
+/* line 328, inputs/scss_css.scss */
+:first-child {
+  a: b; }
+/* line 332, inputs/scss_css.scss */
+:last-child {
+  a: b; }
+/* line 336, inputs/scss_css.scss */
+:first-of-type {
+  a: b; }
+/* line 340, inputs/scss_css.scss */
+:last-of-type {
+  a: b; }
+/* line 344, inputs/scss_css.scss */
+:only-child {
+  a: b; }
+/* line 348, inputs/scss_css.scss */
+:only-of-type {
+  a: b; }
+/* line 352, inputs/scss_css.scss */
+:empty {
+  a: b; }
+/* line 356, inputs/scss_css.scss */
+:link {
+  a: b; }
+/* line 360, inputs/scss_css.scss */
+:visited {
+  a: b; }
+/* line 364, inputs/scss_css.scss */
+:active {
+  a: b; }
+/* line 368, inputs/scss_css.scss */
+:hover {
+  a: b; }
+/* line 372, inputs/scss_css.scss */
+:focus {
+  a: b; }
+/* line 376, inputs/scss_css.scss */
+:target {
+  a: b; }
+/* line 380, inputs/scss_css.scss */
+:lang(fr) {
+  a: b; }
+/* line 384, inputs/scss_css.scss */
+:enabled {
+  a: b; }
+/* line 388, inputs/scss_css.scss */
+:disabled {
+  a: b; }
+/* line 392, inputs/scss_css.scss */
+:checked {
+  a: b; }
+/* line 396, inputs/scss_css.scss */
+::first-line {
+  a: b; }
+/* line 400, inputs/scss_css.scss */
+::first-letter {
+  a: b; }
+/* line 404, inputs/scss_css.scss */
+::before {
+  a: b; }
+/* line 408, inputs/scss_css.scss */
+::after {
+  a: b; }
+/* line 412, inputs/scss_css.scss */
+.warning {
+  a: b; }
+/* line 416, inputs/scss_css.scss */
+#myid {
+  a: b; }
+/* line 420, inputs/scss_css.scss */
+:not(s) {
+  a: b; }
+
+@media all {
+/* line 425, inputs/scss_css.scss */
+rule1 {
+  prop: val; }
+/* line 428, inputs/scss_css.scss */
+rule2 {
+  prop: val; } }
+
+@media screen, print {
+/* line 433, inputs/scss_css.scss */
+rule1 {
+  prop: val; }
+/* line 436, inputs/scss_css.scss */
+rule2 {
+  prop: val; } }
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  a: b; }
+
+@media only screen, print and (foo: 0px) and (bar: flam(12px solid)) {
+  a: b; }
+/* line 448, inputs/scss_css.scss */
+:-moz-any(h1, h2, h3) {
+  a: b; }
+/* line 452, inputs/scss_css.scss */
+:-moz-any(.foo) {
+  a: b; }
+/* line 456, inputs/scss_css.scss */
+:-moz-any(foo bar, .baz > .bang) {
+  a: b; }
+
+@-moz-document url(http://www.w3.org/),
+               url-prefix(http://www.w3.org/Style/),
+               domain(mozilla.org),
+               regexp("^https:.*") {
+/* line 464, inputs/scss_css.scss */
+.foo {
+  a: b; } }
+/* line 468, inputs/scss_css.scss */
+foo {
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1, startColorstr=#c0ff3300, endColorstr=#ff000000);
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1, startColorstr=#c0ff3300, endColorstr=#ff000000); }
+/* line 473, inputs/scss_css.scss */
+foo {
+  filter: alpha(opacity=20);
+  filter: alpha(opacity=20, enabled=true);
+  filter: blaznicate(foo=bar, baz=bang bip, bart=#fa4600); }
+
+@foo bar {
+  a: b; }
+
+@bar baz {
+  c: d; }
+
+@foo bar;
+@bar baz;
+
+
+/* Foo
+ * Bar */
+/* Baz
+ * Bang */
+
+
+.foo {
+  /* Foo
+   * Bar */
+  /* Baz
+   * Bang */ }
+/* line 503, inputs/scss_css.scss */
+.foo {
+  /* Foo Bar */
+  /* Baz Bang */ }
+
+@namespace "http://www.w3.org/Profiles/xhtml1-strict";
+
+@namespace url(http://www.w3.org/Profiles/xhtml1-strict);
+
+@namespace html url("http://www.w3.org/Profiles/xhtml1-strict");
+
+[foo|bar=baz] {
+  a: b; }
+/* line 517, inputs/scss_css.scss */
+[*|bar=baz] {
+  a: b; }
+/* line 521, inputs/scss_css.scss */
+[foo|bar|=baz] {
+  a: b; }
+/* line 525, inputs/scss_css.scss */
+foo|E {
+  a: b; }
+/* line 529, inputs/scss_css.scss */
+*|E {
+  a: b; }
+/* line 533, inputs/scss_css.scss */
+foo|* {
+  a: b; }
+/* line 537, inputs/scss_css.scss */
+*|* {
+  a: b; }
+/* line 541, inputs/scss_css.scss */
+:not(foo|bar) {
+  a: b; }
+/* line 545, inputs/scss_css.scss */
+:not(*|bar) {
+  a: b; }
+/* line 549, inputs/scss_css.scss */
+:not(foo|*) {
+  a: b; }
+/* line 553, inputs/scss_css.scss */
+:not(*|*) {
+  a: b; }
+/* line 557, inputs/scss_css.scss */
+:not(#blah) {
+  a: b; }
+/* line 561, inputs/scss_css.scss */
+:not(.blah) {
+  a: b; }
+/* line 565, inputs/scss_css.scss */
+:not([foo]) {
+  a: b; }
+/* line 569, inputs/scss_css.scss */
+:not([foo^="bar"]) {
+  a: b; }
+/* line 573, inputs/scss_css.scss */
+:not([baz|foo~="bar"]) {
+  a: b; }
+/* line 577, inputs/scss_css.scss */
+:not(:hover) {
+  a: b; }
+/* line 581, inputs/scss_css.scss */
+:not(:nth-child(2n + 3)) {
+  a: b; }
+/* line 585, inputs/scss_css.scss */
+:not(:not(#foo)) {
+  a: b; }
+/* line 589, inputs/scss_css.scss */
+:not(a#foo.bar) {
+  a: b; }
+/* line 593, inputs/scss_css.scss */
+:not(#foo .bar > baz) {
+  a: b; }
+/* line 597, inputs/scss_css.scss */
+:not(h1, h2, h3) {
+  a: b; }
+/* line 605, inputs/scss_css.scss */
+foo {
+  a: "bang 1 bar  bip"; }
+/* line 609, inputs/scss_css.scss */
+:nth-child(-n) {
+  a: b; }
+/* line 613, inputs/scss_css.scss */
+:nth-child(+n) {
+  a: b; }
+/* line 617, inputs/scss_css.scss */
+:nth-child(even) {
+  a: b; }
+/* line 621, inputs/scss_css.scss */
+:nth-child(odd) {
+  a: b; }
+/* line 625, inputs/scss_css.scss */
+:nth-child(50) {
+  a: b; }
+/* line 629, inputs/scss_css.scss */
+:nth-child(-50) {
+  a: b; }
+/* line 633, inputs/scss_css.scss */
+:nth-child(+50) {
+  a: b; }
+/* line 637, inputs/scss_css.scss */
+:nth-child(2n+3) {
+  a: b; }
+/* line 641, inputs/scss_css.scss */
+:nth-child(2n-3) {
+  a: b; }
+/* line 645, inputs/scss_css.scss */
+:nth-child(+2n-3) {
+  a: b; }
+/* line 649, inputs/scss_css.scss */
+:nth-child(-2n+3) {
+  a: b; }
+/* line 653, inputs/scss_css.scss */
+:nth-child(-2n+ 3) {
+  a: b; }
+/* line 657, inputs/scss_css.scss */
+:nth-child( 2n + 3) {
+  a: b; }
+/* line 661, inputs/scss_css.scss */
+foo {
+  a: foo bar baz;
+  b: foo, #abc, -12;
+  c: 1px/2px/-3px;
+  d: foo bar, baz/bang; }
+
+@page {
+  prop1: val;
+  prop2: val; }
+
+@page flap {
+  prop1: val;
+  prop2: val; }
+
+@page :first {
+  prop1: val;
+  prop2: val; }
+
+@page flap:first {
+  prop1: val;
+  prop2: val; }
+/* line 688, inputs/scss_css.scss */
+.foo {
+  /* Foo */
+  a: b; }
+/* line 693, inputs/scss_css.scss */
+.foo {
+  /* Foo
+   * Bar */
+  a: b; }
+/* Foo */
+/* line 699, inputs/scss_css.scss */
+.foo {
+  a: b; }
+/* Foo
+ * Bar */
+/* line 704, inputs/scss_css.scss */
+.foo {
+  a: b; }
+/* line 708, inputs/scss_css.scss */
+.foo #bar:baz(/* bang )*/ bip) {
+  /* .a #foo */
+  a: b; }
+/* line 712, inputs/scss_css.scss */
+> E {
+  a: b; }
+/* line 716, inputs/scss_css.scss */
++ E {
+  a: b; }
+/* line 720, inputs/scss_css.scss */
+~ E {
+  a: b; }
+/* line 724, inputs/scss_css.scss */
+> > E {
+  a: b; }
+/* line 728, inputs/scss_css.scss */
+>> E {
+  a: b; }
+/* line 732, inputs/scss_css.scss */
+E* {
+  a: b; }
+/* line 736, inputs/scss_css.scss */
+E*.foo {
+  a: b; }
+/* line 740, inputs/scss_css.scss */
+E*:hover {
+  a: b; }
+/* line 744, inputs/scss_css.scss */
+E, F {
+  a: b; }
+/* line 749, inputs/scss_css.scss */
+E F {
+  a: b; }
+/* line 754, inputs/scss_css.scss */
+E, F G, H {
+  a: b; }
+/* line 759, inputs/scss_css.scss */
+body {
+  /*
+   //comment here
+   */ }
+/* line 766, inputs/scss_css.scss */
+E > F {
+  a: b; }
+/* line 768, inputs/scss_css.scss */
+E ~ F {
+  a: b; }
+/* line 770, inputs/scss_css.scss */
+E + F {
+  a: b; }
+/* line 772, inputs/scss_css.scss */
+* {
+  a: b; }
+/* line 776, inputs/scss_css.scss */
+E {
+  a: b; }
+/* line 780, inputs/scss_css.scss */
+E[foo] {
+  a: b; }
+/* line 784, inputs/scss_css.scss */
+E[foo="bar"] {
+  a: b; }
+/* line 788, inputs/scss_css.scss */
+E[foo~="bar"] {
+  a: b; }
+/* line 792, inputs/scss_css.scss */
+E[foo^="bar"] {
+  a: b; }
+/* line 796, inputs/scss_css.scss */
+E[foo$="bar"] {
+  a: b; }
+/* line 800, inputs/scss_css.scss */
+E[foo*="bar"] {
+  a: b; }
+/* line 804, inputs/scss_css.scss */
+E[foo|="en"] {
+  a: b; }
+/* line 808, inputs/scss_css.scss */
+E:root {
+  a: b; }
+/* line 812, inputs/scss_css.scss */
+E:nth-child(n) {
+  a: b; }
+/* line 816, inputs/scss_css.scss */
+E:nth-last-child(n) {
+  a: b; }
+/* line 820, inputs/scss_css.scss */
+E:nth-of-type(n) {
+  a: b; }
+/* line 824, inputs/scss_css.scss */
+E:nth-last-of-type(n) {
+  a: b; }
+/* line 828, inputs/scss_css.scss */
+E:first-child {
+  a: b; }
+/* line 832, inputs/scss_css.scss */
+E:last-child {
+  a: b; }
+/* line 836, inputs/scss_css.scss */
+E:first-of-type {
+  a: b; }
+/* line 840, inputs/scss_css.scss */
+E:last-of-type {
+  a: b; }
+/* line 844, inputs/scss_css.scss */
+E:only-child {
+  a: b; }
+/* line 848, inputs/scss_css.scss */
+E:only-of-type {
+  a: b; }
+/* line 852, inputs/scss_css.scss */
+E:empty {
+  a: b; }
+/* line 856, inputs/scss_css.scss */
+E:link {
+  a: b; }
+/* line 860, inputs/scss_css.scss */
+E:visited {
+  a: b; }
+/* line 864, inputs/scss_css.scss */
+E:active {
+  a: b; }
+/* line 868, inputs/scss_css.scss */
+E:hover {
+  a: b; }
+/* line 872, inputs/scss_css.scss */
+E:focus {
+  a: b; }
+/* line 876, inputs/scss_css.scss */
+E:target {
+  a: b; }
+/* line 880, inputs/scss_css.scss */
+E:lang(fr) {
+  a: b; }
+/* line 884, inputs/scss_css.scss */
+E:enabled {
+  a: b; }
+/* line 888, inputs/scss_css.scss */
+E:disabled {
+  a: b; }
+/* line 892, inputs/scss_css.scss */
+E:checked {
+  a: b; }
+/* line 896, inputs/scss_css.scss */
+E::first-line {
+  a: b; }
+/* line 900, inputs/scss_css.scss */
+E::first-letter {
+  a: b; }
+/* line 904, inputs/scss_css.scss */
+E::before {
+  a: b; }
+/* line 908, inputs/scss_css.scss */
+E::after {
+  a: b; }
+/* line 912, inputs/scss_css.scss */
+E.warning {
+  a: b; }
+/* line 916, inputs/scss_css.scss */
+E#myid {
+  a: b; }
+/* line 920, inputs/scss_css.scss */
+E:not(s) {
+  a: b; }
+/* line 924, inputs/scss_css.scss */
+E F {
+  a: b; }
+/* line 928, inputs/scss_css.scss */
+E > F {
+  a: b; }
+/* line 932, inputs/scss_css.scss */
+E + F {
+  a: b; }
+/* line 936, inputs/scss_css.scss */
+E ~ F {
+  a: b; }
+
+@supports (a: b) and (c: d) or (not (d: e)) and ((not (f: g)) or (not ((h: i) and (j: k)))) {
+/* line 941, inputs/scss_css.scss */
+.foo {
+  a: b; } }
+
+@-prefix-supports (a: b) and (c: d) or (not (d: e)) and ((not (f: g)) or (not ((h: i) and (j: k)))) {
+/* line 948, inputs/scss_css.scss */
+.foo {
+  a: b; } }
+/* line 954, inputs/scss_css.scss */
+foo {
+  foo: bar;
+  #baz: bang;
+  #bip: bop; }
+/* line 960, inputs/scss_css.scss */
+foo {
+  a: -2;
+  b: -2.3em;
+  c: -50%;
+  d: -foo(bar baz); }
+/* line 967, inputs/scss_css.scss */
+foo {
+  a: -0.5em;
+  b: 0.5em;
+  c: -foo(12px);
+  d: +foo(12px); }
+/* line 977, inputs/scss_css.scss */
+foo {
+  -moz-foo-bar: blat;
+  -o-flat-blang: wibble; }
+/* line 981, inputs/scss_css.scss */
+foo {
+  a: foo();
+  b: bar baz-bang() bip; }

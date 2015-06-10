@@ -1,0 +1,106 @@
+/* line 9, inputs/mixins.scss */
+div {
+  color: blue;
+  color: red; }
+/* line 4, inputs/mixins.scss */
+div pre {
+  height: 200px; }
+/* line 26, inputs/mixins.scss */
+span {
+  color: blue; }
+/* line 17, inputs/mixins.scss */
+span div {
+  height: 20px; }
+/* line 30, inputs/mixins.scss */
+html {
+  height: 43px; }
+/* line 39, inputs/mixins.scss */
+del {
+  height: 20px; }
+/* line 52, inputs/mixins.scss */
+div {
+  color: white;
+  color: blue;
+  color: white; }
+/* line 62, inputs/mixins.scss */
+div {
+  background-image: linear-gradient(left top, red, green); }
+/* line 72, inputs/mixins.scss */
+div {
+  -moz-box-shadow: 10px 10px 5px #888;
+  -webkit-box-shadow: 10px 10px 5px #888;
+  box-shadow: 10px 10px 5px #888;
+  -moz-box-shadow: inset 10px 10px #888, -10px -10px #f4f4f4;
+  -webkit-box-shadow: inset 10px 10px #888, -10px -10px #f4f4f4;
+  box-shadow: inset 10px 10px #888, -10px -10px #f4f4f4; }
+/* line 81, inputs/mixins.scss */
+/* line 82, inputs/mixins.scss */
+
+div p {
+  color: red;
+  color: blue; }
+/* line 83, inputs/mixins.scss */
+div p .class {
+  color: red; }
+/* line 17, inputs/mixins.scss */
+div p .class div {
+  height: 20px; }
+/* line 17, inputs/mixins.scss */
+div p div {
+  height: 20px; }
+/* line 89, inputs/mixins.scss */
+div p .top {
+  top: 0; }
+/* line 92, inputs/mixins.scss */
+div p .top div {
+  color: red; }
+/* line 103, inputs/mixins.scss */
+div.mixin-content-simple {
+  color: red; }
+/* line 109, inputs/mixins.scss */
+div.mixin-content-with-arg {
+  background: blue;
+  color: red; }
+/* line 109, inputs/mixins.scss */
+div.mixin-content-with-arg {
+  background: purple;
+  height: 20px; }
+/* line 103, inputs/mixins.scss */
+div.mixin-content-simple {
+  height: 43px; }
+/* line 103, inputs/mixins.scss */
+div.mixin-content-simple {
+  color: orange; }
+/* line 17, inputs/mixins.scss */
+div.mixin-content-simple div {
+  height: 20px; }
+/* line 109, inputs/mixins.scss */
+div.mixin-content-with-arg {
+  background: purple;
+  height: 43px; }
+/* line 109, inputs/mixins.scss */
+div.mixin-content-with-arg {
+  background: purple;
+  color: orange; }
+/* line 17, inputs/mixins.scss */
+div.mixin-content-with-arg div {
+  height: 20px; }
+/* line 156, inputs/mixins.scss */
+#please-wait {
+  background: url(/images/logo.png);
+  position: absolute;
+  top: 1em;
+  right: 0;
+  bottom: 3em;
+  left: 4em; }
+/* line 168, inputs/mixins.scss */
+div.parameter-name-scope {
+  -webkit-transform: translateX(50px); }
+
+@-webkit-keyframes change-color {
+/* line 181, inputs/mixins.scss */
+0% {
+  color: green; }
+/* line 182, inputs/mixins.scss */
+100% {
+  color: red; } }

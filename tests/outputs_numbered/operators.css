@@ -1,0 +1,169 @@
+/* line 3, inputs/operators.scss */
+body {
+  color: 8;
+  color: 16;
+  height: 10px/10px;
+  color: 6px;
+  color: 5px;
+  bottom: 2px;
+  top: 1.5em;
+  left: -1cm;
+  top: 6.29921; }
+/* line 15, inputs/operators.scss */
+div {
+  color: false;
+  color: true;
+  color: true;
+  color: false;
+  color: what > 3;
+  color: 0;
+  color: -1;
+  color: 1; }
+/* line 29, inputs/operators.scss */
+#units {
+  test: 2.5748in;
+  test: 13mm;
+  test: 4em;
+  test: 11mm;
+  test: 1.1cm; }
+/* line 37, inputs/operators.scss */
+#modulo {
+  test: 1;
+  test: 1cm; }
+/* line 42, inputs/operators.scss */
+#colors {
+  color: #ff0203;
+  color: #fe0000;
+  color: rgba(3, 8, 15, 0.5);
+  color: rgba(5, 7, 10, 0.5);
+  color: rgba(2, 4, 6, 0.5);
+  color: rgba(0, 1, 1, 0.5);
+  color: rgba(3, 4, 5, 0.5);
+  color: rgba(0, 0, 1, 0.5);
+  color: #22f;
+  color: false;
+  color: true;
+  color: true;
+  color: false; }
+/* line 63, inputs/operators.scss */
+#preserve {
+  hello: what -going;
+  hello: what - going; }
+/* line 68, inputs/operators.scss */
+#strings {
+  hello: what -going;
+  hello: whatgoing;
+  hello: whatgoing;
+  hello: whatgoing;
+  hello: whatgoing;
+  hello: "whatgoing";
+  hello: goingwhat;
+  hello: "whatwhat"; }
+/* line 81, inputs/operators.scss */
+#negation {
+  a: -60;
+  b: -90;
+  b: -90; }
+/* line 88, inputs/operators.scss */
+#bools-fail {
+  and: false and two;
+  and: one and two;
+  and: one and false;
+  or: false or two;
+  or: one or two;
+  or: one or false; }
+/* line 98, inputs/operators.scss */
+#bools {
+  and: false;
+  and: two;
+  and: false;
+  or: two;
+  or: one;
+  or: one; }
+/* line 109, inputs/operators.scss */
+#nots-fail {
+  not: false2;
+  not: not false;
+  not: not 0;
+  not: not 1;
+  not: not "";
+  not: not hello; }
+/* line 118, inputs/operators.scss */
+#nots {
+  not: false2;
+  not: true;
+  not: false;
+  not: false;
+  not: false;
+  not: false; }
+/* line 127, inputs/operators.scss */
+#string-test {
+  str: true;
+  str: false;
+  str: true;
+  str: true;
+  str: xhellohellofalse;
+  str: true; }
+/* line 143, inputs/operators.scss */
+#special {
+  cancel-unit: 1; }
+/* line 150, inputs/operators.scss */
+.row .a {
+  margin: -0.5em; }
+/* line 151, inputs/operators.scss */
+.row .b {
+  margin: -0.5em; }
+/* line 152, inputs/operators.scss */
+.row .c {
+  margin: -0.5em; }
+/* line 153, inputs/operators.scss */
+.row .d {
+  margin: -0.5em; }
+/* line 154, inputs/operators.scss */
+.row .e {
+  margin: 0 -0.5em; }
+/* line 156, inputs/operators.scss */
+.alt .a {
+  margin: -0.5em; }
+/* line 157, inputs/operators.scss */
+.alt .b {
+  margin: -0.5em; }
+/* line 158, inputs/operators.scss */
+.alt .c {
+  margin: -0.5em; }
+/* line 159, inputs/operators.scss */
+.alt .d {
+  margin: 0 -0.5em; }
+/* line 160, inputs/operators.scss */
+.alt .e {
+  margin: 0 -0.5em; }
+/* line 162, inputs/operators.scss */
+.row .f {
+  margin: -2em; }
+/* line 163, inputs/operators.scss */
+.row .g {
+  margin: -2em; }
+/* line 164, inputs/operators.scss */
+.row .h {
+  margin: -2em; }
+/* line 165, inputs/operators.scss */
+.row .i {
+  margin: -2em; }
+/* line 166, inputs/operators.scss */
+.row .j {
+  margin: 0 -2em; }
+/* line 168, inputs/operators.scss */
+.alt .f {
+  margin: -2em; }
+/* line 169, inputs/operators.scss */
+.alt .g {
+  margin: -2em; }
+/* line 170, inputs/operators.scss */
+.alt .h {
+  margin: -2em; }
+/* line 171, inputs/operators.scss */
+.alt .i {
+  margin: 0 -2em; }
+/* line 172, inputs/operators.scss */
+.alt .j {
+  margin: 0 -2em; }

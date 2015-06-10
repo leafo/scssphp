@@ -1,0 +1,16 @@
+/* line 1, inputs/placeholder_selector.scss */
+p a.notice span, p a.error span, #context a.notice span, #context a.error span {
+  color: blue;
+  font-weight: bold;
+  font-size: 2em; }
+/* line 7, inputs/placeholder_selector.scss */
+/* line 9, inputs/placeholder_selector.scss */
+/* line 13, inputs/placeholder_selector.scss */
+p {
+  padding: 2em; }
+/* line 18, inputs/placeholder_selector.scss */
+/* line 22, inputs/placeholder_selector.scss */
+
+.layout {
+  color: red; }
+/* line 26, inputs/placeholder_selector.scss */

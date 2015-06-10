@@ -1,0 +1,21 @@
+/* line 1, inputs/filter_effects.scss */
+#number {
+  -webkit-filter: grayscale(1) sepia(0.5) saturate(0.1) invert(1) opacity(0.5) brightness(0.5) contrast(0.5); }
+/* line 11, inputs/filter_effects.scss */
+#percentage {
+  -webkit-filter: grayscale(100%) sepia(50%) saturate(10%) invert(100%) opacity(50%) brightness(50%) contrast(50%); }
+/* line 21, inputs/filter_effects.scss */
+#misc {
+  -webkit-filter: hue-rotate(90deg) blur(10px) drop-shadow(10px -16px 30px purple); }
+/* line 37, inputs/filter_effects.scss */
+#decimal {
+  opacity: 0.5;
+  filter: alpha(opacity=50, style=1); }
+/* line 41, inputs/filter_effects.scss */
+#percent {
+  opacity: 0.5;
+  filter: alpha(opacity=50); }
+/* line 45, inputs/filter_effects.scss */
+.row {
+  background-color: #071c23;
+  color: #2284a1; }

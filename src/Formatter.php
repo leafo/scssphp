@@ -79,6 +79,15 @@ abstract class Formatter
     }
 
     /**
+     * Strip semi-colon appended by property(); it's a separator, not a terminator
+     *
+     * @param array $lines
+     */
+    public function stripSemicolon(&$lines)
+    {
+    }
+
+    /**
      * Output lines inside a block
      *
      * @param string    $inner

@@ -48,6 +48,9 @@ use Leafo\ScssPhp\Parser;
  */
 class Compiler
 {
+    const LINE_COMMENTS = 1;
+    const DEBUG_INFO    = 2;
+
     static protected $operatorNames = array(
         '+' => 'add',
         '-' => 'sub',
@@ -98,6 +101,7 @@ class Compiler
     protected $registeredVars = array();
 
     protected $numberPrecision = 5;
+    protected $lineNumberStyle = null;
 
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
 
@@ -467,8 +471,32 @@ class Compiler
             array_map(array($this, 'evalSelector'), $block->selectors);
 
         $out = $this->makeOutputBlock(null, $this->multiplySelectors($env));
+
+        if (isset($this->lineNumberStyle) && count($env->selectors) && count($block->children)) {
+            $annotation = $this->makeOutputBlock('comment');
+            $annotation->depth = 0;
+
+            $file = $block->sourceParser->getSourceName();
+            $line = $block->sourceParser->getLineNo($block->sourcePosition);
+
+            switch ($this->lineNumberStyle) {
+                case self::LINE_COMMENTS:
+                    $annotation->lines[] = '/* line ' . $line . ', ' . $file . ' */';
+                    break;
+                case self::DEBUG_INFO:
+                    $annotation->lines[] = '@media -sass-debug-info{filename{font-family:"' . $file
+                                         . '"}line{font-family:' . $line . '}}';
+                    break;
+            }
+
+            $this->scope->children[] = $annotation;
+        }
+
         $this->scope->children[] = $out;
+
         $this->compileChildren($block->children, $out);
+
+        $this->formatter->stripSemicolon($out->lines);
 
         $this->popEnv();
     }
@@ -1273,6 +1301,11 @@ class Compiler
         }
     }
 
+    protected function normalizeName($name)
+    {
+        return str_replace('-', '_', $name);
+    }
+
     public function normalizeValue($value)
     {
         $value = $this->coerceForExpression($this->reduce($value));
@@ -1312,18 +1345,6 @@ class Compiler
         }
 
         return $number;
-    }
-
-    // $number should be normalized
-    protected function coerceUnit($number, $unit)
-    {
-        list(, $value, $baseUnit) = $number;
-
-        if (isset(self::$unitTable[$baseUnit][$unit])) {
-            $value = $value * self::$unitTable[$baseUnit][$unit];
-        }
-
-        return array('number', $value, $unit);
     }
 
     protected function opAddNumberNumber($left, $right)
@@ -1779,150 +1800,6 @@ class Compiler
         return $this->multiplyMedia($env->parent, $childQueries);
     }
 
-    /**
-     * Coerce something to map
-     *
-     * @param array $item
-     *
-     * @return array
-     */
-    protected function coerceMap($item)
-    {
-        if ($item[0] === 'map') {
-            return $item;
-        }
-
-        if ($item == self::$emptyList) {
-            return self::$emptyMap;
-        }
-
-        return array('map', array($item), array(self::$null));
-    }
-
-    /**
-     * Coerce something to list
-     *
-     * @param array $item
-     *
-     * @return array
-     */
-    protected function coerceList($item, $delim = ',')
-    {
-        if (isset($item) && $item[0] == 'list') {
-            return $item;
-        }
-
-        if (isset($item) && $item[0] == 'map') {
-            $keys = $item[1];
-            $values = $item[2];
-            $list = array();
-
-            for ($i = 0, $s = count($keys); $i < $s; $i++) {
-                $key = $keys[$i];
-                $value = $values[$i];
-
-                $list[] = array('list', '', array(array('keyword', $this->compileValue($key)), $value));
-            }
-
-            return array('list', ',', $list);
-        }
-
-        return array('list', $delim, ! isset($item) ? array(): array($item));
-    }
-
-    protected function applyArguments($argDef, $argValues)
-    {
-        $storeEnv = $this->getStoreEnv();
-
-        $env = new \stdClass;
-        $env->store = $storeEnv->store;
-
-        $hasVariable = false;
-        $args = array();
-
-        foreach ($argDef as $i => $arg) {
-            list($name, $default, $isVariable) = $argDef[$i];
-
-            $args[$name] = array($i, $name, $default, $isVariable);
-            $hasVariable |= $isVariable;
-        }
-
-        $keywordArgs = array();
-        $deferredKeywordArgs = array();
-        $remaining = array();
-
-        // assign the keyword args
-        foreach ((array) $argValues as $arg) {
-            if (! empty($arg[0])) {
-                if (! isset($args[$arg[0][1]])) {
-                    if ($hasVariable) {
-                        $deferredKeywordArgs[$arg[0][1]] = $arg[1];
-                    } else {
-                        $this->throwError("Mixin or function doesn't have an argument named $%s.", $arg[0][1]);
-                    }
-                } elseif ($args[$arg[0][1]][0] < count($remaining)) {
-                    $this->throwError("The argument $%s was passed both by position and by name.", $arg[0][1]);
-                } else {
-                    $keywordArgs[$arg[0][1]] = $arg[1];
-                }
-            } elseif (count($keywordArgs)) {
-                $this->throwError('Positional arguments must come before keyword arguments.');
-            } elseif ($arg[2] == true) {
-                $val = $this->reduce($arg[1], true);
-
-                if ($val[0] == 'list') {
-                    foreach ($val[2] as $name => $item) {
-                        if (! is_numeric($name)) {
-                            $keywordArgs[$name] = $item;
-                        } else {
-                            $remaining[] = $item;
-                        }
-                    }
-                } else {
-                    $remaining[] = $val;
-                }
-            } else {
-                $remaining[] = $arg[1];
-            }
-        }
-
-        foreach ($args as $arg) {
-            list($i, $name, $default, $isVariable) = $arg;
-
-            if ($isVariable) {
-                $val = array('list', ',', array());
-                for ($count = count($remaining); $i < $count; $i++) {
-                    $val[2][] = $remaining[$i];
-                }
-                foreach ($deferredKeywordArgs as $itemName => $item) {
-                    $val[2][$itemName] = $item;
-                }
-            } elseif (isset($remaining[$i])) {
-                $val = $remaining[$i];
-            } elseif (isset($keywordArgs[$name])) {
-                $val = $keywordArgs[$name];
-            } elseif (! empty($default)) {
-                continue;
-            } else {
-                $this->throwError("Missing argument $name");
-            }
-
-            $this->set($name, $this->reduce($val, true), true, $env);
-        }
-
-        $storeEnv->store = $env->store;
-
-        foreach ($args as $arg) {
-            list($i, $name, $default, $isVariable) = $arg;
-
-            if ($isVariable || isset($remaining[$i]) || isset($keywordArgs[$name]) || empty($default)) {
-                continue;
-            }
-
-            $this->set($name, $this->reduce($default, true), true);
-        }
-    }
-
     protected function pushEnv($block = null)
     {
         $env = new \stdClass;
@@ -1936,9 +1813,12 @@ class Compiler
         return $env;
     }
 
-    protected function normalizeName($name)
+    protected function popEnv()
     {
-        return str_replace('-', '_', $name);
+        $env = $this->env;
+        $this->env = $this->env->parent;
+
+        return $env;
     }
 
     protected function getStoreEnv()
@@ -2050,14 +1930,6 @@ class Compiler
         unset($this->registeredVars[$name]);
     }
 
-    protected function popEnv()
-    {
-        $env = $this->env;
-        $this->env = $this->env->parent;
-
-        return $env;
-    }
-
     public function getParsedFiles()
     {
         return $this->parsedFiles;
@@ -2085,6 +1957,11 @@ class Compiler
         $this->formatter = $formatterName;
     }
 
+    public function setLineNumberStyle($lineNumberStyle)
+    {
+        $this->lineNumberStyle = $lineNumberStyle;
+    }
+
     public function registerFunction($name, $func)
     {
         $this->userFunctions[$this->normalizeName($name)] = $func;
@@ -2099,6 +1976,7 @@ class Compiler
     {
         // see if tree is cached
         $realPath = realpath($path);
+
         if (isset($this->importCache[$realPath])) {
             $tree = $this->importCache[$realPath];
         } else {
@@ -2154,6 +2032,33 @@ class Compiler
         return null;
     }
 
+    /**
+     * Throw error (exception)
+     *
+     * @param string $msg Message with optional sprintf()-style vararg parameters
+     *
+     * @throws \Exception
+     */
+    public function throwError($msg)
+    {
+        if (func_num_args() > 1) {
+            $msg = call_user_func_array('sprintf', func_get_args());
+        }
+
+        if ($this->sourcePos >= 0 && isset($this->sourceParser)) {
+            $this->sourceParser->throwParseError($msg, $this->sourcePos);
+        }
+
+        throw new \Exception($msg);
+    }
+
+    /**
+     * Does file exist?
+     *
+     * @param string $name
+     *
+     * @return boolean
+     */
     protected function fileExists($name)
     {
         return is_file($name);
@@ -2282,6 +2187,162 @@ class Compiler
         return $finalArgs;
     }
 
+    protected function applyArguments($argDef, $argValues)
+    {
+        $storeEnv = $this->getStoreEnv();
+
+        $env = new \stdClass;
+        $env->store = $storeEnv->store;
+
+        $hasVariable = false;
+        $args = array();
+
+        foreach ($argDef as $i => $arg) {
+            list($name, $default, $isVariable) = $argDef[$i];
+
+            $args[$name] = array($i, $name, $default, $isVariable);
+            $hasVariable |= $isVariable;
+        }
+
+        $keywordArgs = array();
+        $deferredKeywordArgs = array();
+        $remaining = array();
+
+        // assign the keyword args
+        foreach ((array) $argValues as $arg) {
+            if (! empty($arg[0])) {
+                if (! isset($args[$arg[0][1]])) {
+                    if ($hasVariable) {
+                        $deferredKeywordArgs[$arg[0][1]] = $arg[1];
+                    } else {
+                        $this->throwError("Mixin or function doesn't have an argument named $%s.", $arg[0][1]);
+                    }
+                } elseif ($args[$arg[0][1]][0] < count($remaining)) {
+                    $this->throwError("The argument $%s was passed both by position and by name.", $arg[0][1]);
+                } else {
+                    $keywordArgs[$arg[0][1]] = $arg[1];
+                }
+            } elseif (count($keywordArgs)) {
+                $this->throwError('Positional arguments must come before keyword arguments.');
+            } elseif ($arg[2] == true) {
+                $val = $this->reduce($arg[1], true);
+
+                if ($val[0] == 'list') {
+                    foreach ($val[2] as $name => $item) {
+                        if (! is_numeric($name)) {
+                            $keywordArgs[$name] = $item;
+                        } else {
+                            $remaining[] = $item;
+                        }
+                    }
+                } else {
+                    $remaining[] = $val;
+                }
+            } else {
+                $remaining[] = $arg[1];
+            }
+        }
+
+        foreach ($args as $arg) {
+            list($i, $name, $default, $isVariable) = $arg;
+
+            if ($isVariable) {
+                $val = array('list', ',', array());
+                for ($count = count($remaining); $i < $count; $i++) {
+                    $val[2][] = $remaining[$i];
+                }
+                foreach ($deferredKeywordArgs as $itemName => $item) {
+                    $val[2][$itemName] = $item;
+                }
+            } elseif (isset($remaining[$i])) {
+                $val = $remaining[$i];
+            } elseif (isset($keywordArgs[$name])) {
+                $val = $keywordArgs[$name];
+            } elseif (! empty($default)) {
+                continue;
+            } else {
+                $this->throwError("Missing argument $name");
+            }
+
+            $this->set($name, $this->reduce($val, true), true, $env);
+        }
+
+        $storeEnv->store = $env->store;
+
+        foreach ($args as $arg) {
+            list($i, $name, $default, $isVariable) = $arg;
+
+            if ($isVariable || isset($remaining[$i]) || isset($keywordArgs[$name]) || empty($default)) {
+                continue;
+            }
+
+            $this->set($name, $this->reduce($default, true), true);
+        }
+    }
+
+    // $number should be normalized
+    protected function coerceUnit($number, $unit)
+    {
+        list(, $value, $baseUnit) = $number;
+
+        if (isset(self::$unitTable[$baseUnit][$unit])) {
+            $value = $value * self::$unitTable[$baseUnit][$unit];
+        }
+
+        return array('number', $value, $unit);
+    }
+
+    /**
+     * Coerce something to map
+     *
+     * @param array $item
+     *
+     * @return array
+     */
+    protected function coerceMap($item)
+    {
+        if ($item[0] === 'map') {
+            return $item;
+        }
+
+        if ($item == self::$emptyList) {
+            return self::$emptyMap;
+        }
+
+        return array('map', array($item), array(self::$null));
+    }
+
+    /**
+     * Coerce something to list
+     *
+     * @param array $item
+     *
+     * @return array
+     */
+    protected function coerceList($item, $delim = ',')
+    {
+        if (isset($item) && $item[0] == 'list') {
+            return $item;
+        }
+
+        if (isset($item) && $item[0] == 'map') {
+            $keys = $item[1];
+            $values = $item[2];
+            $list = array();
+
+            for ($i = 0, $s = count($keys); $i < $s; $i++) {
+                $key = $keys[$i];
+                $value = $values[$i];
+
+                $list[] = array('list', '', array(array('keyword', $this->compileValue($key)), $value));
+            }
+
+            return array('list', ',', $list);
+        }
+
+        return array('list', $delim, ! isset($item) ? array(): array($item));
+    }
+
     protected function coerceForExpression($value)
     {
         if ($color = $this->coerceColor($value)) {
@@ -2325,6 +2386,19 @@ class Compiler
         return null;
     }
 
+    protected function coercePercent($value)
+    {
+        if ($value[0] == 'number') {
+            if ($value[2] == '%') {
+                return $value[1] / 100;
+            }
+
+            return $value[1];
+        }
+
+        return 0;
+    }
+
     public function assertMap($value)
     {
         $value = $this->coerceMap($value);
@@ -2361,19 +2435,6 @@ class Compiler
         }
 
         return $value[1];
-    }
-
-    protected function coercePercent($value)
-    {
-        if ($value[0] == 'number') {
-            if ($value[2] == '%') {
-                return $value[1] / 100;
-            }
-
-            return $value[1];
-        }
-
-        return 0;
     }
 
     // make sure a color's components don't go out of bounds
@@ -3422,18 +3483,5 @@ class Compiler
         $id += mt_rand(0, 10) + 1;
 
         return array('string', '', array('u' . str_pad(base_convert($id, 10, 36), 8, '0', STR_PAD_LEFT)));
-    }
-
-    public function throwError($msg = null)
-    {
-        if (func_num_args() > 1) {
-            $msg = call_user_func_array('sprintf', func_get_args());
-        }
-
-        if ($this->sourcePos >= 0 && isset($this->sourceParser)) {
-            $this->sourceParser->throwParseError($msg, $this->sourcePos);
-        }
-
-        throw new \Exception($msg);
     }
 }

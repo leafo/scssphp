@@ -1,0 +1,27 @@
+/* line 10, inputs/functions.scss */
+div {
+  color: 14px;
+  sum: 23; }
+/* line 33, inputs/functions.scss */
+div {
+  hello: 10 55;
+  hello: 1010 55;
+  hello: "hello 10 and 55"; }
+/* line 44, inputs/functions.scss */
+del {
+  color: 1000; }
+/* line 48, inputs/functions.scss */
+div {
+  hello: "hello foo and bar";
+  hello: "hello bar and default";
+  hello: "hello Alice, Bob, Tom"; }
+/* line 61, inputs/functions.scss */
+.foo {
+  test2: -moz-art; }
+/* line 77, inputs/functions.scss */
+/* line 67, inputs/functions.scss */
+  div span {
+    height: 3px; }
+/* line 87, inputs/functions.scss */
+div {
+  width: 2; }

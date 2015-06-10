@@ -47,7 +47,7 @@ class ScssTest extends \PHPUnit_Framework_TestCase
 
         $actual = $compiler->compile($scss);
 
-        $this->assertEquals($css, $actual, $name);
+        $this->assertEquals(rtrim($css), rtrim($actual), $name);
 
         // TODO: need to fix this in the formatters
         //$this->assertEquals(trim($css), trim($actual), $name);

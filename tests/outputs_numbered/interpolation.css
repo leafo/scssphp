@@ -1,0 +1,64 @@
+/* line 2, inputs/interpolation.scss */
+div {
+  color: redwhite blue;
+  color: red white blue;
+  color: red whiteblue;
+  color: redwhiteblue;
+  color: ummyeahwhat;
+  color: stacked;
+  font-size: 10px/something;
+  font-size: 10px / something;
+  test: "whatworldwrong";
+  test: "whatworldwrong";
+  test: "whatworldwrong";
+  test: "what"world"wrong";
+  hi: "what is 16 end"; }
+/* line 24, inputs/interpolation.scss */
+/* line 27, inputs/interpolation.scss */
+  pre var {
+    color: red; }
+/* line 31, inputs/interpolation.scss */
+pre var dad {
+  color: red; }
+/* line 35, inputs/interpolation.scss */
+pre bedvardad {
+  color: red; }
+/* line 40, inputs/interpolation.scss */
+/* line 42, inputs/interpolation.scss */
+
+cool .thing-1 {
+  color: red; }
+/* line 42, inputs/interpolation.scss */
+cool .thing-2 {
+  color: red; }
+/* line 42, inputs/interpolation.scss */
+cool .thing-3 {
+  color: red; }
+/* line 42, inputs/interpolation.scss */
+cool .thing-4 {
+  color: red; }
+/* line 42, inputs/interpolation.scss */
+cool .thing-5 {
+  color: red; }
+/* line 48, inputs/interpolation.scss */
+abcde {
+  color: red; }
+/* line 52, inputs/interpolation.scss */
+#hello, .world {
+  color: red; }
+/* line 56, inputs/interpolation.scss */
+#abchelloyeah, .coolworldyes {
+  color: red; }
+/* line 62, inputs/interpolation.scss */
+div.element:nth-child(2n) {
+  display: none; }
+/* line 69, inputs/interpolation.scss */
+div {
+  hello: world;
+  coolhello: world;
+  helloone: world;
+  twohelloone: world;
+  oneabtwo: cool;
+  hello-world: red;
+  hello-mold: white;
+  hello-hello: blue; }

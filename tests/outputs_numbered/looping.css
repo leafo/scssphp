@@ -1,0 +1,61 @@
+/* line 2, inputs/looping.scss */
+div {
+  color: what;
+  color: is;
+  color: this;
+  font: what;
+  font: is;
+  font: this;
+  background: what;
+  background: is;
+  background: this;
+  border: what;
+  border: is;
+  border: this;
+  background: what what;
+  background: is is;
+  background: this this;
+  background: what what;
+  background: is is;
+  background: this this; }
+/* line 30, inputs/looping.scss */
+div h1 {
+  font-size: 2em; }
+/* line 30, inputs/looping.scss */
+div h2 {
+  font-size: 1.5em; }
+/* line 30, inputs/looping.scss */
+div h3 {
+  font-size: 1.2em; }
+/* line 38, inputs/looping.scss */
+span {
+  color: 0;
+  color: 1;
+  color: 2;
+  color: 3;
+  color: 4;
+  color: 5;
+  color: 6;
+  color: 7;
+  color: 8;
+  color: 9;
+  color: 10; }
+/* line 46, inputs/looping.scss */
+pre {
+  color: 1;
+  color: 2;
+  color: 3;
+  color: 4;
+  height: 1;
+  height: 2;
+  height: 3;
+  height: 4;
+  height: 5;
+  cool: 10;
+  cool: 9;
+  cool: 8;
+  cool: 7;
+  cool: 6;
+  cool: 5;
+  cool: 4;
+  cool: 3; }

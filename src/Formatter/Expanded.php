@@ -33,4 +33,24 @@ class Expanded extends Formatter
         $this->tagSeparator = ', ';
         $this->assignSeparator = ': ';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function blockLines($inner, $block)
+    {
+        $glue = $this->break . $inner;
+
+        foreach ($block->lines as $index => $line) {
+            if (substr($line, 0, 2) === '/*') {
+                $block->lines[$index] = preg_replace('/(\r|\n)+/', $glue, $line);
+            }
+        }
+
+        echo $inner . implode($glue, $block->lines);
+
+        if (empty($block->selectors) || ! empty($block->children)) {
+            echo $this->break;
+        }
+    }
 }

@@ -1,0 +1,22 @@
+/* line 10, inputs/if.scss */
+div {
+  color: blue; }
+/* line 16, inputs/if.scss */
+pre {
+  val-1: "red";
+  val-2: "blue";
+  val-3: "blue";
+  val-4: "red";
+  val-5: "red"; }
+/* line 25, inputs/if.scss */
+span {
+  color: blue;
+  height: 10px;
+  width: 20px; }
+/* line 47, inputs/if.scss */
+div {
+  color: blue;
+  border-color: green; }
+/* line 67, inputs/if.scss */
+del {
+  thing: no; }

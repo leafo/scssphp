@@ -1,0 +1,29 @@
+/* line 224, inputs/compass_extract.scss */
+#test-0 {
+  unit: false;
+  unit: true;
+  rhythm: 1.5em;
+  size: 1;
+  size: 1;
+  size: 1;
+  size: 2;
+  size: 2; }
+/* line 236, inputs/compass_extract.scss */
+#test-1 {
+  margin-top: 7.5em;
+  padding-top: 9em;
+  padding-bottom: 10.5em;
+  margin-bottom: 0em; }
+/* line 240, inputs/compass_extract.scss */
+#test-2 {
+  border-style: solid;
+  border-width: 0.0625em;
+  padding: 1.4375em; }
+/* line 244, inputs/compass_extract.scss */
+#test-3 {
+  border-top-style: solid;
+  border-top-width: 0.0625em;
+  padding-top: 1.4375em;
+  border-bottom-style: solid;
+  border-bottom-width: 0.0625em;
+  padding-bottom: 1.4375em; }

@@ -1,0 +1,33 @@
+/** what the heck **/
+/**
+ Here is a block comment
+ **/
+/*hello*/
+/* line 16, inputs/comments.scss */
+div {
+  /*yeah*/
+  border: 1px solid red;
+  /* another property */
+  color: url('http://mage-page.com');
+  string: "hello /* this is not a comment */";
+  world: "// neither is this";
+  string: 'hello /* this is not a comment */';
+  /*what if this is a comment */
+  world: '// neither is this';
+  what-ever: 100px;
+  background: url();
+  /*this is not a comment?*/ }
+/* line 31, inputs/comments.scss */
+.dummy {
+  color: blue; }
+/* comment 1 */
+/* line 36, inputs/comments.scss */
+a {
+  /* comment 2 */
+  /* comment 3 */
+  color: red;
+  /* comment 4 */
+  background-color: red;
+  /* comment 5 */
+  /* comment 6 */ }
+/* comment 7 */

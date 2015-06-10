@@ -1,0 +1,33 @@
+cool: 100px;
+/* line 4, inputs/variables.scss */
+div {
+  height: red, two, three; }
+/* line 10, inputs/variables.scss */
+div {
+  num: 1000; }
+/* line 15, inputs/variables.scss */
+div {
+  num: 2000; }
+/* line 23, inputs/variables.scss */
+pre {
+  color: blue; }
+/* line 31, inputs/variables.scss */
+del {
+  color: red; }
+/* line 34, inputs/variables.scss */
+/* line 36, inputs/variables.scss */
+  del div pre {
+    color: red; }
+/* line 50, inputs/variables.scss */
+body {
+  font-family: Arial;
+  font-family: Helvetica Neue;
+  font-family: "Helvetica Neue";
+  font-family: Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+/* line 58, inputs/variables.scss */
+#main {
+  width: 5em; }
+/* line 63, inputs/variables.scss */
+#sidebar {
+  width: 5em; }

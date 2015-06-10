@@ -1,0 +1,85 @@
+@charset "hello-world";
+@page :left {
+/* line 3, inputs/directives.scss */
+div {
+  color: red; } }
+
+@page test {
+  @media yes {
+/* line 12, inputs/directives.scss */
+div {
+  color: red; } } }
+
+@media something {
+  @page {
+    @media else {
+/* line 29, inputs/directives.scss */
+div {
+  height: 200px; } } } }
+/* line 37, inputs/directives.scss */
+div {
+  color: red; }
+  @page yeah {
+/* line 40, inputs/directives.scss */
+div pre {
+height: 20px; } }
+
+@font-face {
+  color: red;
+  height: 20px; }
+
+@keyframes 'bounce' {
+/* line 53, inputs/directives.scss */
+from {
+  top: 100px;
+  animation-timing-function: ease-out; }
+/* line 58, inputs/directives.scss */
+25% {
+  top: 50px;
+  animation-timing-function: ease-in; }
+/* line 63, inputs/directives.scss */
+50% {
+  top: 100px;
+  animation-timing-function: ease-out; }
+/* line 68, inputs/directives.scss */
+75% {
+  top: 75px;
+  animation-timing-function: ease-in; }
+/* line 73, inputs/directives.scss */
+to {
+  top: 100px; } }
+
+@-webkit-keyframes flowouttoleft {
+/* line 79, inputs/directives.scss */
+0% {
+  -webkit-transform: translateX(0) scale(1); }
+/* line 80, inputs/directives.scss */
+60%, 70% {
+  -webkit-transform: translateX(0) scale(0.7); }
+/* line 81, inputs/directives.scss */
+100% {
+  -webkit-transform: translateX(-100%) scale(0.7); } }
+/* line 84, inputs/directives.scss */
+div {
+  animation-name: 'diagonal-slide';
+  animation-duration: 5s;
+  animation-iteration-count: 10; }
+
+@keyframes 'diagonal-slide' {
+/* line 92, inputs/directives.scss */
+from {
+  left: 0;
+  top: 0; }
+/* line 97, inputs/directives.scss */
+to {
+  left: 100px;
+  top: 100px; } }
+
+@document url(http://www.w3.org/),
+          url-prefix(http://www.w3.org/Style/),
+          domain(mozilla.org),
+          regexp("https:.*") {
+/* line 109, inputs/directives.scss */
+body {
+  color: purple;
+  background: yellow; } }

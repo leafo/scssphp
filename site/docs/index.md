@@ -27,8 +27,6 @@ options, then run the compiler with the `compile` method.
 
     ```php
     <?php
-    require_once 'scssphp/scss.inc.php';
-
     use Leafo\ScssPhp\Compiler;
 
     $scss = new Compiler();
@@ -63,8 +61,6 @@ The default import path is `array('')`, which means the current directory.
 
     ```php
     <?php
-    require_once 'scssphp/scss.inc.php';
-
     use Leafo\ScssPhp\Compiler;
 
     $scss = new Compiler();
@@ -80,8 +76,6 @@ files that SCSS would otherwise not process (such as vanilla CSS imports).
 
     ```php
     <?php
-    require_once 'scssphp/scss.inc.php';
-
     use Leafo\ScssPhp\Compiler;
 
     $scss = new Compiler();
@@ -190,6 +184,42 @@ The formatters output the following:
     .navigation ul{line-height:20px;color:blue;}.navigation ul a{color:red;}.footer .copyright{color:silver;}
     ```
 
+### Source Line Debugging
+
+You can output the original SCSS line numbers within the compiled CSS file for better frontend debugging.
+
+This works well in combination with frontend debugging tools such as https://addons.mozilla.org/de/firefox/addon/firecompass-for-firebug/
+
+To activate this feature, call `->setLineNumberStyle(Compiler::LINE_COMMENTS)` after creating a new instance of class `Compiler`.
+
+    ```php
+    use Leafo\ScssPhp\Server;
+    use Leafo\ScssPhp\Compiler;
+
+    $directory = 'css';
+
+    $scss = new Compiler();
+    $scss->setLineNumberStyle(Compiler::LINE_COMMENTS);
+
+    $server = new Server($directory, null, $scss);
+    $server->serve();
+    ```
+
+You can also call the `compile` method directly (without using an instance of `Server` like above)
+
+    ```php
+    use Leafo\ScssPhp\Server;
+    use Leafo\ScssPhp\Compiler;
+
+    $scss = new Compiler();
+    $scss->setLineNumberStyle(Compiler::LINE_COMMENTS);
+
+    echo $scss->compile('
+      $color: #abc;
+      div { color: lighten($color, 20%); }
+    ');
+    ```
+
 ### Custom Functions
 
 It's possible to register custom functions written in PHP that can be called
@@ -266,8 +296,6 @@ For example, create a file `style.php`:
     <?php
     $directory = 'stylesheets';
 
-    require_once 'scssphp/scss.inc.php';
-
     use Leafo\ScssPhp\Server;
 
     Server::serveFrom($directory);
@@ -319,8 +347,6 @@ Here's an example of creating a SCSS server that outputs compressed CSS:
 
     ```php
     <?php
-    require_once 'scssphp/scss.inc.php';
-
     use Leafo\ScssPhp\Compiler;
     use Leafo\ScssPhp\Server;
 
@@ -358,3 +384,7 @@ The flag `-i` (or `--load_paths`) can be used to set import paths for the loader
 the paths are colon separated.
 
 The flag `-p` (or `--precision`) can be used to set the decimal number precision. The default is 5.
+
+The flag `--debug-info` can be used to annotate the selectors with CSS @media queries that identify the source file and line number.
+
+The flag `--line-comments` (or `--line-numbers`) can be used to annotate the selectors with comments that identify the source file and line number.

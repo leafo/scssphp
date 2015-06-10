@@ -1,0 +1,127 @@
+/* line 2, inputs/extends.scss */
+error, pre seriousError, span seriousError, other, hello {
+  border: 1px #f00;
+  background-color: #fdd; }
+/* line 7, inputs/extends.scss */
+/* line 8, inputs/extends.scss */
+  pre seriousError, span seriousError {
+    font-size: 20px; }
+/* line 14, inputs/extends.scss */
+hello {
+  color: green; }
+/* line 17, inputs/extends.scss */
+hello div {
+  margin: 10px; }
+/* line 22, inputs/extends.scss */
+.cool, .me {
+  color: red; }
+/* line 26, inputs/extends.scss */
+.blue, .me {
+  color: purple; }
+/* line 30, inputs/extends.scss */
+/* line 34, inputs/extends.scss */
+
+/* line 35, inputs/extends.scss */
+
+a:hover, .hoverlink, #demo .overview .fakelink:hover {
+  text-decoration: underline; }
+/* line 40, inputs/extends.scss */
+div.hello.world.hmm, pre div.okay.span.world.hmm, pre #butt .umm div.sure.span.world.hmm, #butt .umm pre div.sure.span.world.hmm, code div.okay.span.world.hmm, code #butt .umm div.sure.span.world.hmm, #butt .umm code div.sure.span.world.hmm {
+  color: blue; }
+/* line 44, inputs/extends.scss */
+/* line 45, inputs/extends.scss */
+
+/* line 51, inputs/extends.scss */
+
+.xxxxx .xxxxx .xxxxx, code .xxxxx .xxxxx, code code .xxxxx, code code code, code .xxxxx code, .xxxxx code .xxxxx, .xxxxx code code, .xxxxx .xxxxx code {
+  color: green; }
+/* line 55, inputs/extends.scss */
+code {
+  color: red; }
+/* line 63, inputs/extends.scss */
+.alpha, .beta, .gama {
+  color: red; }
+/* line 67, inputs/extends.scss */
+.beta, .gama {
+  color: white; }
+/* line 72, inputs/extends.scss */
+.gama {
+  color: blue; }
+/* line 79, inputs/extends.scss */
+#admin .tabbar a, #admin .tabbar #demo .overview .fakelink, #demo .overview #admin .tabbar .fakelink {
+  font-weight: bold; }
+/* line 80, inputs/extends.scss */
+/* line 82, inputs/extends.scss */
+
+a1 b1 c1 d1, x1 y1 z1 w1 b1 c1 d1 {
+  color: red; }
+/* line 83, inputs/extends.scss */
+/* line 85, inputs/extends.scss */
+
+a2 b2 c2 d2, a2 x2 y2 z2 w2 c2 d2, x2 y2 z2 a2 w2 c2 d2 {
+  color: red; }
+/* line 86, inputs/extends.scss */
+/* line 89, inputs/extends.scss */
+
+a3 b3 c3 d3, a3 b3 x3 y3 z3 w3 d3, x3 y3 z3 a3 b3 w3 d3 {
+  color: red; }
+/* line 90, inputs/extends.scss */
+/* line 93, inputs/extends.scss */
+
+a4 b4 c4 d4, a4 b4 c4 x4 y4 z4 w4, x4 y4 z4 a4 b4 c4 w4 {
+  color: red; }
+/* line 94, inputs/extends.scss */
+/* line 98, inputs/extends.scss */
+
+#butt .yeah .okay, #butt .yeah .umm .sure, #butt .umm .yeah .sure {
+  font-weight: bold; }
+/* line 99, inputs/extends.scss */
+/* line 101, inputs/extends.scss */
+
+a9 b9 s9 t9 v9, a9 b9 s9 t9 x9 y9 z9, a9 b9 x9 y9 s9 t9 z9 {
+  color: red; }
+/* line 103, inputs/extends.scss */
+@media print {
+/* line 110, inputs/extends.scss */
+horse, man {
+  color: blue; } }
+/* line 115, inputs/extends.scss */
+man {
+  color: red; }
+/* line 123, inputs/extends.scss */
+wassup {
+  color: blue; }
+/* line 128, inputs/extends.scss */
+/* line 129, inputs/extends.scss */
+
+.foo .wassup {
+  color: blue; }
+/* line 137, inputs/extends.scss */
+#something, .x, .y {
+  color: red; }
+/* line 141, inputs/extends.scss */
+/* line 145, inputs/extends.scss */
+
+/* line 151, inputs/extends.scss */
+
+/* line 152, inputs/extends.scss */
+
+/* line 156, inputs/extends.scss */
+
+.nav-justified, .nav-tabs.nav-justified {
+  text-align: justify; }
+/* line 162, inputs/extends.scss */
+.btn:hover, .edit .actions button:hover, .edit .new .actions button:hover, .btn:active, .edit .actions button:active, .edit .new .actions button:active, .btn.active, .edit .actions button.active, .edit .new .actions button.active, .btn.disabled, .edit .actions button.disabled, .edit .new .actions button.disabled, .btn[disabled], .edit .actions button[disabled], .edit .new .actions button[disabled] {
+  color: red; }
+/* line 169, inputs/extends.scss */
+/* line 170, inputs/extends.scss */
+
+.edit .actions button {
+  float: right; }
+/* line 175, inputs/extends.scss */
+/* line 176, inputs/extends.scss */
+
+/* line 177, inputs/extends.scss */
+  .edit .new .actions {
+    padding: 0; }
+/* line 180, inputs/extends.scss */

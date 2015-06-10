@@ -1,0 +1,128 @@
+@media {
+/* line 4, inputs/media.scss */
+div {
+  color: blue; } }
+
+@media what {
+/* line 7, inputs/media.scss */
+div {
+  color: blue; } }
+
+@media (cool) {
+/* line 11, inputs/media.scss */
+div {
+  color: blue; } }
+
+@media (cool: blue) {
+/* line 14, inputs/media.scss */
+div {
+  color: blue; } }
+
+@media hello and (world) and (butt: man) {
+/* line 18, inputs/media.scss */
+div {
+  color: blue; } }
+
+@media (max-width: 940px) {
+  color: red; }
+
+@media not hello and (world) {
+  color: blue;
+/* line 30, inputs/media.scss */
+pre {
+  color: blue; } }
+  @media butt and (world) {
+    color: red;
+/* line 36, inputs/media.scss */
+div {
+color: red; } }
+
+/* line 64, inputs/media.scss */
+
+div {
+  color: blue; }
+  @media screen and (-webkit-min-device-pixel-ratio: 1.5) {
+/* line 67, inputs/media.scss */
+div .sidebar {
+width: 500px; } }
+/* line 81, inputs/media.scss */
+div {
+  position: absolute; }
+  @media screen {
+  div {
+    top: 0;
+    bottom: 8em;
+    color: red; }
+/* line 87, inputs/media.scss */
+div p {
+margin: 5px; }
+/* line 76, inputs/media.scss */
+div .success {
+color: green; } }
+/* line 95, inputs/media.scss */
+.button {
+  width: 300px;
+  height: 100px;
+  background: #eee; }
+/* line 100, inputs/media.scss */
+.button :hover {
+  background: #aaa; }
+
+@media only screen and (max-width: 300px) {
+    .button {
+      width: 100px;
+      height: 100px; } }
+/* line 110, inputs/media.scss */
+code {
+  position: absolute; }
+
+@media screen {
+    code {
+      height: 10px; }
+/* line 113, inputs/media.scss */
+code pre {
+  height: 20px; } }
+/* line 120, inputs/media.scss */
+@media screen and (color: blue) {
+      dt {
+        height: 10px; } }
+
+@media screen {
+/* line 130, inputs/media.scss */
+.screen {
+  width: 12px; } }
+
+@media only screen {
+/* line 134, inputs/media.scss */
+.only-screen {
+  height: 11px; } }
+
+@media only screen {
+/* line 141, inputs/media.scss */
+.only-screen {
+  width: 14px; } }
+
+@media only screen {
+/* line 145, inputs/media.scss */
+.only-screen {
+  height: 16px; } }
+
+@media print {
+/* line 161, inputs/media.scss */
+.only-print {
+  height: 12px; } }
+
+@media screen {
+/* line 169, inputs/media.scss */
+.only-print {
+  height: 12px; } }
+
+@media not screen {
+/* line 185, inputs/media.scss */
+.not-screen {
+  height: 15px; } }
+
+@media only screen and (color: blue) and (width: 13) {
+/* line 202, inputs/media.scss */
+.only-screen {
+  height: 15px; } }

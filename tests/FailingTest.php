@@ -52,7 +52,7 @@ class FailingTest extends \PHPUnit_Framework_TestCase
 
         $output = $this->compile($scss);
 
-        $this->assertEquals($expected, $output, $id);
+        $this->assertEquals(rtrim($expected), rtrim($output), $id);
     }
 
     /**

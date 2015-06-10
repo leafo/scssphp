@@ -1,0 +1,359 @@
+/* line 1, inputs/selectors.scss */
+* {
+  color: blue; }
+/* line 2, inputs/selectors.scss */
+E {
+  color: blue; }
+/* line 4, inputs/selectors.scss */
+E:not(:link) {
+  color: blue; }
+/* line 5, inputs/selectors.scss */
+E:not(:link):not(:visited) {
+  color: blue; }
+/* line 6, inputs/selectors.scss */
+E:not(:link, :visited) {
+  color: blue; }
+/* line 7, inputs/selectors.scss */
+E:matches(:hover, :focus) {
+  color: blue; }
+/* line 9, inputs/selectors.scss */
+E.warning {
+  color: blue; }
+/* line 10, inputs/selectors.scss */
+E#id {
+  color: blue; }
+/* line 11, inputs/selectors.scss */
+E[foo] {
+  color: blue; }
+/* line 12, inputs/selectors.scss */
+E[foo="barbar"] {
+  color: blue; }
+/* line 13, inputs/selectors.scss */
+E[foo="barbar" i] {
+  color: blue; }
+/* line 14, inputs/selectors.scss */
+E[foo~="hello#$@%@$#^"] {
+  color: blue; }
+/* line 15, inputs/selectors.scss */
+E[foo^="color: green;"] {
+  color: blue; }
+/* line 16, inputs/selectors.scss */
+E[foo$="239023"] {
+  color: blue; }
+/* line 17, inputs/selectors.scss */
+E[foo*="29302"] {
+  color: blue; }
+/* line 18, inputs/selectors.scss */
+E[foo|="239032"] {
+  color: blue; }
+/* line 20, inputs/selectors.scss */
+[foo] {
+  color: blue; }
+/* line 21, inputs/selectors.scss */
+[foo] .helloWorld {
+  color: blue; }
+/* line 22, inputs/selectors.scss */
+[foo].helloWorld {
+  color: blue; }
+/* line 23, inputs/selectors.scss */
+[foo="barbar"] {
+  color: blue; }
+/* line 24, inputs/selectors.scss */
+[foo~="hello#$@%@$#^"] {
+  color: blue; }
+/* line 25, inputs/selectors.scss */
+[foo^="color: green;"] {
+  color: blue; }
+/* line 26, inputs/selectors.scss */
+[foo$="239023"] {
+  color: blue; }
+/* line 27, inputs/selectors.scss */
+[foo*="29302"] {
+  color: blue; }
+/* line 28, inputs/selectors.scss */
+[foo|="239032"] {
+  color: blue; }
+/* line 30, inputs/selectors.scss */
+E:dir(ltr) {
+  color: blue; }
+/* line 31, inputs/selectors.scss */
+E:lang(en) {
+  color: blue; }
+/* line 32, inputs/selectors.scss */
+E:lang(en, fr) {
+  color: blue; }
+/* line 34, inputs/selectors.scss */
+E:any-link {
+  color: blue; }
+/* line 35, inputs/selectors.scss */
+E:link {
+  color: blue; }
+/* line 36, inputs/selectors.scss */
+E:visited {
+  color: blue; }
+/* line 37, inputs/selectors.scss */
+E:local-link {
+  color: blue; }
+/* line 38, inputs/selectors.scss */
+E:local-link(0) {
+  color: red; }
+/* line 39, inputs/selectors.scss */
+E:local-link(1) {
+  color: white; }
+/* line 40, inputs/selectors.scss */
+E:local-link(2) {
+  color: red; }
+/* line 41, inputs/selectors.scss */
+E:target {
+  color: blue; }
+/* line 42, inputs/selectors.scss */
+E:scope {
+  color: blue; }
+/* line 44, inputs/selectors.scss */
+E:current {
+  color: blue; }
+/* line 45, inputs/selectors.scss */
+E:current(:link) {
+  color: blue; }
+/* line 46, inputs/selectors.scss */
+E:past {
+  color: blue; }
+/* line 47, inputs/selectors.scss */
+E:future {
+  color: blue; }
+/* line 49, inputs/selectors.scss */
+E:active {
+  color: blue; }
+/* line 50, inputs/selectors.scss */
+E:hover {
+  color: blue; }
+/* line 51, inputs/selectors.scss */
+E:focus {
+  color: blue; }
+/* line 52, inputs/selectors.scss */
+E:enabled {
+  color: blue; }
+/* line 53, inputs/selectors.scss */
+E:disabled {
+  color: blue; }
+/* line 54, inputs/selectors.scss */
+E:indeterminate {
+  color: blue; }
+/* line 55, inputs/selectors.scss */
+E:default {
+  color: blue; }
+/* line 56, inputs/selectors.scss */
+E:in-range {
+  color: blue; }
+/* line 57, inputs/selectors.scss */
+E:out-of-range {
+  color: blue; }
+/* line 58, inputs/selectors.scss */
+E:required {
+  color: blue; }
+/* line 59, inputs/selectors.scss */
+E:optional {
+  color: blue; }
+/* line 60, inputs/selectors.scss */
+E:read-only {
+  color: blue; }
+/* line 61, inputs/selectors.scss */
+E:read-write {
+  color: blue; }
+/* line 63, inputs/selectors.scss */
+E:root {
+  color: blue; }
+/* line 64, inputs/selectors.scss */
+E:empty {
+  color: blue; }
+/* line 65, inputs/selectors.scss */
+E:first-child {
+  color: blue; }
+/* line 66, inputs/selectors.scss */
+E:nth-child(odd) {
+  color: blue; }
+/* line 67, inputs/selectors.scss */
+E:nth-child(2n+1) {
+  color: blue; }
+/* line 68, inputs/selectors.scss */
+E:nth-child(5) {
+  color: blue; }
+/* line 69, inputs/selectors.scss */
+E:last-child {
+  color: blue; }
+/* line 70, inputs/selectors.scss */
+E:nth-last-child(-n+2) {
+  color: blue; }
+/* line 71, inputs/selectors.scss */
+E:only-child {
+  color: blue; }
+/* line 72, inputs/selectors.scss */
+E:first-of-type {
+  color: blue; }
+/* line 73, inputs/selectors.scss */
+E:nth-of-type(2n) {
+  color: blue; }
+/* line 74, inputs/selectors.scss */
+E:last-of-type {
+  color: blue; }
+/* line 75, inputs/selectors.scss */
+E:nth-last-of-type(n) {
+  color: blue; }
+/* line 76, inputs/selectors.scss */
+E:only-of-type {
+  color: blue; }
+/* line 77, inputs/selectors.scss */
+E:nth-match(odd) {
+  color: blue; }
+/* line 78, inputs/selectors.scss */
+E:nth-last-match(odd) {
+  color: blue; }
+/* line 80, inputs/selectors.scss */
+E:column(n) {
+  color: blue; }
+/* line 81, inputs/selectors.scss */
+E:nth-column(n) {
+  color: blue; }
+/* line 82, inputs/selectors.scss */
+E:nth-last-column(n) {
+  color: blue; }
+/* line 84, inputs/selectors.scss */
+E F {
+  color: blue; }
+/* line 85, inputs/selectors.scss */
+E > F {
+  color: blue; }
+/* line 86, inputs/selectors.scss */
+E + F {
+  color: blue; }
+/* line 87, inputs/selectors.scss */
+E ~ F {
+  color: blue; }
+/* line 88, inputs/selectors.scss */
+E /foo/ F {
+  color: blue; }
+/* line 89, inputs/selectors.scss */
+E! > F {
+  color: blue; }
+/* line 92, inputs/selectors.scss */
+[foo|att=val] {
+  color: blue; }
+/* line 93, inputs/selectors.scss */
+[*|att] {
+  color: yellow; }
+/* line 94, inputs/selectors.scss */
+[|att] {
+  color: green; }
+/* line 95, inputs/selectors.scss */
+[att] {
+  color: green; }
+/* line 98, inputs/selectors.scss */
+E::first-line {
+  color: blue; }
+/* line 99, inputs/selectors.scss */
+E::first-letter {
+  color: blue; }
+/* line 100, inputs/selectors.scss */
+E::before {
+  color: blue; }
+/* line 101, inputs/selectors.scss */
+E::after {
+  color: blue; }
+/* line 104, inputs/selectors.scss */
+E::choices {
+  color: blue; }
+/* line 105, inputs/selectors.scss */
+E::value {
+  color: blue; }
+/* line 106, inputs/selectors.scss */
+E::repeat-index {
+  color: blue; }
+/* line 107, inputs/selectors.scss */
+E::repeat-item {
+  color: blue; }
+/* line 109, inputs/selectors.scss */
+E:first {
+  color: blue; }
+/* line 110, inputs/selectors.scss */
+E:first-line {
+  color: blue; }
+/* line 111, inputs/selectors.scss */
+E:first-letter {
+  color: blue; }
+/* line 112, inputs/selectors.scss */
+E:before {
+  color: blue; }
+/* line 113, inputs/selectors.scss */
+E:after {
+  color: blue; }
+/* line 114, inputs/selectors.scss */
+E:checked {
+  color: blue; }
+/* line 115, inputs/selectors.scss */
+E:invalid {
+  color: blue; }
+/* line 116, inputs/selectors.scss */
+E:valid {
+  color: blue; }
+/* line 117, inputs/selectors.scss */
+E:left {
+  color: blue; }
+/* line 118, inputs/selectors.scss */
+E:right {
+  color: blue; }
+/* line 121, inputs/selectors.scss */
+E:any(ol) {
+  color: blue; }
+/* line 122, inputs/selectors.scss */
+E::selection {
+  color: blue; }
+/* line 126, inputs/selectors.scss */
+div {
+  font: something;
+  font-size: 30em; }
+/* line 127, inputs/selectors.scss */
+div font:something {
+  size: 30em; }
+/* line 139, inputs/selectors.scss */
+/* line 140, inputs/selectors.scss */
+
+.something.world {
+  color: blue; }
+/* line 144, inputs/selectors.scss */
+.something .mold {
+  height: 200px; }
+/* line 148, inputs/selectors.scss */
+.dog .something {
+  color: blue; }
+/* line 153, inputs/selectors.scss */
+/* line 154, inputs/selectors.scss */
+
+.dad .simple .wolf {
+  color: blue; }
+/* line 158, inputs/selectors.scss */
+.rad.simple.bad {
+  color: blue; }
+/* line 164, inputs/selectors.scss */
+/* line 165, inputs/selectors.scss */
+
+/* line 166, inputs/selectors.scss */
+  .something div .what.world {
+    color: blue; }
+/* line 172, inputs/selectors.scss */
+/* line 173, inputs/selectors.scss */
+
+div.foo div {
+  color: blue; }
+/* line 178, inputs/selectors.scss */
+/* line 179, inputs/selectors.scss */
+
+/* line 180, inputs/selectors.scss */
+  /* line 181, inputs/selectors.scss */
+    .nice-fonts .main .message div .title, .nice-fonts div .message div .title {
+      font-size: 24px; }
+/* line 189, inputs/selectors.scss */
+.escape\% {
+  color: red; }
+/* line 193, inputs/selectors.scss */
+.escape-plan\% {
+  color: green; }

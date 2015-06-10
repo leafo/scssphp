@@ -1,0 +1,36 @@
+/* line 3, inputs/content.scss */
+/* line 8, inputs/content.scss */
+  * html #logo {
+    background-image: url(/logo.gif); }
+/* line 20, inputs/content.scss */
+.colors {
+  background-color: blue;
+  color: white;
+  border-color: blue; }
+
+@media only screen and (max-width: 480px) {
+  /* line 32, inputs/content.scss */
+    body {
+      color: red; } }
+/* line 36, inputs/content.scss */
+#sidebar {
+  width: 300px; }
+  @media only screen and (max-width: 480px) {
+  #sidebar {
+    width: 100px; } }
+
+@media only screen and (min-width: 40em) {
+  /* line 51, inputs/content.scss */
+    .grid-1 {
+      width: 100%; }
+/* line 51, inputs/content.scss */
+.grid-2 {
+  width: 100%; } }
+
+@media only screen and (min-width: 40em) {
+  /* line 58, inputs/content.scss */
+    .grid-1 {
+      width: 100%; }
+/* line 58, inputs/content.scss */
+.grid-2 {
+  width: 100%; } }

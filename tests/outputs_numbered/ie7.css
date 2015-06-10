@@ -1,0 +1,9 @@
+/* line 2, inputs/ie7.scss */
+#foo:before {
+  content: counter(item,".") ": "; }
+/* line 6, inputs/ie7.scss */
+#bar:before {
+  content: counter(item,"."); }
+/* line 10, inputs/ie7.scss */
+#fu:before {
+  content: counter(item); }

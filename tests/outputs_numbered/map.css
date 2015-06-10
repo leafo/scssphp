@@ -1,0 +1,13 @@
+/* line 11, inputs/map.scss */
+div {
+  color: black;
+  color: red;
+  foo: black, red, #0f0;
+  bar: color, length;
+  baz: (color: #fff, color2: red, 'color3': #0f0, length: 40em);
+  foo: (length: 40em);
+  bar: true; }
+/* line 22, inputs/map.scss */
+div {
+  foo: color black;
+  bar: color; }

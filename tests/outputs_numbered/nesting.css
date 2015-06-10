@@ -1,0 +1,24 @@
+div: blue;
+/* line 3, inputs/nesting.scss */
+body {
+  color: red; }
+/* line 8, inputs/nesting.scss */
+div {
+  color: red;
+  height: yes; }
+/* line 12, inputs/nesting.scss */
+div pre {
+  color: blue; }
+/* line 21, inputs/nesting.scss */
+div {
+  font: 10px hello world;
+  font-size: 10px;
+  font-color: blue;
+  border-left: 1px solid blue;
+  border-right: 2px dashed green; }
+/* line 34, inputs/nesting.scss */
+#nested-nesting {
+  bar: baz;
+  bang-bop: bar;
+  bang-bip: 1px;
+  bang-blat-baf: bort; }
