@@ -16,7 +16,7 @@ Checkout the homepage, <http://leafo.net/scssphp>, for directions on how to use.
 
 Run the following command from the root directory to run every test:
 
-    phpunit tests
+    vendor/bin/phpunit tests
 
 There are two kinds of tests in the `tests/` directory:
 
@@ -30,6 +30,14 @@ When changing any of the tests in `tests/inputs`, the tests will most likely
 fail because the output has changed. Once you verify that the output is correct
 you can run the following command to rebuild all the tests:
 
-    BUILD=true phpunit tests
+    BUILD=true vendor/bin/phpunit tests
 
 This will compile all the tests, and save results into `tests/outputs`.
+
+## Coding Standard
+
+`scssphp` source conforms to [PSR2](http://www.php-fig.org/psr/psr-2/).
+
+Run the following command from the root directory to check the code for "sniffs".
+
+    vendor/bin/phpcs --standard=PSR2 bin src tests

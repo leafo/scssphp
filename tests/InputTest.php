@@ -1,10 +1,18 @@
 <?php
+/**
+ * SCSSPHP
+ *
+ * @copyright 2012-2015 Leaf Corcoran
+ *
+ * @license http://opensource.org/licenses/gpl-license GPL-3.0
+ * @license http://opensource.org/licenses/MIT MIT
+ *
+ * @link http://leafo.net/scssphp
+ */
 
 namespace Leafo\ScssPhp\Tests;
 
 use Leafo\ScssPhp\Compiler;
-
-// Runs all the tests in inputs/ and compares their output to ouputs/
 
 function _dump($value)
 {
@@ -16,6 +24,11 @@ function _quote($str)
     return preg_quote($str, '/');
 }
 
+/**
+ * Input test - runs all the tests in inputs/ and compares their output to ouputs/
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class InputTest extends \PHPUnit_Framework_TestCase
 {
     protected static $inputDir = 'inputs';

@@ -1,9 +1,24 @@
 <?php
+/**
+ * SCSSPHP
+ *
+ * @copyright 2012-2015 Leaf Corcoran
+ *
+ * @license http://opensource.org/licenses/gpl-license GPL-3.0
+ * @license http://opensource.org/licenses/MIT MIT
+ *
+ * @link http://leafo.net/scssphp
+ */
 
 namespace Leafo\ScssPhp\Tests;
 
 use Leafo\ScssPhp\Compiler;
 
+/**
+ * Exception test
+ *
+ * @author Leaf Corcoran <leafot@gmail.com>
+ */
 class ExceptionTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
