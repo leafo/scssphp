@@ -85,7 +85,7 @@ abstract class Formatter
      */
     protected function blockLines($inner, $block)
     {
-        $glue = $this->break.$inner;
+        $glue = $this->break . $inner;
         echo $inner . implode($glue, $block->lines);
 
         if (! empty($block->children)) {

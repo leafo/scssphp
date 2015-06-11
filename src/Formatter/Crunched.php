@@ -39,7 +39,7 @@ class Crunched extends Formatter
 
     public function blockLines($inner, $block)
     {
-        $glue = $this->break.$inner;
+        $glue = $this->break . $inner;
 
         foreach ($block->lines as $index => $line) {
             if (substr($line, 0, 2) === '/*') {

@@ -81,15 +81,15 @@ class Parser
             $commentSingle = $this->pregQuote(self::$commentSingle);
             $commentMultiLeft = $this->pregQuote(self::$commentMultiLeft);
             $commentMultiRight = $this->pregQuote(self::$commentMultiRight);
-            self::$commentMulti = $commentMultiLeft.'.*?'.$commentMultiRight;
-            self::$whitePattern = '/'.$commentSingle.'[^\n]*\s*|('.self::$commentMulti.')\s*|\s+/Ais';
+            self::$commentMulti = $commentMultiLeft . '.*?' . $commentMultiRight;
+            self::$whitePattern = '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentMulti . ')\s*|\s+/Ais';
         }
     }
 
     protected static function makeOperatorStr($operators)
     {
         return '('
-            . implode('|', array_map(array('Leafo\ScssPhp\Parser','pregQuote'), $operators))
+            . implode('|', array_map(array('Leafo\ScssPhp\Parser', 'pregQuote'), $operators))
             . ')';
     }
 
@@ -122,7 +122,7 @@ class Parser
             $this->throwParseError();
         }
 
-        if ( ! empty($this->env->parent)) {
+        if (! empty($this->env->parent)) {
             $this->throwParseError('unclosed block');
         }
 
@@ -233,7 +233,7 @@ class Parser
                 $child = array('include',
                     $mixinName, isset($argValues) ? $argValues : null, null);
 
-                if ( ! empty($hasBlock)) {
+                if (! empty($hasBlock)) {
                     $include = $this->pushSpecialBlock('include');
                     $include->child = $child;
                 } else {
@@ -404,7 +404,7 @@ class Parser
             if ($this->literal('@charset') &&
                 $this->valueList($charset) && $this->end()
             ) {
-                if ( ! isset($this->charset)) {
+                if (! isset($this->charset)) {
                     $this->charset = $charset;
                 }
 
@@ -546,14 +546,14 @@ class Parser
 
     protected function literal($what, $eatWhitespace = null)
     {
-        if ( ! isset($eatWhitespace)) {
+        if (! isset($eatWhitespace)) {
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
         // shortcut on single letter
-        if ( ! isset($what[1]) && isset($this->buffer[$this->count])) {
+        if (! isset($what[1]) && isset($this->buffer[$this->count])) {
             if ($this->buffer[$this->count] == $what) {
-                if ( ! $eatWhitespace) {
+                if (! $eatWhitespace) {
                     $this->count++;
 
                     return true;
@@ -577,7 +577,7 @@ class Parser
         $b->selectors = $selectors;
         $b->comments = array();
 
-        if ( ! $this->env) {
+        if (! $this->env) {
             $b->children = array();
         } elseif (empty($this->env->children)) {
             $this->env->children = $this->env->comments;
@@ -633,7 +633,7 @@ class Parser
         if ($pos !== null) {
             $statement[self::SOURCE_POSITION] = $pos;
 
-            if ( ! $this->rootParser) {
+            if (! $this->rootParser) {
                 $statement[self::SOURCE_PARSER] = $this;
             }
         }
@@ -751,7 +751,7 @@ class Parser
         $s = $this->seek();
 
         $keyword = null;
-        if ( ! $this->variable($keyword) || ! $this->literal(':')) {
+        if (! $this->variable($keyword) || ! $this->literal(':')) {
             $this->seek($s);
             $keyword = null;
         }
@@ -798,7 +798,7 @@ class Parser
             $items[] = $value;
 
             if ($delim) {
-                if ( ! $this->literal($delim)) {
+                if (! $this->literal($delim)) {
                     break;
                 }
             }
@@ -873,7 +873,7 @@ class Parser
                 break;
             }
 
-            if ( ! $this->value($rhs)) {
+            if (! $this->value($rhs)) {
                 break;
             }
 
@@ -1027,7 +1027,7 @@ class Parser
             ) {
                 $args = array();
 
-                if ( ! empty($str)) {
+                if (! empty($str)) {
                     $args[] = array(null, array('string', '', array($str)));
                 }
 
@@ -1053,7 +1053,7 @@ class Parser
             $ss = $this->seek();
 
             if ($this->literal('=') && $this->expression($exp)) {
-                $args[] = array('string', '', array($var.'='));
+                $args[] = array('string', '', array($var . '='));
                 $arg = $exp;
             } else {
                 break;
@@ -1061,14 +1061,14 @@ class Parser
 
             $args[] = $arg;
 
-            if ( ! $this->literal(',')) {
+            if (! $this->literal(',')) {
                 break;
             }
 
             $args[] = array('string', '', array(', '));
         }
 
-        if ( ! $this->literal(')') || ! count($args)) {
+        if (! $this->literal(')') || ! count($args)) {
             $this->seek($s);
 
             return false;
@@ -1102,7 +1102,7 @@ class Parser
             if ($this->literal('...')) {
                 $sss = $this->seek();
 
-                if ( ! $this->literal(')')) {
+                if (! $this->literal(')')) {
                     $this->throwParseError('... has to be after the final argument');
                 }
 
@@ -1114,12 +1114,12 @@ class Parser
 
             $args[] = $arg;
 
-            if ( ! $this->literal(',')) {
+            if (! $this->literal(',')) {
                 break;
             }
         }
 
-        if ( ! $this->literal(')')) {
+        if (! $this->literal(')')) {
             $this->seek($s);
 
             return false;
@@ -1140,12 +1140,12 @@ class Parser
         while ($this->keyword($key) && $this->literal(':') && $this->genericList($value, 'expression')) {
             $map[$key] = $value;
 
-            if ( ! $this->literal(',')) {
+            if (! $this->literal(',')) {
                 break;
             }
         }
 
-        if ( ! count($map) || ! $this->literal(')')) {
+        if (! count($map) || ! $this->literal(')')) {
             $this->seek($s);
 
             return false;
@@ -1171,7 +1171,7 @@ class Parser
 
             $num = hexdec($num);
 
-            foreach (array(3,2,1) as $i) {
+            foreach (array(3, 2, 1) as $i) {
                 $t = $num % $width;
                 $num /= $width;
 
@@ -1298,7 +1298,7 @@ class Parser
         $stop = array_map(array($this, 'pregQuote'), $stop);
         $stop[] = self::$commentMulti;
 
-        $patt = '(.*?)('.implode('|', $stop).')';
+        $patt = '(.*?)(' . implode('|', $stop) . ')';
 
         $nestingLevel = 0;
 
@@ -1360,7 +1360,6 @@ class Parser
 
         $s = $this->seek();
         if ($this->literal('#{') && $this->valueList($value) && $this->literal('}', false)) {
-
             // TODO: don't error if out of bounds
 
             if ($lookWhite) {
@@ -1420,7 +1419,7 @@ class Parser
             null,
             $this->count
         )) {
-            if ( ! empty($m[0])) {
+            if (! empty($m[0])) {
                 $parts[] = $m[0];
                 $this->count += strlen($m[0]);
             }
@@ -1442,7 +1441,7 @@ class Parser
         while ($this->selector($sel)) {
             $selectors[] = $sel;
 
-            if ( ! $this->literal(',')) {
+            if (! $this->literal(',')) {
                 break;
             }
 
@@ -1573,7 +1572,7 @@ class Parser
                 ) {
                     $parts[] = '(';
 
-                    if ( ! empty($str)) {
+                    if (! empty($str)) {
                         $parts[] = $str;
                     }
 
@@ -1695,7 +1694,8 @@ class Parser
         return false;
     }
 
-    protected function url(&$out) {
+    protected function url(&$out)
+    {
         if ($this->match('(url\(\s*(["\']?)([^)]+)\2\s*\))', $m)) {
             $out = array('string', '', array('url(' . $m[2] . $m[3] . $m[2] . ')'));
 
@@ -1731,7 +1731,7 @@ class Parser
             $validChars = $allowNewline ? '.' : "[^\n]";
         }
 
-        if ( ! $this->match('('.$validChars.'*?)'.$this->pregQuote($what), $m, ! $until)) {
+        if (! $this->match('(' . $validChars . '*?)' . $this->pregQuote($what), $m, ! $until)) {
             return false;
         }
 
@@ -1750,7 +1750,7 @@ class Parser
 
         $line = $this->getLineNo($count);
 
-        if ( ! empty($this->sourceName)) {
+        if (! empty($this->sourceName)) {
             $loc = "$this->sourceName on line $line";
         } else {
             $loc = "line: $line";
@@ -1801,7 +1801,7 @@ class Parser
             }
         }
 
-        if ( ! isset($token)) {
+        if (! isset($token)) {
             return false;
         }
 
@@ -1819,11 +1819,11 @@ class Parser
     // try to match something on head of buffer
     protected function match($regex, &$out, $eatWhitespace = null)
     {
-        if ( ! isset($eatWhitespace)) {
+        if (! isset($eatWhitespace)) {
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-        $r = '/'.$regex.'/Ais';
+        $r = '/' . $regex . '/Ais';
 
         if (preg_match($r, $this->buffer, $out, null, $this->count)) {
             $this->count += strlen($out[0]);
@@ -1858,11 +1858,11 @@ class Parser
 
     protected function peek($regex, &$out, $from = null)
     {
-        if ( ! isset($from)) {
+        if (! isset($from)) {
             $from = $this->count;
         }
 
-        $r = '/'.$regex.'/Ais';
+        $r = '/' . $regex . '/Ais';
         $result = preg_match($r, $this->buffer, $out, null, $from);
 
         return $result;

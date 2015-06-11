@@ -124,7 +124,7 @@ class Server
      */
     protected function needsCompile($in, $out, &$etag)
     {
-        if ( ! is_file($out)) {
+        if (! is_file($out)) {
             return true;
         }
 
@@ -261,7 +261,7 @@ class Server
      */
     public function compileFile($in, $out = null)
     {
-        if ( ! is_readable($in)) {
+        if (! is_readable($in)) {
             throw new \Exception('load error: failed to find ' . $in);
         }
 
@@ -288,7 +288,7 @@ class Server
      */
     public function checkedCompile($in, $out)
     {
-        if ( ! is_file($out) || filemtime($in) > filemtime($out)) {
+        if (! is_file($out) || filemtime($in) > filemtime($out)) {
             $this->compileFile($in, $out);
 
             return true;
@@ -388,7 +388,7 @@ class Server
      */
     public function checkedCachedCompile($in, $out, $force = false)
     {
-        if ( ! is_file($in) || ! is_readable($in)) {
+        if (! is_file($in) || ! is_readable($in)) {
             throw new \Exception('Invalid or unreadable input file specified.');
         }
 
@@ -416,17 +416,17 @@ class Server
     {
         $this->dir = $dir;
 
-        if ( ! isset($cacheDir)) {
+        if (! isset($cacheDir)) {
             $cacheDir = $this->join($dir, 'scss_cache');
         }
 
         $this->cacheDir = $cacheDir;
 
-        if ( ! is_dir($this->cacheDir)) {
+        if (! is_dir($this->cacheDir)) {
             mkdir($this->cacheDir, 0755, true);
         }
 
-        if ( ! isset($scss)) {
+        if (! isset($scss)) {
             $scss = new Compiler();
             $scss->setImportPaths($this->dir);
         }
