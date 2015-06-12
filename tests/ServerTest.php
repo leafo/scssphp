@@ -12,6 +12,8 @@
 
 namespace Leafo\ScssPhp\Tests;
 
+use Leafo\ScssPhp\Server;
+
 /**
  * Server test
  *
@@ -21,7 +23,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCheckedCachedCompile()
     {
-        $server = new Leafo\ScssPhp\Server(__DIR__ . '/inputs/');
+        $server = new Server(__DIR__ . '/inputs/');
         $css = $server->checkedCachedCompile(__DIR__ . '/inputs/import.scss', '/tmp/scss.css');
 
         $this->assertFileExists('/tmp/scss.css');
