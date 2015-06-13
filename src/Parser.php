@@ -407,7 +407,7 @@ class Parser
                 if (! isset($this->charset)) {
                     $statement = array('charset', $charset);
 
-                    $this->charset = $statement;;
+                    $this->charset = $statement;
                 }
 
                 return true;
