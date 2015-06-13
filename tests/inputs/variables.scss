@@ -54,3 +54,12 @@ body {
     font-family: $font-family-commas;
     font-family: $font-family-sans;
 }
+
+#main {
+  $width: 5em !global;
+  width: $width;
+}
+
+#sidebar {
+  width: $width;
+}

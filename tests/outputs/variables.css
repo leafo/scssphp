@@ -22,3 +22,9 @@ body {
   font-family: "Helvetica Neue";
   font-family: Helvetica, Arial, sans-serif;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+#main {
+  width: 5em; }
+
+#sidebar {
+  width: 5em; }
