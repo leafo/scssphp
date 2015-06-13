@@ -55,4 +55,15 @@ class Compressed extends Formatter
             echo $this->break;
         }
     }
+
+    /**
+     * {@inherit}
+     */
+    public function format($block)
+    {
+        return parent::format($block);
+
+        // TODO: we need to fix the 2 "compressed" tests where the "close" is applied
+        return trim(str_replace(';}', '}', parent::format($block)));
+    }
 }

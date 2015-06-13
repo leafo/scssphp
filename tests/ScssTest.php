@@ -41,6 +41,9 @@ class ScssTest extends \PHPUnit_Framework_TestCase
         $actual = $this->scss->compile($scss);
 
         $this->assertEquals($css, $actual, $name);
+
+        // TODO: need to fix this in the formatters
+        //$this->assertEquals(trim($css), trim($actual), $name);
     }
 
     /**
@@ -52,6 +55,8 @@ class ScssTest extends \PHPUnit_Framework_TestCase
         $lines = file(__DIR__ . '/scss_test.rb');
         $tests = array();
         $skipped = array();
+        $scss = array();
+        $css = array();
         $style = false;
 
         for ($i = 0, $s = count($lines); $i < $s; $i++) {
@@ -96,8 +101,6 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                         || preg_match('/^\s*assert_equal <<CSS, render\(<<SCSS, :style => :(compressed|nested)\)\s*$/', $line, $matches)
                     ) {
                         $state = 2; // get css
-                        $scss = array();
-                        $css = array();
                         $style = isset($matches[1]) ? $matches[1] : null;
                         continue;
                     }
@@ -149,11 +152,13 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                         $state = 0; // exit function
 
                         $tests[] = array($name, implode($scss), implode($css), $style);
+                        $scss = array();
+                        $css = array();
                         $style = null;
                         continue;
                     }
 
-                    // var_dump($line);
+                    $skipped[] = $line;
 
                     break;
 
@@ -207,6 +212,8 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                     break;
             }
         }
+
+        // var_dump($skipped);
 
         return $tests;
     }
