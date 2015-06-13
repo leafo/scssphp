@@ -127,7 +127,7 @@ class Parser
         }
 
         if ($this->charset) {
-            array_unshift($this->env->children, array('charset', $this->charset));
+            array_unshift($this->env->children, $this->charset);
         }
 
         $this->env->isRoot    = true;
@@ -405,7 +405,9 @@ class Parser
                 $this->valueList($charset) && $this->end()
             ) {
                 if (! isset($this->charset)) {
-                    $this->charset = $charset;
+                    $statement = array('charset', $charset);
+
+                    $this->charset = $statement;;
                 }
 
                 return true;
