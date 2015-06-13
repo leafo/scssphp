@@ -21,11 +21,6 @@ use Leafo\ScssPhp\Compiler;
  */
 class ScssTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
-    {
-        $this->scss = new Compiler();
-    }
-
     /**
      * @param string $name
      * @param string $scss
@@ -36,9 +31,22 @@ class ScssTest extends \PHPUnit_Framework_TestCase
      */
     public function testTests($name, $scss, $css, $style)
     {
-        $this->scss->setFormatter('Leafo\ScssPhp\Formatter\\' . ($style ? ucfirst($style) : 'Nested'));
+        static $init = false;
 
-        $actual = $this->scss->compile($scss);
+        if (! getenv('TEST_SCSS_COMPAT')) {
+            if (! $init) {
+                $init = true;
+
+                $this->markTestSkipped('Define TEST_SCSS_COMPAT=1 to enable ruby scss compatibility tests');
+            }
+
+            return;
+        }
+
+        $compiler = new Compiler();
+        $compiler->setFormatter('Leafo\ScssPhp\Formatter\\' . ($style ? ucfirst($style) : 'Nested'));
+
+        $actual = $compiler->compile($scss);
 
         $this->assertEquals($css, $actual, $name);
 
@@ -82,11 +90,12 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                     ) {
                         $terminator = $matches[1];
 
-                        for ($i++; trim($lines[$i]) !== $terminator; $i++)
+                        for ($i++; trim($lines[$i]) !== $terminator; $i++) {
                             ;
+                        }
 
                         continue;
-		    }
+                    }
 
                     if (preg_match('/^\s*assert_equal\(<<CSS, render\(<<SASS\)\)\s*$/', $line, $matches)
                         || preg_match('/^\s*assert_equal <<CSS, render\(<<SASS\)\s*$/', $line, $matches)
@@ -97,8 +106,10 @@ class ScssTest extends \PHPUnit_Framework_TestCase
 
                     if (preg_match('/^\s*assert_equal\(<<CSS, render\(<<SCSS\)\)\s*$/', $line, $matches)
                         || preg_match('/^\s*assert_equal <<CSS, render\(<<SCSS\)\s*$/', $line, $matches)
+                        // @codingStandardsIgnoreStart
                         || preg_match('/^\s*assert_equal\(<<CSS, render\(<<SCSS, :style => :(compressed|nested)\)\)\s*$/', $line, $matches)
                         || preg_match('/^\s*assert_equal <<CSS, render\(<<SCSS, :style => :(compressed|nested)\)\s*$/', $line, $matches)
+                        // @codingStandardsIgnoreEnd
                     ) {
                         $state = 2; // get css
                         $style = isset($matches[1]) ? $matches[1] : null;
@@ -127,8 +138,9 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                     }
 
                     if (preg_match('/^\s*assert_equal\(<<CSS,/', $line)) {
-                        for ($i++; trim($lines[$i]) !== 'CSS'; $i++)
+                        for ($i++; trim($lines[$i]) !== 'CSS'; $i++) {
                             ;
+                        }
 
                         continue;
                     }

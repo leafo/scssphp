@@ -50,7 +50,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
         }
 
         if (!is_readable($outFname)) {
-            $this->fail("$outFname is missing, consider building tests with BUILD=true");
+            $this->fail("$outFname is missing, consider building tests with BUILD=1");
         }
 
         $input = file_get_contents($inFname);
