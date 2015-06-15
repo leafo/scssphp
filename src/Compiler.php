@@ -3184,7 +3184,7 @@ class Compiler
         return $string;
     }
 
-    protected static $libFeatureExists = array('string');
+    protected static $libFeatureExists = array('feature');
     protected function libFeatureExists($args)
     {
         /*
@@ -3197,7 +3197,7 @@ class Compiler
         return self::$false;
     }
 
-    protected static $libFunctionExists = array('string');
+    protected static $libFunctionExists = array('name');
     protected function libFunctionExists($args)
     {
         $string = $this->coerceString($args[0]);
@@ -3206,7 +3206,7 @@ class Compiler
         return $this->has(self::$namespaces['function'] . $name) ? self::$true : self::$false;
     }
 
-    protected static $libGlobalVariableExists = array('string');
+    protected static $libGlobalVariableExists = array('name');
     protected function libGlobalVariableExists($args)
     {
         $string = $this->coerceString($args[0]);
@@ -3215,7 +3215,7 @@ class Compiler
         return $this->has($name, $this->rootEnv) ? self::$true : self::$false;
     }
 
-    protected static $libMixinExists = array('string');
+    protected static $libMixinExists = array('name');
     protected function libMixinExists($args)
     {
         $string = $this->coerceString($args[0]);
@@ -3224,7 +3224,7 @@ class Compiler
         return $this->has(self::$namespaces['mixin'] . $name) ? self::$true : self::$false;
     }
 
-    protected static $libVariableExists = array('string');
+    protected static $libVariableExists = array('name');
     protected function libVariableExists($args)
     {
         $string = $this->coerceString($args[0]);
