@@ -3189,6 +3189,19 @@ class Compiler
         return array('string', '', array('counter(' . implode(',', $list) . ')'));
     }
 
+    protected function libUniqueId()
+    {
+        static $id;
+
+        if (! isset($id)) {
+            $id = mt_rand(0, pow(36, 8));
+        }
+
+        $id += mt_rand(0, 10) + 1;
+
+        return array('string', '', array('u' . str_pad(base_convert($id, 10, 36), 8, '0', STR_PAD_LEFT)));
+    }
+
     public function throwError($msg = null)
     {
         if (func_num_args() > 1) {
