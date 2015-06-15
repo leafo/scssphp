@@ -131,3 +131,8 @@
   a: 1;
   a: 0.5;
   a: alpha(currentColor); }
+
+#exists {
+  a: true;
+  b: true;
+  c: false; }

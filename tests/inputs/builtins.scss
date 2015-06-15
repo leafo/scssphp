@@ -177,3 +177,11 @@
   a: alpha(rgba(0, 0, 0, 0.5));
   a: alpha(currentColor);
 }
+
+$a-false-value: false;
+#exists {
+  a: variable-exists(a-false-value);
+  b: variable-exists('a-false-value');
+  c: variable-exists(nonexistent);
+}
+
