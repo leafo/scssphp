@@ -1925,6 +1925,13 @@ class Compiler
         return $defaultValue; // found nothing
     }
 
+    protected function has($name, $env = null)
+    {
+        $value = $this->get($name, false, $env);
+
+        return $value !== false;
+    }
+
     protected function injectVariables(array $args)
     {
         if (empty($args)) {
@@ -3175,6 +3182,55 @@ class Compiler
         $string[2] = array(mb_strtoupper($stringContent));
 
         return $string;
+    }
+
+    protected static $libFeatureExists = array('feature');
+    protected function libFeatureExists($args)
+    {
+        /*
+         * The following features not not (yet) supported:
+         * - global-variable-shadowing
+         * - extend-selector-pseudoclass
+         * - units-level-3
+         * - at-error
+         */
+        return self::$false;
+    }
+
+    protected static $libFunctionExists = array('name');
+    protected function libFunctionExists($args)
+    {
+        $string = $this->coerceString($args[0]);
+        $name = $this->compileStringContent($string);
+
+        return $this->has(self::$namespaces['function'] . $name) ? self::$true : self::$false;
+    }
+
+    protected static $libGlobalVariableExists = array('name');
+    protected function libGlobalVariableExists($args)
+    {
+        $string = $this->coerceString($args[0]);
+        $name = $this->compileStringContent($string);
+
+        return $this->has($name, $this->rootEnv) ? self::$true : self::$false;
+    }
+
+    protected static $libMixinExists = array('name');
+    protected function libMixinExists($args)
+    {
+        $string = $this->coerceString($args[0]);
+        $name = $this->compileStringContent($string);
+
+        return $this->has(self::$namespaces['mixin'] . $name) ? self::$true : self::$false;
+    }
+
+    protected static $libVariableExists = array('name');
+    protected function libVariableExists($args)
+    {
+        $string = $this->coerceString($args[0]);
+        $name = $this->compileStringContent($string);
+
+        return $this->has($name) ? self::$true : self::$false;
     }
 
     /**
