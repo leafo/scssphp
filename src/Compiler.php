@@ -1500,7 +1500,7 @@ class Compiler
      *
      * @param array $value
      */
-    protected function compileValue($value)
+    public function compileValue($value)
     {
         $value = $this->reduce($value);
 
