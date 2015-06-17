@@ -3245,6 +3245,21 @@ class Compiler
         return array('string', '', array('counter(' . implode(',', $list) . ')'));
     }
 
+    protected function libRandom($args)
+    {
+        if (isset($args[0])) {
+            $n = $this->assertNumber($args[0]);
+
+            if ($n < 1) {
+                $this->throwError("limit must be greater than or equal to 1");
+            }
+
+            return array('number', mt_rand(1, $n), '');
+        }
+
+        return array('number', mt_rand(1, mt_getrandmax()), '');
+    }
+
     protected function libUniqueId()
     {
         static $id;
