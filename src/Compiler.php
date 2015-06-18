@@ -998,6 +998,10 @@ class Compiler
                     $this->throwError('Expected @content inside of mixin');
                 }
 
+                if (! isset($content->children)) {
+                    break;
+                }
+
                 $strongTypes = array('include', 'block', 'for', 'while');
 
                 foreach ($content->children as $child) {
@@ -1765,7 +1769,33 @@ class Compiler
         return $this->multiplyMedia($env->parent, $childQueries);
     }
 
-    // convert something to list
+    /**
+     * Coerce something to map
+     *
+     * @param array $item
+     *
+     * @return array
+     */
+    protected function coerceMap($item)
+    {
+        if ($item[0] === 'map') {
+            return $item;
+        }
+
+        if ($item == self::$emptyList) {
+            return self::$emptyMap;
+        }
+
+        return array('map', array($item), array(self::$null));
+    }
+
+    /**
+     * Coerce something to list
+     *
+     * @param array $item
+     *
+     * @return array
+     */
     protected function coerceList($item, $delim = ',')
     {
         if (isset($item) && $item[0] == 'list') {
@@ -2256,6 +2286,17 @@ class Compiler
                 return array('string', '', array($value[1]));
         }
         return null;
+    }
+
+    public function assertMap($value)
+    {
+        $value = $this->coerceMap($value);
+
+        if ($value[0] != 'map') {
+            $this->throwError('expecting map');
+        }
+
+        return $value;
     }
 
     public function assertList($value)
@@ -2973,7 +3014,8 @@ class Compiler
     protected static $libMapGet = array('map', 'key');
     protected function libMapGet($args)
     {
-        $map = $args[0];
+        $map = $this->assertMap($args[0]);
+
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
         for ($i = count($map[1]) - 1; $i >= 0; $i--) {
@@ -2988,7 +3030,8 @@ class Compiler
     protected static $libMapKeys = array('map');
     protected function libMapKeys($args)
     {
-        $map = $args[0];
+        $map = $this->assertMap($args[0]);
+
         $keys = $map[1];
 
         return array('list', ',', $keys);
@@ -2997,7 +3040,8 @@ class Compiler
     protected static $libMapValues = array('map');
     protected function libMapValues($args)
     {
-        $map = $args[0];
+        $map = $this->assertMap($args[0]);
+
         $values = $map[2];
 
         return array('list', ',', $values);
@@ -3006,7 +3050,8 @@ class Compiler
     protected static $libMapRemove = array('map', 'key');
     protected function libMapRemove($args)
     {
-        $map = $args[0];
+        $map = $this->assertMap($args[0]);
+
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
         for ($i = count($map[1]) - 1; $i >= 0; $i--) {
@@ -3022,7 +3067,8 @@ class Compiler
     protected static $libMapHasKey = array('map', 'key');
     protected function libMapHasKey($args)
     {
-        $map = $args[0];
+        $map = $this->assertMap($args[0]);
+
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
         for ($i = count($map[1]) - 1; $i >= 0; $i--) {
@@ -3034,20 +3080,11 @@ class Compiler
         return self::$false;
     }
 
-
     protected static $libMapMerge = array('map-1', 'map-2');
     protected function libMapMerge($args)
     {
-        $map1 = $args[0];
-        $map2 = $args[1];
-
-        if ($map1 == self::$emptyList) {
-            $map1 = self::$emptyMap;
-        }
-
-        if ($map2 == self::$emptyList) {
-            $map2 = self::$emptyMap;
-        }
+        $map1 = $this->assertMap($args[0]);
+        $map2 = $this->assertMap($args[1]);
 
         return array('map', array_merge($map1[1], $map2[1]), array_merge($map1[2], $map2[2]));
     }
