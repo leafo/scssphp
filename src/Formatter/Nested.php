@@ -21,6 +21,9 @@ use Leafo\ScssPhp\Formatter;
  */
 class Nested extends Formatter
 {
+    /**
+     * {@inheritdoc}
+     */
     public function __construct()
     {
         $this->indentLevel = 0;
@@ -32,7 +35,11 @@ class Nested extends Formatter
         $this->assignSeparator = ': ';
     }
 
-    // adjust the depths of all children, depth first
+    /**
+     * Adjust the depths of all children, depth first
+     *
+     * @param \stdClass $block
+     */
     public function adjustAllChildren($block)
     {
         // flatten empty nested blocks
@@ -70,6 +77,9 @@ class Nested extends Formatter
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function blockLines($inner, $block)
     {
         $glue = $this->break . $inner;
@@ -87,6 +97,9 @@ class Nested extends Formatter
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function block($block)
     {
         if ($block->type == 'root') {
