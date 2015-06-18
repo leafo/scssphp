@@ -108,6 +108,7 @@ class Compiler
     private $sourcePos;
     private $sourceParser;
     private $storeEnv;
+    private $charsetSeen;
 
     /**
      * Compile scss
@@ -772,7 +773,11 @@ class Compiler
                 $this->compileBlock($child[1]);
                 break;
             case 'charset':
-                $out->lines[] = '@charset ' . $this->compileValue($child[1]) . ';';
+                if (! $this->charsetSeen) {
+                    $this->charsetSeen = true;
+
+                    $out->lines[] = '@charset ' . $this->compileValue($child[1]) . ';';
+                }
                 break;
             case 'assign':
                 list(, $name, $value) = $child;
