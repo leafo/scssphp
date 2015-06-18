@@ -455,7 +455,7 @@ class Compiler
      *
      * @see Compiler::compileChild()
      *
-     * @param \StdClass $block
+     * @param \stdClass $block
      */
     protected function compileBlock($block)
     {
