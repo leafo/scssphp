@@ -1198,12 +1198,23 @@ class Compiler
                 }
 
                 return $value;
+            case 'map':
+                foreach ($value[1] as &$item) {
+                    $item = $this->reduce($item);
+                }
+
+                foreach ($value[2] as &$item) {
+                    $item = $this->reduce($item);
+                }
+
+                return $value;
             case 'string':
                 foreach ($value[2] as &$item) {
                     if (is_array($item)) {
                         $item = $this->reduce($item);
                     }
                 }
+
                 return $value;
             case 'interpolate':
                 $value[1] = $this->reduce($value[1]);
@@ -1518,6 +1529,8 @@ class Compiler
      * things like expressions and variables.
      *
      * @param array $value
+     *
+     * @return string
      */
     public function compileValue($value)
     {
@@ -1578,18 +1591,17 @@ class Compiler
 
                 return implode("$delim ", $filtered);
             case 'map':
-                $map = $value[1];
-
+                $keys = $value[1];
+                $values = $value[2];
                 $filtered = array();
-                foreach ($map as $key => $item) {
-                    if ($item[0] == 'null') {
-                        continue;
-                    }
 
-                    $filtered[] = $key . ': ' . $this->compileValue($item);
+                for ($i = 0, $s = count($keys); $i < $s; $i++) {
+                    $filtered[$this->compileValue($keys[$i])] = $this->compileValue($values[$i]);
                 }
 
-                return '(' . implode(", ", $filtered) . ')';
+                array_walk($filtered, function (&$value, $key) { $value = $key . ': ' . $value; });
+
+                return '(' . implode(', ', $filtered) . ')';
             case 'interpolated': # node created by extractInterpolation
                 list(, $interpolate, $left, $right) = $value;
                 list(,, $whiteLeft, $whiteRight) = $interpolate;
@@ -1759,11 +1771,15 @@ class Compiler
         }
 
         if (isset($item) && $item[0] == 'map') {
-            $map = $item[1];
+            $keys = $item[1];
+            $values = $item[2];
             $list = array();
 
-            foreach ($map as $key => $value) {
-                $list[] = array('list', '', array(array('keyword', $key), $value));
+            for ($i = 0, $s = count($keys); $i < $s; $i++) {
+                $key = $keys[$i];
+                $value = $values[$i];
+
+                $list[] = array('list', '', array(array('keyword', $this->compileValue($key)), $value));
             }
 
             return array('list', ',', $list);
@@ -2958,17 +2974,20 @@ class Compiler
         $map = $args[0];
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
-        return isset($map[1][$key]) ? $map[1][$key] : self::$defaultValue;
+        for ($i = count($map[1]) - 1; $i >= 0; $i--) {
+            if ($key === $this->compileValue($map[1][$i])) {
+                return $map[2][$i];
+            }
+        }
+
+        return self::$defaultValue;
     }
 
     protected static $libMapKeys = array('map');
     protected function libMapKeys($args)
     {
-        $map = $args[0][1];
-        $keys = array();
-        foreach (array_keys($map) as $key) {
-            $keys[] = array('keyword', $key);
-        }
+        $map = $args[0];
+        $keys = $map[1];
 
         return array('list', ',', $keys);
     }
@@ -2976,40 +2995,53 @@ class Compiler
     protected static $libMapValues = array('map');
     protected function libMapValues($args)
     {
-        $map = $args[0][1];
+        $map = $args[0];
+        $values = $map[2];
 
-        return array('list', ',', array_values($map));
+        return array('list', ',', $values);
     }
 
     protected static $libMapRemove = array('map', 'key');
     protected function libMapRemove($args)
     {
-        $map = $args[0][1];
+        $map = $args[0];
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
-        unset($map[$key]);
+        for ($i = count($map[1]) - 1; $i >= 0; $i--) {
+            if ($key === $this->compileValue($map[1][$i])) {
+                array_splice($map[1], $i, 1);
+                array_splice($map[2], $i, 1);
+            }
+        }
 
-        return array('map', $map);
+        return $map;
     }
 
     protected static $libMapHasKey = array('map', 'key');
     protected function libMapHasKey($args)
     {
-        $map = $args[0][1];
+        $map = $args[0];
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
-        return isset($map[$key]) ? self::$true : self::$false;
+        for ($i = count($map[1]) - 1; $i >= 0; $i--) {
+            if ($key === $this->compileValue($map[1][$i])) {
+                return self::$true;
+            }
+        }
+
+        return self::$false;
     }
 
 
     protected static $libMapMerge = array('map-1', 'map-2');
     protected function libMapMerge($args)
     {
-        $map1 = $args[0][1];
-        $map2 = $args[1][1];
+        $map1 = $args[0];
+        $map2 = $args[1];
 
-        return array('map', array_merge($map1, $map2));
+        return array('map', array_merge($map1[1], $map2[1]), array_merge($map1[2], $map2[2]));
     }
+
     protected function listSeparatorForJoin($list1, $sep)
     {
         if (! isset($sep)) {

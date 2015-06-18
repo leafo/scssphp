@@ -837,7 +837,7 @@ class Parser
                 return true;
             }
 
-            if ($this->valueList($out) && $this->literal(')') && $out[0] == 'list') {
+            if ($this->valueList($out) && $this->literal(')') && $out[0] === 'list') {
                 return true;
             }
 
@@ -846,6 +846,8 @@ class Parser
             if ($this->map($out)) {
                 return true;
             }
+
+            $this->seek($s);
         }
 
         if ($this->value($lhs)) {
@@ -1140,25 +1142,28 @@ class Parser
     protected function map(&$out)
     {
         $s = $this->seek();
+
         $this->literal('(');
 
-        $map = array();
+        $keys = array();
+        $values = array();
 
-        while ($this->keyword($key) && $this->literal(':') && $this->genericList($value, 'expression')) {
-            $map[$key] = $value;
+        while ($this->genericList($key, 'expression') && $this->literal(':') && $this->genericList($value, 'expression')) {
+            $keys[] = $key;
+            $values[] = $value;
 
             if (! $this->literal(',')) {
                 break;
             }
         }
 
-        if (! count($map) || ! $this->literal(')')) {
+        if (! count($keys) || ! $this->literal(')')) {
             $this->seek($s);
 
             return false;
         }
 
-        $out = array('map', $map);
+        $out = array('map', $keys, $values);
 
         return true;
     }
@@ -1789,14 +1794,7 @@ class Parser
     {
         $token = null;
 
-        $end = strpos($this->buffer, "\n", $this->count);
-
-        if ($end === false ||
-            $this->buffer[$end - 1] == '\\' ||
-            $this->buffer[$end - 2] == '\\' && $this->buffer[$end - 1] == "\r"
-        ) {
-            $end = strlen($this->buffer);
-        }
+        $end = strlen($this->buffer);
 
         // look for either ending delim, escape, or string interpolation
         foreach (array('#{', '\\', $delim) as $lookahead) {

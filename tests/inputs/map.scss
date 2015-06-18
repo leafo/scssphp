@@ -1,13 +1,12 @@
 $map: (
     color: black,
     color2: red,
-    color3: #00FF00
+    'color' + '3': #00FF00
 );
 $map2: (
     color: rgb(255, 255, 255),
     length: 40em
 );
-
 // Map functions
 div {
     color: map_get($map, color);
