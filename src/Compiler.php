@@ -2371,7 +2371,9 @@ class Compiler
     {
         list($list, $value) = $args;
 
-        $list = $this->assertList($list);
+        if ($list[0] !== 'list') {
+            return self::$null;
+        }
 
         $values = array();
 
