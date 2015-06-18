@@ -89,6 +89,8 @@ class Compiler
     static public $null = array('null');
     static public $defaultValue = array('keyword', '');
     static public $selfSelector = array('self');
+    static public $emptyList = array('list', '', array());
+    static public $emptyMap = array('map', array(), array());
 
     protected $importPaths = array('');
     protected $importCache = array();
@@ -3038,6 +3040,14 @@ class Compiler
     {
         $map1 = $args[0];
         $map2 = $args[1];
+
+        if ($map1 == self::$emptyList) {
+            $map1 = self::$emptyMap;
+        }
+
+        if ($map2 == self::$emptyList) {
+            $map2 = self::$emptyMap;
+        }
 
         return array('map', array_merge($map1[1], $map2[1]), array_merge($map1[2], $map2[2]));
     }
