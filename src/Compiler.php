@@ -111,6 +111,7 @@ class Compiler
     private $sourceParser;
     private $storeEnv;
     private $charsetSeen;
+    private $stderr;
 
     /**
      * Compile scss
@@ -129,6 +130,8 @@ class Compiler
         $this->parsedFiles  = array();
         $this->env          = null;
         $this->scope        = null;
+
+        $this->stderr = fopen('php://stderr', 'w');
 
         $locale = setlocale(LC_NUMERIC, 0);
         setlocale(LC_NUMERIC, 'C');
@@ -1010,7 +1013,7 @@ class Compiler
 
                 $line = $this->parser->getLineNo($pos);
                 $value = $this->compileValue($this->reduce($value, true));
-                fwrite(STDERR, "Line $line DEBUG: $value\n");
+                fwrite($this->stderr, "Line $line DEBUG: $value\n");
                 break;
             default:
                 $this->throwError("unknown child type: $child[0]");
