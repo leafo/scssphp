@@ -27,7 +27,7 @@ use Leafo\ScssPhp\Parser;
  * types are brought to the lowest form before being dump as strings. This
  * handles math equations, variable dereferences, and the like.
  *
- * The `parse` function of `Compiler` is the entry point.
+ * The `compile` function of `Compiler` is the entry point.
  *
  * In summary:
  *
@@ -63,6 +63,8 @@ class Compiler
 
         '<=' => 'lte',
         '>=' => 'gte',
+
+        '<=>' => 'sgn',
     );
 
     static protected $namespaces = array(
@@ -1485,6 +1487,15 @@ class Compiler
     protected function opLtNumberNumber($left, $right)
     {
         return $this->toBool($left[1] < $right[1]);
+    }
+
+    protected function opSgnNumberNumber($left, $right)
+    {
+        $n = $left[1] - $right[1];
+
+        return array('number', $n ? $n / abs($n) : 0, '');
+
+        // PHP7: return array('number', $left[1] <=> $right[1], '');
     }
 
     public function toBool($thing)

@@ -30,6 +30,7 @@ class Parser
 
         '==' => 2,
         '!=' => 2,
+        '<=>' => 2,
         '<=' => 2,
         '>=' => 2,
         '=' => 2,
@@ -44,7 +45,7 @@ class Parser
     );
 
     protected static $operators = array('+', '-', '*', '/', '%',
-        '==', '!=', '<=', '>=', '<', '>', 'and', 'or');
+        '==', '!=', '<=>', '<=', '>=', '<', '>', 'and', 'or');
 
     protected static $operatorStr;
     protected static $whitePattern;
