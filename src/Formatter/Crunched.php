@@ -21,6 +21,9 @@ use Leafo\ScssPhp\Formatter;
  */
 class Crunched extends Formatter
 {
+    /**
+     * {@inheritdoc}
+     */
     public function __construct()
     {
         $this->indentLevel = 0;
@@ -32,11 +35,17 @@ class Crunched extends Formatter
         $this->assignSeparator = ':';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function indentStr($n = 0)
     {
         return '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function blockLines($inner, $block)
     {
         $glue = $this->break . $inner;

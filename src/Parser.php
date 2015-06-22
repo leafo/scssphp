@@ -99,7 +99,7 @@ class Parser
      *
      * @param string $buffer;
      *
-     * @return \StdClass
+     * @return \stdClass
      */
     public function parse($buffer)
     {

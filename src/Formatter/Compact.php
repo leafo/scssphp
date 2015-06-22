@@ -21,6 +21,9 @@ use Leafo\ScssPhp\Formatter;
  */
 class Compact extends Formatter
 {
+    /**
+     * {@inheritdoc}
+     */
     public function __construct()
     {
         $this->indentLevel = 0;
@@ -32,6 +35,9 @@ class Compact extends Formatter
         $this->assignSeparator = ':';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function indentStr($n = 0)
     {
         return ' ';

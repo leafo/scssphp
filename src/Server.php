@@ -220,6 +220,13 @@ class Server
         return array($css, $etag);
     }
 
+    /**
+     * Format error as a pseudo-element in CSS
+     *
+     * @param \Exception $error
+     *
+     * @return string
+     */
     protected function createErrorCSS($error)
     {
         $message = str_replace(

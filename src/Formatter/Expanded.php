@@ -21,6 +21,9 @@ use Leafo\ScssPhp\Formatter;
  */
 class Expanded extends Formatter
 {
+    /**
+     * {@inheritdoc}
+     */
     public function __construct()
     {
         $this->indentLevel = 0;
