@@ -965,14 +965,21 @@ class Parser
 
         $inParens = $this->inParens;
 
-        if ($this->literal('(') &&
-            ($this->inParens = true) && $this->expression($exp) &&
-            $this->literal(')')
-        ) {
-            $out = $exp;
-            $this->inParens = $inParens;
+        if ($this->literal('(')) {
+            if ($this->literal(')')) {
+                $out = array('list', '', array());
 
-            return true;
+                return true;
+            }
+
+            $this->inParens = true;
+
+            if ($this->expression($exp) && $this->literal(')')) {
+                $out = $exp;
+                $this->inParens = $inParens;
+
+                return true;
+            }
         }
 
         $this->inParens = $inParens;

@@ -74,3 +74,7 @@ del {
     thing: $thing;
 }
 
+$return: (1);
+@if $return == () {
+    @warn 'empty list';
+}
