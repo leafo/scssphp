@@ -24,28 +24,46 @@ class Parser
     const SOURCE_POSITION = -1;
     const SOURCE_PARSER   = -2;
 
+    /**
+     * @var array
+     */
     protected static $precedence = array(
-        'or' => 0,
-        'and' => 1,
-
-        '==' => 2,
-        '!=' => 2,
-        '<=>' => 2,
-        '<=' => 2,
-        '>=' => 2,
-        '=' => 2,
-        '<' => 3,
-        '>' => 2,
-
-        '+' => 3,
-        '-' => 3,
-        '*' => 4,
-        '/' => 4,
-        '%' => 4,
+        '=' => 0,
+        'or' => 1,
+        'and' => 2,
+        '==' => 3,
+        '!=' => 3,
+        '<=>' => 3,
+        '<=' => 4,
+        '>=' => 4,
+        '<' => 4,
+        '>' => 4,
+        '+' => 5,
+        '-' => 5,
+        '*' => 6,
+        '/' => 6,
+        '%' => 6,
     );
 
-    protected static $operators = array('+', '-', '*', '/', '%',
-        '==', '!=', '<=>', '<=', '>=', '<', '>', 'and', 'or');
+    /**
+     * @var array
+     */
+    protected static $operators = array(
+        '+',
+        '-',
+        '*',
+        '/',
+        '%',
+        '==',
+        '!=',
+        '<=>',
+        '<=',
+        '>=',
+        '<',
+        '>',
+        'and',
+        'or',
+    );
 
     protected static $operatorStr;
     protected static $whitePattern;
