@@ -17,6 +17,10 @@ use Leafo\ScssPhp\Compiler;
 /**
  * Failing tests
  *
+ * {@internal
+ *     Minimal tests as reported in github issues.
+ * }}
+ *
  * @author Anthon Pang <anthon.pang@gmail.com>
  */
 class FailingTest extends \PHPUnit_Framework_TestCase
@@ -29,24 +33,27 @@ class FailingTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $id
      * @param string $scss
-     * @param string $good
-     * @param string $bad
+     * @param string $expected
      *
      * @dataProvider provideFailing
      */
-    public function testFailing($id, $scss, $good, $bad)
+    public function testFailing($id, $scss, $expected)
     {
-        try {
-            $output = $this->compile($scss);
+        static $init = false;
 
-            $this->assertTrue($output != $good, $id);
-            $this->assertTrue($output == $bad, $id);
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
+        if (! getenv('TEST_SCSS_COMPAT')) {
+            if (! $init) {
+                $init = true;
 
-            $this->assertTrue(strpos($message, $good) === false, $id);
-            $this->assertTrue(strpos($message, $bad) !== false, $id);
+                $this->markTestSkipped('Define TEST_SCSS_COMPAT=1 to enable ruby scss compatibility tests');
+            }
+
+            return;
         }
+
+        $output = $this->compile($scss);
+
+        $this->assertEquals($expected, $output, $id);
     }
 
     /**
@@ -98,7 +105,7 @@ class FailingTest extends \PHPUnit_Framework_TestCase
         }
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 #content .social-login {
   display: block;
   float: right;
@@ -120,30 +127,7 @@ END_OF_SCSS
       background-position: 0 -172px; }
     #content .social-login .twitter:active, #content .social-login .twitter:focus {
       background-position: 0 -215px; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-#content .social-login {
-  display: block;
-  float: right;
-  margin-right: 15px;
-  width: 250px; }
-  #content .social-login .facebook, #content .social-login .social-login .twitter, #content .social-login .social-login .twitter {
-    display: block;
-    width: 255px;
-    height: 42px;
-    background: transparent url('images/login-btns.png') no-repeat;
-    background-position: 0 0; }
-    #content .social-login .facebook:hover, #content .social-login .social-login .twitter:hover, #content .social-login .social-login .twitter:hover {
-      background-position: 0 -43px; }
-    #content .social-login .facebook:focus, #content .social-login .social-login .twitter:focus, #content .social-login .social-login .twitter:focus, #content .social-login .facebook:active, #content .social-login .social-login .twitter:active, #content .social-login .social-login .twitter:active {
-      background-position: 0 -86px; }
-  #content .social-login .twitter {
-    background-position: 0 -129px; }
-    #content .social-login .twitter:hover {
-      background-position: 0 -172px; }
-    #content .social-login .twitter:active, #content .social-login .twitter:focus {
-      background-position: 0 -215px; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
             array(
                 '#67 - weird @extend behavior', <<<'END_OF_SCSS'
@@ -162,40 +146,12 @@ header ul {
     }
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 .nav-bar, header ul {
   background: #eee; }
   .nav-bar > .item, header ul > .item, header ul > li {
     margin: 0 10px; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-.nav-bar, header ul {
-  background: #eee; }
-  .nav-bar > .item, header ul > .item, header ul > header ul > li, header ul > header ul > li, .nav-bar > header ul > li, header ul > .nav-bar > li {
-    margin: 0 10px; }
-END_OF_BAD
-            ),
-            array(
-                '#107 - incompatible units (example 1)', <<<'END_OF_SCSS'
-$gridColumns:             12 !default;
-$gridColumnWidth:         60px !default;
-$gridGutterWidth:         20px !default;
-$gridRowWidth:            ($gridColumns * $gridColumnWidth) + ($gridGutterWidth * ($gridColumns - 1)) !default;
-
-$fluidGridGutterWidth:    percentage($gridGutterWidth/$gridRowWidth) !default;
-
-div {
-*margin-left: $fluidGridGutterWidth - (.5 / $gridRowWidth * 100px * 1%);
-}
-END_OF_SCSS
-                , <<<END_OF_GOOD
-div {
-  *margin-left: 2.07447%; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-div {
-  *margin-left: 2.12765%; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
             array(
                 '#107 - incompatible units (example 2)', <<<'END_OF_SCSS'
@@ -206,14 +162,10 @@ $gridRowWidth: 20px;
 width: (2.5 / $gridRowWidth * 100px * 1% );
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 .foo {
   width: 12.5%; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-.foo {
-  width: 0.13021px; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
             array(
                 '#111 - interpolated string is not the same as regular string', <<<'END_OF_SCSS'
@@ -222,14 +174,10 @@ body{
     color : index($test, "#{3}");
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 body {
   color: 3; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-body {
-  color : false; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
             array(
                 '#112 - variable arguments type should be arglist', <<<'END_OF_SCSS'
@@ -241,14 +189,10 @@ p{
     color : test("a", "s", "d", "f");
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 p {
   color: arglist; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-p {
-  color : list; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
             array(
                 '#117 - extends and scope', <<<'END_OF_SCSS'
@@ -261,14 +205,10 @@ body{
   }
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 body .to-extend, body .test {
   color: red; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-body .to-extend, body body .test, body body .test {
-  color: red; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
             array(
                 '#127 - nesting not working with interpolated strings', <<<'END_OF_SCSS'
@@ -278,14 +218,10 @@ END_OF_BAD
   }
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 .element .one, .element .two {
   property: value; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-.element .one, .two {
-  property: value; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
             array(
                 '#149 - parent selector (&) inside string does not work', <<<'END_OF_SCSS'
@@ -303,22 +239,14 @@ END_OF_BAD
     }
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 .parent.self {
   content: "should match .parent.self"; }
 .parent .child {
   content: "should match .parent .child"; }
 .parent.self2 {
   content: "should match .parent.self2"; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-.parent.self {
-  content: "should match .parent.self"; }
-  .parent .child {
-    content: "should match .parent .child"; }
-  .parent &.self2 {
-    content: "should match .parent.self2"; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
 /*************************************************************
             array(
@@ -335,15 +263,12 @@ END_OF_BAD
   }
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 .navbar .navbar-brand, .navbar .navbar-brand:hover {
   font-weight: bold;
   text-shadow: none;
   color: #fff; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-Fatal error: Allowed memory size of %d bytes exhausted (tried to allocate %d bytes) in %s on line %d
-END_OF_BAD
+END_OF_EXPECTED
             ),
 *************************************************************/
             array(
@@ -374,14 +299,10 @@ END_OF_BAD
     @include H(color,  #e6e6e6);
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 #secondary h1, #secondary h2, #secondary h3, #secondary h4, #secondary h5, #secondary h6 {
   color: #e6e6e6; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-#secondary h1, h2, h3, h4, h5, h6 {
-  color: #e6e6e6; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
             array(
                 '#199 - issue with selectors', <<<'END_OF_SCSS'
@@ -398,7 +319,7 @@ small {
   font-weight: italic;
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 .abc, small {
   color: #ddd; }
 
@@ -407,17 +328,7 @@ a.abc:hover {
 
 small {
   font-weight: italic; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-.abc, small {
-  color: #ddd; }
-
-a.abc:hover, a:hover {
-  text-decoration: underline; }
-
-small {
-  font-weight: italic; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
             array(
                 '#240 - variable interpolation not working correctly', <<<'END_OF_SCSS'
@@ -433,15 +344,11 @@ $all: $span, $p, $div;
     }
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 span a, p a, div a {
   color: red; }
 
-END_OF_GOOD
-                , <<<END_OF_BAD
-'span', 'p', 'div' a {
-  color: red; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
             array(
                 '#244 - incorrect handling of lists as selectors', <<<'END_OF_SCSS'
@@ -454,23 +361,17 @@ END_OF_BAD
     }
 }
 END_OF_SCSS
-                , <<<END_OF_GOOD
+                , <<<END_OF_EXPECTED
 .test foo, .test bar {
   border: 1px dashed red; }
-END_OF_GOOD
-                , <<<END_OF_BAD
-.test foo, bar {
-  border: 1px dashed red; }
-END_OF_BAD
+END_OF_EXPECTED
             ),
 /*************************************************************
             array(
                 '', <<<'END_OF_SCSS'
 END_OF_SCSS
-                , <<<END_OF_GOOD
-END_OF_GOOD
-                , <<<END_OF_BAD
-END_OF_BAD
+                , <<<END_OF_EXPECTED
+END_OF_EXPECTED
             ),
 *************************************************************/
         );
