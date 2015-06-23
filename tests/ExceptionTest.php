@@ -51,33 +51,33 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
     public function provideScss()
     {
         return array(
-            array(<<<END_OF_SCSS
+            array(<<<'END_OF_SCSS'
 .test {
   foo : bar;
 END_OF_SCSS
                 ,
                 'unclosed block'
             ),
-            array(<<<END_OF_SCSS
+            array(<<<'END_OF_SCSS'
 .test {
 }}
 END_OF_SCSS
                 ,
                 'unexpected }'
             ),
-            array(<<<END_OF_SCSS
+            array(<<<'END_OF_SCSS'
 .test { color: #fff / 0; }
 END_OF_SCSS
                 ,
                 'color: Can\'t divide by zero'
             ),
-            array(<<<END_OF_SCSS
+            array(<<<'END_OF_SCSS'
 .test { left: 300px/0; }
 END_OF_SCSS
                 ,
                 'Division by zero'
             ),
-            array(<<<END_OF_SCSS
+            array(<<<'END_OF_SCSS'
 .test {
   @include foo();
 }
@@ -85,18 +85,18 @@ END_OF_SCSS
                 ,
                 'Undefined mixin foo'
             ),
-            array(<<<END_OF_SCSS
+            array(<<<'END_OF_SCSS'
 @mixin do-nothing() {
 }
 
 .test {
-  @include do-nothing(\$a: "hello");
+  @include do-nothing($a: "hello");
 }
 END_OF_SCSS
                 ,
                 'Mixin or function doesn\'t have an argument named $a.'
             ),
-            array(<<<END_OF_SCSS
+            array(<<<'END_OF_SCSS'
 div {
   color: darken(cobaltgreen, 10%);
 }
