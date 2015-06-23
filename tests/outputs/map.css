@@ -3,7 +3,7 @@ div {
   color: red;
   foo: black, red, #0f0;
   bar: color, length;
-  baz: (color: #fff, color2: red, color3: #0f0, length: 40em);
+  baz: (color: #fff, color2: red, 'color3': #0f0, length: 40em);
   foo: (length: 40em);
   bar: true; }
 
