@@ -111,6 +111,12 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.1.6** -- June 22, 2015
+  * !global
+  * more built-in functions
+  * Server: checkedCachedCompile() (zimzat)
+  * Server: showErrorsAsCSS() to display errors in a pseudo-element (khamer)
+  * misc bug fixes
 * **0.1.5** -- June 2, 2015
   * misc bug fixes
 * **0.1.4** -- June 2, 2015
