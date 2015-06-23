@@ -201,7 +201,7 @@ class Parser
         // the directives
         if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == '@') {
             if ($this->literal('@media') && $this->mediaQueryList($mediaQueryList) && $this->literal('{')) {
-                $media = $this->pushSpecialBlock('media');
+                $media = $this->pushSpecialBlock('media', $s);
                 $media->queryList = $mediaQueryList[2];
 
                 return true;
@@ -214,7 +214,7 @@ class Parser
                 ($this->argumentDef($args) || true) &&
                 $this->literal('{')
             ) {
-                $mixin = $this->pushSpecialBlock('mixin');
+                $mixin = $this->pushSpecialBlock('mixin', $s);
                 $mixin->name = $mixinName;
                 $mixin->args = $args;
 
@@ -235,7 +235,7 @@ class Parser
                     $mixinName, isset($argValues) ? $argValues : null, null);
 
                 if (! empty($hasBlock)) {
-                    $include = $this->pushSpecialBlock('include');
+                    $include = $this->pushSpecialBlock('include', $s);
                     $include->child = $child;
                 } else {
                     $this->append($child, $s);
@@ -284,7 +284,7 @@ class Parser
                 $this->argumentDef($args) &&
                 $this->literal('{')
             ) {
-                $func = $this->pushSpecialBlock('function');
+                $func = $this->pushSpecialBlock('function', $s);
                 $func->name = $fnName;
                 $func->args = $args;
 
@@ -307,7 +307,7 @@ class Parser
                 $this->valueList($list) &&
                 $this->literal('{')
             ) {
-                $each = $this->pushSpecialBlock('each');
+                $each = $this->pushSpecialBlock('each', $s);
                 foreach ($varNames[2] as $varName) {
                     $each->vars[] = $varName[1];
                 }
@@ -322,7 +322,7 @@ class Parser
                 $this->expression($cond) &&
                 $this->literal('{')
             ) {
-                $while = $this->pushSpecialBlock('while');
+                $while = $this->pushSpecialBlock('while', $s);
                 $while->cond = $cond;
 
                 return true;
@@ -339,7 +339,7 @@ class Parser
                 $this->expression($end) &&
                 $this->literal('{')
             ) {
-                $for = $this->pushSpecialBlock('for');
+                $for = $this->pushSpecialBlock('for', $s);
                 $for->var = $varName[1];
                 $for->start = $start;
                 $for->end = $end;
@@ -351,7 +351,7 @@ class Parser
             $this->seek($s);
 
             if ($this->literal('@if') && $this->valueList($cond) && $this->literal('{')) {
-                $if = $this->pushSpecialBlock('if');
+                $if = $this->pushSpecialBlock('if', $s);
                 $if->cond = $cond;
                 $if->cases = array();
 
@@ -384,9 +384,9 @@ class Parser
 
                 if ($this->literal('@else')) {
                     if ($this->literal('{')) {
-                        $else = $this->pushSpecialBlock('else');
+                        $else = $this->pushSpecialBlock('else', $s);
                     } elseif ($this->literal('if') && $this->valueList($cond) && $this->literal('{')) {
-                        $else = $this->pushSpecialBlock('elseif');
+                        $else = $this->pushSpecialBlock('elseif', $s);
                         $else->cond = $cond;
                     }
 
@@ -421,7 +421,7 @@ class Parser
                 ($this->variable($dirValue) || $this->openString('{', $dirValue) || true) &&
                 $this->literal('{')
             ) {
-                $directive = $this->pushSpecialBlock('directive');
+                $directive = $this->pushSpecialBlock('directive', $s);
                 $directive->name = $dirName;
 
                 if (isset($dirValue)) {
@@ -472,7 +472,7 @@ class Parser
 
         // opening css block
         if ($this->selectors($selectors) && $this->literal('{')) {
-            $b = $this->pushBlock($selectors);
+            $b = $this->pushBlock($selectors, $s);
 
             return true;
         }
@@ -488,7 +488,7 @@ class Parser
             }
 
             if ($this->literal('{')) {
-                $propBlock = $this->pushSpecialBlock('nestedprop');
+                $propBlock = $this->pushSpecialBlock('nestedprop', $s);
                 $propBlock->prefix = $name;
                 $foundSomething = true;
             } elseif ($foundSomething) {
@@ -574,13 +574,21 @@ class Parser
         return $this->match($this->pregQuote($what), $m, $eatWhitespace);
     }
 
-    // tree builders
-
-    protected function pushBlock($selectors)
+    /**
+     * Push block onto parse tree
+     *
+     * @param array   $selectors
+     * @param integer $pos
+     *
+     * @return \stdClass
+     */
+    protected function pushBlock($selectors, $pos = null)
     {
         $b = new \stdClass;
         $b->parent = $this->env; // not sure if we need this yet
 
+        $b->sourcePosition = $pos;
+        $b->sourceParser = $this;
         $b->selectors = $selectors;
         $b->comments = array();
 
@@ -600,9 +608,17 @@ class Parser
         return $b;
     }
 
-    protected function pushSpecialBlock($type)
+    /**
+     * Push special (named) block onto parse tree
+     *
+     * @param array   $selectors
+     * @param integer $pos
+     *
+     * @return \stdClass
+     */
+    protected function pushSpecialBlock($type, $pos)
     {
-        $block = $this->pushBlock(null);
+        $block = $this->pushBlock(null, $pos);
         $block->type = $type;
 
         return $block;
@@ -1782,6 +1798,23 @@ class Parser
         throw new \Exception("$msg: $loc");
     }
 
+    /**
+     * Get source file name
+     *
+     * @return string
+     */
+    public function getSourceName()
+    {
+        return $this->sourceName;
+    }
+
+    /**
+     * Get source line number (given character position in the buffer)
+     *
+     * @param integer $pos
+     *
+     * @return integer
+     */
     public function getLineNo($pos)
     {
         return 1 + substr_count(substr($this->buffer, 0, $pos), "\n");
@@ -1858,6 +1891,7 @@ class Parser
         while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
             if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
                 $this->appendComment(array('comment', $m[1]));
+
                 $this->commentsSeen[$this->count] = true;
             }
 
