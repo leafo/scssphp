@@ -3303,7 +3303,24 @@ class Compiler
         $string = $this->coerceString($args[0]);
         $name = $this->compileStringContent($string);
 
-        return $this->has(self::$namespaces['function'] . $name) ? self::$true : self::$false;
+        // user defined functions
+        if ($this->has(self::$namespaces['function'] . $name)) {
+            return self::$true;
+        }
+
+        // built-in functions
+        $name = $this->normalizeName($name);
+        $libName = 'lib' . preg_replace_callback(
+            '/_(.)/',
+            function ($m) {
+                return ucfirst($m[1]);
+            },
+            ucfirst($name)
+        );
+
+        $f = array($this, $libName);
+
+        return is_callable($f) ? self::$true : self::$false;
     }
 
     protected static $libGlobalVariableExists = array('name');
