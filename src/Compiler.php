@@ -2149,30 +2149,21 @@ class Compiler
         return is_file($name);
     }
 
+    /**
+     * Call built-in and registered (PHP) functions
+     *
+     * @param string $name
+     * @param array  $args
+     * @param array  $returnValue
+     *
+     * @return boolean Returns true if returnValue is set; otherwise, false
+     */
     protected function callBuiltin($name, $args, &$returnValue)
     {
         // try a lib function
         $name = $this->normalizeName($name);
-        $libName = 'lib' . preg_replace_callback(
-            '/_(.)/',
-            function ($m) {
-                return ucfirst($m[1]);
-            },
-            ucfirst($name)
-        );
 
-        $f = array($this, $libName);
-
-        if (is_callable($f)) {
-            $prototype = isset(self::$$libName) ? self::$$libName : null;
-            $sorted = $this->sortArgs($prototype, $args);
-
-            foreach ($sorted as &$val) {
-                $val = $this->reduce($val, true);
-            }
-
-            $returnValue = call_user_func($f, $sorted, $this);
-        } elseif (isset($this->userFunctions[$name])) {
+        if (isset($this->userFunctions[$name])) {
             // see if we can find a user function
             $fn = $this->userFunctions[$name];
 
@@ -2181,6 +2172,21 @@ class Compiler
             }
 
             $returnValue = call_user_func($fn, $args, $this);
+        } else {
+            $f = $this->getBuiltinFunction($name);
+
+            if (is_callable($f)) {
+                $libName = $f[1];
+
+                $prototype = isset(self::$$libName) ? self::$$libName : null;
+                $sorted = $this->sortArgs($prototype, $args);
+
+                foreach ($sorted as &$val) {
+                    $val = $this->reduce($val, true);
+                }
+
+                $returnValue = call_user_func($f, $sorted, $this);
+            }
         }
 
         if (isset($returnValue)) {
@@ -2198,6 +2204,27 @@ class Compiler
 
         return false;
     }
+
+    /**
+     * Get built-in function
+     *
+     * @param string $name Normalized name
+     *
+     * @return array
+     */
+    protected function getBuiltinFunction($name)
+    {
+        $libName = 'lib' . preg_replace_callback(
+            '/_(.)/',
+            function ($m) {
+                return ucfirst($m[1]);
+            },
+            ucfirst($name)
+        );
+
+        return array($this, $libName);
+    }
+
 
     // sorts any keyword arguments
     // TODO: merge with apply arguments?
@@ -3308,19 +3335,16 @@ class Compiler
             return self::$true;
         }
 
-        // built-in functions
         $name = $this->normalizeName($name);
-        $libName = 'lib' . preg_replace_callback(
-            '/_(.)/',
-            function ($m) {
-                return ucfirst($m[1]);
-            },
-            ucfirst($name)
-        );
 
-        $f = array($this, $libName);
+        if (isset($this->userFunctions[$name])) {
+            return self::$true;
+        }
 
-        return is_callable($f) ? self::$true : self::$false;
+        // built-in functions
+        $f = $this->getBuiltinFunction($name);
+
+        return $this->toBool(is_callable($f));
     }
 
     protected static $libGlobalVariableExists = array('name');
