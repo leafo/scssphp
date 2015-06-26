@@ -366,6 +366,35 @@ END_OF_SCSS
   border: 1px dashed red; }
 END_OF_EXPECTED
             ),
+            array(
+                '#281 - nested animation selector', <<<'END_OF_SCSS'
+.custom-selector {
+
+& {
+  color:blue;
+}
+@keyframes zoomer {
+  from {
+    transform:scale(0.5);
+  }
+
+  to {
+    transform:scale(1);
+  }
+}
+
+}
+END_OF_SCSS
+                , <<<END_OF_EXPECTED
+.custom-selector {
+  color: blue; }
+@keyframes zoomer {
+  from {
+    transform: scale(0.5); }
+  to {
+    transform: scale(1); } }
+END_OF_EXPECTED
+            ),
 /*************************************************************
             array(
                 '', <<<'END_OF_SCSS'
