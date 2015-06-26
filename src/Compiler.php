@@ -64,7 +64,7 @@ class Compiler
         '<=' => 'lte',
         '>=' => 'gte',
 
-        '<=>' => 'sgn',
+        '<=>' => 'cmp',
     );
 
     static protected $namespaces = array(
@@ -1510,7 +1510,15 @@ class Compiler
         return $this->toBool($left[1] < $right[1]);
     }
 
-    protected function opSgnNumberNumber($left, $right)
+    /**
+     * Three-way comparison, aka spaceship operator
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
+    protected function opCmpNumberNumber($left, $right)
     {
         $n = $left[1] - $right[1];
 
