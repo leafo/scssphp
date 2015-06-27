@@ -475,7 +475,7 @@ class Parser
             $this->valueList($value) && $this->end()
         ) {
             // check for '!flag'
-            $assignmentFlag = $value[0] === 'list' ? $this->stripAssignmentFlag($value) : false;
+            $assignmentFlag = $this->stripAssignmentFlag($value);
             $this->append(array('assign', $name, $value, $assignmentFlag), $s);
 
             return true;
@@ -556,17 +556,21 @@ class Parser
      */
     protected function stripAssignmentFlag(&$value)
     {
-        $lastNode = end($value[2]);
+        $token = &$value;
 
-        if ($lastNode[0] === 'keyword' && in_array($lastNode[1], array('!default', '!global'))) {
-            array_pop($value[2]);
+        for ($token = &$value; $token[0] === 'list' && ($s = count($token[2])); $token = &$lastNode) {
+            $lastNode = &$token[2][$s - 1];
 
-            $value = $this->flattenList($value);
+            if ($lastNode[0] === 'keyword' && in_array($lastNode[1], array('!default', '!global'))) {
+                array_pop($token[2]);
 
-            return $lastNode[1];
+                $token = $this->flattenList($token);
+
+                return $lastNode[1];
+            }
         }
 
-        return $lastNode[0] === 'list' ? $this->stripAssignmentFlag($value[2][count($value[2]) - 1]) : false;
+        return false;
     }
 
     protected function literal($what, $eatWhitespace = null)
