@@ -2603,8 +2603,7 @@ class Compiler
             if (isset($args[$i])) {
                 $val = $this->assertNumber($args[$i]);
                 $ii = $i == 7 ? 4 : $i; // alpha
-                $color[$ii] =
-                    $this->$fn(isset($color[$ii]) ? $color[$ii] : 0, $val, $i);
+                $color[$ii] = call_user_func($fn, isset($color[$ii]) ? $color[$ii] : 0, $val, $i);
             }
         }
 
@@ -2614,7 +2613,7 @@ class Compiler
             foreach (array(4, 5, 6) as $i) {
                 if (isset($args[$i])) {
                     $val = $this->assertNumber($args[$i]);
-                    $hsl[$i - 3] = $this->$fn($hsl[$i - 3], $val, $i);
+                    $hsl[$i - 3] = call_user_func($fn, $hsl[$i - 3], $val, $i);
                 }
             }
 
@@ -2634,64 +2633,61 @@ class Compiler
         'color', 'red', 'green', 'blue',
         'hue', 'saturation', 'lightness', 'alpha'
     );
-    protected function adjustColorHelper($base, $alter, $i)
-    {
-        return $base += $alter;
-    }
     protected function libAdjustColor($args)
     {
-        return $this->alterColor($args, 'adjustColorHelper');
+        return $this->alterColor($args, function ($base, $alter, $i) {
+            return $base + $alter;
+        });
     }
 
     protected static $libChangeColor = array(
         'color', 'red', 'green', 'blue',
         'hue', 'saturation', 'lightness', 'alpha'
     );
-    protected function changeColorHelper($base, $alter, $i)
-    {
-        return $alter;
-    }
     protected function libChangeColor($args)
     {
-        return $this->alterColor($args, 'changeColorHelper');
+        return $this->alterColor($args, function ($base, $alter, $i) {
+            return $alter;
+        });
     }
 
     protected static $libScaleColor = array(
         'color', 'red', 'green', 'blue',
         'hue', 'saturation', 'lightness', 'alpha'
     );
-    protected function scaleColorHelper($base, $scale, $i)
-    {
-        // 1, 2, 3 - rgb
-        // 4, 5, 6 - hsl
-        // 7 - a
-        switch ($i) {
-            case 1:
-            case 2:
-            case 3:
-                $max = 255;
-                break;
-            case 4:
-                $max = 360;
-                break;
-            case 7:
-                $max = 1;
-                break;
-            default:
-                $max = 100;
-        }
-
-        $scale = $scale / 100;
-
-        if ($scale < 0) {
-            return $base * $scale + $base;
-        }
-
-        return ($max - $base) * $scale + $base;
-    }
     protected function libScaleColor($args)
     {
-        return $this->alterColor($args, 'scaleColorHelper');
+        return $this->alterColor($args, function ($base, $scale, $i) {
+            // 1, 2, 3 - rgb
+            // 4, 5, 6 - hsl
+            // 7 - a
+            switch ($i) {
+                case 1:
+                case 2:
+                case 3:
+                    $max = 255;
+                    break;
+
+                case 4:
+                    $max = 360;
+                    break;
+
+                case 7:
+                    $max = 1;
+                    break;
+
+                default:
+                    $max = 100;
+            }
+
+            $scale = $scale / 100;
+
+            if ($scale < 0) {
+                return $base * $scale + $base;
+            }
+
+            return ($max - $base) * $scale + $base;
+        });
     }
 
     protected static $libIeHexStr = array('color');
