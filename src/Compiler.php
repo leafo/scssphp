@@ -4,7 +4,6 @@
  *
  * @copyright 2012-2015 Leaf Corcoran
  *
- * @license http://opensource.org/licenses/gpl-license GPL-3.0
  * @license http://opensource.org/licenses/MIT MIT
  *
  * @link http://leafo.net/scssphp
@@ -1614,7 +1613,9 @@ class Compiler
                     $filtered[$this->compileValue($keys[$i])] = $this->compileValue($values[$i]);
                 }
 
-                array_walk($filtered, function (&$value, $key) { $value = $key . ': ' . $value; });
+                array_walk($filtered, function (&$value, $key) {
+                    $value = $key . ': ' . $value;
+                });
 
                 return '(' . implode(', ', $filtered) . ')';
             case 'interpolated': # node created by extractInterpolation
