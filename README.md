@@ -18,10 +18,11 @@ Run the following command from the root directory to run every test:
 
     vendor/bin/phpunit tests
 
-There are two kinds of tests in the `tests/` directory:
+There are several tests in the `tests/` directory:
 
 * `ApiTest.php` contains various unit tests that test the PHP interface.
 * `ExceptionTest.php` contains unit tests that test for exceptions thrown by the parser and compiler.
+* `FailingTest.php` contains tests reported in Github issues that demonstrate compatibility bugs.
 * `InputTest.php` compiles every `.scss` file in the `tests/inputs` directory
   then compares to the respective `.css` file in the `tests/outputs` directory.
 * `ScssTest.php` extracts (ruby) `scss` tests from the `tests/scss_test.rb` file.
