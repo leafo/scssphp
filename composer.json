@@ -5,8 +5,7 @@
     "keywords": ["css", "stylesheet", "scss", "sass", "less"],
     "homepage": "http://leafo.net/scssphp/",
     "license": [
-        "MIT",
-        "GPL-3.0"
+        "MIT"
     ],
     "authors": [
         {
