@@ -1784,9 +1784,15 @@ class Parser
         return false;
     }
 
-    // advance counter to next occurrence of $what
-    // $until - don't include $what in advance
-    // $allowNewline, if string, will be used as valid char set
+    /**
+     * @deprecated
+     *
+     * {@internal
+     *     advance counter to next occurrence of $what
+     *     $until - don't include $what in advance
+     *     $allowNewline, if string, will be used as valid char set
+     * }}
+     */
     protected function to($what, &$out, $until = false, $allowNewline = false)
     {
         if (is_string($allowNewline)) {
@@ -1959,6 +1965,9 @@ class Parser
         return preg_quote($what, '/');
     }
 
+    /**
+     * @deprecated
+     */
     protected function show()
     {
         if ($this->peek("(.*?)(\n|$)", $m, $this->count)) {
