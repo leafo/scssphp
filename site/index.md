@@ -111,6 +111,12 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 <div id="changelog"></div>
 ## Changelog
 
+* **0.1.7** -- July 1, 2015
+  * bin/pscss: added --line-numbers and --debug-info options
+  * Compiler: added setLineCommentStyle() and 'q' unit
+  * Parser: deprecated show() and to() methods
+  * simplified licensing (MIT)
+  * refactoring internals and misc bug fixes (maps, empty list, function-exists())
 * **0.1.6** -- June 22, 2015
   * !global
   * more built-in functions
