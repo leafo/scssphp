@@ -6,7 +6,7 @@
  *
  * @license http://opensource.org/licenses/MIT MIT
  *
- * @link http://leafo.net/scssphp
+ * @link http://leafo.github.io/scssphp
  */
 
 namespace Leafo\ScssPhp;

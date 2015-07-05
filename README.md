@@ -1,5 +1,5 @@
 # scssphp v0.1.7
-### <http://leafo.net/scssphp>
+### <http://leafo.github.io/scssphp>
 
 [![Build Status](https://travis-ci.org/leafo/scssphp.svg?branch=master)](http://travis-ci.org/leafo/scssphp)
 
@@ -8,7 +8,7 @@
 It primarily implements SCSS 3.2.16, with some 3.3.x/3.4.x compatibility. It does not implement the SASS syntax, only the SCSS
 syntax.
 
-Checkout the homepage, <http://leafo.net/scssphp>, for directions on how to use.
+Checkout the homepage, <http://leafo.github.io/scssphp>, for directions on how to use.
 
 ## Running Tests
 
