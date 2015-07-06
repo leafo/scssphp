@@ -1,22 +1,20 @@
 # Site settings
 title: SCSS Compiler in PHP
-email: leafot@gmail.com
-description: > # this means to ignore newlines until "baseurl:"
-  SCSS compiler written in PHP
-baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://leafo.github.io/scssphp" # the base hostname & protocol for your site
-twitter_username: jekyllrb
-github_username:  jekyll
 current_version: 0.1.7
-root: /scssphp
+description: >
+  SCSS compiler written in PHP
+url: http://leafo.github.io
+baseurl: /scssphp/
+email: leafot@gmail.com
+twitter_username: moonscript
 
 # Build settings
 markdown: kramdown
 exclude:
 - Gemfile
 - Gemfile.lock
+- Makefile
 - composer.lock
-- serve.sh
 - vendor/
 
 # Github Pages

@@ -1,5 +1,5 @@
 _site
 .sass-cache
 composer.lock
-serve.sh
+pscss.phar
 /vendor/

@@ -14,7 +14,7 @@ from the terminal.
 **scssphp**  primarily implements SCSS 3.2.16, with some 3.3.x/3.4.x compatibility. 
 It does not implement the SASS syntax, only the SCSS syntax.
 
-Follow the author on twitter: [@moonscript](http://twitter.com/moonscript).
+Follow the author on twitter: [@{{ site.twitter_username }}](http://twitter.com/{{ site.twitter_username }}).
 
 <div class="github-buttons">
 <iframe src="http://ghbtns.com/github-btn.html?user=leafo&repo=scssphp&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
@@ -49,7 +49,7 @@ For a complete guide to the syntax of SCSS, consult the [official documentation]
 
 ## PHP Reference
 
-Complete documentation for **scssphp** is located at <a href="{{ site.root }}/docs/">{{ site.root }}/docs/</a>.
+Complete documentation for **scssphp** is located at <a href="{{ site.baseurl }}docs/">{{ site.baseurl }}docs/</a>.
 
 ### Quickstart
 
@@ -109,7 +109,7 @@ is an error when compiling then an exception is thrown with an appropriate
 message.
 
 
-For a more detailed guide consult <a href="{{ site.root }}/docs/">{{ site.root }}/docs/</a>.
+For a more detailed guide consult <a href="{{ site.baseurl }}docs/">{{ site.baseurl }}docs/</a>.
 
 <a name="issues"></a>
 
@@ -224,7 +224,7 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
   * SCSS server is aware of imports
   * added custom function interface
   * compressed formatter
-  * wrote <a href="{{ site.root }}/docs/">documentation</a>
+  * wrote <a href="{{ site.baseurl }}docs/">documentation</a>
 * Initial Release v0.0.1 -- July 29th, 2012
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>

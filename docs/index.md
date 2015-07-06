@@ -184,7 +184,7 @@ You can output the original SCSS line numbers within the compiled CSS file for b
 
 This works well in combination with frontend debugging tools such as https://addons.mozilla.org/de/firefox/addon/firecompass-for-firebug/
 
-To activate this feature, call `->setLineNumberStyle(Compiler::LINE_COMMENTS)` after creating a new instance of class `Compiler`.
+To activate this feature, call `setLineNumberStyle(Compiler::LINE_COMMENTS)` after creating a new instance of class `Compiler`.
 
 {% highlight php startinline=true %}
 use Leafo\ScssPhp\Server;

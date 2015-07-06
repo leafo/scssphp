@@ -10,7 +10,7 @@
           </a>
         </div>
 
-        <h1><a href="{{ site.root }}">scssphp</a></h1>
+        <h1><a href="{{ site.baseurl }}">scssphp</a></h1>
       </div>
     </div>
 
@@ -18,16 +18,16 @@
       <div class="inner">
         <div class="social">
 
-          <a class="twitter-share-button" href="https://twitter.com/intent/tweet" data-text="scssphp v{{ site.current_version }} - SCSS compiler for PHP" data-url="http://leafo.github.io/scssphp/" data-via="moonscript" data-count="horizontal" data-counturl="scssphp">Tweet</a>
-          <a href="https://twitter.com/moonscript" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @moonscript</a>
+          <a class="twitter-share-button" href="https://twitter.com/intent/tweet" data-text="scssphp v{{ site.current_version }} - SCSS compiler for PHP" data-url="http://leafo.github.io/scssphp/" data-via="{{ site.twitter_username }}" data-count="horizontal" data-counturl="scssphp">Tweet</a>
+          <a href="https://twitter.com/{{ site.twitter_username }}" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @{{ site.twitter_username }}</a>
 
         </div>
 
-        <a href="{{ site.root }}/#installing">Install</a>
+        <a href="{{ site.baseurl }}#installing">Install</a>
         &middot;
-        <a href="{{ site.root }}/#quickstart">Quickstart</a>
+        <a href="{{ site.baseurl }}#quickstart">Quickstart</a>
         &middot;
-        <a href="{{ site.root }}/docs/">Docs</a>
+        <a href="{{ site.baseurl }}docs/">Docs</a>
       </div>
     </div>
 
