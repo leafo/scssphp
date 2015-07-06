@@ -1,0 +1,13 @@
+{
+    "chmod": "0755",
+    "files": [
+        "LICENSE.md",
+        "classmap.php",
+        "scss.inc.php"
+    ],
+    "directories": ["src"],
+    "main": "bin/pscss",
+    "output": "pscss.phar",
+    "compactors": "Herrera\\Box\\Compactor\\Php",
+    "stub": true
+}
