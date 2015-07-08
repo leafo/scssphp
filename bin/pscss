@@ -31,9 +31,30 @@ $changeDir = false;
 $debugInfo = false;
 $lineNumbers = false;
 
-function parseArgument($argument, $options) {
-    if (preg_match('/^(?:' . implode('|', (array) $options) . ')=?(.*)/', $argument, $matches)) {
-        return $matches[1] === '' ? false : $matches[1];
+/**
+ * Parse argument
+ *
+ * @param integer $i
+ * @param array $options
+ *
+ * @return string|false|null
+ */
+function parseArgument(&$i, $options) {
+    global $argc;
+    global $argv;
+
+    if (! preg_match('/^(?:' . implode('|', (array) $options) . ')=?(.*)/', $argv[$i], $matches)) {
+        return;
+    }
+
+    if (strlen($matches[1])) {
+        return $matches[1];
+    }
+
+    if ($i + 1 < $argc) {
+        $i++;
+
+        return $argv[$i];
     }
 }
 
@@ -78,21 +99,21 @@ EOT;
         continue;
     }
 
-    $value = parseArgument($argv[$i], array('-f', '--style'));
+    $value = parseArgument($i, array('-f', '--style'));
 
     if (isset($value)) {
         $style = $value;
         continue;
     }
 
-    $value = parseArgument($argv[$i], array('-i', '--load_paths'));
+    $value = parseArgument($i, array('-i', '--load_paths'));
 
     if (isset($value)) {
         $loadPaths = $value;
         continue;
     }
 
-    $value = parseArgument($argv[$i], array('-p', '--precision'));
+    $value = parseArgument($i, array('-p', '--precision'));
 
     if (isset($value)) {
         $precision = $value;
