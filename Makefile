@@ -2,4 +2,4 @@ test:
 	vendor/bin/phpunit --colors tests
 
 phar:
-	vendor/bin/box build -v
+	php -dphar.readonly=0 vendor/bin/box build -v
