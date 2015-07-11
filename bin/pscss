@@ -37,7 +37,7 @@ $lineNumbers = false;
  * @param integer $i
  * @param array $options
  *
- * @return string|false|null
+ * @return string|null
  */
 function parseArgument(&$i, $options) {
     global $argc;
