@@ -36,7 +36,7 @@ If you use [Packagist][2] for installing packages, then you can update your `com
 {% highlight json %}
 {
     "require": {
-        "leafo/scss.php": "{{ site.current_version }}"
+        "leafo/scssphp": "{{ site.current_version }}"
     }
 }
 {% endhighlight %}
@@ -88,7 +88,7 @@ must have permission to write in `scss_cache`.
 ### Compiler Interface
 
 If you're interested in directly using the compiler, then all you need to either
-require `scss.inc.php` or use your `composer` generated auto-laoder, and then
+require `scss.inc.php` or use your `composer` generated auto-loader, and then
 invoke the `Compiler` class:
 
 {% highlight php startinline=true %}
