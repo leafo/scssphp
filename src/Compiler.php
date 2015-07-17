@@ -1503,7 +1503,8 @@ class Compiler
             $lStr[1] = '';
             $rStr[1] = '';
 
-            return $this->toBool($this->compileValue($lStr) == $this->compileValue($rStr));
+            $left = $this->compileValue($lStr);
+            $right = $this->compileValue($rStr);
         }
 
         return $this->toBool($left == $right);
@@ -1511,6 +1512,14 @@ class Compiler
 
     protected function opNeq($left, $right)
     {
+        if (($lStr = $this->coerceString($left)) && ($rStr = $this->coerceString($right))) {
+            $lStr[1] = '';
+            $rStr[1] = '';
+
+            $left = $this->compileValue($lStr);
+            $right = $this->compileValue($rStr);
+        }
+
         return $this->toBool($left != $right);
     }
 
