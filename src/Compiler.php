@@ -1688,6 +1688,12 @@ class Compiler
         }
     }
 
+    protected function flattenList($list)
+    {
+        // temporary
+        return $this->compileValue($list);
+    }
+
     protected function compileStringContent($string)
     {
         $parts = array();
@@ -2395,6 +2401,8 @@ class Compiler
         switch ($value[0]) {
             case 'string':
                 return $value;
+            case 'function':
+                return array('string', '', array($value[1] . '(' . $this->flattenList($value[2]) . ')'));
             case 'keyword':
                 return array('string', '', array($value[1]));
         }
@@ -3277,6 +3285,8 @@ class Compiler
                     return 'color';
                 }
 
+                // fall-thru
+            case 'function':
                 return 'string';
             default:
                 return $value[0];
