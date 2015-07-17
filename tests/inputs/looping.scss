@@ -64,3 +64,23 @@ $j: null;
   .item { width: 2em; }
   $j: false;
 }
+
+@function contains($list, $values...) {
+  @each $value in $values {
+    @if type-of(index($list, $value)) != "number" {
+      @return false;
+    }
+  }
+  @return true;
+}
+
+@function is-number($value) {
+  @return contains("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" 0 1 2 3 4 5 6 7 8 9, $value);
+}
+
+div {
+  a: is-number('red');
+  b: is-number('1');
+  c: is-number("3");
+  c: is-number(5);
+}

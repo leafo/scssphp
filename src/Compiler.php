@@ -919,6 +919,7 @@ class Compiler
                 $list = $this->coerceList($this->reduce($each->list));
                 foreach ($list[2] as $item) {
                     $this->pushEnv();
+
                     if (count($each->vars) == 1) {
                         $this->set($each->vars[0], $item);
                     } else {
@@ -927,9 +928,13 @@ class Compiler
                             $this->set($var, isset($values[$i]) ? $values[$i] : self::$null);
                         }
                     }
-                    // TODO: allow return from here?
-                    $this->compileChildren($each->children, $out);
+
+                    $ret = $this->compileChildren($each->children, $out);
                     $this->popEnv();
+
+                    if ($ret) {
+                        return $ret;
+                    }
                 }
                 break;
             case 'while':
@@ -937,6 +942,7 @@ class Compiler
 
                 while ($this->isTruthy($this->reduce($while->cond, true))) {
                     $ret = $this->compileChildren($while->children, $out);
+
                     if ($ret) {
                         return $ret;
                     }
@@ -1328,6 +1334,9 @@ class Compiler
                 }
 
                 return $value;
+
+            case 'string':
+                return array($value[0], '"', $value[2]);
 
             case 'number':
                 return $this->normalizeNumber($value);
