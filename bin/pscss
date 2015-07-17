@@ -148,7 +148,7 @@ if ($inputFile) {
 if ($dumpTree) {
     $parser = new Parser($inputFile ?: 'STDIN');
 
-    print_r($parser->parse($data));
+    print_r(json_decode(json_encode($parser->parse($data)), true));
 
     exit();
 }
