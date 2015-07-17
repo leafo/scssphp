@@ -96,6 +96,7 @@ class Compiler
     static public $selfSelector = array('self');
     static public $emptyList = array('list', '', array());
     static public $emptyMap = array('map', array(), array());
+    static public $emptyString = array('string', '"', array());
 
     protected $importPaths = array('');
     protected $importCache = array();
@@ -3350,13 +3351,17 @@ class Compiler
     protected static $libStrSlice = array('string', 'start-at', 'end-at');
     protected function libStrSlice($args)
     {
+        if ($args[2][1] == 0) {
+            return self::$emptyString;
+        }
+
         $string = $this->coerceString($args[0]);
         $stringContent = $this->compileStringContent($string);
 
-        list(, $start) = $args[1];
-        list(, $end) = $args[2];
+        $start = (int) $args[1][1] ?: 1;
+        $end = (int) $args[2][1];
 
-        $string[2] = array(substr($stringContent, $start - 1, $end - $start + 1));
+        $string[2] = array(substr($stringContent, $start - 1, $end < 0 ? $end : $end - $start + 1));
 
         return $string;
     }
