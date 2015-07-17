@@ -70,7 +70,8 @@ class ScssTest extends \PHPUnit_Framework_TestCase
             $line = trim($lines[$i]);
 
             switch ($state) {
-                case 0: // outside of function
+                case 0:
+                    // outside of function
                     if (preg_match('/^\s*def test_([a-z_]+)/', $line, $matches)) {
                         $state = 1; // enter function
                         $name = $matches[1];
@@ -79,7 +80,8 @@ class ScssTest extends \PHPUnit_Framework_TestCase
 
                     break;
 
-                case 1: // inside function
+                case 1:
+                    // inside function
                     if ($line === '' || $line[0] === '#') {
                         continue;
                     }
@@ -173,7 +175,8 @@ class ScssTest extends \PHPUnit_Framework_TestCase
 
                     break;
 
-                case 2: // get css
+                case 2:
+                    // get css
                     if (preg_match('/^CSS\s*$/', $line)) {
                         $state = 3; // get scss
                         continue;
@@ -183,7 +186,8 @@ class ScssTest extends \PHPUnit_Framework_TestCase
 
                     break;
 
-                case 3: // get scss
+                case 3:
+                    // get scss
                     if (preg_match('/^SCSS\s*$/', $line)) {
                         $state = 1; // end of parameter list
                         continue;
@@ -193,7 +197,8 @@ class ScssTest extends \PHPUnit_Framework_TestCase
 
                     break;
 
-                case 4: // inside block
+                case 4:
+                    // inside block
                     if (preg_match('/^\s*end\s*$/', $line)) {
                         $state = 1; // end block
                         continue;
@@ -206,7 +211,8 @@ class ScssTest extends \PHPUnit_Framework_TestCase
 
                     break;
 
-                case 5: // consume parameters
+                case 5:
+                    // consume parameters
                     if (preg_match('/^SCSS\s*$/', $line)) {
                         $state = 4; // end of parameter list
                         continue;
@@ -214,7 +220,8 @@ class ScssTest extends \PHPUnit_Framework_TestCase
    
                     break;
 
-                case 6: // consume parameters
+                case 6:
+                    // consume parameters
                     if (preg_match('/^S[AC]SS\s*$/', $line)) {
                         $state = 1; // end of parameter list
                         continue;
