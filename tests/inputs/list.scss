@@ -13,3 +13,9 @@ $list: join($list, (red, blue), comma);
 p {
   background: linear-gradient($list);
 }
+
+div {
+x: index(1px solid red, solid);
+y: index(1px solid red, dashed);
+z: index((width: 10px, height: 20px), (height 20px));
+}

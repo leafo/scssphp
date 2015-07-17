@@ -6,3 +6,7 @@ div {
 /* line 13, inputs/list.scss */
 p {
   background: linear-gradient(red, blue); }
+/* line 17, inputs/list.scss */
+div {
+  x: 2;
+  z: 2; }

@@ -2579,6 +2579,14 @@ class Compiler
     {
         list($list, $value) = $args;
 
+        if ($value[0] == 'map') {
+            return self::$null;
+        }
+
+        if ($list[0] === 'map') {
+            $list = $this->coerceList($list, ' ');
+        }
+
         if ($list[0] !== 'list') {
             return self::$null;
         }
@@ -2591,7 +2599,7 @@ class Compiler
 
         $key = array_search($this->normalizeValue($value), $values);
 
-        return false === $key ? false : $key + 1;
+        return false === $key ? self::$null : $key + 1;
     }
 
     protected static $libRgb = array('red', 'green', 'blue');
