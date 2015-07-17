@@ -12,7 +12,9 @@
 namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Colors;
+use Leafo\ScssPhp\Compat\Range;
 use Leafo\ScssPhp\Parser;
+use Leafo\ScssPhp\Util;
 
 /**
  * The scss compiler and parser.
@@ -725,7 +727,7 @@ class Compiler
         }
 
         if ($m1 == 'not' && $m2 == 'not') {
-            # CSS has no way of representing "neither screen nor print"
+            // CSS has no way of representing "neither screen nor print"
             if ($t1 != $t2) {
                 return null;
             }
@@ -986,7 +988,8 @@ class Compiler
 
                 $this->compileChildren($prefixed, $out);
                 break;
-            case 'include': // including a mixin
+            case 'include':
+                // including a mixin
                 list(, $name, $argValues, $content) = $child;
 
                 $mixin = $this->get(self::$namespaces['mixin'] . $name, false);
@@ -1639,7 +1642,8 @@ class Compiler
                 });
 
                 return '(' . implode(', ', $filtered) . ')';
-            case 'interpolated': # node created by extractInterpolation
+            case 'interpolated':
+                // node created by extractInterpolation
                 list(, $interpolate, $left, $right) = $value;
                 list(,, $whiteLeft, $whiteRight) = $interpolate;
 
@@ -1651,7 +1655,8 @@ class Compiler
 
                 return $left . $this->compileValue($interpolate) . $right;
 
-            case 'interpolate': # raw parse node
+            case 'interpolate':
+                // raw parse node
                 list(, $exp) = $value;
 
                 // strip quotes if it's a string
@@ -2855,7 +2860,7 @@ class Compiler
     protected function libLighten($args)
     {
         $color = $this->assertColor($args[0]);
-        $amount = 100*$this->coercePercent($args[1]);
+        $amount = Util::checkRange('amount', new Range(0, 100), $args[1], '%');
 
         return $this->adjustHsl($color, 3, $amount);
     }
@@ -2864,7 +2869,7 @@ class Compiler
     protected function libDarken($args)
     {
         $color = $this->assertColor($args[0]);
-        $amount = 100*$this->coercePercent($args[1]);
+        $amount = Util::checkRange('amount', new Range(0, 100), $args[1], '%');
 
         return $this->adjustHsl($color, 3, -$amount);
     }
