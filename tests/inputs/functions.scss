@@ -87,3 +87,11 @@ div {
 div {
   width: test(4);
 }
+
+@function test($args...){
+    @return type-of($args); // should return arglist, but returns list
+}
+
+p{
+    color: test("a", "s", "d", "f");
+}

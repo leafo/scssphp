@@ -2277,7 +2277,7 @@ class Compiler
             list($i, $name, $default, $isVariable) = $arg;
 
             if ($isVariable) {
-                $val = array('list', ',', array());
+                $val = array('list', ',', array(), $isVariable);
                 for ($count = count($remaining); $i < $count; $i++) {
                     $val[2][] = $remaining[$i];
                 }
@@ -3305,6 +3305,12 @@ class Compiler
                 // fall-thru
             case 'function':
                 return 'string';
+            case 'list':
+                if (isset($value[3]) && $value[3]) {
+                    return 'arglist';
+                }
+
+                // fall-thru
             default:
                 return $value[0];
         }

@@ -180,21 +180,6 @@ body {
 END_OF_EXPECTED
             ),
             array(
-                '#112 - variable arguments type should be arglist', <<<'END_OF_SCSS'
-@function test($args...){
-    @return type-of($args); // should return arglist, but returns list
-}
-
-p{
-    color : test("a", "s", "d", "f");
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-p {
-  color: arglist; }
-END_OF_EXPECTED
-            ),
-            array(
                 '#117 - extends and scope', <<<'END_OF_SCSS'
 body{
   .to-extend{
