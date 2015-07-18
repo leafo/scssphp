@@ -2,17 +2,14 @@
 layout: default
 ---
 
-**scssphp** is a compiler for [SCSS][0] written in PHP.
+**scssphp** is a compiler for [SCSS][0] 3.x written in PHP.
 
-SCSS is a CSS preprocessor that adds many features like variables, mixins,
-imports, color manipulation, functions, and tons of other powerful features.
+SCSS is a CSS preprocessor language that adds many features like variables,
+mixins, imports, color manipulation, functions, and tons of other powerful
+features.
 
-The entire compiler comes in a single class file ready for including in any
-kind of project in addition to a command line tool for running the compiler
-from the terminal.
-
-**scssphp**  primarily implements SCSS 3.2.16, with some 3.3.x/3.4.x compatibility. 
-It does not implement the SASS syntax, only the SCSS syntax.
+**scssphp** is ready for inclusion in any project. It includes a command
+line tool for running the compiler from a terminal/shell or script.
 
 Follow the author on twitter: [@{{ site.twitter_username }}](http://twitter.com/{{ site.twitter_username }}).
 
@@ -121,6 +118,15 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
+* **0.1.8** -- July 18, 2015
+  * Online documentation moved to http://leafo.github.com/scssphp/
+  * Fix index() - map support; now returns null (instead of false) when value not found
+  * Fix lighten(), darken() - percentages don't require % unit
+  * Fix str-slice() - edge cases when starts-at or ends-at is 0
+  * Fix type-of() - returns arglist for variable arguments
+  * Fix !=
+  * Fix {% raw %}@{% endraw %}return inside {% raw %}@{% endraw %}each
+  * Add box support to generate .phar
 * **0.1.7** -- July 1, 2015
   * bin/pscss: added --line-numbers and --debug-info options
   * Compiler: added setLineNumberStyle() and 'q' unit
@@ -208,7 +214,7 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
   * Add zip, index, comparable functions (Martin Hasoň)
   * A bunch of parser and bug fixes
 * **0.0.4** -- Nov 3nd, 2012
-  * [Import path can be a function](docs/#import_paths) (Christian Lück).
+  * [Import path can be a function](docs/#import-paths) (Christian Lück).
   * Correctly parse media queries with more than one item (Christian Lück).
   * Add `ie_hex_str`, `abs`, `min`, `max` functions (Martin Hasoň)
   * Ignore expressions inside of `calc()` (Martin Hasoň)
@@ -225,9 +231,8 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
   * added custom function interface
   * compressed formatter
   * wrote <a href="{{ site.baseurl }}docs/">documentation</a>
-* Initial Release v0.0.1 -- July 29th, 2012
+* **0.0.1** -- July 29th, 2012 -- Initial Release
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
 (function() {
   var changelog = jQuery("#changelog").nextAll("ul:first");
@@ -243,7 +248,7 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 </script>
 
   [0]: http://sass-lang.com/
-  [1]: http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#css_extensions
+  [1]: http://sass-lang.com/documentation/file.SASS_REFERENCE.html
   [2]: http://packagist.org/
   [3]: https://github.com/leafo/scssphp/issues
   [4]: https://github.com/leafo/scssphp/

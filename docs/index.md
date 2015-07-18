@@ -184,7 +184,7 @@ You can output the original SCSS line numbers within the compiled CSS file for b
 
 This works well in combination with frontend debugging tools such as https://addons.mozilla.org/de/firefox/addon/firecompass-for-firebug/
 
-To activate this feature, call `setLineNumberStyle(Compiler::LINE_COMMENTS)` after creating a new instance of class `Compiler`.
+To activate this feature, call the `setLineNumberStyle` method after creating a new instance of class `Compiler`.
 
 {% highlight php startinline=true %}
 use Leafo\ScssPhp\Server;
@@ -360,7 +360,7 @@ If passed the flag `-v` (or `--version`), input is ignored and the current versi
 
 If passed the flag `-T`, a formatted parse tree is returned instead of the compiled CSS..
 
-The flag `-f` (or `--style`) can be used to set the [formatter](#Output_formatting):
+The flag `-f` (or `--style`) can be used to set the [formatter](#output-formatting):
 
 {% highlight bash %}
 $ bin/pscss -f compressed < styles.scss
