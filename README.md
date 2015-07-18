@@ -1,4 +1,4 @@
-# scssphp v0.1.7
+# scssphp v0.1.8
 ### <http://leafo.github.io/scssphp>
 
 [![Build](https://travis-ci.org/leafo/scssphp.svg?branch=master)](http://travis-ci.org/leafo/scssphp)
