@@ -11,7 +11,7 @@
 
 namespace Leafo\ScssPhp;
 
-use Leafo\ScssPhp\Compat\Range;
+use Leafo\ScssPhp\Base\Range;
 
 /**
  * SCSS utilties

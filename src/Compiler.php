@@ -11,8 +11,8 @@
 
 namespace Leafo\ScssPhp;
 
+use Leafo\ScssPhp\Base\Range;
 use Leafo\ScssPhp\Colors;
-use Leafo\ScssPhp\Compat\Range;
 use Leafo\ScssPhp\Parser;
 use Leafo\ScssPhp\Util;
 

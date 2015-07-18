@@ -9,7 +9,7 @@
  * @link http://leafo.github.io/scssphp
  */
 
-namespace Leafo\ScssPhp\Compat;
+namespace Leafo\ScssPhp\Base;
 
 /**
  * Range class
