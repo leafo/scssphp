@@ -377,10 +377,33 @@ class Parser
 
             $this->seek($s);
 
-            if (($this->literal('@debug') || $this->literal('@warn')) &&
+            if ($this->literal('@debug') &&
                 $this->valueList($value) &&
-                $this->end()) {
+                $this->end()
+            ) {
                 $this->append(array('debug', $value), $s);
+
+                return true;
+            }
+
+            $this->seek($s);
+
+            if ($this->literal('@warn') &&
+                $this->valueList($value) &&
+                $this->end()
+            ) {
+                $this->append(array('warn', $value), $s);
+
+                return true;
+            }
+
+            $this->seek($s);
+
+            if ($this->literal('@error') &&
+                $this->valueList($value) &&
+                $this->end()
+            ) {
+                $this->append(array('error', $value), $s);
 
                 return true;
             }

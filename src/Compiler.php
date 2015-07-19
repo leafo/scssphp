@@ -1059,6 +1059,20 @@ class Compiler
                 $value = $this->compileValue($this->reduce($value, true));
                 fwrite($this->stderr, "Line $line DEBUG: $value\n");
                 break;
+            case 'warn':
+                list(, $value) = $child;
+
+                $line = $this->parser->getLineNo($this->sourcePos);
+                $value = $this->compileValue($this->reduce($value, true));
+                echo "Line $line WARN: $value\n";
+                break;
+            case 'error':
+                list(, $value) = $child;
+
+                $line = $this->parser->getLineNo($this->sourcePos);
+                $value = $this->compileValue($this->reduce($value, true));
+                $this->throwError("Line $line ERROR: $value\n");
+                break;
             default:
                 $this->throwError("unknown child type: $child[0]");
         }
