@@ -62,3 +62,6 @@ div {
   hello-world: red;
   hello-mold: white;
   hello-hello: blue; }
+/* line 86, inputs/interpolation.scss */
+body {
+  color: 3; }

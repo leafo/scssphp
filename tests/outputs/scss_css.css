@@ -219,7 +219,7 @@ foo {
   /* b; c: */ }
 
 foo {
-  a : d;
+  a: d;
   /*: b; c */ }
 /* Foo
  * Bar */

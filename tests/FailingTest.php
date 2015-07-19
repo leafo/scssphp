@@ -168,18 +168,6 @@ END_OF_SCSS
 END_OF_EXPECTED
             ),
             array(
-                '#111 - interpolated string is not the same as regular string', <<<'END_OF_SCSS'
-body{
-    $test : "1", "2", "3", "4", "5";
-    color : index($test, "#{3}");
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-body {
-  color: 3; }
-END_OF_EXPECTED
-            ),
-            array(
                 '#117 - extends and scope', <<<'END_OF_SCSS'
 body{
   .to-extend{

@@ -75,7 +75,7 @@ abstract class Formatter
      */
     public function property($name, $value)
     {
-        return $name . $this->assignSeparator . $value . ';';
+        return rtrim($name) . $this->assignSeparator . $value . ';';
     }
 
     /**

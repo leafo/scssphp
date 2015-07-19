@@ -230,7 +230,7 @@ foo {
   /* b; c: */ }
 /* line 268, inputs/scss_css.scss */
 foo {
-  a : d;
+  a: d;
   /*: b; c */ }
 /* Foo
  * Bar */

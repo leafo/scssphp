@@ -1336,7 +1336,7 @@ class Compiler
                 return $value;
 
             case 'string':
-                return array($value[0], '"', $value[2]);
+                return array($type, '"', $this->compileStringContent($value));
 
             case 'number':
                 return $this->normalizeNumber($value);
