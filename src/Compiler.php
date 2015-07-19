@@ -3145,6 +3145,21 @@ class Compiler
         return isset($list[2][$n]) ? $list[2][$n] : self::$defaultValue;
     }
 
+    protected static $libSetNth = array('list', 'n', 'value');
+    protected function libSetNth($args)
+    {
+        $list = $this->coerceList($args[0]);
+        $n = $this->assertNumber($args[1]) - 1;
+
+        if (! isset($list[2][$n])) {
+            $this->throwError('Invalid argument for "n"');
+        }
+
+        $list[2][$n] = $args[2];
+
+        return $list;
+    }
+
     protected static $libMapGet = array('map', 'key');
     protected function libMapGet($args)
     {

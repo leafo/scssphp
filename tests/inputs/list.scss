@@ -19,3 +19,10 @@ x: index(1px solid red, solid);
 y: index(1px solid red, dashed);
 z: index((width: 10px, height: 20px), (height 20px));
 }
+
+$list: set-nth($list: 10px 20px 30px, $n: 2, $value: -20px);
+div {
+    a: nth($list, 1);
+   b: nth($list, 2);
+  c: nth($list, 3);
+}
