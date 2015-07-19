@@ -380,7 +380,7 @@ class Parser
             if (($this->literal('@debug') || $this->literal('@warn')) &&
                 $this->valueList($value) &&
                 $this->end()) {
-                $this->append(array('debug', $value, $s), $s);
+                $this->append(array('debug', $value), $s);
 
                 return true;
             }

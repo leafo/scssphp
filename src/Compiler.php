@@ -1053,9 +1053,9 @@ class Compiler
                 unset($this->storeEnv);
                 break;
             case 'debug':
-                list(, $value, $pos) = $child;
+                list(, $value) = $child;
 
-                $line = $this->parser->getLineNo($pos);
+                $line = $this->parser->getLineNo($this->sourcePos);
                 $value = $this->compileValue($this->reduce($value, true));
                 fwrite($this->stderr, "Line $line DEBUG: $value\n");
                 break;
