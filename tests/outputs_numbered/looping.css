@@ -65,3 +65,24 @@ div {
   b: true;
   c: true;
   c: true; }
+/* line 88, inputs/looping.scss */
+body.each {
+  color: 1;
+  background-color: 2;
+  color: 3;
+  background-color: 4;
+  color: 5; }
+/* line 108, inputs/looping.scss */
+body.for {
+  color: 1;
+  background-color: 2;
+  color: 3;
+  background-color: 4;
+  color: 5; }
+/* line 128, inputs/looping.scss */
+body.while {
+  color: 1;
+  background-color: 2;
+  color: 3;
+  background-color: 4;
+  color: 5; }
