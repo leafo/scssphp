@@ -26,3 +26,9 @@ div {
    b: nth($list, 2);
   c: nth($list, 3);
 }
+
+div {
+x:list-separator(1px 2px 3px);
+y:list-separator(1px, 2px, 3px);
+z:list-separator('foo');
+}

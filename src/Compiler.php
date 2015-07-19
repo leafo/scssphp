@@ -3136,6 +3136,27 @@ class Compiler
         return count($list[2]);
     }
 
+    // TODO: need a way to declare this built-in as varargs
+    //protected static $libListSeparator = array('list...');
+    protected function libListSeparator($args)
+    {
+        if (count($args) > 1) {
+            return 'comma';
+        }
+
+        $list = $this->coerceList($args[0]);
+
+        if (count($list[2]) <= 1) {
+            return 'space';
+        }
+
+        if ($list[1] === ',') {
+            return 'comma';
+        }
+
+        return 'space';
+    }
+
     protected static $libNth = array('list', 'n');
     protected function libNth($args)
     {

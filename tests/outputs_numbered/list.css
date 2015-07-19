@@ -15,3 +15,8 @@ div {
   a: 10px;
   b: -20px;
   c: 30px; }
+/* line 30, inputs/list.scss */
+div {
+  x: space;
+  y: comma;
+  z: space; }
