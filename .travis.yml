@@ -10,3 +10,7 @@ php:
 
 script:
   - phpunit tests
+
+branches:
+  only:
+    - master
