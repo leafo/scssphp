@@ -1,0 +1,15 @@
+.first {
+  color: red; }
+
+body .second {
+  color: white;
+  color: black; }
+
+    .nested1 {
+      color: blue;
+      color: orange; }
+        .nested2 {
+          color: yellow; }
+
+.third {
+  color: green; }

@@ -531,6 +531,36 @@ class Compiler
     }
 
     /**
+     * Compile at-root
+     *
+     * @param \stdClass $block
+     */
+    protected function compileAtRoot($block)
+    {
+        $env = $this->pushEnv($block);
+
+        $envs = $this->compactEnv($env);
+
+        if (isset($block->with)) {
+            // @todo move outside of nested directives, e.g., (without: all), (without: media supports), (with: rule)
+        } else {
+            // exclude selectors by default
+            $this->env->parent = $this->rootEnv;
+        }
+
+        $this->scope = $this->makeOutputBlock('at-root');
+        $this->scope->depth = 1;
+        $this->scope->parent->children[] = $this->scope;
+
+        $this->compileChildren($block->children, $this->scope);
+
+        $this->scope = $this->scope->parent;
+        $this->env   = $this->extractEnv($envs);
+
+        $this->popEnv();
+    }
+
+    /**
      * Compile keyframe block
      *
      * @param \stdClass $block
@@ -1082,6 +1112,10 @@ class Compiler
                 } else {
                     $this->compileNestedBlock($directive, array($s));
                 }
+                break;
+
+            case 'at-root':
+                $this->compileAtRoot($child[1]);
                 break;
 
             case 'media':

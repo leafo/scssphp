@@ -241,6 +241,20 @@ class Parser
 
         // the directives
         if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] === '@') {
+            if ($this->literal('@at-root') &&
+                ($this->selectors($selector) || true) &&
+                ($this->map($with) || true) &&
+                $this->literal('{')
+            ) {
+                $atRoot = $this->pushSpecialBlock('at-root', $s);
+                $atRoot->selector = $selector;
+                $atRoot->with = $with;
+
+                return true;
+            }
+
+            $this->seek($s);
+
             if ($this->literal('@media') && $this->mediaQueryList($mediaQueryList) && $this->literal('{')) {
                 $media = $this->pushSpecialBlock('media', $s);
                 $media->queryList = $mediaQueryList[2];
@@ -1393,7 +1407,9 @@ class Parser
     {
         $s = $this->seek();
 
-        $this->literal('(');
+        if (! $this->literal('(')) {
+            return false;
+        }
 
         $keys = array();
         $values = array();

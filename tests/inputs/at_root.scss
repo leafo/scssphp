@@ -1,0 +1,24 @@
+.first {
+  color: red;
+}
+body{
+.second {
+  color: white;
+
+  @at-root {
+    .nested1 {
+      color: blue;
+      @at-root {
+        .nested2 {
+          color: yellow;
+        }
+      }
+      color: orange;
+    }
+  }
+  color: black;
+}
+}
+.third {
+  color: green;
+}

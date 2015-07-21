@@ -1,0 +1,19 @@
+/* line 1, inputs/at_root.scss */
+.first {
+  color: red; }
+/* line 4, inputs/at_root.scss */
+/* line 5, inputs/at_root.scss */
+  body .second {
+    color: white;
+    color: black; }
+
+/* line 9, inputs/at_root.scss */
+.nested1 {
+color: blue;
+color: orange; }
+/* line 12, inputs/at_root.scss */
+.nested2 {
+color: yellow; }
+/* line 22, inputs/at_root.scss */
+.third {
+  color: green; }
