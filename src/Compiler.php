@@ -67,6 +67,8 @@ class Compiler
 
         '<=' => 'lte',
         '>=' => 'gte',
+
+        '<=>' => 'cmp',
     );
 
     static protected $namespaces = array(
@@ -1596,6 +1598,23 @@ class Compiler
     protected function opLtNumberNumber($left, $right)
     {
         return $this->toBool($left[1] < $right[1]);
+    }
+
+    /**
+     * Three-way comparison, aka spaceship operator
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
+    protected function opCmpNumberNumber($left, $right)
+    {
+        $n = $left[1] - $right[1];
+
+        return array('number', $n ? $n / abs($n) : 0, '');
+
+        // PHP7: return array('number', $left[1] <=> $right[1], '');
     }
 
     public function toBool($thing)

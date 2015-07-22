@@ -14,7 +14,10 @@ div {
   color: true;
   color: true;
   color: false;
-  color: what > 3; }
+  color: what > 3;
+  color: 0;
+  color: -1;
+  color: 1; }
 
 #units {
   test: 2.5748in;
