@@ -545,11 +545,21 @@ class Compiler
         $newSelectors = array();
 
         foreach ($selectors as $selector) {
-            if (is_array($selector[0][0]) || strpos($selector[0][0], ',') === false) {
+            if (is_array($selector[0][0])) {
+                $newSelectors[] = $selector;
+            } elseif (strpos($selector[0][0], ',') === false) {
+                if ($selector[0][0][0] === '&') {
+                    $selector = array(array(array('self'), substr($selector[0][0], 1)));
+                }
+
                 $newSelectors[] = $selector;
             } else {
                 foreach (array_map(function ($s) { return trim($s, " \t\n\r\0\x0b'\""); }, explode(',', $selector[0][0])) as $newSelectorPart) {
-                    $newSelectors[] = array(array($newSelectorPart));
+                    if ($newSelectorPart[0] === '&') {
+                        $newSelectors[] = array(array(array('self'), substr($newSelectorPart, 1)));
+                    } else {
+                        $newSelectors[] = array(array($newSelectorPart));
+                    }
                 }
             }
         }

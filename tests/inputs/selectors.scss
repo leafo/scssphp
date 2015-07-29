@@ -246,3 +246,24 @@ $all: $span, $p, $div;
         color: red;
     }
 }
+
+.parent {
+    $sub: unquote(".child");
+    $self: unquote("&.self2");
+    &.self { // works perfectly
+        content: "should match .parent.self";
+    }
+    #{$sub} { // works as it should
+        content: "should match .parent .child";
+    }
+    #{$self} { // does not work (see below)
+        content: "should match .parent.self2";
+    }
+}
+
+.parent {
+    $selfMultiple: unquote("&.self1, &.self2");
+    #{$selfMultiple} {
+        content: "should match .parent.self1, .parent.self2";
+    }
+}

@@ -377,3 +377,19 @@ div.foo div {
 
 span a, p a, div a {
   color: red; }
+/* line 250, inputs/selectors.scss */
+/* line 253, inputs/selectors.scss */
+
+.parent.self {
+  content: "should match .parent.self"; }
+/* line 256, inputs/selectors.scss */
+.parent .child {
+  content: "should match .parent .child"; }
+/* line 259, inputs/selectors.scss */
+.parent.self2 {
+  content: "should match .parent.self2"; }
+/* line 264, inputs/selectors.scss */
+/* line 266, inputs/selectors.scss */
+
+.parent.self1, .parent.self2 {
+  content: "should match .parent.self1, .parent.self2"; }

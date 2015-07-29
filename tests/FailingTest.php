@@ -183,31 +183,6 @@ body .to-extend, body .test {
   color: red; }
 END_OF_EXPECTED
             ),
-            array(
-                '#149 - parent selector (&) inside string does not work', <<<'END_OF_SCSS'
-.parent {
-    $sub: unquote(".child");
-    $self: unquote("&.self2");
-    &.self { // works perfectly
-        content: "should match .parent.self";
-    }
-    #{$sub} { // works as it should
-        content: "should match .parent .child";
-    }
-    #{$self} { // does not work (see below)
-        content: "should match .parent.self2";
-    }
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-.parent.self {
-  content: "should match .parent.self"; }
-.parent .child {
-  content: "should match .parent .child"; }
-.parent.self2 {
-  content: "should match .parent.self2"; }
-END_OF_EXPECTED
-            ),
 /*************************************************************
             array(
                 '#158 - nested extend error', <<<'END_OF_SCSS'

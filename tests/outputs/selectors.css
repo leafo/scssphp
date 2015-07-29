@@ -351,3 +351,13 @@ div.foo div {
 
 span a, p a, div a {
   color: red; }
+
+.parent.self {
+  content: "should match .parent.self"; }
+  .parent .child {
+    content: "should match .parent .child"; }
+  .parent.self2 {
+    content: "should match .parent.self2"; }
+
+.parent.self1, .parent.self2 {
+  content: "should match .parent.self1, .parent.self2"; }
