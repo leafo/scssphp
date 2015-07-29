@@ -193,3 +193,44 @@ $name: escape;
 .escape-plan\% {
     color: green;
 }
+
+.element {
+  #{".one, .two"} {
+    property: value;
+  }
+}
+
+@function H($el:false)
+{
+  $h: ();
+    $newList: ();
+    @each $ord in 1,2,3,4,5,6 {
+        @if $el {
+            $h: h#{$ord $el};
+        } @else {
+            $h: h#{$ord};
+        }
+        $newList: append($newList, $h, comma);
+    }
+    @return $newList;
+}
+
+@mixin H($prop, $val, $el:false) {
+    $list: H($el);
+    #{$list} {
+        #{$prop}: $val;
+    }
+}
+
+#secondary {
+    @include H(color,  #e6e6e6);
+}
+
+@function tester() {
+    @return (foo, bar);
+}
+.test   {
+    #{tester()} {
+        border: 1px dashed red;
+    }
+}

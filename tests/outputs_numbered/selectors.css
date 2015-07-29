@@ -357,3 +357,18 @@ div.foo div {
 /* line 193, inputs/selectors.scss */
 .escape-plan\% {
   color: green; }
+/* line 197, inputs/selectors.scss */
+/* line 198, inputs/selectors.scss */
+
+.element .one, .element .two {
+  property: value; }
+/* line 225, inputs/selectors.scss */
+/* line 220, inputs/selectors.scss */
+
+#secondary h1, #secondary h2, #secondary h3, #secondary h4, #secondary h5, #secondary h6 {
+  color: #e6e6e6; }
+/* line 232, inputs/selectors.scss */
+/* line 233, inputs/selectors.scss */
+
+.test foo, .test bar {
+  border: 1px dashed red; }

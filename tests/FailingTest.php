@@ -184,19 +184,6 @@ body .to-extend, body .test {
 END_OF_EXPECTED
             ),
             array(
-                '#127 - nesting not working with interpolated strings', <<<'END_OF_SCSS'
-.element {
-  #{".one, .two"} {
-    property: value;
-  }
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-.element .one, .element .two {
-  property: value; }
-END_OF_EXPECTED
-            ),
-            array(
                 '#149 - parent selector (&) inside string does not work', <<<'END_OF_SCSS'
 .parent {
     $sub: unquote(".child");
@@ -245,39 +232,6 @@ END_OF_EXPECTED
             ),
 *************************************************************/
             array(
-                '#160 - nesting issue with list', <<<'END_OF_SCSS'
-@function H($el:false)
-{
-  $h: ();
-    $newList: ();
-    @each $ord in 1,2,3,4,5,6 {
-        @if $el {
-            $h: h#{$ord $el};
-        } @else {
-            $h: h#{$ord};
-        }
-        $newList: append($newList, $h, comma);
-    }
-    @return $newList;
-}
-
-@mixin H($prop, $val, $el:false) {
-    $list: H($el);
-    #{$list} {
-        #{$prop}: $val;
-    }
-}
-
-#secondary {
-    @include H(color,  #e6e6e6);
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-#secondary h1, #secondary h2, #secondary h3, #secondary h4, #secondary h5, #secondary h6 {
-  color: #e6e6e6; }
-END_OF_EXPECTED
-            ),
-            array(
                 '#199 - issue with selectors', <<<'END_OF_SCSS'
 .abc {
   color: #ddd;
@@ -321,22 +275,6 @@ END_OF_SCSS
 span a, p a, div a {
   color: red; }
 
-END_OF_EXPECTED
-            ),
-            array(
-                '#244 - incorrect handling of lists as selectors', <<<'END_OF_SCSS'
-@function tester() {
-    @return (foo, bar);
-}
-.test   {
-    #{tester()} {
-        border: 1px dashed red;
-    }
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-.test foo, .test bar {
-  border: 1px dashed red; }
 END_OF_EXPECTED
             ),
             array(

@@ -468,8 +468,7 @@ class Compiler
     {
         $env = $this->pushEnv($block);
 
-        $env->selectors =
-            array_map(array($this, 'evalSelector'), $block->selectors);
+        $env->selectors = $this->evalSelectors($block->selectors);
 
         $out = $this->makeOutputBlock(null, $this->multiplySelectors($env));
 
@@ -537,6 +536,25 @@ class Compiler
     protected function evalSelector($selector)
     {
         return array_map(array($this, 'evalSelectorPart'), $selector);
+    }
+
+    protected function evalSelectors($selectors)
+    {
+        $selectors = array_map(array($this, 'evalSelector'), $selectors);
+
+        $newSelectors = array();
+
+        foreach ($selectors as $selector) {
+            if (is_array($selector[0][0]) || strpos($selector[0][0], ',') === false) {
+                $newSelectors[] = $selector;
+            } else {
+                foreach (array_map('trim', explode(',', $selector[0][0])) as $newSelectorPart) {
+                    $newSelectors[] = array(array($newSelectorPart));
+                }
+            }
+        }
+
+        return $newSelectors;
     }
 
     protected function evalSelectorPart($piece)

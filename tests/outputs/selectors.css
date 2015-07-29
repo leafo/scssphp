@@ -339,3 +339,12 @@ div.foo div {
 
 .escape-plan\% {
   color: green; }
+
+.element .one, .element .two {
+  property: value; }
+
+#secondary h1, #secondary h2, #secondary h3, #secondary h4, #secondary h5, #secondary h6 {
+  color: #e6e6e6; }
+
+.test foo, .test bar {
+  border: 1px dashed red; }
