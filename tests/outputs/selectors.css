@@ -348,3 +348,6 @@ div.foo div {
 
 .test foo, .test bar {
   border: 1px dashed red; }
+
+span a, p a, div a {
+  color: red; }

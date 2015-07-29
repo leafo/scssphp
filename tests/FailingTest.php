@@ -258,26 +258,6 @@ small {
 END_OF_EXPECTED
             ),
             array(
-                '#240 - variable interpolation not working correctly', <<<'END_OF_SCSS'
-$span: 'span';
-$p: 'p';
-$div: 'div'; 
-
-$all: $span, $p, $div;
-
-#{$all} {
-    a {
-        color: red;
-    }
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-span a, p a, div a {
-  color: red; }
-
-END_OF_EXPECTED
-            ),
-            array(
                 '#281 - nested animation selector', <<<'END_OF_SCSS'
 .custom-selector {
 

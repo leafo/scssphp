@@ -234,3 +234,15 @@ $name: escape;
         border: 1px dashed red;
     }
 }
+
+$span: 'span';
+$p: 'p';
+$div: 'div'; 
+
+$all: $span, $p, $div;
+
+#{$all} {
+    a {
+        color: red;
+    }
+}

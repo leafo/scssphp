@@ -548,7 +548,7 @@ class Compiler
             if (is_array($selector[0][0]) || strpos($selector[0][0], ',') === false) {
                 $newSelectors[] = $selector;
             } else {
-                foreach (array_map('trim', explode(',', $selector[0][0])) as $newSelectorPart) {
+                foreach (array_map(function ($s) { return trim($s, " \t\n\r\0\x0b'\""); }, explode(',', $selector[0][0])) as $newSelectorPart) {
                     $newSelectors[] = array(array($newSelectorPart));
                 }
             }

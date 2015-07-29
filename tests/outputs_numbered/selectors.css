@@ -372,3 +372,8 @@ div.foo div {
 
 .test foo, .test bar {
   border: 1px dashed red; }
+/* line 244, inputs/selectors.scss */
+/* line 245, inputs/selectors.scss */
+
+span a, p a, div a {
+  color: red; }
