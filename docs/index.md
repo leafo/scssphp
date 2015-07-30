@@ -3,7 +3,7 @@ layout: default
 title: Documentation
 ---
 
-<h1 skip="true">scssphp {{ site.current_version }} Documentation</h1>
+# scssphp {{ site.current_version }} Documentation
 
 ## PHP Interface
 
