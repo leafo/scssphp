@@ -23,10 +23,10 @@ Follow the author on twitter: [@{{ site.twitter_username }}](http://twitter.com/
 ## Installing
 
 You can always download the latest version here:
-<a href="https://github.com/leafo/scssphp/archive/v{{ site.current_version }}.tar.gz" id="download-link">scssphp-{{ site.current_version }}.tar.gz</a>
+<a href="{{ site.repo_url }}/archive/v{{ site.current_version }}.tar.gz" id="download-link">scssphp-{{ site.current_version }}.tar.gz</a>
 
 You can also find the latest source online:
-<https://github.com/leafo/scssphp/>
+<{{ site.repo_url }}/>
 
 If you use [Packagist][2] for installing packages, then you can update your `composer.json` like so:
 
@@ -250,5 +250,5 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
   [0]: http://sass-lang.com/
   [1]: http://sass-lang.com/documentation/file.SASS_REFERENCE.html
   [2]: http://packagist.org/
-  [3]: https://github.com/leafo/scssphp/issues
-  [4]: https://github.com/leafo/scssphp/
+  [3]: {{ site.repo_url }}/issues
+  [4]: {{ site.repo_url }}/
