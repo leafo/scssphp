@@ -5,7 +5,6 @@ description: >
   SCSS compiler written in PHP
 url: http://leafo.github.io
 baseurl: /scssphp/
-email: leafot@gmail.com
 twitter_username: moonscript
 
 # Build settings
