@@ -344,52 +344,61 @@ div font:something {
 
 div.foo div {
   color: blue; }
-/* line 178, inputs/selectors.scss */
-/* line 179, inputs/selectors.scss */
+/* line 176, inputs/selectors.scss */
+div + div {
+  color: green; }
+/* line 181, inputs/selectors.scss */
+/* line 182, inputs/selectors.scss */
 
-/* line 180, inputs/selectors.scss */
-  /* line 181, inputs/selectors.scss */
+/* line 183, inputs/selectors.scss */
+  /* line 184, inputs/selectors.scss */
     .nice-fonts .main .message div .title, .nice-fonts div .message div .title {
       font-size: 24px; }
-/* line 189, inputs/selectors.scss */
+/* line 192, inputs/selectors.scss */
 .escape\% {
   color: red; }
-/* line 193, inputs/selectors.scss */
+/* line 196, inputs/selectors.scss */
 .escape-plan\% {
   color: green; }
-/* line 197, inputs/selectors.scss */
-/* line 198, inputs/selectors.scss */
+/* line 200, inputs/selectors.scss */
+/* line 201, inputs/selectors.scss */
 
 .element .one, .element .two {
   property: value; }
-/* line 225, inputs/selectors.scss */
-/* line 220, inputs/selectors.scss */
+/* line 228, inputs/selectors.scss */
+/* line 223, inputs/selectors.scss */
 
 #secondary h1, #secondary h2, #secondary h3, #secondary h4, #secondary h5, #secondary h6 {
   color: #e6e6e6; }
-/* line 232, inputs/selectors.scss */
-/* line 233, inputs/selectors.scss */
+/* line 235, inputs/selectors.scss */
+/* line 236, inputs/selectors.scss */
 
 .test foo, .test bar {
   border: 1px dashed red; }
-/* line 244, inputs/selectors.scss */
-/* line 245, inputs/selectors.scss */
+/* line 247, inputs/selectors.scss */
+/* line 248, inputs/selectors.scss */
 
 span a, p a, div a {
   color: red; }
-/* line 250, inputs/selectors.scss */
 /* line 253, inputs/selectors.scss */
+/* line 256, inputs/selectors.scss */
 
 .parent.self {
   content: "should match .parent.self"; }
-/* line 256, inputs/selectors.scss */
+/* line 259, inputs/selectors.scss */
 .parent .child {
   content: "should match .parent .child"; }
-/* line 259, inputs/selectors.scss */
+/* line 262, inputs/selectors.scss */
 .parent.self2 {
   content: "should match .parent.self2"; }
-/* line 264, inputs/selectors.scss */
-/* line 266, inputs/selectors.scss */
+/* line 267, inputs/selectors.scss */
+/* line 269, inputs/selectors.scss */
 
 .parent.self1, .parent.self2 {
   content: "should match .parent.self1, .parent.self2"; }
+/* line 274, inputs/selectors.scss */
+.self1 .parent {
+  content: "should match .self1 .parent"; }
+/* line 279, inputs/selectors.scss */
+.parent + .parent {
+  content: "should match .parent + .parent"; }

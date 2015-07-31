@@ -330,6 +330,8 @@ div {
 
 div.foo div {
   color: blue; }
+  div + div {
+    color: green; }
 
 .nice-fonts .main .message div .title, .nice-fonts div .message div .title {
   font-size: 24px; }
@@ -361,3 +363,7 @@ span a, p a, div a {
 
 .parent.self1, .parent.self2 {
   content: "should match .parent.self1, .parent.self2"; }
+.self1 .parent {
+  content: "should match .self1 .parent"; }
+.parent + .parent {
+  content: "should match .parent + .parent"; }

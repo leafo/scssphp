@@ -173,6 +173,9 @@ div {
     &.foo & {
         color: blue;
     }
+    & + & {
+        color: green;
+    }
 }
 
 .main, div {
@@ -265,5 +268,15 @@ $all: $span, $p, $div;
     $selfMultiple: unquote("&.self1, &.self2");
     #{$selfMultiple} {
         content: "should match .parent.self1, .parent.self2";
+    }
+
+    $trailingSelf: unquote(".self1 &");
+    #{$trailingSelf} {
+        content: "should match .self1 .parent";
+    }
+
+    $doubleSelf: unquote("& + &");
+    #{$doubleSelf} {
+        content: "should match .parent + .parent";
     }
 }
