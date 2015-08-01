@@ -118,6 +118,12 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
+* **0.1.9** -- August 1, 2015
+  * Adoption of the Sass Community Guidelines
+  * Nested selector fixes with lists, interpolated string, and parent selector
+  * Implement list-separator() and set-nth() built-ins
+  * Implement {% raw %}@{% endraw %}warn and {% raw %}@{% endraw %}error
+  * Removed spaceship operator pending discussion with reference implementators
 * **0.1.8** -- July 18, 2015
   * Online documentation moved to http://leafo.github.com/scssphp/
   * Fix index() - map support; now returns null (instead of false) when value not found
