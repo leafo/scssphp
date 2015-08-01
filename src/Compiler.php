@@ -119,6 +119,7 @@ class Compiler
     private $storeEnv;
     private $charsetSeen;
     private $stderr;
+    private $shouldEvaluate;
 
     /**
      * Compile scss
@@ -509,6 +510,66 @@ class Compiler
         $this->scope->children[] = $out;
     }
 
+    protected function evalSelectors($selectors)
+    {
+        $this->shouldEvaluate = false;
+
+        $selectors = array_map(array($this, 'evalSelector'), $selectors);
+
+        // after evaluating interpolates, we might need a second pass
+        if ($this->shouldEvaluate) {
+            $buffer = $this->collapseSelectors($selectors);
+            $parser = new Parser(__METHOD__, false);
+
+            if ($parser->parseSelector($buffer, $newSelectors)) {
+                $selectors = array_map(array($this, 'evalSelector'), $newSelectors);
+            }
+        }
+
+        return $selectors;
+    }
+
+    protected function evalSelector($selector)
+    {
+        return array_map(array($this, 'evalSelectorPart'), $selector);
+    }
+
+    // replaces all the interpolates, stripping quotes
+    protected function evalSelectorPart($part)
+    {
+        foreach ($part as &$p) {
+            if (is_array($p) && ($p[0] === 'interpolate' || $p[0] === 'string')) {
+                $p = $this->compileValue($p);
+
+                // force re-evaluation
+                if (strpos($p, '&') !== false || strpos($p, ',') !== false) {
+                    $this->shouldEvaluate = true;
+                }
+            } elseif (is_string($p) && strlen($p) >= 2 &&
+                ($first = $p[0]) && ($first === '"' || $first === "'") &&
+                substr($p, -1) === $first
+            ) {
+                $p = substr($p, 1, -1);
+            }
+        }
+
+        return $this->flattenSelectorSingle($part);
+    }
+
+    protected function collapseSelectors($selectors)
+    {
+        $output = '';
+
+        array_walk_recursive(
+            $selectors,
+            function ($value, $key) use (&$output) {
+                $output .= $value;
+            }
+        );
+
+        return $output;
+    }
+
     // joins together .classes and #ids
     protected function flattenSelectorSingle($single)
     {
@@ -530,61 +591,6 @@ class Compiler
         }
 
         return $joined;
-    }
-
-    // replaces all the interpolates
-    protected function evalSelector($selector)
-    {
-        return array_map(array($this, 'evalSelectorPart'), $selector);
-    }
-
-    protected function evalSelectors($selectors)
-    {
-        $selectors = array_map(array($this, 'evalSelector'), $selectors);
-
-        $newSelectors = array();
-
-        foreach ($selectors as $selector) {
-            if (is_array($selector[0][0])) {
-                $newSelectors[] = $selector;
-            } elseif (strpos($selector[0][0], ',') === false) {
-                if ($selector[0][0][0] === '&') {
-                    $selector = array(array(array('self'), substr($selector[0][0], 1)));
-                }
-
-                $newSelectors[] = $selector;
-            } else {
-                foreach (array_map(function ($s) { return trim($s, " \t\n\r\0\x0b'\""); }, explode(',', $selector[0][0])) as $newSelectorPart) {
-                    if ($newSelectorPart[0] === '&') {
-                        $newSelectors[] = array(array(array('self'), substr($newSelectorPart, 1)));
-                    } else {
-                        $newSelectors[] = array(array($newSelectorPart));
-                    }
-                }
-            }
-        }
-
-        return $newSelectors;
-    }
-
-    protected function evalSelectorPart($piece)
-    {
-        foreach ($piece as &$p) {
-            if (! is_array($p)) {
-                continue;
-            }
-
-            switch ($p[0]) {
-                case 'interpolate':
-                    $p = $this->compileValue($p);
-                    break;
-                case 'string':
-                    $p = $this->compileValue($p);
-                    break;
-            }
-        }
-
-        return $this->flattenSelectorSingle($piece);
     }
 
     // compiles to string
@@ -918,8 +924,8 @@ class Compiler
 
                 foreach ($selectors as $sel) {
                     // only use the first one
-                    $sel = current($this->evalSelector($sel));
-                    $this->pushExtends($sel, $out->selectors);
+                    $result = $this->evalSelectors(array($sel));
+                    $this->pushExtends(current($result[0]), $out->selectors);
                 }
                 break;
             case 'if':

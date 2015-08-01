@@ -363,7 +363,7 @@ span a, p a, div a {
 
 .parent.self1, .parent.self2 {
   content: "should match .parent.self1, .parent.self2"; }
-.self1 .parent {
-  content: "should match .self1 .parent"; }
-.parent + .parent {
-  content: "should match .parent + .parent"; }
+  .self1 .parent {
+    content: "should match .self1 .parent"; }
+  .parent + .parent {
+    content: "should match .parent + .parent"; }

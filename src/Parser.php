@@ -171,6 +171,25 @@ class Parser
     }
 
     /**
+     * Parse a selector or selector list
+     *
+     * @param string $buffer
+     * @param string $out
+     *
+     * @return boolean
+     */
+    public function parseSelector($buffer, &$out)
+    {
+        $this->count           = 0;
+        $this->env             = null;
+        $this->inParens        = false;
+        $this->eatWhiteDefault = true;
+        $this->buffer          = (string) $buffer;
+
+        return $this->selectors($out);
+    }
+
+    /**
      * Parse a single chunk off the head of the buffer and append it to the
      * current parse environment.
      *
