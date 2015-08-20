@@ -336,6 +336,7 @@ class Compiler
                 continue;
             }
 
+            // TODO: this conditional is always false...
             // check if target is subset of single
             if (array_diff(array_intersect($single, $target), $target)) {
                 continue;
