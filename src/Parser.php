@@ -327,8 +327,28 @@ class Parser
 
             $this->seek($s);
 
-            if ($this->literal('@return') && $this->valueList($retVal) && $this->end()) {
-                $this->append(array('return', $retVal), $s);
+            // SCSSPHP feature
+            if ($this->literal('@break') && $this->end()) {
+                $this->append(array('break'), $s);
+
+                return true;
+            }
+
+            $this->seek($s);
+
+            // SCSSPHP feature
+            if ($this->literal('@continue') && $this->end()) {
+                $this->append(array('continue'), $s);
+
+                return true;
+            }
+
+            $this->seek($s);
+
+
+            // SCSSPHP feature: optional return value
+            if ($this->literal('@return') && ($this->valueList($retVal) || true) && $this->end()) {
+                $this->append(array('return', isset($retVal) ? $retVal : array('null')), $s);
 
                 return true;
             }

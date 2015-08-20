@@ -84,3 +84,66 @@ div {
   c: is-number("3");
   c: is-number(5);
 }
+
+body.each {
+    @each $x in 1 2 3 4 5 {
+        @if $x == 2 or $x == 4 {
+            background-color: $x;
+            @continue;
+        }
+
+        color: $x;
+
+        @if $x == 5 {
+            @break;
+        }
+        @else {
+            @continue;
+        }
+
+        color: "not reached";
+    }
+}
+
+body.for {
+    @for $x from 1 through 5 {
+        @if $x == 2 or $x == 4 {
+            background-color: $x;
+            @continue;
+        }
+
+        color: $x;
+
+        @if $x == 5 {
+            @break;
+        }
+        @else {
+            @continue;
+        }
+
+        color: "not reached";
+    }
+}
+
+body.while {
+    $x: 0;
+    @while $x <= 5 {
+        $x: $x+1;
+
+        @if $x == 2 or $x == 4 {
+            background-color: $x;
+            @continue;
+        }
+
+        color: $x;
+
+        @if $x == 5 {
+            @break;
+        }
+        @else {
+            @continue;
+        }
+
+        color: "not reached";
+    }
+}

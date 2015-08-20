@@ -61,3 +61,24 @@ div {
   b: true;
   c: true;
   c: true; }
+
+body.each {
+  color: 1;
+  background-color: 2;
+  color: 3;
+  background-color: 4;
+  color: 5; }
+
+body.for {
+  color: 1;
+  background-color: 2;
+  color: 3;
+  background-color: 4;
+  color: 5; }
+
+body.while {
+  color: 1;
+  background-color: 2;
+  color: 3;
+  background-color: 4;
+  color: 5; }

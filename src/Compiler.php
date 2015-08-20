@@ -943,6 +943,10 @@ class Compiler
                     }
                 }
                 break;
+            case 'break':
+                return array('control', true);
+            case 'continue':
+                return array('control', false);
             case 'return':
                 return $this->reduce($child[1], true);
             case 'each':
@@ -965,7 +969,13 @@ class Compiler
                     $this->popEnv();
 
                     if ($ret) {
-                        return $ret;
+                        if ($ret[0] != 'control') {
+                            return $ret;
+                        }
+
+                        if ($ret[1]) {
+                            break;
+                        }
                     }
                 }
                 break;
@@ -976,7 +986,13 @@ class Compiler
                     $ret = $this->compileChildren($while->children, $out);
 
                     if ($ret) {
-                        return $ret;
+                        if ($ret[0] != 'control') {
+                            return $ret;
+                        }
+
+                        if ($ret[1]) {
+                            break;
+                        }
                     }
                 }
                 break;
@@ -1002,7 +1018,13 @@ class Compiler
                     $ret = $this->compileChildren($for->children, $out);
 
                     if ($ret) {
-                        return $ret;
+                        if ($ret[0] != 'control') {
+                            return $ret;
+                        }
+
+                        if ($ret[1]) {
+                            break;
+                        }
                     }
                 }
 
@@ -1105,6 +1127,8 @@ class Compiler
                 $value = $this->compileValue($this->reduce($value, true));
                 $this->throwError("Line $line ERROR: $value\n");
                 break;
+            case 'control':
+                $this->throwError('@break/@continue not permitted in this scope');
             default:
                 $this->throwError("unknown child type: $child[0]");
         }
