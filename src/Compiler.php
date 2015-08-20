@@ -311,6 +311,7 @@ class Compiler
     protected function matchExtendsSingle($single, &$outOrigin)
     {
         $counts = array();
+
         foreach ($single as $part) {
             if (! is_string($part)) {
                 return false; // hmm
@@ -400,6 +401,7 @@ class Compiler
 
             foreach ($media->children as $child) {
                 $type = $child[0];
+
                 if ($type !== 'block' && $type !== 'media' && $type !== 'directive') {
                     $needsWrap = true;
                     break;
@@ -484,6 +486,7 @@ class Compiler
                 case self::LINE_COMMENTS:
                     $annotation->lines[] = '/* line ' . $line . ', ' . $file . ' */';
                     break;
+
                 case self::DEBUG_INFO:
                     $annotation->lines[] = '@media -sass-debug-info{filename{font-family:"' . $file
                                          . '"}line{font-family:' . $line . '}}';
@@ -574,6 +577,7 @@ class Compiler
     protected function flattenSelectorSingle($single)
     {
         $joined = array();
+
         foreach ($single as $part) {
             if (empty($joined) ||
                 ! is_string($part) ||
@@ -621,6 +625,7 @@ class Compiler
                 case 'self':
                     $p = '&';
                     break;
+
                 default:
                     $p = $this->compileValue($p);
                     break;
@@ -683,6 +688,7 @@ class Compiler
                             $type = array_map(array($this, 'compileValue'), array_slice($q, 1));
                         }
                         break;
+
                     case 'mediaExp':
                         if (isset($q[2])) {
                             $parts[] = '('
@@ -790,6 +796,7 @@ class Compiler
 
             return false;
         }
+
         if ($rawPath[0] == 'list') {
             // handle a list of strings
             if (count($rawPath[2]) == 0) {
@@ -823,25 +830,32 @@ class Compiler
                 list(, $rawPath) = $child;
 
                 $rawPath = $this->reduce($rawPath);
+
                 if (! $this->compileImport($rawPath, $out)) {
                     $out->lines[] = '@import ' . $this->compileValue($rawPath) . ';';
                 }
                 break;
+
             case 'directive':
                 list(, $directive) = $child;
 
                 $s = '@' . $directive->name;
+
                 if (! empty($directive->value)) {
                     $s .= ' ' . $this->compileValue($directive->value);
                 }
+
                 $this->compileNestedBlock($directive, array($s));
                 break;
+
             case 'media':
                 $this->compileMedia($child[1]);
                 break;
+
             case 'block':
                 $this->compileBlock($child[1]);
                 break;
+
             case 'charset':
                 if (! $this->charsetSeen) {
                     $this->charsetSeen = true;
@@ -849,6 +863,7 @@ class Compiler
                     $out->lines[] = '@charset ' . $this->compileValue($child[1]) . ';';
                 }
                 break;
+
             case 'assign':
                 list(, $name, $value) = $child;
 
@@ -893,6 +908,7 @@ class Compiler
                 // the property should be discarded
                 if ($value[0] != 'null') {
                     $value = $this->reduce($value);
+
                     if ($value[0] == 'null') {
                         break;
                     }
@@ -905,6 +921,7 @@ class Compiler
                     $compiledValue
                 );
                 break;
+
             case 'comment':
                 if ($out->type == 'root') {
                     $this->compileComment($child);
@@ -913,12 +930,14 @@ class Compiler
 
                 $out->lines[] = $child[1];
                 break;
+
             case 'mixin':
             case 'function':
                 list(, $block) = $child;
 
                 $this->set(self::$namespaces[$block->type] . $block->name, $block);
                 break;
+
             case 'extend':
                 list(, $selectors) = $child;
 
@@ -928,27 +947,31 @@ class Compiler
                     $this->pushExtends(current($result[0]), $out->selectors);
                 }
                 break;
+
             case 'if':
                 list(, $if) = $child;
 
                 if ($this->isTruthy($this->reduce($if->cond, true))) {
                     return $this->compileChildren($if->children, $out);
-                } else {
-                    foreach ($if->cases as $case) {
-                        if ($case->type == 'else' ||
-                            $case->type == 'elseif' && $this->isTruthy($this->reduce($case->cond))
-                        ) {
-                            return $this->compileChildren($case->children, $out);
-                        }
+                }
+
+                foreach ($if->cases as $case) {
+                    if ($case->type == 'else' ||
+                        $case->type == 'elseif' && $this->isTruthy($this->reduce($case->cond))
+                    ) {
+                        return $this->compileChildren($case->children, $out);
                     }
                 }
                 break;
+
             case 'return':
                 return $this->reduce($child[1], true);
+
             case 'each':
                 list(, $each) = $child;
 
                 $list = $this->coerceList($this->reduce($each->list));
+
                 foreach ($list[2] as $item) {
                     $this->pushEnv();
 
@@ -956,6 +979,7 @@ class Compiler
                         $this->set($each->vars[0], $item);
                     } else {
                         list(,, $values) = $this->coerceList($item);
+
                         foreach ($each->vars as $i => $var) {
                             $this->set($var, isset($values[$i]) ? $values[$i] : self::$null);
                         }
@@ -969,6 +993,7 @@ class Compiler
                     }
                 }
                 break;
+
             case 'while':
                 list(, $while) = $child;
 
@@ -980,6 +1005,7 @@ class Compiler
                     }
                 }
                 break;
+
             case 'for':
                 list(, $for) = $child;
 
@@ -1007,6 +1033,7 @@ class Compiler
                 }
 
                 break;
+
             case 'nestedprop':
                 list(, $prop) = $child;
 
@@ -1027,6 +1054,7 @@ class Compiler
 
                 $this->compileChildren($prefixed, $out);
                 break;
+
             case 'include':
                 // including a mixin
                 list(, $name, $argValues, $content) = $child;
@@ -1061,6 +1089,7 @@ class Compiler
 
                 $this->popEnv();
                 break;
+
             case 'mixin_content':
                 $content = $this->get(self::$namespaces['special'] . 'content');
 
@@ -1084,6 +1113,7 @@ class Compiler
 
                 unset($this->storeEnv);
                 break;
+
             case 'debug':
                 list(, $value) = $child;
 
@@ -1091,6 +1121,7 @@ class Compiler
                 $value = $this->compileValue($this->reduce($value, true));
                 fwrite($this->stderr, "Line $line DEBUG: $value\n");
                 break;
+
             case 'warn':
                 list(, $value) = $child;
 
@@ -1098,6 +1129,7 @@ class Compiler
                 $value = $this->compileValue($this->reduce($value, true));
                 echo "Line $line WARN: $value\n";
                 break;
+
             case 'error':
                 list(, $value) = $child;
 
@@ -1105,6 +1137,7 @@ class Compiler
                 $value = $this->compileValue($this->reduce($value, true));
                 $this->throwError("Line $line ERROR: $value\n");
                 break;
+
             default:
                 $this->throwError("unknown child type: $child[0]");
         }
@@ -1150,12 +1183,14 @@ class Compiler
             case 'fncall':
                 return true;
         }
+
         return false;
     }
 
     protected function reduce($value, $inExp = false)
     {
         list($type) = $value;
+
         switch ($type) {
             case 'exp':
                 list(, $op, $left, $right, $inParens) = $value;
@@ -1186,6 +1221,7 @@ class Compiler
                 // 2. op[left type][right type] (passing the op as first arg
                 // 3. op[op name]
                 $fn = "op${ucOpName}${ucLType}${ucRType}";
+
                 if (is_callable(array($this, $fn)) ||
                     (($fn = "op${ucLType}${ucRType}") &&
                         is_callable(array($this, $fn)) &&
@@ -1248,6 +1284,7 @@ class Compiler
                 }
 
                 return $this->expToString($value);
+
             case 'unary':
                 list(, $op, $exp, $inParens) = $value;
 
@@ -1258,6 +1295,7 @@ class Compiler
                     switch ($op) {
                         case '+':
                             return $exp;
+
                         case '-':
                             $exp[1] *= -1;
 
@@ -1272,22 +1310,25 @@ class Compiler
                         }
 
                         return self::$false;
-                    } else {
-                        $op = $op . ' ';
                     }
+
+                    $op = $op . ' ';
                 }
 
                 return array('string', '', array($op, $exp));
+
             case 'var':
                 list(, $name) = $value;
 
                 return $this->reduce($this->get($name));
+
             case 'list':
                 foreach ($value[2] as &$item) {
                     $item = $this->reduce($item);
                 }
 
                 return $value;
+
             case 'map':
                 foreach ($value[1] as &$item) {
                     $item = $this->reduce($item);
@@ -1298,6 +1339,7 @@ class Compiler
                 }
 
                 return $value;
+
             case 'string':
                 foreach ($value[2] as &$item) {
                     if (is_array($item)) {
@@ -1306,10 +1348,12 @@ class Compiler
                 }
 
                 return $value;
+
             case 'interpolate':
                 $value[1] = $this->reduce($value[1]);
 
                 return $value;
+
             case 'fncall':
                 list(, $name, $argValues) = $value;
 
@@ -1352,6 +1396,7 @@ class Compiler
                 }
 
                 return array('function', $name, array('list', ',', $listArgs));
+
             default:
                 return $value;
         }
@@ -1497,25 +1542,33 @@ class Compiler
                 case '+':
                     $out[] = $lval + $rval;
                     break;
+
                 case '-':
                     $out[] = $lval - $rval;
                     break;
+
                 case '*':
                     $out[] = $lval * $rval;
                     break;
+
                 case '%':
                     $out[] = $lval % $rval;
                     break;
+
                 case '/':
                     if ($rval == 0) {
                         $this->throwError("color: Can't divide by zero");
                     }
+
                     $out[] = (int) ($lval / $rval);
                     break;
+
                 case '==':
                     return $this->opEq($left, $right);
+
                 case '!=':
                     return $this->opNeq($left, $right);
+
                 default:
                     $this->throwError("color: unknown op $op");
             }
@@ -1627,6 +1680,7 @@ class Compiler
         switch ($type) {
             case 'keyword':
                 return $value[1];
+
             case 'color':
                 // [1] - red component (either number for a %)
                 // [2] - green component
@@ -1650,13 +1704,18 @@ class Compiler
                 }
 
                 return $h;
+
             case 'number':
                 return round($value[1], $this->numberPrecision) . $value[2];
+
             case 'string':
                 return $value[1] . $this->compileStringContent($value) . $value[1];
+
             case 'function':
                 $args = ! empty($value[2]) ? $this->compileValue($value[2]) : '';
+
                 return "$value[1]($args)";
+
             case 'list':
                 $value = $this->extractInterpolation($value);
 
@@ -1667,6 +1726,7 @@ class Compiler
                 list(, $delim, $items) = $value;
 
                 $filtered = array();
+
                 foreach ($items as $item) {
                     if ($item[0] == 'null') {
                         continue;
@@ -1676,6 +1736,7 @@ class Compiler
                 }
 
                 return implode("$delim ", $filtered);
+
             case 'map':
                 $keys = $value[1];
                 $values = $value[2];
@@ -1690,6 +1751,7 @@ class Compiler
                 });
 
                 return '(' . implode(', ', $filtered) . ')';
+
             case 'interpolated':
                 // node created by extractInterpolation
                 list(, $interpolate, $left, $right) = $value;
@@ -1719,8 +1781,10 @@ class Compiler
                 }
 
                 return $this->compileValue($reduced);
+
             case 'null':
                 return 'null';
+
             default:
                 $this->throwError("unknown value type: $type");
         }
@@ -2209,7 +2273,9 @@ class Compiler
 
         foreach ($args as $arg) {
             list($key, $value) = $arg;
+
             $key = $key[1];
+
             if (empty($key)) {
                 $posArgs[] = $value;
             } else {
@@ -2230,6 +2296,7 @@ class Compiler
             }
 
             $set = false;
+
             foreach ((array)$names as $name) {
                 if (isset($keyArgs[$name])) {
                     $finalArgs[] = $keyArgs[$name];
@@ -2307,9 +2374,11 @@ class Compiler
 
             if ($isVariable) {
                 $val = array('list', ',', array(), $isVariable);
+
                 for ($count = count($remaining); $i < $count; $i++) {
                     $val[2][] = $remaining[$i];
                 }
+
                 foreach ($deferredKeywordArgs as $itemName => $item) {
                     $val[2][$itemName] = $item;
                 }
@@ -2439,11 +2508,14 @@ class Compiler
         switch ($value[0]) {
             case 'string':
                 return $value;
+
             case 'function':
                 return array('string', '', array($value[1] . '(' . $this->flattenList($value[2]) . ')'));
+
             case 'keyword':
                 return array('string', '', array($value[1]));
         }
+
         return null;
     }
 
@@ -2820,6 +2892,7 @@ class Compiler
     protected function libMix($args)
     {
         list($first, $second, $weight) = $args;
+
         $first = $this->assertColor($first);
         $second = $this->assertColor($second);
 
@@ -3297,8 +3370,10 @@ class Compiler
         switch ($this->compileValue($sep)) {
             case 'comma':
                 return ',';
+
             case 'space':
                 return '';
+
             default:
                 return $list1[1];
         }
@@ -3370,6 +3445,7 @@ class Compiler
                 // fall-thru
             case 'function':
                 return 'string';
+
             case 'list':
                 if (isset($value[3]) && $value[3]) {
                     return 'arglist';

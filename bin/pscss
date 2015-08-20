@@ -140,7 +140,7 @@ if ($inputFile) {
 } else {
     $data = '';
 
-    while ( ! feof(STDIN)) {
+    while (! feof(STDIN)) {
         $data .= fread(STDIN, 8192);
     }
 }

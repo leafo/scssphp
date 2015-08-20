@@ -3,7 +3,7 @@ if (version_compare(PHP_VERSION, '5.3') < 0) {
     die('Requires PHP 5.3 or above');
 }
 
-if ( ! class_exists('scssc', false)) {
+if (! class_exists('scssc', false)) {
     include_once __DIR__ . '/src/Base/Range.php';
     include_once __DIR__ . '/src/Colors.php';
     include_once __DIR__ . '/src/Compiler.php';
