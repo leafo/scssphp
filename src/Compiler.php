@@ -204,6 +204,110 @@ class Compiler
         return $out;
     }
 
+    protected function compileRoot($rootBlock)
+    {
+        $this->scope = $this->makeOutputBlock('root');
+
+        $this->compileChildren($rootBlock->children, $this->scope);
+        $this->flattenSelectors($this->scope);
+    }
+
+    protected function flattenSelectors($block, $parentKey = null)
+    {
+        if ($block->selectors) {
+            $selectors = array();
+
+            foreach ($block->selectors as $s) {
+                $selectors[] = $s;
+
+                if (! is_array($s)) {
+                    continue;
+                }
+
+                // check extends
+                if (! empty($this->extendsMap)) {
+                    $this->matchExtends($s, $selectors);
+                }
+            }
+
+            $block->selectors = array();
+            $placeholderSelector = false;
+
+            foreach ($selectors as $selector) {
+                if ($this->hasSelectorPlaceholder($selector)) {
+                    $placeholderSelector = true;
+                    continue;
+                }
+
+                $block->selectors[] = $this->compileSelector($selector);
+            }
+
+            if ($placeholderSelector && 0 == count($block->selectors) && null !== $parentKey) {
+                unset($block->parent->children[$parentKey]);
+
+                return;
+            }
+        }
+
+        foreach ($block->children as $key => $child) {
+            $this->flattenSelectors($child, $key);
+        }
+    }
+
+    protected function matchExtends($selector, &$out, $from = 0, $initial = true)
+    {
+        foreach ($selector as $i => $part) {
+            if ($i < $from) {
+                continue;
+            }
+
+            if ($this->matchExtendsSingle($part, $origin)) {
+                $before = array_slice($selector, 0, $i);
+                $after = array_slice($selector, $i + 1);
+
+                foreach ($origin as $new) {
+                    $k = 0;
+
+                    // remove shared parts
+                    if ($initial) {
+                        foreach ($before as $k => $val) {
+                            if (! isset($new[$k]) || $val != $new[$k]) {
+                                break;
+                            }
+                        }
+                    }
+
+                    $result = array_merge(
+                        $before,
+                        $k > 0 ? array_slice($new, $k) : $new,
+                        $after
+                    );
+
+                    if ($result == $selector) {
+                        continue;
+                    }
+
+                    $out[] = $result;
+
+                    // recursively check for more matches
+                    $this->matchExtends($result, $out, $i, false);
+
+                    // selector sequence merging
+                    if (! empty($before) && count($new) > 1) {
+                        $result2 = array_merge(
+                            array_slice($new, 0, -1),
+                            $k > 0 ? array_slice($before, $k) : $before,
+                            array_slice($new, -1),
+                            $after
+                        );
+
+                        $out[] = $result2;
+                    }
+                }
+            }
+        }
+    }
+
     protected function matchExtendsSingle($single, &$outOrigin)
     {
         $counts = array();
@@ -277,110 +381,6 @@ class Compiler
         }
 
         return $out;
-    }
-
-    protected function matchExtends($selector, &$out, $from = 0, $initial = true)
-    {
-        foreach ($selector as $i => $part) {
-            if ($i < $from) {
-                continue;
-            }
-
-            if ($this->matchExtendsSingle($part, $origin)) {
-                $before = array_slice($selector, 0, $i);
-                $after = array_slice($selector, $i + 1);
-
-                foreach ($origin as $new) {
-                    $k = 0;
-
-                    // remove shared parts
-                    if ($initial) {
-                        foreach ($before as $k => $val) {
-                            if (! isset($new[$k]) || $val != $new[$k]) {
-                                break;
-                            }
-                        }
-                    }
-
-                    $result = array_merge(
-                        $before,
-                        $k > 0 ? array_slice($new, $k) : $new,
-                        $after
-                    );
-
-                    if ($result == $selector) {
-                        continue;
-                    }
-
-                    $out[] = $result;
-
-                    // recursively check for more matches
-                    $this->matchExtends($result, $out, $i, false);
-
-                    // selector sequence merging
-                    if (! empty($before) && count($new) > 1) {
-                        $result2 = array_merge(
-                            array_slice($new, 0, -1),
-                            $k > 0 ? array_slice($before, $k) : $before,
-                            array_slice($new, -1),
-                            $after
-                        );
-
-                        $out[] = $result2;
-                    }
-                }
-            }
-        }
-    }
-
-    protected function flattenSelectors($block, $parentKey = null)
-    {
-        if ($block->selectors) {
-            $selectors = array();
-
-            foreach ($block->selectors as $s) {
-                $selectors[] = $s;
-
-                if (! is_array($s)) {
-                    continue;
-                }
-
-                // check extends
-                if (! empty($this->extendsMap)) {
-                    $this->matchExtends($s, $selectors);
-                }
-            }
-
-            $block->selectors = array();
-            $placeholderSelector = false;
-
-            foreach ($selectors as $selector) {
-                if ($this->hasSelectorPlaceholder($selector)) {
-                    $placeholderSelector = true;
-                    continue;
-                }
-
-                $block->selectors[] = $this->compileSelector($selector);
-            }
-
-            if ($placeholderSelector && 0 == count($block->selectors) && null !== $parentKey) {
-                unset($block->parent->children[$parentKey]);
-
-                return;
-            }
-        }
-
-        foreach ($block->children as $key => $child) {
-            $this->flattenSelectors($child, $key);
-        }
-    }
-
-    protected function compileRoot($rootBlock)
-    {
-        $this->scope = $this->makeOutputBlock('root');
-
-        $this->compileChildren($rootBlock->children, $this->scope);
-        $this->flattenSelectors($this->scope);
     }
 
     protected function compileMedia($media)
