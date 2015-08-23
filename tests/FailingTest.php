@@ -63,73 +63,6 @@ class FailingTest extends \PHPUnit_Framework_TestCase
         // @codingStandardsIgnoreStart
         return array(
             array(
-                '#28 - @extend working unexpected', <<<'END_OF_SCSS'
-#content {
-
-        .social-login {
-            display: block;
-            float: right;
-            margin-right: 15px;
-            width: 250px;
-
-                .facebook {
-                    display: block;
-                    width: 255px;
-                    height: 42px;
-                    background: transparent url('images/login-btns.png') no-repeat;
-                    background-position: 0 0;
-
-                    &:hover {
-                        background-position: 0 -43px;
-                        }
-
-                    &:focus, &:active {
-                        background-position: 0 -86px;
-                        }
-                }
-
-                .twitter {
-
-                    @extend .facebook;
-                    background-position: 0 -129px;
-
-                    &:hover {
-                        background-position: 0 -172px;
-                    }
-
-                    &:active, &:focus {
-                        background-position: 0 -215px;
-                    }
-                }
-
-        }
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-#content .social-login {
-  display: block;
-  float: right;
-  margin-right: 15px;
-  width: 250px; }
-  #content .social-login .facebook, #content .social-login .twitter {
-    display: block;
-    width: 255px;
-    height: 42px;
-    background: transparent url("images/login-btns.png") no-repeat;
-    background-position: 0 0; }
-    #content .social-login .facebook:hover, #content .social-login .twitter:hover {
-      background-position: 0 -43px; }
-    #content .social-login .facebook:focus, #content .social-login .twitter:focus, #content .social-login .facebook:active, #content .social-login .twitter:active {
-      background-position: 0 -86px; }
-  #content .social-login .twitter {
-    background-position: 0 -129px; }
-    #content .social-login .twitter:hover {
-      background-position: 0 -172px; }
-    #content .social-login .twitter:active, #content .social-login .twitter:focus {
-      background-position: 0 -215px; }
-END_OF_EXPECTED
-            ),
-            array(
                 '#67 - weird @extend behavior', <<<'END_OF_SCSS'
 .nav-bar {
     background: #eee;
@@ -167,45 +100,6 @@ END_OF_SCSS
   width: 12.5%; }
 END_OF_EXPECTED
             ),
-            array(
-                '#117 - extends and scope', <<<'END_OF_SCSS'
-body{
-  .to-extend{
-    color: red;
-  }
-  .test{
-    @extend .to-extend;
-  }
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-body .to-extend, body .test {
-  color: red; }
-END_OF_EXPECTED
-            ),
-/*************************************************************
-            array(
-                '#158 - nested extend error', <<<'END_OF_SCSS'
-.navbar {
-  .navbar-brand {
-    font-weight: bold;
-    text-shadow: none;
-    color: #fff;
-
-    &:hover {
-      @extend .navbar-brand;
-    }
-  }
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-.navbar .navbar-brand, .navbar .navbar-brand:hover {
-  font-weight: bold;
-  text-shadow: none;
-  color: #fff; }
-END_OF_EXPECTED
-            ),
-*************************************************************/
             array(
                 '#199 - issue with selectors', <<<'END_OF_SCSS'
 .abc {

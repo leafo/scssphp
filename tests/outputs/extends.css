@@ -85,3 +85,34 @@ wassup {
 
 .edit .new .actions {
   padding: 0; }
+  .z, .parent .self.z {
+    color: red; }
+
+#content .social-login {
+  display: block;
+  float: right;
+  margin-right: 15px;
+  width: 250px; }
+  #content .social-login .facebook, #content .social-login .twitter {
+    display: block;
+    width: 255px;
+    height: 42px;
+    background: transparent url('images/login-btns.png') no-repeat;
+    background-position: 0 0; }
+    #content .social-login .facebook:hover, #content .social-login .twitter:hover {
+      background-position: 0 -43px; }
+    #content .social-login .facebook:focus, #content .social-login .twitter:focus, #content .social-login .facebook:active, #content .social-login .twitter:active {
+      background-position: 0 -86px; }
+  #content .social-login .twitter {
+    background-position: 0 -129px; }
+    #content .social-login .twitter:hover {
+      background-position: 0 -172px; }
+    #content .social-login .twitter:active, #content .social-login .twitter:focus {
+      background-position: 0 -215px; }
+
+body .to-extend, body .test {
+  color: red; }
+  .navbar .navbar-brand, .navbar .navbar-brand:hover {
+    font-weight: bold;
+    text-shadow: none;
+    color: #fff; }

@@ -227,6 +227,11 @@ class Compiler
                 // check extends
                 if (! empty($this->extendsMap)) {
                     $this->matchExtends($s, $selectors);
+
+                    // remove duplicates
+                    array_walk($selectors, function (&$value) { $value = json_encode($value); });
+                    $selectors = array_unique($selectors);
+                    array_walk($selectors, function (&$value) { $value = json_decode($value); });
                 }
             }
 
@@ -270,10 +275,8 @@ class Compiler
 
                     // remove shared parts
                     if ($initial) {
-                        foreach ($before as $k => $val) {
-                            if (! isset($new[$k]) || $val != $new[$k]) {
-                                break;
-                            }
+                        while (isset($new[$k]) && $before[$k] === $new[$k]) {
+                            $k++;
                         }
                     }
 
@@ -319,8 +322,7 @@ class Compiler
 
             if (isset($this->extendsMap[$part])) {
                 foreach ($this->extendsMap[$part] as $idx) {
-                    $counts[$idx] =
-                        isset($counts[$idx]) ? $counts[$idx] + 1 : 1;
+                    $counts[$idx] = isset($counts[$idx]) ? $counts[$idx] + 1 : 1;
                 }
             }
         }
@@ -336,19 +338,13 @@ class Compiler
                 continue;
             }
 
-            // TODO: this conditional is always false...
-            // check if target is subset of single
-            if (array_diff(array_intersect($single, $target), $target)) {
-                continue;
-            }
-
             $rem = array_diff($single, $target);
 
             foreach ($origin as $j => $new) {
                 // prevent infinite loop when target extends itself
                 foreach ($new as $new_selector) {
-                    if (! array_diff($single, $new_selector)) {
-                        continue 2;
+                    if ($single === $new_selector) {
+                        return false;
                     }
                 }
 

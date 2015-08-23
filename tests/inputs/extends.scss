@@ -182,3 +182,70 @@ wassup {
    }
  }
 }
+
+.z {color: red;}
+.parent .self.z {
+    @extend .z;
+}
+
+#content {
+
+        .social-login {
+            display: block;
+            float: right;
+            margin-right: 15px;
+            width: 250px;
+
+                .facebook {
+                    display: block;
+                    width: 255px;
+                    height: 42px;
+                    background: transparent url('images/login-btns.png') no-repeat;
+                    background-position: 0 0;
+
+                    &:hover {
+                        background-position: 0 -43px;
+                        }
+
+                    &:focus, &:active {
+                        background-position: 0 -86px;
+                        }
+                }
+
+                .twitter {
+
+                    @extend .facebook;
+                    background-position: 0 -129px;
+
+                    &:hover {
+                        background-position: 0 -172px;
+                    }
+
+                    &:active, &:focus {
+                        background-position: 0 -215px;
+                    }
+                }
+
+        }
+}
+
+body{
+  .to-extend{
+    color: red;
+  }
+  .test{
+    @extend .to-extend;
+  }
+}
+
+.navbar {
+  .navbar-brand {
+    font-weight: bold;
+    text-shadow: none;
+    color: #fff;
+    
+    &:hover {
+      @extend .navbar-brand;
+    }
+  }
+}
