@@ -118,6 +118,9 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
+* **0.1.10** -- August 23, 2015
+  * Fix 3 year old {% raw %}@{% endraw %}extend bug
+  * Fix autoloader. (ext)
 * **0.1.9** -- August 1, 2015
   * Adoption of the Sass Community Guidelines
   * Nested selector fixes with lists, interpolated string, and parent selector
