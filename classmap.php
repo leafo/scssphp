@@ -11,6 +11,7 @@
  * @link http://leafo.github.io/scssphp
  */
 
+// @codingStandardsIgnoreStart
 /**
  * @deprecated since 0.1.0
  */
@@ -59,3 +60,4 @@ class scss_formatter_crunched extends \Leafo\ScssPhp\Formatter\Crunched
 class scss_server extends \Leafo\ScssPhp\Server
 {
 }
+// @codingStandardsIgnoreEnd

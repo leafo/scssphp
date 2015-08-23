@@ -53,6 +53,9 @@ class Compiler
     const LINE_COMMENTS = 1;
     const DEBUG_INFO    = 2;
 
+    /**
+     * @var array
+     */
     static protected $operatorNames = array(
         '+' => 'add',
         '-' => 'sub',
@@ -69,12 +72,18 @@ class Compiler
         '>=' => 'gte',
     );
 
+    /**
+     * @var array
+     */
     static protected $namespaces = array(
         'special' => '%',
         'mixin' => '@',
         'function' => '^',
     );
 
+    /**
+     * @var array
+     */
     static protected $unitTable = array(
         'in' => array(
             'in' => 1,
@@ -124,6 +133,8 @@ class Compiler
     /**
      * Compile scss
      *
+     * @api
+     *
      * @param string $code
      * @param string $name
      *
@@ -162,6 +173,14 @@ class Compiler
         return $out;
     }
 
+    /**
+     * Is self extend?
+     *
+     * @param array $target
+     * @param array $origin
+     *
+     * @return boolean
+     */
     protected function isSelfExtend($target, $origin)
     {
         foreach ($origin as $sel) {
@@ -173,6 +192,12 @@ class Compiler
         return false;
     }
 
+    /**
+     * Push extends
+     *
+     * @param array $target
+     * @param array $origin
+     */
     protected function pushExtends($target, $origin)
     {
         if ($this->isSelfExtend($target, $origin)) {
@@ -191,6 +216,14 @@ class Compiler
         }
     }
 
+    /**
+     * Make output block
+     *
+     * @param string $type
+     * @param array  $selectors
+     *
+     * @return \stdClass
+     */
     protected function makeOutputBlock($type, $selectors = null)
     {
         $out = new \stdClass;
@@ -204,6 +237,11 @@ class Compiler
         return $out;
     }
 
+    /**
+     * Compile root
+     *
+     * @param \stdClass $rootBlock
+     */
     protected function compileRoot($rootBlock)
     {
         $this->scope = $this->makeOutputBlock('root');
@@ -212,6 +250,12 @@ class Compiler
         $this->flattenSelectors($this->scope);
     }
 
+    /**
+     * Flatten selectors
+     *
+     * @param \stdClass $block
+     * @parent string   $parentKey
+     */
     protected function flattenSelectors($block, $parentKey = null)
     {
         if ($block->selectors) {
@@ -229,9 +273,13 @@ class Compiler
                     $this->matchExtends($s, $selectors);
 
                     // remove duplicates
-                    array_walk($selectors, function (&$value) { $value = json_encode($value); });
+                    array_walk($selectors, function (&$value) {
+                        $value = json_encode($value);
+                    });
                     $selectors = array_unique($selectors);
-                    array_walk($selectors, function (&$value) { $value = json_decode($value); });
+                    array_walk($selectors, function (&$value) {
+                        $value = json_decode($value);
+                    });
                 }
             }
 
@@ -259,6 +307,14 @@ class Compiler
         }
     }
 
+    /**
+     * Match extends
+     *
+     * @param array   $selector
+     * @param array   $out
+     * @param integer $from
+     * @param boolean $initial
+     */
     protected function matchExtends($selector, &$out, $from = 0, $initial = true)
     {
         foreach ($selector as $i => $part) {
@@ -312,6 +368,14 @@ class Compiler
         }
     }
 
+    /**
+     * Match extends single
+     *
+     * @param array $single
+     * @param array $outOrigin
+     *
+     * @return boolean
+     */
     protected function matchExtendsSingle($single, &$outOrigin)
     {
         $counts = array();
@@ -360,6 +424,14 @@ class Compiler
         return $found;
     }
 
+    /**
+     * Combine selector single
+     *
+     * @param array $base
+     * @param array $other
+     *
+     * @return array
+     */
     protected function combineSelectorSingle($base, $other)
     {
         $tag = null;
@@ -382,6 +454,11 @@ class Compiler
         return $out;
     }
 
+    /**
+     * Compile media
+     *
+     * @param \stdClass $media
+     */
     protected function compileMedia($media)
     {
         $this->pushEnv($media);
@@ -422,19 +499,34 @@ class Compiler
         $this->popEnv();
     }
 
+    /**
+     * Media parent
+     *
+     * @param \stdClass $scope
+     *
+     * @return \stdClass
+     */
     protected function mediaParent($scope)
     {
         while (! empty($scope->parent)) {
             if (! empty($scope->type) && $scope->type != 'media') {
                 break;
             }
+
             $scope = $scope->parent;
         }
 
         return $scope;
     }
 
-    // TODO: refactor compileNestedBlock and compileMedia into same thing?
+    /**
+     * Compile nested block
+     *
+     * @todo refactor compileNestedBlock and compileMedia into same thing?
+     *
+     * @param \stdClass $block
+     * @param array     $selectors
+     */
     protected function compileNestedBlock($block, $selectors)
     {
         $this->pushEnv($block);
@@ -503,7 +595,11 @@ class Compiler
         $this->popEnv();
     }
 
-    // root level comment
+    /**
+     * Compile root level comment
+     *
+     * @param array $block
+     */
     protected function compileComment($block)
     {
         $out = $this->makeOutputBlock('comment');
@@ -511,6 +607,13 @@ class Compiler
         $this->scope->children[] = $out;
     }
 
+    /**
+     * Evaluate selectors
+     *
+     * @param array $selectors
+     *
+     * @return array
+     */
     protected function evalSelectors($selectors)
     {
         $this->shouldEvaluate = false;
@@ -530,12 +633,25 @@ class Compiler
         return $selectors;
     }
 
+    /**
+     * Evaluate selector
+     *
+     * @param array $selector
+     *
+     * @return array
+     */
     protected function evalSelector($selector)
     {
         return array_map(array($this, 'evalSelectorPart'), $selector);
     }
 
-    // replaces all the interpolates, stripping quotes
+    /**
+     * Evaluate selector part; replaces all the interpolates, stripping quotes
+     *
+     * @param array $part
+     *
+     * @return array
+     */
     protected function evalSelectorPart($part)
     {
         foreach ($part as &$p) {
@@ -557,6 +673,13 @@ class Compiler
         return $this->flattenSelectorSingle($part);
     }
 
+    /**
+     * Collapse selectors
+     *
+     * @param array $selectors
+     *
+     * @return string
+     */
     protected function collapseSelectors($selectors)
     {
         $output = '';
@@ -571,7 +694,13 @@ class Compiler
         return $output;
     }
 
-    // joins together .classes and #ids
+    /**
+     * Flatten selector single; joins together .classes and #ids
+     *
+     * @param array $single
+     *
+     * @return array
+     */
     protected function flattenSelectorSingle($single)
     {
         $joined = array();
@@ -595,8 +724,13 @@ class Compiler
         return $joined;
     }
 
-    // compiles to string
-    // self(&) should have been replaced by now
+    /**
+     * Compile selector to string; self(&) should have been replaced by now
+     *
+     * @param array $selector
+     *
+     * @return string
+     */
     protected function compileSelector($selector)
     {
         if (! is_array($selector)) {
@@ -612,6 +746,13 @@ class Compiler
         );
     }
 
+    /**
+     * Compile selector part
+     *
+     * @param arary $piece
+     *
+     * @return string
+     */
     protected function compileSelectorPart($piece)
     {
         foreach ($piece as &$p) {
@@ -633,6 +774,13 @@ class Compiler
         return implode($piece);
     }
 
+    /**
+     * Has selector placeholder?
+     *
+     * @param array $selector
+     *
+     * @return boolean
+     */
     protected function hasSelectorPlaceholder($selector)
     {
         if (! is_array($selector)) {
@@ -650,6 +798,14 @@ class Compiler
         return false;
     }
 
+    /**
+     * Compile children
+     *
+     * @param array $stms
+     * @param array $out
+     *
+     * @return array
+     */
     protected function compileChildren($stms, $out)
     {
         foreach ($stms as $stm) {
@@ -661,6 +817,13 @@ class Compiler
         }
     }
 
+    /**
+     * Compile media query
+     *
+     * @param array $queryList
+     *
+     * @return string
+     */
     protected function compileMediaQuery($queryList)
     {
         $out = '@media';
@@ -722,6 +885,14 @@ class Compiler
         return $out;
     }
 
+    /**
+     * Merge media types
+     *
+     * @param array $type1
+     * @param array $type2
+     *
+     * @return array|null
+     */
     protected function mergeMediaTypes($type1, $type2)
     {
         if (empty($type1)) {
@@ -780,7 +951,14 @@ class Compiler
         return array(empty($m1)? $m2 : $m1, $t1);
     }
 
-    // returns true if the value was something that could be imported
+    /**
+     * Compile import; returns true if the value was something that could be imported
+     *
+     * @param array $rawPath
+     * @param array $out
+     *
+     * @return boolean
+     */
     protected function compileImport($rawPath, $out)
     {
         if ($rawPath[0] == 'string') {
@@ -817,7 +995,14 @@ class Compiler
         return false;
     }
 
-    // return a value to halt execution
+    /**
+     * Compile child; returns a value to halt execution
+     *
+     * @param array     $child
+     * @param \stdClass $out
+     *
+     * @return array
+     */
     protected function compileChild($child, $out)
     {
         $this->sourcePos = isset($child[Parser::SOURCE_POSITION]) ? $child[Parser::SOURCE_POSITION] : -1;
@@ -1141,6 +1326,13 @@ class Compiler
         }
     }
 
+    /**
+     * Reduce expression to string
+     *
+     * @param array $exp
+     *
+     * @return array
+     */
     protected function expToString($exp)
     {
         list(, $op, $left, $right, $inParens, $whiteLeft, $whiteRight) = $exp;
@@ -1162,12 +1354,25 @@ class Compiler
         return array('string', '', $content);
     }
 
+    /**
+     * Is truthy?
+     *
+     * @param array $value
+     *
+     * @return array
+     */
     protected function isTruthy($value)
     {
         return $value != self::$false && $value != self::$null;
     }
 
-    // should $value cause its operand to eval
+    /**
+     * Should $value cause its operand to eval
+     *
+     * @param array $value
+     *
+     * @return boolean
+     */
     protected function shouldEval($value)
     {
         switch ($value[0]) {
@@ -1185,6 +1390,14 @@ class Compiler
         return false;
     }
 
+    /**
+     * Reduce value
+     *
+     * @param array   $value
+     * @param boolean $inExp
+     *
+     * @return array
+     */
     protected function reduce($value, $inExp = false)
     {
         list($type) = $value;
@@ -1400,11 +1613,25 @@ class Compiler
         }
     }
 
+    /**
+     * Normalize name
+     *
+     * @param string $name
+     *
+     * @return string
+     */
     protected function normalizeName($name)
     {
         return str_replace('-', '_', $name);
     }
 
+    /**
+     * Normalize value
+     *
+     * @param array $value
+     *
+     * @return array
+     */
     public function normalizeValue($value)
     {
         $value = $this->coerceForExpression($this->reduce($value));
@@ -1435,7 +1662,13 @@ class Compiler
         }
     }
 
-    // just does physical lengths for now
+    /**
+     * Normalize number; just does physical lengths for now
+     *
+     * @param array $number
+     *
+     * @return array
+     */
     protected function normalizeNumber($number)
     {
         list(, $value, $unit) = $number;
@@ -1449,21 +1682,53 @@ class Compiler
         return $number;
     }
 
+    /**
+     * Add numbers
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opAddNumberNumber($left, $right)
     {
         return array('number', $left[1] + $right[1], $left[2]);
     }
 
+    /**
+     * Multiply numbers
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opMulNumberNumber($left, $right)
     {
         return array('number', $left[1] * $right[1], $left[2]);
     }
 
+    /**
+     * Subtract numbers
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opSubNumberNumber($left, $right)
     {
         return array('number', $left[1] - $right[1], $left[2]);
     }
 
+    /**
+     * Divide numbers
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opDivNumberNumber($left, $right)
     {
         if ($right[1] == 0) {
@@ -1473,12 +1738,27 @@ class Compiler
         return array('number', $left[1] / $right[1], $left[2]);
     }
 
+    /**
+     * Mod numbers
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opModNumberNumber($left, $right)
     {
         return array('number', $left[1] % $right[1], $left[2]);
     }
 
-    // adding strings
+    /**
+     * Add strings
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opAdd($left, $right)
     {
         if ($strLeft = $this->coerceString($left)) {
@@ -1502,6 +1782,15 @@ class Compiler
         }
     }
 
+    /**
+     * Boolean and
+     *
+     * @param array   $left
+     * @param array   $right
+     * @param boolean $shouldEval
+     *
+     * @return array
+     */
     protected function opAnd($left, $right, $shouldEval)
     {
         if (! $shouldEval) {
@@ -1515,6 +1804,15 @@ class Compiler
         return $left;
     }
 
+    /**
+     * Boolean or
+     *
+     * @param array   $left
+     * @param array   $right
+     * @param boolean $shouldEval
+     *
+     * @return array
+     */
     protected function opOr($left, $right, $shouldEval)
     {
         if (! $shouldEval) {
@@ -1528,6 +1826,15 @@ class Compiler
         return $right;
     }
 
+    /**
+     * Compare colors
+     *
+     * @param string $op
+     * @param array  $left
+     * @param array  $right
+     *
+     * @return array
+     */
     protected function opColorColor($op, $left, $right)
     {
         $out = array('color');
@@ -1581,6 +1888,15 @@ class Compiler
         return $this->fixColor($out);
     }
 
+    /**
+     * Compare color and number
+     *
+     * @param string $op
+     * @param array  $left
+     * @param array  $right
+     *
+     * @return array
+     */
     protected function opColorNumber($op, $left, $right)
     {
         $value = $right[1];
@@ -1592,6 +1908,15 @@ class Compiler
         );
     }
 
+    /**
+     * Compare number and color
+     *
+     * @param string $op
+     * @param array  $left
+     * @param array  $right
+     *
+     * @return array
+     */
     protected function opNumberColor($op, $left, $right)
     {
         $value = $left[1];
@@ -1603,6 +1928,14 @@ class Compiler
         );
     }
 
+    /**
+     * Compare number1 == number2
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opEq($left, $right)
     {
         if (($lStr = $this->coerceString($left)) && ($rStr = $this->coerceString($right))) {
@@ -1616,6 +1949,14 @@ class Compiler
         return $this->toBool($left == $right);
     }
 
+    /**
+     * Compare number1 != number2
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opNeq($left, $right)
     {
         if (($lStr = $this->coerceString($left)) && ($rStr = $this->coerceString($right))) {
@@ -1629,26 +1970,67 @@ class Compiler
         return $this->toBool($left != $right);
     }
 
+    /**
+     * Compare number1 >= number2
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opGteNumberNumber($left, $right)
     {
         return $this->toBool($left[1] >= $right[1]);
     }
 
+    /**
+     * Compare number1 > number2
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opGtNumberNumber($left, $right)
     {
         return $this->toBool($left[1] > $right[1]);
     }
 
+    /**
+     * Compare number1 <= number2
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opLteNumberNumber($left, $right)
     {
         return $this->toBool($left[1] <= $right[1]);
     }
 
+    /**
+     * Compare number1 < number2
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
     protected function opLtNumberNumber($left, $right)
     {
         return $this->toBool($left[1] < $right[1]);
     }
 
+    /**
+     * Cast to boolean
+     *
+     * @api
+     *
+     * @param mixed $thing
+     *
+     * @return array
+     */
     public function toBool($thing)
     {
         return $thing ? self::$true : self::$false;
@@ -1664,6 +2046,8 @@ class Compiler
      *
      * The input is expected to be reduced. This function will not work on
      * things like expressions and variables.
+     *
+     * @api
      *
      * @param array $value
      *
@@ -1788,12 +2172,25 @@ class Compiler
         }
     }
 
+    /**
+     * Flatten list
+     *
+     * @param array $list
+     *
+     * @return string
+     */
     protected function flattenList($list)
     {
-        // temporary
         return $this->compileValue($list);
     }
 
+    /**
+     * Compile string content
+     *
+     * @param array $string
+     *
+     * @return string
+     */
     protected function compileStringContent($string)
     {
         $parts = array();
@@ -1809,7 +2206,13 @@ class Compiler
         return implode($parts);
     }
 
-    // doesn't need to be recursive, compileValue will handle that
+    /**
+     * Extract interpolation; it doesn't need to be recursive, compileValue will handle that
+     *
+     * @param array $list
+     *
+     * @return array
+     */
     protected function extractInterpolation($list)
     {
         $items = $list[2];
@@ -1826,7 +2229,13 @@ class Compiler
         return $list;
     }
 
-    // find the final set of selectors
+    /**
+     * Find the final set of selectors
+     *
+     * @param \stdClass $env
+     *
+     * @return array
+     */
     protected function multiplySelectors($env)
     {
         $envs = array();
@@ -1857,7 +2266,14 @@ class Compiler
         return $selectors;
     }
 
-    // looks for & to replace, or append parent before child
+    /**
+     * Join selectors; looks for & to replace, or append parent before child
+     *
+     * @param array $parent
+     * @param array $child
+     *
+     * @return array
+     */
     protected function joinSelectors($parent, $child)
     {
         $setSelf = false;
@@ -1891,6 +2307,14 @@ class Compiler
         return $setSelf ? $out : array_merge($parent, $child);
     }
 
+    /**
+     * Multiply media
+     *
+     * @param \stdClass $env
+     * @param array     $childQueries
+     *
+     * @return array
+     */
     protected function multiplyMedia($env, $childQueries = null)
     {
         if (! isset($env) ||
@@ -1921,6 +2345,13 @@ class Compiler
         return $this->multiplyMedia($env->parent, $childQueries);
     }
 
+    /**
+     * Push environment
+     *
+     * @param \stdClass $block
+     *
+     * @return \stdClass
+     */
     protected function pushEnv($block = null)
     {
         $env = new \stdClass;
@@ -1934,6 +2365,9 @@ class Compiler
         return $env;
     }
 
+    /**
+     * Pop environment
+     */
     protected function popEnv()
     {
         $env = $this->env;
@@ -1942,11 +2376,24 @@ class Compiler
         return $env;
     }
 
+    /**
+     * Get store environment
+     *
+     * @return \stdClass
+     */
     protected function getStoreEnv()
     {
         return isset($this->storeEnv) ? $this->storeEnv : $this->env;
     }
 
+    /**
+     * Set variable
+     *
+     * @param string    $name
+     * @param mixed     $value
+     * @param boolean   $shadow
+     * @param \stdClass $env
+     */
     protected function set($name, $value, $shadow = false, $env = null)
     {
         $name = $this->normalizeName($name);
@@ -1958,6 +2405,13 @@ class Compiler
         }
     }
 
+    /**
+     * Set existing variable
+     *
+     * @param string    $name
+     * @param mixed     $value
+     * @param \stdClass $env
+     */
     protected function setExisting($name, $value, $env = null)
     {
         if (! isset($env)) {
@@ -1971,6 +2425,13 @@ class Compiler
         }
     }
 
+    /**
+     * Set raw variable
+     *
+     * @param string    $name
+     * @param mixed     $value
+     * @param \stdClass $env
+     */
     protected function setRaw($name, $value, $env = null)
     {
         if (! isset($env)) {
@@ -1980,6 +2441,17 @@ class Compiler
         $env->store[$name] = $value;
     }
 
+    /**
+     * Get variable
+     *
+     * @api
+     *
+     * @param string    $name
+     * @param mixed     $defaultValue
+     * @param \stdClass $env
+     *
+     * @return mixed
+     */
     public function get($name, $defaultValue = null, $env = null)
     {
         $name = $this->normalizeName($name);
@@ -2003,6 +2475,14 @@ class Compiler
         return $defaultValue; // found nothing
     }
 
+    /**
+     * Has variable?
+     *
+     * @param string    $name
+     * @param \stdClass $env
+     *
+     * @return boolean
+     */
     protected function has($name, $env = null)
     {
         $value = $this->get($name, false, $env);
@@ -2010,6 +2490,11 @@ class Compiler
         return $value !== false;
     }
 
+    /**
+     * Inject variables
+     *
+     * @param array $args
+     */
     protected function injectVariables(array $args)
     {
         if (empty($args)) {
@@ -2034,6 +2519,8 @@ class Compiler
     /**
      * Set variables
      *
+     * @api
+     *
      * @param array $variables
      */
     public function setVariables(array $variables)
@@ -2044,6 +2531,8 @@ class Compiler
     /**
      * Unset variable
      *
+     * @api
+     *
      * @param string $name
      */
     public function unsetVariable($name)
@@ -2051,11 +2540,25 @@ class Compiler
         unset($this->registeredVars[$name]);
     }
 
+    /**
+     * Returns list of parsed files
+     *
+     * @api
+     *
+     * @return array
+     */
     public function getParsedFiles()
     {
         return $this->parsedFiles;
     }
 
+    /**
+     * Add import path
+     *
+     * @api
+     *
+     * @param string $path
+     */
     public function addImportPath($path)
     {
         if (! in_array($path, $this->importPaths)) {
@@ -2063,36 +2566,85 @@ class Compiler
         }
     }
 
+    /**
+     * Set import paths
+     *
+     * @api
+     *
+     * @param string|array $path
+     */
     public function setImportPaths($path)
     {
         $this->importPaths = (array)$path;
     }
 
+    /**
+     * Set number precision
+     *
+     * @api
+     *
+     * @param integer $numberPrecision
+     */
     public function setNumberPrecision($numberPrecision)
     {
         $this->numberPrecision = $numberPrecision;
     }
 
+    /**
+     * Set formatter
+     *
+     * @api
+     *
+     * @param string $formatterName
+     */
     public function setFormatter($formatterName)
     {
         $this->formatter = $formatterName;
     }
 
+    /**
+     * Set line number style
+     *
+     * @api
+     *
+     * @param string $lineNumberStyle
+     */
     public function setLineNumberStyle($lineNumberStyle)
     {
         $this->lineNumberStyle = $lineNumberStyle;
     }
 
+    /**
+     * Register function
+     *
+     * @api
+     *
+     * @param string   $name
+     * @param callable $func
+     */
     public function registerFunction($name, $func)
     {
         $this->userFunctions[$this->normalizeName($name)] = $func;
     }
 
+    /**
+     * Unregister function
+     *
+     * @api
+     *
+     * @param string $name
+     */
     public function unregisterFunction($name)
     {
         unset($this->userFunctions[$this->normalizeName($name)]);
     }
 
+    /**
+     * Import file
+     *
+     * @param string $path
+     * @param array  $out
+     */
     protected function importFile($path, $out)
     {
         // see if tree is cached
@@ -2115,7 +2667,15 @@ class Compiler
         array_shift($this->importPaths);
     }
 
-    // results the file path for an import url if it exists
+    /**
+     * Return the file path for an import url if it exists
+     *
+     * @api
+     *
+     * @param string $url
+     *
+     * @return string|null
+     */
     public function findImport($url)
     {
         $urls = array();
@@ -2155,6 +2715,8 @@ class Compiler
 
     /**
      * Throw error (exception)
+     *
+     * @api
      *
      * @param string $msg Message with optional sprintf()-style vararg parameters
      *
@@ -2261,9 +2823,16 @@ class Compiler
         return array($this, $libName);
     }
 
-
-    // sorts any keyword arguments
-    // TODO: merge with apply arguments?
+    /**
+     * Sorts keyword arguments
+     *
+     * @todo Merge with applyArguments()?
+     *
+     * @param array $prototype
+     * @param array $args
+     *
+     * @return array
+     */
     protected function sortArgs($prototype, $args)
     {
         $keyArgs = array();
@@ -2311,6 +2880,14 @@ class Compiler
         return $finalArgs;
     }
 
+    /**
+     * Apply argument values per definition
+     *
+     * @param array $argDef
+     * @param array $argValues
+     *
+     * @throws \Exception
+     */
     protected function applyArguments($argDef, $argValues)
     {
         $storeEnv = $this->getStoreEnv();
@@ -2406,7 +2983,14 @@ class Compiler
         }
     }
 
-    // $number should be normalized
+    /**
+     * Coerce unit on number to be normalized
+     *
+     * @param array  $number
+     * @param string $unit
+     *
+     * @return array
+     */
     protected function coerceUnit($number, $unit)
     {
         list(, $value, $baseUnit) = $number;
@@ -2469,6 +3053,13 @@ class Compiler
         return array('list', $delim, ! isset($item) ? array(): array($item));
     }
 
+    /**
+     * Coerce color for expression
+     *
+     * @param array $value
+     *
+     * @return array|null
+     */
     protected function coerceForExpression($value)
     {
         if ($color = $this->coerceColor($value)) {
@@ -2478,6 +3069,13 @@ class Compiler
         return $value;
     }
 
+    /**
+     * Coerce value to color
+     *
+     * @param array $value
+     *
+     * @return array|null
+     */
     protected function coerceColor($value)
     {
         switch ($value[0]) {
@@ -2501,6 +3099,13 @@ class Compiler
         return null;
     }
 
+    /**
+     * Coerce value to string
+     *
+     * @param array $value
+     *
+     * @return array|null
+     */
     protected function coerceString($value)
     {
         switch ($value[0]) {
@@ -2517,6 +3122,13 @@ class Compiler
         return null;
     }
 
+    /**
+     * Coerce value to a percentage
+     *
+     * @param array $value
+     *
+     * @return integer|float
+     */
     protected function coercePercent($value)
     {
         if ($value[0] == 'number') {
@@ -2530,6 +3142,17 @@ class Compiler
         return 0;
     }
 
+    /**
+     * Assert value is a map
+     *
+     * @api
+     *
+     * @param array $value
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
     public function assertMap($value)
     {
         $value = $this->coerceMap($value);
@@ -2541,6 +3164,17 @@ class Compiler
         return $value;
     }
 
+    /**
+     * Assert value is a list
+     *
+     * @api
+     *
+     * @param array $value
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
     public function assertList($value)
     {
         if ($value[0] != 'list') {
@@ -2550,6 +3184,17 @@ class Compiler
         return $value;
     }
 
+    /**
+     * Assert value is a color
+     *
+     * @api
+     *
+     * @param array $value
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
     public function assertColor($value)
     {
         if ($color = $this->coerceColor($value)) {
@@ -2559,6 +3204,17 @@ class Compiler
         $this->throwError('expecting color');
     }
 
+    /**
+     * Assert value is a number
+     *
+     * @api
+     *
+     * @param array $value
+     *
+     * @return integer|float
+     *
+     * @throws \Exception
+     */
     public function assertNumber($value)
     {
         if ($value[0] != 'number') {
@@ -2568,7 +3224,13 @@ class Compiler
         return $value[1];
     }
 
-    // make sure a color's components don't go out of bounds
+    /**
+     * Make sure a color's components don't go out of bounds
+     *
+     * @param array $c
+     *
+     * @return array
+     */
     protected function fixColor($c)
     {
         foreach (range(1, 3) as $i) {
@@ -2584,6 +3246,17 @@ class Compiler
         return $c;
     }
 
+    /**
+     * Convert RGB to HSL
+     *
+     * @api
+     *
+     * @param integer $red
+     * @param integer $green
+     * @param integer $blue
+     *
+     * @return array
+     */
     public function toHSL($red, $green, $blue)
     {
         $min = min($red, $green, $blue);
@@ -2613,7 +3286,16 @@ class Compiler
         return array('hsl', fmod($h, 360), $s * 100, $l / 5.1);
     }
 
-    public function hueToRGB($m1, $m2, $h)
+    /**
+     * Hue to RGB helper
+     *
+     * @param float $m1
+     * @param float $m2
+     * @param float $h
+     *
+     * @return float
+     */
+    private function hueToRGB($m1, $m2, $h)
     {
         if ($h < 0) {
             $h += 1;
@@ -2636,7 +3318,17 @@ class Compiler
         return $m1;
     }
 
-    // H from 0 to 360, S and L from 0 to 100
+    /**
+     * Convert HSL to RGB
+     *
+     * @api
+     *
+     * @param integer $hue        H from 0 to 360
+     * @param integer $saturation S from 0 to 100
+     * @param integer $lightness  L from 0 to 100
+     *
+     * @return array
+     */
     public function toRGB($hue, $saturation, $lightness)
     {
         if ($hue < 0) {
@@ -3202,6 +3894,13 @@ class Compiler
         return $args[$max[0]];
     }
 
+    /**
+     * Helper to normalize args containing numbers
+     *
+     * @param array $args
+     *
+     * @return array
+     */
     protected function getNormalizedNumbers($args)
     {
         $unit = null;

@@ -59,6 +59,7 @@ abstract class Formatter
      * Return indentation (whitespace)
      *
      * @param integer $n
+     *
      * @return string
      */
     protected function indentStr($n = 0)
@@ -71,6 +72,7 @@ abstract class Formatter
      *
      * @param string $name
      * @param mixed  $value
+     *
      * @return string
      */
     public function property($name, $value)
@@ -149,6 +151,7 @@ abstract class Formatter
      * Entry point to formatting a block
      *
      * @param \stdClass $block An abstract syntax tree
+     *
      * @return string
      */
     public function format($block)
