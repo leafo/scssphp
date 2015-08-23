@@ -407,10 +407,8 @@ class Compiler
 
             foreach ($origin as $j => $new) {
                 // prevent infinite loop when target extends itself
-                foreach ($new as $new_selector) {
-                    if ($single === $new_selector) {
-                        return false;
-                    }
+                if ($this->isSelfExtend($single, $origin)) {
+                    return false;
                 }
 
                 $origin[$j][count($origin[$j]) - 1] = $this->combineSelectorSingle(end($new), $rem);
