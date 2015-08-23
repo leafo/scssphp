@@ -269,13 +269,14 @@ class Compiler
             if ($this->matchExtendsSingle($part, $origin)) {
                 $before = array_slice($selector, 0, $i);
                 $after = array_slice($selector, $i + 1);
+                $s = count($before);
 
                 foreach ($origin as $new) {
                     $k = 0;
 
                     // remove shared parts
                     if ($initial) {
-                        while (isset($new[$k]) && $before[$k] === $new[$k]) {
+                        while ($k < $s && isset($new[$k]) && $before[$k] === $new[$k]) {
                             $k++;
                         }
                     }
