@@ -29,5 +29,16 @@
         "phpunit/phpunit": "~3.7",
         "kherge/box": "~2.5"
     },
-    "bin": ["bin/pscss"]
+    "bin": ["bin/pscss"],
+    "archive": {
+        "exclude": [
+            "/Makefile",
+            "/.gitattributes",
+            "/.gitignore",
+            "/.travis.yml",
+            "/box.json.dist",
+            "/phpunit.xml.dist",
+            "/tests"
+        ]
+    }
 }
