@@ -2744,17 +2744,17 @@ class Compiler
      */
     private function handleImportLoop($name)
     {
-       for ($env = $this->env; $env; $env = $env->parent) {
-           $file = $env->block->sourceParser->getSourceName();
+        for ($env = $this->env; $env; $env = $env->parent) {
+            $file = $env->block->sourceParser->getSourceName();
 
-           if (realpath($file) === $name) {
-               $this->throwError(
-                   'An @import loop has been found: %s imports %s',
-                   $this->env->block->sourceParser->getSourceName(),
-                   basename($file)
-               );
-           }
-       }
+            if (realpath($file) === $name) {
+                $this->throwError(
+                    'An @import loop has been found: %s imports %s',
+                    $this->env->block->sourceParser->getSourceName(),
+                    basename($file)
+                );
+            }
+        }
     }
 
     /**
