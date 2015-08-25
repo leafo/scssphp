@@ -2649,6 +2649,8 @@ class Compiler
         $realPath = realpath($path);
 
         if (isset($this->importCache[$realPath])) {
+            $this->handleImportLoop($realPath);
+
             $tree = $this->importCache[$realPath];
         } else {
             $code = file_get_contents($path);
@@ -2731,6 +2733,28 @@ class Compiler
         }
 
         throw new \Exception($msg);
+    }
+
+    /**
+     * Handle import loop
+     *
+     * @param string $name
+     *
+     * @throws \Exception
+     */
+    private function handleImportLoop($name)
+    {
+       for ($env = $this->env; $env; $env = $env->parent) {
+           $file = $env->block->sourceParser->getSourceName();
+
+           if (realpath($file) === $name) {
+               $this->throwError(
+                   'An @import loop has been found: %s imports %s',
+                   $this->env->block->sourceParser->getSourceName(),
+                   basename($file)
+               );
+           }
+       }
     }
 
     /**
