@@ -38,6 +38,10 @@ If you use [Packagist][2] for installing packages, then you can update your `com
 }
 {% endhighlight %}
 
+Note: git archives of stable versions no longer include the `tests/` folder.
+To install the unit tests, download the complete package source using `composer`'s
+`--prefer-source` option.
+
 <a name="quickstart"></a>
 
 ## Language Reference
@@ -118,6 +122,10 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
+* **0.2.0** -- August 25, 2015
+  * Smaller git archives
+  * Detect {% raw %}@{% endraw %}import loops
+  * Doc blocks everywhere!
 * **0.1.10** -- August 23, 2015
   * Fix 3 year old {% raw %}@{% endraw %}extend bug
   * Fix autoloader. (ext)
