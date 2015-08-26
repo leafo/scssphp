@@ -6,7 +6,6 @@ description: >
 url: http://leafo.github.io
 baseurl: /scssphp/
 repo_url: https://github.com/leafo/scssphp
-twitter_username: moonscript
 
 # Build settings
 markdown: kramdown

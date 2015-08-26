@@ -11,8 +11,6 @@ features.
 **scssphp** is ready for inclusion in any project. It includes a command
 line tool for running the compiler from a terminal/shell or script.
 
-Follow the author on twitter: [@{{ site.twitter_username }}](http://twitter.com/{{ site.twitter_username }}).
-
 <div class="github-buttons">
 <iframe src="http://ghbtns.com/github-btn.html?user=leafo&repo=scssphp&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
 <iframe src="http://ghbtns.com/github-btn.html?user=leafo&repo=scssphp&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="95px" height="20px"></iframe>
