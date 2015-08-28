@@ -680,16 +680,22 @@ class Compiler
      */
     protected function collapseSelectors($selectors)
     {
-        $output = '';
+        $parts = array();
 
-        array_walk_recursive(
-            $selectors,
-            function ($value, $key) use (&$output) {
-                $output .= $value;
-            }
-        );
+        foreach ($selectors as $selector) {
+            $output = '';
 
-        return $output;
+            array_walk_recursive(
+                $selector,
+                function ($value, $key) use (&$output) {
+                    $output .= $value;
+                }
+            );
+
+            $parts[] = $output;
+        }
+
+        return implode(', ', $parts);;
     }
 
     /**

@@ -65,3 +65,6 @@ div {
 /* line 86, inputs/interpolation.scss */
 body {
   color: 3; }
+/* line 91, inputs/interpolation.scss */
+foo, x, y {
+  color: #abc; }

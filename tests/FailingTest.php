@@ -155,17 +155,6 @@ END_OF_SCSS
     transform: scale(1); } }
 END_OF_EXPECTED
             ),
-            array(
-                '#316 - swallowed comma before interpolation', <<<'END_OF_SCSS'
-foo, #{x, y} {
-    color: #abc;
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-foo, x, y {
-  color: #abc; }
-END_OF_EXPECTED
-            ),
 /*************************************************************
             array(
                 '', <<<'END_OF_SCSS'

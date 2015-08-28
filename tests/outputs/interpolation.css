@@ -55,3 +55,6 @@ div {
 
 body {
   color: 3; }
+
+foo, x, y {
+  color: #abc; }

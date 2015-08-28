@@ -87,3 +87,7 @@ body{
     $test : "1", "2", "3", "4", "5";
     color : index($test, "#{3}");
 }
+
+foo, #{x, y} {
+    color: #abc;
+}
