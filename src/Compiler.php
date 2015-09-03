@@ -2159,9 +2159,9 @@ class Compiler
                 $reduced = $this->reduce($exp);
                 switch ($reduced[0]) {
                     case 'string':
-                        $reduced = array('keyword',
-                            $this->compileStringContent($reduced));
+                        $reduced = array('keyword', $this->compileStringContent($reduced));
                         break;
+
                     case 'null':
                         $reduced = array('keyword', '');
                 }
@@ -3145,6 +3145,12 @@ class Compiler
 
             case 'keyword':
                 return array('string', '', array($value[1]));
+
+            case 'number':
+                return array('string', '', array(round($value[1], $this->numberPrecision) . $value[2]));
+
+            case 'null':
+                return array('string', '', array(''));
         }
 
         return null;
