@@ -3136,24 +3136,11 @@ class Compiler
      */
     protected function coerceString($value)
     {
-        switch ($value[0]) {
-            case 'string':
-                return $value;
-
-            case 'function':
-                return array('string', '', array($value[1] . '(' . $this->flattenList($value[2]) . ')'));
-
-            case 'keyword':
-                return array('string', '', array($value[1]));
-
-            case 'number':
-                return array('string', '', array(round($value[1], $this->numberPrecision) . $value[2]));
-
-            case 'null':
-                return array('string', '', array(''));
+        if ($value[0] === 'string') {
+            return $value;
         }
 
-        return null;
+        return array('string', '', array($this->compileValue($value)));
     }
 
     /**
