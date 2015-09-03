@@ -2197,17 +2197,20 @@ class Compiler
      */
     protected function compileStringContent($string)
     {
-        $parts = array();
-
-        foreach ($string[2] as $part) {
-            if (is_array($part)) {
-                $parts[] = $this->compileValue($part);
-            } else {
-                $parts[] = $part;
-            }
-        }
-
-        return implode($parts);
+        
+ 		if(is_array($string[2])) {
+             return implode(
+                array_map(function($part) {
+                    if (is_array($part)) {
+                        return $this->compileValue($part);
+                    } else {
+                        return $part;
+                    }
+                }, $string[2])
+            );
+ 		}
+ 		
+ 		//TODO: make else condition
     }
 
     /**
