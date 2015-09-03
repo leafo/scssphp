@@ -7,7 +7,7 @@ div {
   baz: (color: #fff, color2: red, 'color3': #0f0, length: 40em);
   foo: (length: 40em);
   bar: true; }
-/* line 22, inputs/map.scss */
+/* line 23, inputs/map.scss */
 div {
   foo: color black;
   bar: color; }

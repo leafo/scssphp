@@ -4027,7 +4027,7 @@ class Compiler
             }
         }
 
-        return self::$defaultValue;
+        return self::$null;
     }
 
     protected static $libMapKeys = array('map');

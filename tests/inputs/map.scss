@@ -16,6 +16,7 @@ div {
     baz: map_merge($map, $map2);
     foo: map_remove($map2, color);
     bar: if(map_has_key($map, color), true, false);
+    suppress: map_get($map, null);
 }
 
 // List functions
