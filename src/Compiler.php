@@ -295,7 +295,7 @@ class Compiler
                 $block->selectors[] = $this->compileSelector($selector);
             }
 
-            if ($placeholderSelector && 0 == count($block->selectors) && null !== $parentKey) {
+            if ($placeholderSelector && 0 === count($block->selectors) && null !== $parentKey) {
                 unset($block->parent->children[$parentKey]);
 
                 return;
@@ -343,7 +343,7 @@ class Compiler
                         $after
                     );
 
-                    if ($result == $selector) {
+                    if ($result === $selector) {
                         continue;
                     }
 
@@ -399,7 +399,7 @@ class Compiler
             list($target, $origin) = $this->extends[$idx];
 
             // check count
-            if ($count != count($target)) {
+            if ($count !== count($target)) {
                 continue;
             }
 
@@ -507,7 +507,7 @@ class Compiler
     protected function mediaParent($scope)
     {
         while (! empty($scope->parent)) {
-            if (! empty($scope->type) && $scope->type != 'media') {
+            if (! empty($scope->type) && $scope->type !== 'media') {
                 break;
             }
 
@@ -793,7 +793,7 @@ class Compiler
 
         foreach ($selector as $parts) {
             foreach ($parts as $part) {
-                if ('%' == $part[0]) {
+                if ('%' === $part[0]) {
                     return true;
                 }
             }
@@ -927,27 +927,27 @@ class Compiler
             $t2 = strtolower($type2[0]);
         }
 
-        if (($m1 == 'not') ^ ($m2 == 'not')) {
-            if ($t1 == $t2) {
+        if (($m1 === 'not') ^ ($m2 === 'not')) {
+            if ($t1 === $t2) {
                 return null;
             }
 
             return array(
-                $m1 == 'not' ? $m2 : $m1,
-                $m1 == 'not' ? $t2 : $t1
+                $m1 === 'not' ? $m2 : $m1,
+                $m1 === 'not' ? $t2 : $t1
             );
         }
 
-        if ($m1 == 'not' && $m2 == 'not') {
+        if ($m1 === 'not' && $m2 === 'not') {
             // CSS has no way of representing "neither screen nor print"
-            if ($t1 != $t2) {
+            if ($t1 !== $t2) {
                 return null;
             }
 
             return array('not', $t1);
         }
 
-        if ($t1 != $t2) {
+        if ($t1 !== $t2) {
             return null;
         }
 
@@ -965,7 +965,7 @@ class Compiler
      */
     protected function compileImport($rawPath, $out)
     {
-        if ($rawPath[0] == 'string') {
+        if ($rawPath[0] === 'string') {
             $path = $this->compileStringContent($rawPath);
 
             if ($path = $this->findImport($path)) {
@@ -977,14 +977,14 @@ class Compiler
             return false;
         }
 
-        if ($rawPath[0] == 'list') {
+        if ($rawPath[0] === 'list') {
             // handle a list of strings
-            if (count($rawPath[2]) == 0) {
+            if (count($rawPath[2]) === 0) {
                 return false;
             }
 
             foreach ($rawPath[2] as $path) {
-                if ($path[0] != 'string') {
+                if ($path[0] !== 'string') {
                     return false;
                 }
             }
@@ -1054,7 +1054,7 @@ class Compiler
             case 'assign':
                 list(, $name, $value) = $child;
 
-                if ($name[0] == 'var') {
+                if ($name[0] === 'var') {
                     $flag = isset($child[3]) ? $child[3] : null;
                     $isDefault = $flag === '!default';
                     $isGlobal = $flag === '!global';
@@ -1067,7 +1067,7 @@ class Compiler
 
                     if ($isDefault) {
                         $existingValue = $this->get($name[1], true);
-                        $shouldSet = $existingValue === true || $existingValue == self::$null;
+                        $shouldSet = $existingValue === true || $existingValue === self::$null;
                     }
 
                     if (! $isDefault || $shouldSet) {
@@ -1093,10 +1093,10 @@ class Compiler
 
                 // if the value reduces to null from something else then
                 // the property should be discarded
-                if ($value[0] != 'null') {
+                if ($value[0] !== 'null') {
                     $value = $this->reduce($value);
 
-                    if ($value[0] == 'null') {
+                    if ($value[0] === 'null') {
                         break;
                     }
                 }
@@ -1110,7 +1110,7 @@ class Compiler
                 break;
 
             case 'comment':
-                if ($out->type == 'root') {
+                if ($out->type === 'root') {
                     $this->compileComment($child);
                     break;
                 }
@@ -1131,7 +1131,9 @@ class Compiler
                 foreach ($selectors as $sel) {
                     // only use the first one
                     $result = $this->evalSelectors(array($sel));
-                    $this->pushExtends(current($result[0]), $out->selectors);
+                    $result = current($result[0]);
+
+                    $this->pushExtends($result, $out->selectors);
                 }
                 break;
 
@@ -1143,8 +1145,8 @@ class Compiler
                 }
 
                 foreach ($if->cases as $case) {
-                    if ($case->type == 'else' ||
-                        $case->type == 'elseif' && $this->isTruthy($this->reduce($case->cond))
+                    if ($case->type === 'else' ||
+                        $case->type === 'elseif' && $this->isTruthy($this->reduce($case->cond))
                     ) {
                         return $this->compileChildren($case->children, $out);
                     }
@@ -1162,7 +1164,7 @@ class Compiler
                 foreach ($list[2] as $item) {
                     $this->pushEnv();
 
-                    if (count($each->vars) == 1) {
+                    if (count($each->vars) === 1) {
                         $this->set($each->vars[0], $item);
                     } else {
                         list(,, $values) = $this->coerceList($item);
@@ -1228,11 +1230,11 @@ class Compiler
                 $prefix = $this->compileValue($prop->prefix) . '-';
 
                 foreach ($prop->children as $child) {
-                    if ($child[0] == 'assign') {
+                    if ($child[0] === 'assign') {
                         array_unshift($child[1][2], $prefix);
                     }
 
-                    if ($child[0] == 'nestedprop') {
+                    if ($child[0] === 'nestedprop') {
                         array_unshift($child[1]->prefix[2], $prefix);
                     }
 
@@ -1367,7 +1369,7 @@ class Compiler
      */
     protected function isTruthy($value)
     {
-        return $value != self::$false && $value != self::$null;
+        return $value !== self::$false && $value !== self::$null;
     }
 
     /**
@@ -1381,7 +1383,7 @@ class Compiler
     {
         switch ($value[0]) {
             case 'exp':
-                if ($value[1] == '/') {
+                if ($value[1] === '/') {
                     return $this->shouldEval($value[2], $value[3]);
                 }
 
@@ -1417,7 +1419,7 @@ class Compiler
                 $right = $this->reduce($right, true);
 
                 // special case: looks like css short-hand
-                if ($opName == 'div' && ! $inParens && ! $inExp && isset($right[2]) && $right[2] != '') {
+                if ($opName === 'div' && ! $inParens && ! $inExp && isset($right[2]) && $right[2] !== '') {
                     return $this->expToString($value);
                 }
 
@@ -1448,34 +1450,34 @@ class Compiler
                     $unitChange = false;
 
                     if (! isset($genOp) &&
-                        $left[0] == 'number' && $right[0] == 'number'
+                        $left[0] === 'number' && $right[0] === 'number'
                     ) {
-                        if ($opName == 'mod' && $right[2] != '') {
+                        if ($opName === 'mod' && $right[2] !== '') {
                             $this->throwError("Cannot modulo by a number with units: $right[1]$right[2].");
                         }
 
                         $unitChange = true;
-                        $emptyUnit = $left[2] == '' || $right[2] == '';
-                        $targetUnit = '' != $left[2] ? $left[2] : $right[2];
+                        $emptyUnit = $left[2] === '' || $right[2] === '';
+                        $targetUnit = '' !== $left[2] ? $left[2] : $right[2];
 
-                        if ($opName != 'mul') {
-                            $left[2] = '' != $left[2] ? $left[2] : $targetUnit;
-                            $right[2] = '' != $right[2] ? $right[2] : $targetUnit;
+                        if ($opName !== 'mul') {
+                            $left[2] = '' !== $left[2] ? $left[2] : $targetUnit;
+                            $right[2] = '' !== $right[2] ? $right[2] : $targetUnit;
                         }
 
-                        if ($opName != 'mod') {
+                        if ($opName !== 'mod') {
                             $left = $this->normalizeNumber($left);
                             $right = $this->normalizeNumber($right);
                         }
 
-                        if ($opName == 'div' && ! $emptyUnit && $left[2] == $right[2]) {
+                        if ($opName === 'div' && ! $emptyUnit && $left[2] === $right[2]) {
                             $targetUnit = '';
                         }
 
-                        if ($opName == 'mul') {
-                            $left[2] = '' != $left[2] ? $left[2] : $right[2];
-                            $right[2] = '' != $right[2] ? $right[2] : $left[2];
-                        } elseif ($opName == 'div' && $left[2] == $right[2]) {
+                        if ($opName === 'mul') {
+                            $left[2] = '' !== $left[2] ? $left[2] : $right[2];
+                            $right[2] = '' !== $right[2] ? $right[2] : $left[2];
+                        } elseif ($opName === 'div' && $left[2] === $right[2]) {
                             $left[2] = '';
                             $right[2] = '';
                         }
@@ -1490,7 +1492,7 @@ class Compiler
                     }
 
                     if (isset($out)) {
-                        if ($unitChange && $out[0] == 'number') {
+                        if ($unitChange && $out[0] === 'number') {
                             $out = $this->coerceUnit($out, $targetUnit);
                         }
 
@@ -1506,7 +1508,7 @@ class Compiler
                 $inExp = $inExp || $this->shouldEval($exp);
                 $exp = $this->reduce($exp);
 
-                if ($exp[0] == 'number') {
+                if ($exp[0] === 'number') {
                     switch ($op) {
                         case '+':
                             return $exp;
@@ -1518,9 +1520,9 @@ class Compiler
                     }
                 }
 
-                if ($op == 'not') {
+                if ($op === 'not') {
                     if ($inExp || $inParens) {
-                        if ($exp == self::$false) {
+                        if ($exp === self::$false) {
                             return self::$true;
                         }
 
@@ -1645,7 +1647,7 @@ class Compiler
             case 'list':
                 $value = $this->extractInterpolation($value);
 
-                if ($value[0] != 'list') {
+                if ($value[0] !== 'list') {
                     return array('keyword', $this->compileValue($value));
                 }
 
@@ -1766,7 +1768,7 @@ class Compiler
     protected function opAdd($left, $right)
     {
         if ($strLeft = $this->coerceString($left)) {
-            if ($right[0] == 'string') {
+            if ($right[0] === 'string') {
                 $right[1] = '';
             }
 
@@ -1776,7 +1778,7 @@ class Compiler
         }
 
         if ($strRight = $this->coerceString($right)) {
-            if ($left[0] == 'string') {
+            if ($left[0] === 'string') {
                 $left[1] = '';
             }
 
@@ -1801,7 +1803,7 @@ class Compiler
             return;
         }
 
-        if ($left != self::$false) {
+        if ($left !== self::$false) {
             return $right;
         }
 
@@ -1823,7 +1825,7 @@ class Compiler
             return;
         }
 
-        if ($left != self::$false) {
+        if ($left !== self::$false) {
             return $left;
         }
 
@@ -1950,7 +1952,7 @@ class Compiler
             $right = $this->compileValue($rStr);
         }
 
-        return $this->toBool($left == $right);
+        return $this->toBool($left === $right);
     }
 
     /**
@@ -1971,7 +1973,7 @@ class Compiler
             $right = $this->compileValue($rStr);
         }
 
-        return $this->toBool($left != $right);
+        return $this->toBool($left !== $right);
     }
 
     /**
@@ -2078,7 +2080,7 @@ class Compiler
                 $g = round($g);
                 $b = round($b);
 
-                if (count($value) == 5 && $value[4] != 1) { // rgba
+                if (count($value) === 5 && $value[4] !== 1) { // rgba
                     return 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $value[4] . ')';
                 }
 
@@ -2105,7 +2107,7 @@ class Compiler
             case 'list':
                 $value = $this->extractInterpolation($value);
 
-                if ($value[0] != 'list') {
+                if ($value[0] !== 'list') {
                     return $this->compileValue($value);
                 }
 
@@ -2114,7 +2116,7 @@ class Compiler
                 $filtered = array();
 
                 foreach ($items as $item) {
-                    if ($item[0] == 'null') {
+                    if ($item[0] === 'null') {
                         continue;
                     }
 
@@ -2222,7 +2224,7 @@ class Compiler
         $items = $list[2];
 
         foreach ($items as $i => $item) {
-            if ($item[0] == 'interpolate') {
+            if ($item[0] === 'interpolate') {
                 $before = array('list', $list[1], array_slice($items, 0, $i));
                 $after = array('list', $list[1], array_slice($items, $i + 1));
 
@@ -2287,7 +2289,7 @@ class Compiler
             $newPart = array();
 
             foreach ($part as $p) {
-                if ($p == self::$selfSelector) {
+                if ($p === self::$selfSelector) {
                     $setSelf = true;
 
                     foreach ($parent as $i => $parentPart) {
@@ -2322,7 +2324,7 @@ class Compiler
     protected function multiplyMedia($env, $childQueries = null)
     {
         if (! isset($env) ||
-            ! empty($env->block->type) && $env->block->type != 'media'
+            ! empty($env->block->type) && $env->block->type !== 'media'
         ) {
             return $childQueries;
         }
@@ -2333,7 +2335,7 @@ class Compiler
         }
 
         $parentQueries = $env->block->queryList;
-        if ($childQueries == null) {
+        if ($childQueries === null) {
             $childQueries = $parentQueries;
         } else {
             $originalQueries = $childQueries;
@@ -2697,7 +2699,7 @@ class Compiler
                 // check urls for normal import paths
                 foreach ($urls as $full) {
                     $full = $dir .
-                        (! empty($dir) && substr($dir, -1) != '/' ? '/' : '') .
+                        (! empty($dir) && substr($dir, -1) !== '/' ? '/' : '') .
                         $full;
 
                     if ($this->fileExists($file = $full . '.scss') ||
@@ -2953,10 +2955,10 @@ class Compiler
                 }
             } elseif (count($keywordArgs)) {
                 $this->throwError('Positional arguments must come before keyword arguments.');
-            } elseif ($arg[2] == true) {
+            } elseif ($arg[2] === true) {
                 $val = $this->reduce($arg[1], true);
 
-                if ($val[0] == 'list') {
+                if ($val[0] === 'list') {
                     foreach ($val[2] as $name => $item) {
                         if (! is_numeric($name)) {
                             $keywordArgs[$name] = $item;
@@ -3043,7 +3045,7 @@ class Compiler
             return $item;
         }
 
-        if ($item == self::$emptyList) {
+        if ($item === self::$emptyList) {
             return self::$emptyMap;
         }
 
@@ -3059,11 +3061,11 @@ class Compiler
      */
     protected function coerceList($item, $delim = ',')
     {
-        if (isset($item) && $item[0] == 'list') {
+        if (isset($item) && $item[0] === 'list') {
             return $item;
         }
 
-        if (isset($item) && $item[0] == 'map') {
+        if (isset($item) && $item[0] === 'map') {
             $keys = $item[1];
             $values = $item[2];
             $list = array();
@@ -3152,8 +3154,8 @@ class Compiler
      */
     protected function coercePercent($value)
     {
-        if ($value[0] == 'number') {
-            if ($value[2] == '%') {
+        if ($value[0] === 'number') {
+            if ($value[2] === '%') {
                 return $value[1] / 100;
             }
 
@@ -3178,7 +3180,7 @@ class Compiler
     {
         $value = $this->coerceMap($value);
 
-        if ($value[0] != 'map') {
+        if ($value[0] !== 'map') {
             $this->throwError('expecting map');
         }
 
@@ -3198,7 +3200,7 @@ class Compiler
      */
     public function assertList($value)
     {
-        if ($value[0] != 'list') {
+        if ($value[0] !== 'list') {
             $this->throwError('expecting list');
         }
 
@@ -3238,7 +3240,7 @@ class Compiler
      */
     public function assertNumber($value)
     {
-        if ($value[0] != 'number') {
+        if ($value[0] !== 'number') {
             $this->throwError('expecting number');
         }
 
@@ -3286,7 +3288,7 @@ class Compiler
         $l = $min + $max;
         $d = $max - $min;
 
-        if ((int) $d == 0) {
+        if ((int) $d === 0) {
             $h = $s = 0;
         } else {
             if ($l < 255) {
@@ -3391,7 +3393,7 @@ class Compiler
     {
         list($list, $value) = $args;
 
-        if ($value[0] == 'map') {
+        if ($value[0] === 'map') {
             return self::$null;
         }
 
@@ -3454,7 +3456,7 @@ class Compiler
         foreach (array(1, 2, 3, 7) as $i) {
             if (isset($args[$i])) {
                 $val = $this->assertNumber($args[$i]);
-                $ii = $i == 7 ? 4 : $i; // alpha
+                $ii = $i === 7 ? 4 : $i; // alpha
                 $color[$ii] = call_user_func($fn, isset($color[$ii]) ? $color[$ii] : 0, $val, $i);
             }
         }
@@ -3619,7 +3621,7 @@ class Compiler
         $w = $weight * 2 - 1;
         $a = $firstAlpha - $secondAlpha;
 
-        $w1 = (($w * $a == -1 ? $w : ($w + $a) / (1 + $w * $a)) + 1) / 2.0;
+        $w1 = (($w * $a === -1 ? $w : ($w + $a) / (1 + $w * $a)) + 1) / 2.0;
         $w2 = 1.0 - $w1;
 
         $new = array('color',
@@ -3824,7 +3826,7 @@ class Compiler
     {
         $str = $args[0];
 
-        if ($str[0] == 'string') {
+        if ($str[0] === 'string') {
             $str[1] = '';
         }
 
@@ -3836,7 +3838,7 @@ class Compiler
     {
         $value = $args[0];
 
-        if ($value[0] == 'string' && ! empty($value[1])) {
+        if ($value[0] === 'string' && ! empty($value[1])) {
             return $value;
         }
 
@@ -3929,7 +3931,7 @@ class Compiler
         $numbers = array();
 
         foreach ($args as $key => $item) {
-            if ('number' != $item[0]) {
+            if ('number' !== $item[0]) {
                 $this->throwError('%s is not a number', $item[0]);
             }
 
@@ -4152,7 +4154,7 @@ class Compiler
 
         switch ($value[0]) {
             case 'keyword':
-                if ($value == self::$true || $value == self::$false) {
+                if ($value === self::$true || $value === self::$false) {
                     return 'bool';
                 }
 
@@ -4180,7 +4182,7 @@ class Compiler
     {
         $num = $args[0];
 
-        if ($num[0] == 'number') {
+        if ($num[0] === 'number') {
             return array('string', '"', array($num[2]));
         }
 
@@ -4192,7 +4194,7 @@ class Compiler
     {
         $value = $args[0];
 
-        return $value[0] == 'number' && empty($value[2]);
+        return $value[0] === 'number' && empty($value[2]);
     }
 
     protected static $libComparable = array('number-1', 'number-2');
@@ -4200,14 +4202,14 @@ class Compiler
     {
         list($number1, $number2) = $args;
 
-        if (! isset($number1[0]) || $number1[0] != 'number' || ! isset($number2[0]) || $number2[0] != 'number') {
+        if (! isset($number1[0]) || $number1[0] !== 'number' || ! isset($number2[0]) || $number2[0] !== 'number') {
             $this->throwError('Invalid argument(s) for "comparable"');
         }
 
         $number1 = $this->normalizeNumber($number1);
         $number2 = $this->normalizeNumber($number2);
 
-        return $number1[2] == $number2[2] || $number1[2] == '' || $number2[2] == '';
+        return $number1[2] === $number2[2] || $number1[2] === '' || $number2[2] === '';
     }
 
     protected static $libStrIndex = array('string', 'substring');

@@ -141,7 +141,7 @@ class Parser
             ;
         }
 
-        if ($this->count != strlen($this->buffer)) {
+        if ($this->count !== strlen($this->buffer)) {
             $this->throwParseError();
         }
 
@@ -240,7 +240,7 @@ class Parser
         $s = $this->seek();
 
         // the directives
-        if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == '@') {
+        if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] === '@') {
             if ($this->literal('@media') && $this->mediaQueryList($mediaQueryList) && $this->literal('{')) {
                 $media = $this->pushSpecialBlock('media', $s);
                 $media->queryList = $mediaQueryList[2];
@@ -446,7 +446,7 @@ class Parser
 
             $last = $this->last();
 
-            if (isset($last) && $last[0] == 'if') {
+            if (isset($last) && $last[0] === 'if') {
                 list(, $if) = $last;
 
                 if ($this->literal('@else')) {
@@ -580,7 +580,7 @@ class Parser
         if ($this->literal('}')) {
             $block = $this->popBlock();
 
-            if (isset($block->type) && $block->type == 'include') {
+            if (isset($block->type) && $block->type === 'include') {
                 $include = $block->child;
                 unset($block->child);
                 $include[3] = $block;
@@ -645,7 +645,7 @@ class Parser
 
         // shortcut on single letter
         if (! isset($what[1]) && isset($this->buffer[$this->count])) {
-            if ($this->buffer[$this->count] == $what) {
+            if ($this->buffer[$this->count] === $what) {
                 if (! $eatWhitespace) {
                     $this->count++;
 
@@ -987,13 +987,13 @@ class Parser
             }
         }
 
-        if (count($items) == 0) {
+        if (count($items) === 0) {
             $this->seek($s);
 
             return false;
         }
 
-        if ($flatten && count($items) == 1) {
+        if ($flatten && count($items) === 1) {
             $out = $items[0];
         } else {
             $out = array('list', $delim, $items);
@@ -1146,7 +1146,7 @@ class Parser
         }
 
         if ($this->keyword($keyword)) {
-            if ($keyword == 'null') {
+            if ($keyword === 'null') {
                 $out = array('null');
             } else {
                 $out = array('keyword', $keyword);
@@ -1239,13 +1239,13 @@ class Parser
         if ($this->keyword($name, false) &&
             $this->literal('(')
         ) {
-            if ($name == 'alpha' && $this->argumentList($args)) {
+            if ($name === 'alpha' && $this->argumentList($args)) {
                 $func = array('function', $name, array('string', '', $args));
 
                 return true;
             }
 
-            if ($name != 'expression' && ! preg_match('/^(-[a-z]+-)?calc$/', $name)) {
+            if ($name !== 'expression' && ! preg_match('/^(-[a-z]+-)?calc$/', $name)) {
                 $ss = $this->seek();
 
                 if ($this->argValues($args) && $this->literal(')')) {
@@ -1498,7 +1498,7 @@ class Parser
         while ($this->matchString($m, $delim)) {
             $content[] = $m[1];
 
-            if ($m[2] == '#{') {
+            if ($m[2] === '#{') {
                 $this->count -= strlen($m[2]);
 
                 if ($this->interpolation($inter, false)) {
@@ -1507,7 +1507,7 @@ class Parser
                     $this->count += strlen($m[2]);
                     $content[] = '#{'; // ignore it
                 }
-            } elseif ($m[2] == '\\') {
+            } elseif ($m[2] === '\\') {
                 $content[] = $m[2];
 
                 if ($this->literal($delim, false)) {
@@ -1564,7 +1564,7 @@ class Parser
 
         $this->eatWhiteDefault = $oldWhite;
 
-        if (count($parts) == 0) {
+        if (count($parts) === 0) {
             return false;
         }
 
@@ -1614,16 +1614,16 @@ class Parser
 
             $this->count-= strlen($tok);
 
-            if ($tok == $end && ! $nestingLevel--) {
+            if ($tok === $end && ! $nestingLevel--) {
                 break;
             }
 
-            if (($tok == '\'' || $tok == '"') && $this->string($str)) {
+            if (($tok === '\'' || $tok === '"') && $this->string($str)) {
                 $content[] = $str;
                 continue;
             }
 
-            if ($tok == '#{' && $this->interpolation($inter)) {
+            if ($tok === '#{' && $this->interpolation($inter)) {
                 $content[] = $inter;
                 continue;
             }
@@ -1634,7 +1634,7 @@ class Parser
 
         $this->eatWhiteDefault = $oldWhite;
 
-        if (count($content) == 0) {
+        if (count($content) === 0) {
             return false;
         }
 
@@ -1707,7 +1707,7 @@ class Parser
                 $parts[] = $inter;
             } elseif ($this->keyword($text)) {
                 $parts[] = $text;
-            } elseif (count($parts) == 0 && $this->match('[:.#]', $m, false)) {
+            } elseif (count($parts) === 0 && $this->match('[:.#]', $m, false)) {
                 // css hacks
                 $parts[] = $m[0];
             } else {
@@ -1717,7 +1717,7 @@ class Parser
 
         $this->eatWhiteDefault = $oldWhite;
 
-        if (count($parts) == 0) {
+        if (count($parts) === 0) {
             return false;
         }
 
@@ -1766,7 +1766,7 @@ class Parser
             }
         }
 
-        if (count($selectors) == 0) {
+        if (count($selectors) === 0) {
             $this->seek($s);
 
             return false;
@@ -1802,7 +1802,7 @@ class Parser
 
         }
 
-        if (count($selector) == 0) {
+        if (count($selector) === 0) {
             return false;
         }
 
@@ -1979,7 +1979,7 @@ class Parser
 
         $this->eatWhiteDefault = $oldWhite;
 
-        if (count($parts) == 0) {
+        if (count($parts) === 0) {
             return false;
         }
 
@@ -2080,7 +2080,7 @@ class Parser
             return true;
         }
 
-        if ($this->count == strlen($this->buffer) || $this->buffer[$this->count] == '}') {
+        if ($this->count === strlen($this->buffer) || $this->buffer[$this->count] === '}') {
             // if there is end of file or a closing block next then we don't need a ;
             return true;
         }
@@ -2333,7 +2333,7 @@ class Parser
      */
     protected function flattenList($value)
     {
-        if ($value[0] == 'list' && count($value[2]) == 1) {
+        if ($value[0] === 'list' && count($value[2]) === 1) {
             return $this->flattenList($value[2][0]);
         }
 

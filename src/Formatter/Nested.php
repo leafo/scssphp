@@ -101,7 +101,7 @@ class Nested extends Formatter
      */
     protected function block($block)
     {
-        if ($block->type == 'root') {
+        if ($block->type === 'root') {
             $this->adjustAllChildren($block);
         }
 
@@ -126,7 +126,7 @@ class Nested extends Formatter
 
                 if (isset($block->children[$i + 1])) {
                     $next = $block->children[$i + 1];
-                    if ($next->depth == max($block->depth, 1) && $child->depth >= $next->depth) {
+                    if ($next->depth === max($block->depth, 1) && $child->depth >= $next->depth) {
                         echo $this->break;
                     }
                 }
@@ -138,7 +138,7 @@ class Nested extends Formatter
             echo $this->close;
         }
 
-        if ($block->type == 'root') {
+        if ($block->type === 'root') {
             echo $this->break;
         }
     }
