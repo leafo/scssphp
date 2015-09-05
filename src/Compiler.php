@@ -2424,10 +2424,10 @@ class Compiler
             $env = $this->getStoreEnv();
         }
 
-        if (isset($env->store[$name]) || ! isset($env->parent)) {
-            $env->store[$name] = $value;
-        } else {
+        if (! isset($env->store[$name]) && isset($env->parent) && $this->has($name, $env->parent)) {
             $this->setExisting($name, $value, $env->parent);
+        } else {
+            $env->store[$name] = $value;
         }
     }
 
