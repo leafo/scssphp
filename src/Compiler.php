@@ -695,7 +695,7 @@ class Compiler
             $parts[] = $output;
         }
 
-        return implode(', ', $parts);;
+        return implode(', ', $parts);
     }
 
     /**
@@ -2515,7 +2515,7 @@ class Compiler
             }
 
             if (! $parser->parseValue($strValue, $value)) {
-                throw new \Exception("failed to parse passed in variable $name: $strValue");
+                $value = $this->coerceValue($strValue);
             }
 
             $this->set($name, $value);
@@ -2818,14 +2818,7 @@ class Compiler
         }
 
         if (isset($returnValue)) {
-            // coerce a php value into a scss one
-            if (is_numeric($returnValue)) {
-                $returnValue = array('number', $returnValue, '');
-            } elseif (is_bool($returnValue)) {
-                $returnValue = $returnValue ? self::$true : self::$false;
-            } elseif (! is_array($returnValue)) {
-                $returnValue = array('keyword', $returnValue);
-            }
+            $returnValue = $this->coerceValue($returnValue);
 
             return true;
         }
@@ -3011,6 +3004,38 @@ class Compiler
 
             $this->set($name, $this->reduce($default, true), true);
         }
+    }
+
+    /**
+     * Coerce a php value into a scss one
+     *
+     * @param mixed $value
+     *
+     * @return array
+     */
+    private function coerceValue($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_bool($value)) {
+            return $value ? self::$true : self::$false;
+        }
+
+        if ($value === null) {
+            $value = self::$null;
+        }
+
+        if (is_numeric($value)) {
+            return array('number', $value, '');
+        }
+
+        if ($value === '') {
+            return self::$emptyString;
+        }
+
+        return array('keyword', $value);
     }
 
     /**
