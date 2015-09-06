@@ -536,9 +536,11 @@ class Compiler
 
         $this->scope = $this->makeOutputBlock($block->type, $selectors);
         $this->scope->parent->children[] = $this->scope;
+
         $this->compileChildren($block->children, $this->scope);
 
         $this->scope = $this->scope->parent;
+
         $this->popEnv();
     }
 
@@ -1166,26 +1168,29 @@ class Compiler
 
                 $list = $this->coerceList($this->reduce($each->list));
 
-                foreach ($list[2] as $item) {
-                    $this->pushEnv();
+                $this->pushEnv();
 
+                foreach ($list[2] as $item) {
                     if (count($each->vars) === 1) {
-                        $this->set($each->vars[0], $item);
+                        $this->set($each->vars[0], $item, true);
                     } else {
                         list(,, $values) = $this->coerceList($item);
 
                         foreach ($each->vars as $i => $var) {
-                            $this->set($var, isset($values[$i]) ? $values[$i] : self::$null);
+                            $this->set($var, isset($values[$i]) ? $values[$i] : self::$null, true);
                         }
                     }
 
                     $ret = $this->compileChildren($each->children, $out);
-                    $this->popEnv();
 
                     if ($ret) {
+                        $this->popEnv();
+
                         return $ret;
                     }
                 }
+
+                $this->popEnv();
                 break;
 
             case 'while':

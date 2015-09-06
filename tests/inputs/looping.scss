@@ -1,5 +1,7 @@
 
 div {
+        $var: red;
+
 	@each $var in what is this {
 		color: $var;
 	}
@@ -32,6 +34,8 @@ div {
  			border: $nonexistent;
  		}
  	}
+
+        color: $var;
 }
 
 

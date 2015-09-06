@@ -17,17 +17,18 @@ div {
   background: this this;
   background: what what;
   background: is is;
-  background: this this; }
-/* line 30, inputs/looping.scss */
+  background: this this;
+  color: red; }
+/* line 32, inputs/looping.scss */
 div h1 {
   font-size: 2em; }
-/* line 30, inputs/looping.scss */
+/* line 32, inputs/looping.scss */
 div h2 {
   font-size: 1.5em; }
-/* line 30, inputs/looping.scss */
+/* line 32, inputs/looping.scss */
 div h3 {
   font-size: 1.2em; }
-/* line 38, inputs/looping.scss */
+/* line 42, inputs/looping.scss */
 span {
   color: 0;
   color: 1;
@@ -40,7 +41,7 @@ span {
   color: 8;
   color: 9;
   color: 10; }
-/* line 46, inputs/looping.scss */
+/* line 50, inputs/looping.scss */
 pre {
   color: 1;
   color: 2;
@@ -59,7 +60,7 @@ pre {
   cool: 5;
   cool: 4;
   cool: 3; }
-/* line 81, inputs/looping.scss */
+/* line 85, inputs/looping.scss */
 div {
   a: false;
   b: true;

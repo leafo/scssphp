@@ -16,7 +16,8 @@ div {
   background: this this;
   background: what what;
   background: is is;
-  background: this this; }
+  background: this this;
+  color: red; }
   div h1 {
     font-size: 2em; }
   div h2 {
