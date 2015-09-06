@@ -1068,14 +1068,12 @@ class Compiler
 
                     if ($isGlobal) {
                         $this->set($name[1], $this->reduce($value), false, $this->rootEnv);
-
                         break;
                     }
 
-                    if ($isDefault) {
-                        $existingValue = $this->get($name[1], true);
-                        $shouldSet = $existingValue === true || $existingValue === self::$null;
-                    }
+                    $shouldSet = $isDefault &&
+                        (($result = $this->get($name[1], false)) === null
+                        || $result === self::$null);
 
                     if (! $isDefault || $shouldSet) {
                         $this->set($name[1], $this->reduce($value));
@@ -1230,7 +1228,6 @@ class Compiler
                         return $ret;
                     }
                 }
-
                 break;
 
             case 'nestedprop':
@@ -1290,9 +1287,9 @@ class Compiler
                 break;
 
             case 'mixin_content':
-                $content = $this->get(self::$namespaces['special'] . 'content');
+                $content = $this->get(self::$namespaces['special'] . 'content', false);
 
-                if (! isset($content)) {
+                if (! $content) {
                     $this->throwError('Expected @content inside of mixin');
                 }
 
@@ -2434,11 +2431,22 @@ class Compiler
             $env = $this->getStoreEnv();
         }
 
-        if (! isset($env->store[$name]) && isset($env->parent) && $this->has($name, $env->parent)) {
-            $this->setExisting($name, $value, $env->parent);
-        } else {
-            $env->store[$name] = $value;
+        $storeEnv = $env;
+
+        for (;;) {
+            if (array_key_exists($name, $env->store)) {
+                break;
+            }
+
+            if (! isset($env->parent)) {
+                $env = $storeEnv;
+                break;
+            }
+
+            $env = $env->parent;
         }
+
+        $env->store[$name] = $value;
     }
 
     /**
@@ -2463,12 +2471,12 @@ class Compiler
      * @api
      *
      * @param string    $name
-     * @param mixed     $defaultValue
+     * @param boolean   $shouldThrow
      * @param \stdClass $env
      *
      * @return mixed
      */
-    public function get($name, $defaultValue = null, $env = null)
+    public function get($name, $shouldThrow = true, $env = null)
     {
         $name = $this->normalizeName($name);
 
@@ -2476,19 +2484,25 @@ class Compiler
             $env = $this->getStoreEnv();
         }
 
-        if (! isset($defaultValue)) {
-            $defaultValue = self::$defaultValue;
+        $hasNamespace = $name[0] === '^' || $name[0] === '@' || $name[0] === '%';
+
+        for (;;) {
+            if (array_key_exists($name, $env->store)) {
+                return $env->store[$name];
+            }
+
+            if (! isset($env->parent)) {
+                break;
+            }
+
+            $env = $env->parent;
         }
 
-        if (isset($env->store[$name])) {
-            return $env->store[$name];
+        if ($shouldThrow) {
+            $this->throwError('undefined variable $' . $name);
         }
 
-        if (isset($env->parent)) {
-            return $this->get($name, $defaultValue, $env->parent);
-        }
-
-        return $defaultValue; // found nothing
+        // found nothing
     }
 
     /**
@@ -2501,9 +2515,7 @@ class Compiler
      */
     protected function has($name, $env = null)
     {
-        $value = $this->get($name, false, $env);
-
-        return $value !== false;
+        return $this->get($name, false, $env) !== null;
     }
 
     /**
