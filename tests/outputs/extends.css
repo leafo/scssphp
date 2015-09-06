@@ -116,3 +116,5 @@ body .to-extend, body .test {
     font-weight: bold;
     text-shadow: none;
     color: #fff; }
+  .foo__bar#test, input {
+    background: red; }

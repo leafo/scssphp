@@ -371,14 +371,23 @@ class Compiler
     /**
      * Match extends single
      *
-     * @param array $single
+     * @param array $rawSingle
      * @param array $outOrigin
      *
      * @return boolean
      */
-    protected function matchExtendsSingle($single, &$outOrigin)
+    protected function matchExtendsSingle($rawSingle, &$outOrigin)
     {
         $counts = array();
+        $single = array();
+
+        foreach ($rawSingle as $part) {
+            if (! preg_match('/^[\[.:#%]/', $part) && count($single)) {
+                $single[count($single) - 1] .= $part;
+            } else {
+                $single[] = $part;
+            }
+        }
 
         foreach ($single as $part) {
             if (isset($this->extendsMap[$part])) {

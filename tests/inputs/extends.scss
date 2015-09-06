@@ -249,3 +249,8 @@ body{
     }
   }
 }
+
+.foo{
+   &__bar#test{background:red;}
+}
+input{@extend .foo__bar#test;}

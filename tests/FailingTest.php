@@ -172,18 +172,6 @@ A {
   color: green; }
 END_OF_EXPECTED
             ),
-            array(
-                '#318 - BEM + parent selector @extend', <<<'END_OF_SCSS'
-.foo{
-   &__bar{background:red;}
-}
-input{@extend .foo__bar;}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-.foo__bar, input {
-  background: red; }
-END_OF_EXPECTED
-            ),
 /*************************************************************
             array(
                 '', <<<'END_OF_SCSS'

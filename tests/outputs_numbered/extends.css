@@ -176,3 +176,10 @@ body .to-extend, body .test {
   text-shadow: none;
   color: #fff; }
 /* line 247, inputs/extends.scss */
+/* line 253, inputs/extends.scss */
+
+/* line 254, inputs/extends.scss */
+
+.foo__bar#test, input {
+  background: red; }
+/* line 256, inputs/extends.scss */
