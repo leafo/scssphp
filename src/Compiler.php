@@ -2669,8 +2669,8 @@ class Compiler
             $code = file_get_contents($path);
             $parser = new Parser($path, false);
             $tree = $parser->parse($code);
-            $this->parsedFiles[] = $path;
 
+            $this->parsedFiles[realPath] = filemtime($path);
             $this->importCache[$realPath] = $tree;
         }
 
