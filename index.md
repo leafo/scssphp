@@ -120,6 +120,11 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
+* **0.2.1** -- September 5, 2015
+  * Fix map-get(null)
+  * Fix nested function definition (variable scoping)
+  * Fix extend bug with BEM syntax
+  * Fix selector regression from 0.1.9
 * **0.2.0** -- August 25, 2015
   * Smaller git archives
   * Detect {% raw %}@{% endraw %}import loops
