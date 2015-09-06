@@ -381,10 +381,6 @@ class Compiler
         $counts = array();
 
         foreach ($single as $part) {
-            if (! is_string($part)) {
-                return false; // hmm
-            }
-
             if (isset($this->extendsMap[$part])) {
                 foreach ($this->extendsMap[$part] as $idx) {
                     $counts[$idx] = isset($counts[$idx]) ? $counts[$idx] + 1 : 1;
