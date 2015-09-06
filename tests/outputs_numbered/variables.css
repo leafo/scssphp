@@ -31,3 +31,6 @@ body {
 /* line 63, inputs/variables.scss */
 #sidebar {
   width: 5em; }
+/* line 71, inputs/variables.scss */
+A {
+  color: green; }

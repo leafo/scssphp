@@ -103,6 +103,32 @@ END_OF_SCSS
                 ,
                 'expecting color'
             ),
+            array(<<<'END_OF_SCSS'
+BODY {
+    DIV {
+        $bg: red;
+    }
+
+    background: $bg;
+}
+END_OF_SCSS
+                ,
+                'Undefined variable $bg'
+            ),
+            array(<<<'END_OF_SCSS'
+@mixin example {
+    background: $bg;
+}
+
+P {
+    $bg: red;
+
+    @include example;
+}
+END_OF_SCSS
+                ,
+                'Undefined variable $bg'
+            ),
         );
     }
 

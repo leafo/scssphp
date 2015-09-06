@@ -63,3 +63,13 @@ body {
 #sidebar {
   width: $width;
 }
+
+@mixin example {
+    $color: red;
+}
+
+A {
+    $color: green;
+    @include example;
+    color: $color;
+}

@@ -1272,12 +1272,15 @@ class Compiler
 
                 if (isset($content)) {
                     $content->scope = $callingScope;
+
                     $this->setRaw(self::$namespaces['special'] . 'content', $content);
                 }
 
                 if (isset($mixin->args)) {
                     $this->applyArguments($mixin->args, $argValues);
                 }
+
+                $this->env->marker = 'mixin';
 
                 foreach ($mixin->children as $child) {
                     $this->compileChild($child, $out);
@@ -2433,8 +2436,15 @@ class Compiler
 
         $storeEnv = $env;
 
+        $hasNamespace = $name[0] === '^' || $name[0] === '@' || $name[0] === '%';
+
         for (;;) {
             if (array_key_exists($name, $env->store)) {
+                break;
+            }
+
+            if (! $hasNamespace && isset($env->marker)) {
+                $env = $storeEnv;
                 break;
             }
 
@@ -2491,6 +2501,11 @@ class Compiler
                 return $env->store[$name];
             }
 
+            if (! $hasNamespace && isset($env->marker)) {
+                $env = $this->rootEnv;
+                continue;
+            }
+
             if (! isset($env->parent)) {
                 break;
             }
@@ -2499,7 +2514,7 @@ class Compiler
         }
 
         if ($shouldThrow) {
-            $this->throwError('undefined variable $' . $name);
+            $this->throwError("Undefined variable \$$name");
         }
 
         // found nothing

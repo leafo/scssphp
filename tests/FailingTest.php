@@ -155,23 +155,6 @@ END_OF_SCSS
     transform: scale(1); } }
 END_OF_EXPECTED
             ),
-            array(
-                '#295 - variable scope bug', <<<'END_OF_SCSS'
-@mixin example {
-    $color: red;
-}
-
-A {
-    $color: green;
-    @include example;
-    color: $color;
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-A {
-  color: green; }
-END_OF_EXPECTED
-            ),
 /*************************************************************
             array(
                 '', <<<'END_OF_SCSS'
