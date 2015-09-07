@@ -83,3 +83,15 @@ to {
 body {
   color: purple;
   background: yellow; } }
+
+@keyframes anim-rotate {
+/* line 113, inputs/directives.scss */
+0% {
+  transform: rotate(0); }
+/* line 116, inputs/directives.scss */
+100% {
+  transform: rotate(360deg); } }
+/* line 121, inputs/directives.scss */
+.bold, .icon-ajax {
+  font-weight: 700; }
+/* line 125, inputs/directives.scss */

@@ -382,6 +382,11 @@ class Compiler
         $single = array();
 
         foreach ($rawSingle as $part) {
+            // matches Number
+            if (! is_string($part)) {
+                return false;
+            }
+
             if (! preg_match('/^[\[.:#%]/', $part) && count($single)) {
                 $single[count($single) - 1] .= $part;
             } else {

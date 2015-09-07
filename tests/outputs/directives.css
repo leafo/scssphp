@@ -75,3 +75,13 @@ div {
   body {
     color: purple;
     background: yellow; } }
+
+@keyframes anim-rotate {
+  0% {
+    transform: rotate(0); }
+
+  100% {
+    transform: rotate(360deg); } }
+
+.bold, .icon-ajax {
+  font-weight: 700; }
