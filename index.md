@@ -121,9 +121,9 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 ## Changelog
 
 * **0.3.0** -- September 6, 2015
-  * Compiler getParsedFiles() now returns a map of each imported files and their corresponding timestamps
-  * Fix scope bug with {% raw %}@{% endraw %}each
-  * Fix multiple variable scope bugs
+  * Compiler getParsedFiles() now returns a map of imported files and their corresponding timestamps
+  * Fix multiple variable scope bugs, including {% raw %}@{% endraw %}each
+  * Fix regression from 0.2.1
 * **0.2.1** -- September 5, 2015
   * Fix map-get(null)
   * Fix nested function definition (variable scoping)
