@@ -1285,7 +1285,7 @@ class Compiler
                     $this->applyArguments($mixin->args, $argValues);
                 }
 
-                $this->env->marker = 'mixin';
+                //$this->env->marker = 'mixin';
 
                 foreach ($mixin->children as $child) {
                     $this->compileChild($child, $out);
