@@ -4,7 +4,6 @@
 <phpunit
     backupGlobals               = "false"
     backupStaticAttributes      = "false"
-    strict                      = "false"
     colors                      = "true"
     convertErrorsToExceptions   = "true"
     convertNoticesToExceptions  = "true"
