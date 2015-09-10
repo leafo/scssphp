@@ -332,7 +332,7 @@ class Compiler
 
                     // remove shared parts
                     if ($initial) {
-                        while ($k < $s && isset($new[$k]) && $before[$k] === $new[$k]) {
+                        while ($k < $s && isset($new[$k]) && isset($before[$k]) && $before[$k] === $new[$k]) {
                             $k++;
                         }
                     }
