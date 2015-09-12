@@ -697,7 +697,7 @@ class Parser
     /**
      * Push special (named) block onto parse tree
      *
-     * @param array   $selectors
+     * @param string  $type
      * @param integer $pos
      *
      * @return \stdClass
