@@ -120,6 +120,8 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
+* **0.3.1** -- September 11, 2015
+  * Fix bootstrap v4-dev regression from 0.3.0
 * **0.3.0** -- September 6, 2015
   * Compiler getParsedFiles() now returns a map of imported files and their corresponding timestamps
   * Fix multiple variable scope bugs, including {% raw %}@{% endraw %}each
