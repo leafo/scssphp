@@ -83,6 +83,23 @@ $scss->addImportPath(function($path) {
 echo $scss->compile('{% raw %}@{% endraw %}import "vanilla.css";');
 {% endhighlight %}
 
+### Preset Variables
+
+You can set variables before compilation by using the `setVariables($vars)`
+method. To override a variable already defined in your scss source, use
+the `!default` flag.
+
+{% highlight php startinline=true %}
+use Leafo\ScssPhp\Compiler;
+-
+$scss = new Compiler();
+$scss->setVariables(array(
+    'var' => 'false',
+));
+
+echo $scss->compile('$var: true !default;');
+{% endhighlight %}
+
 ### Output Formatting
 
 It's possible to customize the formatting of the output CSS by changing the
