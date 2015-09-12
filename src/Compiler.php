@@ -1270,10 +1270,7 @@ class Compiler
 
                 // push scope, apply args
                 $this->pushEnv();
-
-                if ($this->env->depth > 0) {
-                    $this->env->depth--;
-                }
+                $this->env->depth--;
 
                 if (isset($content)) {
                     $content->scope = $callingScope;
@@ -1285,7 +1282,7 @@ class Compiler
                     $this->applyArguments($mixin->args, $argValues);
                 }
 
-                //$this->env->marker = 'mixin';
+                $this->env->marker = 'mixin';
 
                 foreach ($mixin->children as $child) {
                     $this->compileChild($child, $out);
@@ -1305,17 +1302,14 @@ class Compiler
                     break;
                 }
 
-                $strongTypes = array('include', 'block', 'for', 'while');
+                $this->storeEnv = $content->scope;
 
                 foreach ($content->children as $child) {
-                    $this->storeEnv = (in_array($child[0], $strongTypes))
-                        ? null
-                        : $content->scope;
-
                     $this->compileChild($child, $out);
                 }
 
-                unset($this->storeEnv);
+                $this->storeEnv = null;
+
                 break;
 
             case 'debug':
