@@ -57,8 +57,10 @@ class Crunched extends Formatter
     /**
      * {@inheritdoc}
      */
-    public function blockLines($inner, $block)
+    public function blockLines($block)
     {
+        $inner = $this->indentStr();
+
         $glue = $this->break . $inner;
 
         foreach ($block->lines as $index => $line) {

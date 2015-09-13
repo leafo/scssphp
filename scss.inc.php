@@ -11,6 +11,7 @@ if (! class_exists('scssc', false)) {
     include_once __DIR__ . '/src/Formatter/Compact.php';
     include_once __DIR__ . '/src/Formatter/Compressed.php';
     include_once __DIR__ . '/src/Formatter/Crunched.php';
+    include_once __DIR__ . '/src/Formatter/Debug.php';
     include_once __DIR__ . '/src/Formatter/Expanded.php';
     include_once __DIR__ . '/src/Formatter/Nested.php';
     include_once __DIR__ . '/src/Parser.php';

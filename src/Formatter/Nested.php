@@ -37,8 +37,10 @@ class Nested extends Formatter
     /**
      * {@inheritdoc}
      */
-    protected function blockLines($inner, $block)
+    protected function blockLines($block)
     {
+        $inner = $this->indentStr($block->depth - 1);
+
         $glue = $this->break . $inner;
 
         foreach ($block->lines as $index => $line) {
@@ -57,25 +59,32 @@ class Nested extends Formatter
     /**
      * {@inheritdoc}
      */
+    protected function blockSelectors($block)
+    {
+        $inner = $this->indentStr($block->depth - 1);
+
+        echo $inner
+            . implode($this->tagSeparator, $block->selectors)
+            . $this->open . $this->break;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function block($block)
     {
         if ($block->type === 'root') {
             $this->adjustAllChildren($block);
         }
 
-        $inner = $pre = $this->indentStr($block->depth - 1);
         if (! empty($block->selectors)) {
-            echo $pre .
-                implode($this->tagSeparator, $block->selectors) .
-                $this->open . $this->break;
+            $this->blockSelectors($block);
 
             $this->indentLevel++;
-
-            $inner = $this->indentStr($block->depth - 1);
         }
 
         if (! empty($block->lines)) {
-            $this->blockLines($inner, $block);
+            $this->blockLines($block);
         }
 
         foreach ($block->children as $i => $child) {

@@ -1303,11 +1303,13 @@ class Compiler
                 }
 
                 $this->storeEnv = $content->scope;
+                //$this->pushEnv();
 
                 foreach ($content->children as $child) {
                     $this->compileChild($child, $out);
                 }
 
+                //$this->popEnv();
                 $this->storeEnv = null;
 
                 break;
@@ -2734,9 +2736,9 @@ class Compiler
             if (is_string($dir)) {
                 // check urls for normal import paths
                 foreach ($urls as $full) {
-                    $full = $dir .
-                        (! empty($dir) && substr($dir, -1) !== '/' ? '/' : '') .
-                        $full;
+                    $full = $dir
+                        . (! empty($dir) && substr($dir, -1) !== '/' ? '/' : '')
+                        . $full;
 
                     if ($this->fileExists($file = $full . '.scss') ||
                         $this->fileExists($file = $full)

@@ -37,8 +37,10 @@ class Expanded extends Formatter
     /**
      * {@inheritdoc}
      */
-    protected function blockLines($inner, $block)
+    protected function blockLines($block)
     {
+        $inner = $this->indentStr();
+
         $glue = $this->break . $inner;
 
         foreach ($block->lines as $index => $line) {
