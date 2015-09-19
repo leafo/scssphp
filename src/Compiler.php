@@ -161,6 +161,11 @@ class Compiler
 
         $this->formatter = new $this->formatter();
 
+        if (!empty($name)) {
+            $realPath = realpath($name);
+            $this->parsedFiles[$realPath] = filemtime($realPath);
+        }
+
         $this->rootEnv = $this->pushEnv($tree);
         $this->injectVariables($this->registeredVars);
         $this->compileRoot($tree);
