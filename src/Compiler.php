@@ -161,10 +161,7 @@ class Compiler
 
         $this->formatter = new $this->formatter();
 
-        if (!empty($name)) {
-            $realPath = realpath($name);
-            $this->parsedFiles[$realPath] = filemtime($realPath);
-        }
+        $this->addParsedFile($name);
 
         $this->rootEnv = $this->pushEnv($tree);
         $this->injectVariables($this->registeredVars);
@@ -2590,6 +2587,19 @@ class Compiler
     }
 
     /**
+     * Adds to list of parsed files
+     *
+     * @api
+     *
+     * @param string $file
+     */
+    public function addParsedFile($file) {
+        if (!empty($file)) {
+            $this->parsedFiles[realpath($file)] = filemtime($file);
+        }
+   	}
+
+    /**
      * Returns list of parsed files
      *
      * @api
@@ -2708,7 +2718,7 @@ class Compiler
             $parser = new Parser($path, false);
             $tree = $parser->parse($code);
 
-            $this->parsedFiles[$realPath] = filemtime($path);
+            $this->addParsedFile($path);
             $this->importCache[$realPath] = $tree;
         }
 
