@@ -2504,10 +2504,10 @@ class Compiler
                 return $env->store[$name];
             }
 
-            if (! $hasNamespace && isset($env->marker)) {
-                $env = $this->rootEnv;
-                continue;
-            }
+//            if (! $hasNamespace && isset($env->marker)) {
+//                $env = $this->rootEnv;
+//                continue;
+//            }
 
             if (! isset($env->parent)) {
                 break;
