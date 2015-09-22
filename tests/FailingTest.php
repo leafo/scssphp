@@ -155,6 +155,31 @@ END_OF_SCSS
     transform: scale(1); } }
 END_OF_EXPECTED
             ),
+            array(
+                '#336 - @extend with interpolation of list', <<<'END_OF_SCSS'
+.selector1 {
+    color: blue;
+}
+
+.selector2 {
+    background: #ccc;
+}
+
+$var: ".selector1, .selector2";
+
+.master-class {
+    // interpolation of the variable is needed since we have a selector in $var
+    @extend #{$var};
+}
+END_OF_SCSS
+                , <<<END_OF_EXPECTED
+.selector1, .master-class {
+  color: blue; }
+
+.selector2, .master-class {
+  background: #ccc; }
+END_OF_EXPECTED
+            ),
 /*************************************************************
             array(
                 '', <<<'END_OF_SCSS'
