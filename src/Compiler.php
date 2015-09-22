@@ -107,6 +107,7 @@ class Compiler
 
     protected $importPaths = array('');
     protected $importCache = array();
+    protected $importedFiles = array();
     protected $userFunctions = array();
     protected $registeredVars = array();
 
@@ -982,6 +983,53 @@ class Compiler
 
             if ($path = $this->findImport($path)) {
                 $this->importFile($path, $out);
+                $this->importedFiles[] = $path;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        if ($rawPath[0] === 'list') {
+            // handle a list of strings
+            if (count($rawPath[2]) === 0) {
+                return false;
+            }
+
+            foreach ($rawPath[2] as $path) {
+                if ($path[0] !== 'string') {
+                    return false;
+                }
+            }
+
+            foreach ($rawPath[2] as $path) {
+                $this->compileImport($path, $out);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Compile importOnce; returns true if the value was something that could be imported
+     *
+     * @param array $rawPath
+     * @param array $out
+     *
+     * @return boolean
+     */
+    protected function compileImportOnce($rawPath, $out)
+    {
+        if ($rawPath[0] === 'string') {
+            $path = $this->compileStringContent($rawPath);
+            if ($path = $this->findImport($path)) {
+                if (!in_array($path, $this->importedFiles)) {
+                    $this->importFile($path, $out);
+                    $this->importedFiles[] = $path;
+                }
 
                 return true;
             }
@@ -1025,6 +1073,16 @@ class Compiler
         $this->sourceParser = isset($child[Parser::SOURCE_PARSER]) ? $child[Parser::SOURCE_PARSER] : $this->parser;
 
         switch ($child[0]) {
+            case 'importOnce':
+                list(, $rawPath) = $child;
+
+                $rawPath = $this->reduce($rawPath);
+
+                if (! $this->compileImportOnce($rawPath, $out)) {
+                    $out->lines[] = '@importOnce ' . $this->compileValue($rawPath) . ';';
+                }
+                break;
+
             case 'import':
                 list(, $rawPath) = $child;
 

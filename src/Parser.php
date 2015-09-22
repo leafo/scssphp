@@ -287,6 +287,17 @@ class Parser
 
             $this->seek($s);
 
+            if ($this->literal('@importOnce') &&
+                $this->valueList($importPath) &&
+                $this->end()
+            ) {
+                $this->append(array('importOnce', $importPath), $s);
+
+                return true;
+            }
+
+            $this->seek($s);
+
             if ($this->literal('@import') &&
                 $this->valueList($importPath) &&
                 $this->end()
