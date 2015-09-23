@@ -146,7 +146,7 @@ if ($inputFile) {
 }
 
 if ($dumpTree) {
-    $parser = new Parser($inputFile ?: 'STDIN');
+    $parser = new Parser($inputFile);
 
     print_r(json_decode(json_encode($parser->parse($data)), true));
 
@@ -175,7 +175,7 @@ if ($style) {
     $scss->setFormatter('Leafo\\ScssPhp\\Formatter\\' . ucfirst($style));
 }
 
-echo $scss->compile($data, $inputFile ?: 'STDIN');
+echo $scss->compile($data, $inputFile);
 
 if ($changeDir) {
     chdir($oldWorkingDir);

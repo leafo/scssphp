@@ -87,7 +87,7 @@ class Parser
      */
     public function __construct($sourceName = null, $rootParser = true)
     {
-        $this->sourceName = $sourceName;
+        $this->sourceName = $sourceName ?: '(stdin)';
         $this->rootParser = $rootParser;
         $this->charset = null;
 

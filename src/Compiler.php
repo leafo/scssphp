@@ -136,11 +136,11 @@ class Compiler
      * @api
      *
      * @param string $code
-     * @param string $name
+     * @param string $path
      *
      * @return string
      */
-    public function compile($code, $name = null)
+    public function compile($code, $path = null)
     {
         $this->indentLevel  = -1;
         $this->commentsSeen = array();
@@ -155,13 +155,13 @@ class Compiler
         $locale = setlocale(LC_NUMERIC, 0);
         setlocale(LC_NUMERIC, 'C');
 
-        $this->parser = new Parser($name);
+        $this->parser = new Parser($path);
 
         $tree = $this->parser->parse($code);
 
         $this->formatter = new $this->formatter();
 
-        $this->addParsedFile($name);
+        $this->addParsedFile($path);
 
         $this->rootEnv = $this->pushEnv($tree);
         $this->injectVariables($this->registeredVars);
@@ -2594,13 +2594,14 @@ class Compiler
      *
      * @api
      *
-     * @param string $file
+     * @param string $path
      */
-    public function addParsedFile($file) {
-        if (!empty($file)) {
-            $this->parsedFiles[realpath($file)] = filemtime($file);
+    public function addParsedFile($path)
+    {
+        if (isset($path)) {
+            $this->parsedFiles[realpath($path)] = filemtime($path);
         }
-   	}
+    }
 
     /**
      * Returns list of parsed files
