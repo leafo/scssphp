@@ -287,11 +287,11 @@ class Parser
 
             $this->seek($s);
 
-            if ($this->literal('@importOnce') &&
+            if ($this->literal('@scssphp-import-once') &&
                 $this->valueList($importPath) &&
                 $this->end()
             ) {
-                $this->append(array('importOnce', $importPath), $s);
+                $this->append(array('scssphp-import-once', $importPath), $s);
 
                 return true;
             }

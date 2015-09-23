@@ -1073,13 +1073,13 @@ class Compiler
         $this->sourceParser = isset($child[Parser::SOURCE_PARSER]) ? $child[Parser::SOURCE_PARSER] : $this->parser;
 
         switch ($child[0]) {
-            case 'importOnce':
+            case 'scssphp-import-once':
                 list(, $rawPath) = $child;
 
                 $rawPath = $this->reduce($rawPath);
 
                 if (! $this->compileImportOnce($rawPath, $out)) {
-                    $out->lines[] = '@importOnce ' . $this->compileValue($rawPath) . ';';
+                    $out->lines[] = '@scssphp-import-once ' . $this->compileValue($rawPath) . ';';
                 }
                 break;
 
