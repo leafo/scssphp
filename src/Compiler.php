@@ -161,6 +161,8 @@ class Compiler
 
         $this->formatter = new $this->formatter();
 
+        $this->addParsedFile($name);
+
         $this->rootEnv = $this->pushEnv($tree);
         $this->injectVariables($this->registeredVars);
         $this->compileRoot($tree);
@@ -2505,10 +2507,10 @@ class Compiler
                 return $env->store[$name];
             }
 
-            if (! $hasNamespace && isset($env->marker)) {
-                $env = $this->rootEnv;
-                continue;
-            }
+//            if (! $hasNamespace && isset($env->marker)) {
+//                $env = $this->rootEnv;
+//                continue;
+//            }
 
             if (! isset($env->parent)) {
                 break;
@@ -2586,6 +2588,19 @@ class Compiler
     {
         unset($this->registeredVars[$name]);
     }
+
+    /**
+     * Adds to list of parsed files
+     *
+     * @api
+     *
+     * @param string $file
+     */
+    public function addParsedFile($file) {
+        if (!empty($file)) {
+            $this->parsedFiles[realpath($file)] = filemtime($file);
+        }
+   	}
 
     /**
      * Returns list of parsed files
@@ -2706,7 +2721,7 @@ class Compiler
             $parser = new Parser($path, false);
             $tree = $parser->parse($code);
 
-            $this->parsedFiles[$realPath] = filemtime($path);
+            $this->addParsedFile($path);
             $this->importCache[$realPath] = $tree;
         }
 
