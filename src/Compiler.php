@@ -1139,11 +1139,14 @@ class Compiler
                 list(, $selectors) = $child;
 
                 foreach ($selectors as $sel) {
-                    // only use the first one
-                    $result = $this->evalSelectors(array($sel));
-                    $result = current($result[0]);
+                    $results = $this->evalSelectors(array($sel));
 
-                    $this->pushExtends($result, $out->selectors);
+                    foreach ($results as $result) {
+                        // only use the first one
+                        $result = current($result);
+
+                        $this->pushExtends($result, $out->selectors);
+                    }
                 }
                 break;
 

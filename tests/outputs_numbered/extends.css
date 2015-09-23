@@ -183,3 +183,11 @@ body .to-extend, body .test {
 .foo__bar#test, input {
   background: red; }
 /* line 256, inputs/extends.scss */
+/* line 258, inputs/extends.scss */
+
+.selector1, .master-class {
+  color: blue; }
+/* line 262, inputs/extends.scss */
+.selector2, .master-class {
+  background: #ccc; }
+/* line 268, inputs/extends.scss */

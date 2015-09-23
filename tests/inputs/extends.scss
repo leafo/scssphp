@@ -254,3 +254,18 @@ body{
    &__bar#test{background:red;}
 }
 input{@extend .foo__bar#test;}
+
+.selector1 {
+    color: blue;
+}
+
+.selector2 {
+    background: #ccc;
+}
+
+$var: ".selector1, .selector2";
+
+.master-class {
+    // interpolation of the variable is needed since we have a selector in $var
+    @extend #{$var};
+}
