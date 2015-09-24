@@ -671,7 +671,7 @@ class Parser
     protected function pushBlock($selectors, $pos = 0)
     {
         $b = new \stdClass;
-        $b->parent = $this->env; // not sure if we need this yet
+        $b->parent = $this->env;
 
         $b->sourcePosition = $pos;
         $b->sourceParser = $this;
