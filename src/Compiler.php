@@ -93,7 +93,7 @@ class Compiler
             'mm' => 25.4,
             'px' => 96,
             'q'  => 101.6,
-        )
+        ),
     );
 
     static public $true = array('keyword', 'true');
@@ -494,10 +494,11 @@ class Compiler
             }
 
             if ($needsWrap) {
-                $wrapped = (object)array(
+                $wrapped = (object) array(
                     'selectors' => array(),
-                    'children' => $media->children
+                    'children' => $media->children,
                 );
+
                 $media->children = array(array('block', $wrapped));
             }
 
@@ -819,8 +820,8 @@ class Compiler
     /**
      * Compile children
      *
-     * @param array $stms
-     * @param array $out
+     * @param array     $stms
+     * @param \stdClass $out
      *
      * @return array
      */
@@ -948,7 +949,7 @@ class Compiler
 
             return array(
                 $m1 === 'not' ? $m2 : $m1,
-                $m1 === 'not' ? $t2 : $t1
+                $m1 === 'not' ? $t2 : $t1,
             );
         }
 
@@ -1602,9 +1603,9 @@ class Compiler
                     }
 
                     // throw away lines and children
-                    $tmp = (object)array(
+                    $tmp = (object) array(
                         'lines' => array(),
-                        'children' => array()
+                        'children' => array(),
                     );
 
                     $ret = $this->compileChildren($func->children, $tmp);
