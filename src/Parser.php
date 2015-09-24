@@ -470,7 +470,8 @@ class Parser
 
             // only retain the first @charset directive encountered
             if ($this->literal('@charset') &&
-                $this->valueList($charset) && $this->end()
+                $this->valueList($charset) &&
+                $this->end()
             ) {
                 if (! isset($this->charset)) {
                     $statement = array('charset', $charset);
@@ -490,7 +491,8 @@ class Parser
             $this->seek($s);
 
             // doesn't match built in directive, do generic one
-            if ($this->literal('@', false) && $this->keyword($dirName) &&
+            if ($this->literal('@', false) &&
+                $this->keyword($dirName) &&
                 ($this->variable($dirValue) || $this->openString('{', $dirValue) || true) &&
                 $this->literal('{')
             ) {
@@ -527,7 +529,8 @@ class Parser
         // variable assigns
         if ($this->variable($name) &&
             $this->literal(':') &&
-            $this->valueList($value) && $this->end()
+            $this->valueList($value) &&
+            $this->end()
         ) {
             // check for '!flag'
             $assignmentFlag = $this->stripAssignmentFlag($value);
@@ -1395,8 +1398,8 @@ class Parser
         $keys = array();
         $values = array();
 
-        while ($this->genericList($key, 'expression') && $this->literal(':')
-            && $this->genericList($value, 'expression')
+        while ($this->genericList($key, 'expression') && $this->literal(':') &&
+            $this->genericList($value, 'expression')
         ) {
             $keys[] = $key;
             $values[] = $value;
