@@ -533,8 +533,6 @@ class Compiler
     /**
      * Compile nested block
      *
-     * @todo refactor compileNestedBlock and compileMedia into same thing?
-     *
      * @param \stdClass $block
      * @param array     $selectors
      */
@@ -601,7 +599,7 @@ class Compiler
 
         $this->scope->children[] = $out;
 
-        if (! empty($block->children)) {
+        if (count($block->children)) {
             $out->selectors = $this->multiplySelectors($env);
 
             $this->compileChildren($block->children, $out);
