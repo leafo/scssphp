@@ -576,7 +576,7 @@ class Compiler
 
         $env->selectors = $this->evalSelectors($block->selectors);
 
-        $out = $this->makeOutputBlock(null, $this->multiplySelectors($env));
+        $out = $this->makeOutputBlock(null);
 
         if (isset($this->lineNumberStyle) && count($env->selectors) && count($block->children)) {
             $annotation = $this->makeOutputBlock('comment');
@@ -601,7 +601,11 @@ class Compiler
 
         $this->scope->children[] = $out;
 
-        $this->compileChildren($block->children, $out);
+        if (! empty($block->children)) {
+            $out->selectors = $this->multiplySelectors($env);
+
+            $this->compileChildren($block->children, $out);
+        }
 
         $this->formatter->stripSemicolon($out->lines);
 
