@@ -71,6 +71,28 @@ class Nested extends Formatter
     /**
      * {@inheritdoc}
      */
+    protected function blockChildren($block)
+    {
+        foreach ($block->children as $i => $child) {
+            $this->block($child);
+
+            if ($i < count($block->children) - 1) {
+                echo $this->break;
+
+                if (isset($block->children[$i + 1])) {
+                    $next = $block->children[$i + 1];
+
+                    if ($next->depth === max($block->depth, 1) && $child->depth >= $next->depth) {
+                        echo $this->break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function block($block)
     {
         if ($block->type === 'root') {
@@ -87,20 +109,8 @@ class Nested extends Formatter
             $this->blockLines($block);
         }
 
-        foreach ($block->children as $i => $child) {
-            $this->block($child);
-
-            if ($i < count($block->children) - 1) {
-                echo $this->break;
-
-                if (isset($block->children[$i + 1])) {
-                    $next = $block->children[$i + 1];
-
-                    if ($next->depth === max($block->depth, 1) && $child->depth >= $next->depth) {
-                        echo $this->break;
-                    }
-                }
-            }
+        if (! empty($block->children)) {
+            $this->blockChildren($block);
         }
 
         if (! empty($block->selectors)) {

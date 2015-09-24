@@ -122,6 +122,18 @@ abstract class Formatter
     }
 
     /**
+     * Output block children
+     *
+     * @param \stdClass $block
+     */
+    protected function blockChildren($block)
+    {
+        foreach ($block->children as $child) {
+            $this->block($child);
+        }
+    }
+
+    /**
      * Output non-empty block
      *
      * @param \stdClass $block
@@ -144,8 +156,8 @@ abstract class Formatter
             $this->blockLines($block);
         }
 
-        foreach ($block->children as $child) {
-            $this->block($child);
+        if (! empty($block->children)) {
+            $this->blockChildren($block);
         }
 
         if (! empty($block->selectors)) {

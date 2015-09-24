@@ -39,6 +39,12 @@ class Debug extends Formatter
      */
     protected function blockLines($block)
     {
+        if (empty($block->lines)) {
+            echo "block->lines: []\n";
+
+            return;
+        }
+
         foreach ($block->lines as $index => $line) {
             echo "block->lines[{$index}]: $line\n";
         }
@@ -49,8 +55,30 @@ class Debug extends Formatter
      */
     protected function blockSelectors($block)
     {
+        if (empty($block->selectors)) {
+            echo "block->selectors: []\n";
+
+            return;
+        }
+
         foreach ($block->selectors as $index => $selector) {
             echo "block->selectors[{$index}]: $selector\n";
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function blockChildren($block)
+    {
+        if (empty($block->children)) {
+            echo "block->children: []\n";
+
+            return;
+        }
+
+        foreach ($block->children as $i => $child) {
+            $this->block($child);
         }
     }
 
@@ -62,16 +90,8 @@ class Debug extends Formatter
         echo "block->type: {$block->type}\n" .
              "block->depth: {$block->depth}\n";
 
-        if (! empty($block->selectors)) {
-            $this->blockSelectors($block);
-        }
-
-        if (! empty($block->lines)) {
-            $this->blockLines($block);
-        }
-
-        foreach ($block->children as $i => $child) {
-            $this->block($child);
-        }
+        $this->blockSelectors($block);
+        $this->blockLines($block);
+        $this->blockChildren($block);
     }
 }
