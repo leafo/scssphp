@@ -2263,15 +2263,11 @@ class Compiler
      */
     protected function multiplySelectors($env)
     {
-        $envs = array();
-
-        while (null !== $env) {
-            if (! empty($env->selectors)) {
+        for ($envs = array(); $env; $env = $env->parent) {
+            if (count($env->selectors)) {
                 $envs[] = $env;
             }
-
-            $env = $env->parent;
-        };
+        }
 
         $selectors = array();
         $parentSelectors = array(array());

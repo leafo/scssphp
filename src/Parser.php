@@ -137,7 +137,7 @@ class Parser
         $this->pushBlock(null);
         $this->popBlock();
 
-        while (false !== $this->parseChunk()) {
+        while ($this->parseChunk()) {
             ;
         }
 
@@ -1551,7 +1551,7 @@ class Parser
         $oldWhite = $this->eatWhiteDefault;
         $this->eatWhiteDefault = false;
 
-        while (true) {
+        for (;;) {
             if ($this->keyword($key)) {
                 $parts[] = $key;
                 continue;
@@ -1705,7 +1705,7 @@ class Parser
         $oldWhite = $this->eatWhiteDefault;
         $this->eatWhiteDefault = false;
 
-        while (true) {
+        for (;;) {
             if ($this->interpolation($inter)) {
                 $parts[] = $inter;
             } elseif ($this->keyword($text)) {
@@ -1791,7 +1791,7 @@ class Parser
     {
         $selector = array();
 
-        while (true) {
+        for (;;) {
             if ($this->match('[>+~]+', $m)) {
                 $selector[] = array($m[0]);
             } elseif ($this->selectorSingle($part)) {
@@ -1835,7 +1835,7 @@ class Parser
             $parts[] = '*';
         }
 
-        while (true) {
+        for (;;) {
             // see if we can stop early
             if ($this->match('\s*[{,]', $m)) {
                 $this->count--;
@@ -1928,7 +1928,7 @@ class Parser
                 $attrParts = array('[');
 
                 // keyword, string, operator
-                while (true) {
+                for (;;) {
                     if ($this->literal(']', false)) {
                         $this->count--;
                         break; // get out early
