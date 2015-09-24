@@ -133,6 +133,17 @@ END_OF_EXPECTED
 & {
   color:blue;
 }
+
+@-webkit-keyframes zoomer {
+  from {
+    transform:scale(0.5);
+  }
+
+  to {
+    transform:scale(1);
+  }
+}
+
 @keyframes zoomer {
   from {
     transform:scale(0.5);
@@ -148,6 +159,13 @@ END_OF_SCSS
                 , <<<END_OF_EXPECTED
 .custom-selector {
   color: blue; }
+
+@-webkit-keyframes zoomer {
+  from {
+    transform: scale(0.5); }
+  to {
+    transform: scale(1); } }
+
 @keyframes zoomer {
   from {
     transform: scale(0.5); }
