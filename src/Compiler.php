@@ -531,6 +531,34 @@ class Compiler
     }
 
     /**
+     * Compile keyframe block
+     *
+     * @param \stdClass $block
+     * @param array     $selectors
+     */
+    protected function compileKeyframeBlock($block, $selectors)
+    {
+        $env = $this->pushEnv($block);
+
+        $envs = $this->compactEnv($env);
+
+        $this->env = $this->extractEnv(array_filter($envs, function ($e) {
+            return ! isset($e->block->selectors);
+        }));
+
+        $this->scope = $this->makeOutputBlock($block->type, $selectors);
+        $this->scope->depth = 1;
+        $this->scope->parent->children[] = $this->scope;
+
+        $this->compileChildren($block->children, $this->scope);
+
+        $this->scope = $this->scope->parent;
+        $this->env   = $this->extractEnv($envs);
+
+        $this->popEnv();
+    }
+
+    /**
      * Compile nested block
      *
      * @param \stdClass $block
@@ -1049,7 +1077,11 @@ class Compiler
                     $s .= ' ' . $this->compileValue($directive->value);
                 }
 
-                $this->compileNestedBlock($directive, array($s));
+                if ($directive->name === 'keyframes' || substr($directive->name, -10) === '-keyframes') {
+                    $this->compileKeyframeBlock($directive, array($s));
+                } else {
+                    $this->compileNestedBlock($directive, array($s));
+                }
                 break;
 
             case 'media':
@@ -2245,7 +2277,7 @@ class Compiler
         foreach ($items as $i => $item) {
             if ($item[0] === 'interpolate') {
                 $before = array('list', $list[1], array_slice($items, 0, $i));
-                $after = array('list', $list[1], array_slice($items, $i + 1));
+                $after  = array('list', $list[1], array_slice($items, $i + 1));
 
                 return array('interpolated', $item, $before, $after);
             }
@@ -2263,16 +2295,15 @@ class Compiler
      */
     protected function multiplySelectors($env)
     {
-        for ($envs = array(); $env; $env = $env->parent) {
-            if (count($env->selectors)) {
-                $envs[] = $env;
-            }
-        }
-
-        $selectors = array();
+        $envs            = $this->compactEnv($env);
+        $selectors       = array();
         $parentSelectors = array(array());
 
         while ($env = array_pop($envs)) {
+            if (empty($env->selectors)) {
+                continue;
+            }
+
             $selectors = array();
 
             foreach ($env->selectors as $selector) {
@@ -2364,6 +2395,39 @@ class Compiler
         }
 
         return $this->multiplyMedia($env->parent, $childQueries);
+    }
+
+    /**
+     * Convert env linked list to stack
+     *
+     * @param \stdClass $env
+     *
+     * @return array
+     */
+    private function compactEnv($env)
+    {
+        for ($envs = array(); $env; $env = $env->parent) {
+            $envs[] = $env;
+        }
+
+        return $envs;
+    }
+
+    /**
+     * Convert env stack to singly linked list
+     *
+     * @param array $envs
+     *
+     * @return \stdClass
+     */
+    private function extractEnv($envs)
+    {
+        for ($env = null; $e = array_pop($envs);) {
+            $e->parent = $env;
+            $env = $e;
+        }
+
+        return $env;
     }
 
     /**

@@ -85,3 +85,18 @@ div {
 
 .bold, .icon-ajax {
   font-weight: 700; }
+
+.custom-selector {
+  color: blue; }
+
+@-webkit-keyframes zoomer {
+    from {
+      transform: scale(0.5); }
+    to {
+      transform: scale(1); } }
+
+@keyframes zoomer {
+    from {
+      transform: scale(0.5); }
+    to {
+      transform: scale(1); } }
