@@ -37,7 +37,7 @@ class Compact extends Formatter
     /**
      * {@inheritdoc}
      */
-    public function indentStr($n = 0)
+    public function indentStr()
     {
         return ' ';
     }

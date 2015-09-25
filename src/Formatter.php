@@ -58,13 +58,11 @@ abstract class Formatter
     /**
      * Return indentation (whitespace)
      *
-     * @param integer $n
-     *
      * @return string
      */
-    protected function indentStr($n = 0)
+    protected function indentStr()
     {
-        return str_repeat($this->indentChar, max($this->indentLevel + $n, 0));
+        return '';
     }
 
     /**

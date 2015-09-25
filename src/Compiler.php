@@ -629,7 +629,6 @@ class Compiler
     protected function compileBlock($block)
     {
         $env = $this->pushEnv($block);
-
         $env->selectors = $this->evalSelectors($block->selectors);
 
         $out = $this->makeOutputBlock(null);
@@ -1377,13 +1376,11 @@ class Compiler
                 }
 
                 $this->storeEnv = $content->scope;
-                //$this->pushEnv();
 
                 foreach ($content->children as $child) {
                     $this->compileChild($child, $out);
                 }
 
-                //$this->popEnv();
                 $this->storeEnv = null;
 
                 break;
