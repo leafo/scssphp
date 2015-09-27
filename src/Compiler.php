@@ -53,6 +53,11 @@ class Compiler
     const LINE_COMMENTS = 1;
     const DEBUG_INFO    = 2;
 
+    const WITH_RULE = 1;
+    const WITH_MEDIA = 2;
+    const WITH_SUPPORTS = 4;
+    const WITH_ALL = 7;
+
     /**
      * @var array
      */
@@ -104,6 +109,8 @@ class Compiler
     static public $emptyList = array('list', '', array());
     static public $emptyMap = array('map', array(), array());
     static public $emptyString = array('string', '"', array());
+    static public $with = array('keyword', 'with');
+    static public $without = array('keyword', 'without');
 
     protected $importPaths = array('');
     protected $importCache = array();
@@ -582,20 +589,9 @@ class Compiler
      */
     protected function compileAtRoot($block)
     {
-        $env = $this->pushEnv($block);
-
-        $envs = $this->compactEnv($env);
-
-        if (isset($block->with)) {
-            // @todo move outside of nested directives, e.g., (without: all), (without: media supports), (with: rule)
-        } else {
-            // exclude selectors by default
-            $this->env->parent = $this->rootEnv;
-        }
-
-        $this->scope = $this->makeOutputBlock('at-root');
-        $this->scope->depth = 1;
-        $this->scope->parent->children[] = $this->scope;
+        $env     = $this->pushEnv($block);
+        $envs    = $this->compactEnv($env);
+        $without = isset($block->with) ? $this->compileWith($block->with) : self::WITH_RULE;
 
         // wrap inline selector
         if ($block->selector) {
@@ -611,12 +607,205 @@ class Compiler
             $block->children = array(array('block', $wrapped));
         }
 
-        $this->compileChildren($block->children, $this->scope);
+        $this->env = $this->filterWithout($envs, $without);
+        $newBlock  = $this->spliceTree($envs, $block, $without);
 
-        $this->scope = $this->scope->parent;
+        $saveScope   = $this->scope;
+        $this->scope = $this->rootBlock;
+
+        $this->compileChild($newBlock, $this->scope);
+
+        $this->scope = $saveScope;
         $this->env   = $this->extractEnv($envs);
 
         $this->popEnv();
+    }
+
+    /**
+     * Splice parse tree
+     *
+     * @param array     $envs
+     * @param \stdClass $block
+     * @param integer   $without
+     *
+     * @return \stdClass
+     */
+    private function spliceTree($envs, $block, $without)
+    {
+        $newBlock = null;
+
+        foreach ($envs as $e) {
+            if (! isset($e->block)) {
+                continue;
+            }
+
+            if (isset($e->block) && $e->block === $block) {
+                continue;
+            }
+
+            if (isset($e->block->type) && $e->block->type === 'at-root') {
+                continue;
+            }
+
+            if (($without & self::WITH_RULE) && isset($e->block->selectors)) {
+                continue;
+            }
+
+            if (($without & self::WITH_MEDIA) &&
+                isset($e->block->type) && $e->block->type === 'media'
+            ) {
+                continue;
+            }
+
+            if (($without & self::WITH_SUPPORTS) &&
+                isset($e->block->type) && $e->block->type === 'directive' &&
+                isset($e->block->name) && $e->block->name === 'supports'
+            ) {
+                continue;
+            }
+
+            $b = new \stdClass;
+
+            if (isset($e->block->sourcePosition)) {
+                $b->sourcePosition = $e->block->sourcePosition;
+            }
+
+            if (isset($e->block->sourceIndex)) {
+                $b->sourceIndex = $e->block->sourceIndex;
+            }
+
+            $b->selectors = array();
+
+            if (isset($e->block->comments)) {
+                $b->comments = $e->block->comments;
+            }
+
+            if (isset($e->block->type)) {
+                $b->type = $e->block->type;
+            }
+
+            if (isset($e->block->name)) {
+                $b->name = $e->block->name;
+            }
+
+            if (isset($e->block->queryList)) {
+                $b->queryList = $e->block->queryList;
+            }
+
+            if (isset($e->block->value)) {
+                $b->value = $e->block->value;
+            }
+
+            if ($newBlock) {
+                $type = isset($newBlock->type) ? $newBlock->type : 'block';
+
+                $b->children = array(array($type, $newBlock));
+
+                $newBlock->parent = $b;
+            } elseif (count($block->children)) {
+                foreach ($block->children as $child) {
+                    if ($child[0] === 'block') {
+                        $child[1]->parent = $b;
+                    }
+                }
+
+                $b->children = $block->children;
+            }
+
+            $b->parent = null;
+
+            $newBlock = $b;
+        }
+
+        $type = isset($newBlock->type) ? $newBlock->type : 'block';
+
+        return array($type, $newBlock);
+    }
+
+    /**
+     * Compile @at-root's with: inclusion / without: exclusion into filter flags
+     *
+     * @param array $with
+     *
+     * @return integer
+     */
+    private function compileWith($with)
+    {
+        static $mapping = array(
+            'rule' => self::WITH_RULE,
+            'media' => self::WITH_MEDIA,
+            'supports' => self::WITH_SUPPORTS,
+            'all' => self::WITH_ALL,
+        );
+
+        // exclude selectors by default
+        $without = self::WITH_RULE;
+
+        if ($this->libMapHasKey(array($with, self::$with))) {
+            $without = self::WITH_ALL;
+
+            $list = $this->coerceList($this->libMapGet(array($with, self::$with)));
+
+            foreach ($list[2] as $item) {
+                $keyword = $this->compileStringContent($this->coerceString($item));
+
+                if (array_key_exists($keyword, $mapping)) {
+                    $without &= ~($mapping[$keyword]);
+                }
+            }
+        }
+
+        if ($this->libMapHasKey(array($with, self::$without))) {
+            $without = 0;
+
+            $list = $this->coerceList($this->libMapGet(array($with, self::$without)));
+
+            foreach ($list[2] as $item) {
+                $keyword = $this->compileStringContent($this->coerceString($item));
+
+                if (array_key_exists($keyword, $mapping)) {
+                    $without |= $mapping[$keyword];
+                }
+            }
+        }
+
+        return $without;
+    }
+
+    /**
+     * Filter env stack
+     *
+     * @param array   $envs
+     * @param integer $without
+     *
+     * @return \stdClass
+     */
+    private function filterWithout($envs, $without)
+    {
+        $filtered = array();
+
+        foreach ($envs as $e) {
+            if (($without & self::WITH_RULE) && isset($e->block->selectors)) {
+                continue;
+            }
+
+            if (($without & self::WITH_MEDIA) &&
+                isset($e->block->type) && $e->block->type === 'media'
+            ) {
+                continue;
+            }
+
+            if (($without & self::WITH_SUPPORTS) &&
+                isset($e->block->type) && $e->block->type === 'directive' &&
+                isset($e->block->name) && $e->block->name === 'supports'
+            ) {
+                continue;
+            }
+
+            $filtered[] = $e;
+        }
+
+        return $this->extractEnv($filtered);
     }
 
     /**
@@ -4135,9 +4324,7 @@ class Compiler
     protected static $libPercentage = array('value');
     protected function libPercentage($args)
     {
-        return array('number',
-            $this->coercePercent($args[0]) * 100,
-            '%');
+        return array('number', $this->coercePercent($args[0]) * 100, '%');
     }
 
     protected static $libRound = array('value');
@@ -4359,11 +4546,11 @@ class Compiler
 
         for ($i = count($map[1]) - 1; $i >= 0; $i--) {
             if ($key === $this->compileStringContent($this->coerceString($map[1][$i]))) {
-                return self::$true;
+                return true;
             }
         }
 
-        return self::$false;
+        return false;
     }
 
     protected static $libMapMerge = array('map-1', 'map-2');
@@ -4605,13 +4792,13 @@ class Compiler
 
         // user defined functions
         if ($this->has(self::$namespaces['function'] . $name)) {
-            return self::$true;
+            return true;
         }
 
         $name = $this->normalizeName($name);
 
         if (isset($this->userFunctions[$name])) {
-            return self::$true;
+            return true;
         }
 
         // built-in functions

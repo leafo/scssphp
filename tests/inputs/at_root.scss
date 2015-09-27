@@ -1,24 +1,149 @@
+.parent-inline-selector {
+  color: white;
+  @at-root .child { color: black; }
+}
+
+.parent-block {
+  color: white;
+  @at-root {
+    .child1 { color: green; }
+    .child2 { color: blue; }
+  }
+  .step-child { color: black; }
+}
+
 .first {
   color: red;
 }
 body{
-.second {
-  color: white;
+  .second {
+    color: white;
 
-  @at-root {
-    .nested1 {
-      color: blue;
-      @at-root {
-        .nested2 {
-          color: yellow;
+    @at-root {
+      .nested1 {
+        color: blue;
+        @at-root {
+          .nested2 {
+            color: yellow;
+          }
         }
+        color: orange;
       }
-      color: orange;
     }
+    color: black;
   }
-  color: black;
-}
 }
 .third {
   color: green;
+}
+
+@media print {
+  .page {
+    width: 8in;
+    @at-root (without: media) {
+      color: red;
+    }
+  }
+}
+
+.my-widget {
+  @media (min-width: 300px) {
+    .inside-mq {
+      inside-style: mq;
+    }
+    @at-root (without: media){
+      //this without:media tells the screen what to bust out of
+      .outside-mq {
+        outside-style: mq;
+      }
+    }
+    // using (without:all) forces all nested selectors outside of all media
+    // queries, hence color:blue only in the .outside-everything class in generated css
+    @at-root (without:all){
+      .outside-class {
+        color: blue;
+      }
+    }
+
+    // using the (with:media) keeps .with-only inside media query hence .with-only selector
+    // inside @media ()min-width:300px
+    @at-root (with: media) {
+      .with-only {
+        // do this ONLY inside mq
+        color: pink;
+      }
+    }
+  }
+}
+
+// without: rule - default - outside of all css rules, but inside directives
+@media screen and (max-width:320px) {
+  .foo {
+    margin: 0;
+
+    @at-root (without: rule) {
+      .bar {
+        padding: 0;
+      }
+    }
+    @at-root (without: media rule) {
+      .baar {
+        padding: 0;
+      }
+    }
+    @at-root (without: media) {
+      .barr {
+        padding: 0;
+      }
+    }
+  }
+}
+
+// with: rule - outside of all directives but preserve any css rules
+@media screen and (max-width:640px) {
+  .foo {
+    @supports ( display: flex ) {
+      @at-root (with: rule) {
+        .bar {
+          width: 0;
+        }
+      }
+      @at-root (with: supports) {
+        .baz {
+          height: 0;
+        }
+      }
+      @at-root (with: media) {
+        .qux {
+          margin: 0;
+        }
+      }
+      @at-root (with: media rule) {
+        .quux {
+          padding: 0;
+        }
+      }
+      @at-root (with: rule) {
+        .quix {
+          padding: 0;
+        }
+      }
+    }
+  }
+}
+
+$table-padding: 10px !default;
+
+@mixin table($padding: $table-padding) {
+  @at-root {
+    tbody {
+      padding: $padding;
+    }
+  }
+}
+.test{
+  .test2{
+    padding: 0px;
+    @include table;
+  }
 }
