@@ -552,6 +552,20 @@ class Compiler
         $this->scope->depth = 1;
         $this->scope->parent->children[] = $this->scope;
 
+        // wrap inline selector
+        if ($block->selector) {
+            $wrapped = (object) array(
+                'parent' => $block,
+                'sourcePosition' => $block->sourcePosition,
+                'sourceParser' => $block->sourceParser,
+                'selectors' => $block->selector,
+                'comments' => array(),
+                'children' => $block->children,
+            );
+
+            $block->children = array(array('block', $wrapped));
+        }
+
         $this->compileChildren($block->children, $this->scope);
 
         $this->scope = $this->scope->parent;
