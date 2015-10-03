@@ -2255,6 +2255,7 @@ class Compiler
 
                 // strip quotes if it's a string
                 $reduced = $this->reduce($exp);
+
                 switch ($reduced[0]) {
                     case 'string':
                         $reduced = array('keyword', $this->compileStringContent($reduced));
@@ -3835,8 +3836,7 @@ class Compiler
         return $this->toRGB($h[1], $s[1], $l[1]);
     }
 
-    protected static $libHsla = array('hue', 'saturation',
-        'lightness', 'alpha');
+    protected static $libHsla = array('hue', 'saturation', 'lightness', 'alpha');
     protected function libHsla($args)
     {
         list($h, $s, $l, $a) = $args;
@@ -4197,11 +4197,10 @@ class Compiler
     protected function libMapGet($args)
     {
         $map = $this->assertMap($args[0]);
-
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
         for ($i = count($map[1]) - 1; $i >= 0; $i--) {
-            if ($key === $this->compileValue($map[1][$i])) {
+            if ($key === $this->compileStringContent($this->coerceString($map[1][$i]))) {
                 return $map[2][$i];
             }
         }
@@ -4213,7 +4212,6 @@ class Compiler
     protected function libMapKeys($args)
     {
         $map = $this->assertMap($args[0]);
-
         $keys = $map[1];
 
         return array('list', ',', $keys);
@@ -4223,7 +4221,6 @@ class Compiler
     protected function libMapValues($args)
     {
         $map = $this->assertMap($args[0]);
-
         $values = $map[2];
 
         return array('list', ',', $values);
@@ -4233,11 +4230,10 @@ class Compiler
     protected function libMapRemove($args)
     {
         $map = $this->assertMap($args[0]);
-
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
         for ($i = count($map[1]) - 1; $i >= 0; $i--) {
-            if ($key === $this->compileValue($map[1][$i])) {
+            if ($key === $this->compileStringContent($this->coerceString($map[1][$i]))) {
                 array_splice($map[1], $i, 1);
                 array_splice($map[2], $i, 1);
             }
@@ -4250,11 +4246,10 @@ class Compiler
     protected function libMapHasKey($args)
     {
         $map = $this->assertMap($args[0]);
-
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
         for ($i = count($map[1]) - 1; $i >= 0; $i--) {
-            if ($key === $this->compileValue($map[1][$i])) {
+            if ($key === $this->compileStringContent($this->coerceString($map[1][$i]))) {
                 return self::$true;
             }
         }
@@ -4331,6 +4326,7 @@ class Compiler
                     break 2;
                 }
             }
+
             $lists[] = $list;
         }
 
