@@ -2964,7 +2964,7 @@ class Compiler
             // see if we can find a user function
             $fn = $this->userFunctions[$name];
 
-            if ($name !== 'if') {
+            if ($name !== 'if' && $name !== 'call') {
                 foreach ($args as &$val) {
                     $val = $this->reduce($val[1], true);
                 }
@@ -2980,7 +2980,7 @@ class Compiler
                 $prototype = isset(self::$$libName) ? self::$$libName : null;
                 $sorted = $this->sortArgs($prototype, $args);
 
-                if ($name !== 'if') {
+                if ($name !== 'if' && $name !== 'call') {
                     foreach ($sorted as &$val) {
                         $val = $this->reduce($val, true);
                     }
@@ -3573,6 +3573,14 @@ class Compiler
     }
 
     // Built in functions
+
+    //protected static $libCall = array('name', 'args...');
+    protected function libCall($args)
+    {
+        $name = $this->compileStringContent($this->coerceString($this->reduce(array_shift($args), true)));
+
+        return $this->reduce(array('fncall', $name, array_map(function ($a) { return array(null, $a); }, $args)));
+    }
 
     protected static $libIf = array('condition', 'if-true', 'if-false');
     protected function libIf($args)

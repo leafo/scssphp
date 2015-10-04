@@ -133,3 +133,7 @@
   a: true;
   b: true;
   c: false; }
+
+div.call-tests {
+  a: #0a64ff;
+  c: b; }
