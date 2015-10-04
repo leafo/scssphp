@@ -120,6 +120,15 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
+* **0.3.2** -- October 4, 2015
+  * Fix @extend behavior when interpolating variable containing a selector list
+  * Hoist @keyframes so children selectors are not be prefixed by parent selector
+  * Don't wrap @import inside @media query
+  * Partial @at-root support; with: and without: not yet supported
+  * Partial call()' support;kwargs` not yet supported
+  * String-based keys mismatch in map functions
+  * Short-circuit evaluation for and, or, and if()
+  * Compiler: getParsedFiles() now includes the main file
 * **0.3.1** -- September 11, 2015
   * Fix bootstrap v4-dev regression from 0.3.0
 * **0.3.0** -- September 6, 2015
