@@ -487,7 +487,7 @@ class Compiler
             foreach ($media->children as $child) {
                 $type = $child[0];
 
-                if ($type !== 'block' && $type !== 'media' && $type !== 'directive') {
+                if ($type !== 'block' && $type !== 'media' && $type !== 'directive' && $type !== 'import') {
                     $needsWrap = true;
                     break;
                 }
