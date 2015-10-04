@@ -3579,7 +3579,18 @@ class Compiler
     {
         $name = $this->compileStringContent($this->coerceString($this->reduce(array_shift($args), true)));
 
-        return $this->reduce(array('fncall', $name, array_map(function ($a) { return array(null, $a); }, $args)));
+        return $this->reduce(
+            array(
+                'fncall',
+                $name,
+                array_map(
+                    function ($a) {
+                        return array(null, $a);
+                    },
+                    $args
+                )
+            )
+        );
     }
 
     protected static $libIf = array('condition', 'if-true', 'if-false');
