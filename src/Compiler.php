@@ -2964,8 +2964,10 @@ class Compiler
             // see if we can find a user function
             $fn = $this->userFunctions[$name];
 
-            foreach ($args as &$val) {
-                $val = $this->reduce($val[1], true);
+            if ($name !== 'if') {
+                foreach ($args as &$val) {
+                    $val = $this->reduce($val[1], true);
+                }
             }
 
             $returnValue = call_user_func($fn, $args, $this);
@@ -2978,8 +2980,10 @@ class Compiler
                 $prototype = isset(self::$$libName) ? self::$$libName : null;
                 $sorted = $this->sortArgs($prototype, $args);
 
-                foreach ($sorted as &$val) {
-                    $val = $this->reduce($val, true);
+                if ($name !== 'if') {
+                    foreach ($sorted as &$val) {
+                        $val = $this->reduce($val, true);
+                    }
                 }
 
                 $returnValue = call_user_func($f, $sorted, $this);
@@ -3575,11 +3579,11 @@ class Compiler
     {
         list($cond, $t, $f) = $args;
 
-        if (! $this->isTruthy($cond)) {
-            return $f;
+        if (! $this->isTruthy($this->reduce($cond, true))) {
+            return $this->reduce($f, true);
         }
 
-        return $t;
+        return $this->reduce($t, true);
     }
 
     protected static $libIndex = array('list', 'value');
