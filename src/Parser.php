@@ -1129,6 +1129,14 @@ class Parser
 
         $this->seek($s);
 
+        if ($this->literal('not', false) && $this->parenValue($inner)) {
+            $out = array('unary', 'not', $inner, $this->inParens);
+
+            return true;
+        }
+
+        $this->seek($s);
+
         if ($this->literal('+') && $this->value($inner)) {
             $out = array('unary', '+', $inner, $this->inParens);
 
