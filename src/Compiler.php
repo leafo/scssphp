@@ -1512,7 +1512,10 @@ class Compiler
                 $inExp = $inExp || $this->shouldEval($left) || $this->shouldEval($right);
 
                 $left = $this->reduce($left, true);
-                $right = $this->reduce($right, true);
+
+                if ($op !== 'and' && $op !== 'or') {
+                    $right = $this->reduce($right, true);
+                }
 
                 // special case: looks like css short-hand
                 if ($opName === 'div' && ! $inParens && ! $inExp && isset($right[2]) && $right[2] !== '') {
@@ -1900,7 +1903,7 @@ class Compiler
         }
 
         if ($left !== self::$false) {
-            return $right;
+            return $this->reduce($right, true);
         }
 
         return $left;
@@ -1925,7 +1928,7 @@ class Compiler
             return $left;
         }
 
-        return $right;
+        return $this->reduce($right, true);
     }
 
     /**
