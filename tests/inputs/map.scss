@@ -24,3 +24,11 @@ div {
     foo: nth($map, 1);
     bar: nth(nth($map, 1), 1);
 }
+
+$color: ("black" : #000000);
+
+@each $color_name, $color_value in $color {
+  .#{$color_name} {
+    background-color: $color_value !important;
+  }
+}

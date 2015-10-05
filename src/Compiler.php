@@ -3272,7 +3272,11 @@ class Compiler
                 $key = $keys[$i];
                 $value = $values[$i];
 
-                $list[] = array('list', '', array(array('keyword', $this->compileStringContent($this->coerceString($key))), $value));
+                $list[] = array(
+                    'list',
+                    '',
+                    array(array('keyword', $this->compileStringContent($this->coerceString($key))), $value)
+                );
             }
 
             return array('list', ',', $list);

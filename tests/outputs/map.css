@@ -10,3 +10,5 @@ div {
 div {
   foo: color black;
   bar: color; }
+  .black {
+    background-color: #000 !important; }
