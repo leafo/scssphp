@@ -4233,7 +4233,13 @@ class Compiler
     protected function libSetNth($args)
     {
         $list = $this->coerceList($args[0]);
-        $n = $this->assertNumber($args[1]) - 1;
+        $n = $this->assertNumber($args[1]);
+
+        if ($n > 0) {
+            $n--;
+        } elseif ($n < 0) {
+            $n += count($list[2]);
+        }
 
         if (! isset($list[2][$n])) {
             $this->throwError('Invalid argument for "n"');
