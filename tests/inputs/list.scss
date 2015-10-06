@@ -25,6 +25,7 @@ div {
     a: nth($list, 1);
    b: nth($list, 2);
   c: nth($list, 3);
+ d: nth($list, -1);
 }
 
 div {

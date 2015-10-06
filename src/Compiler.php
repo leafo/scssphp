@@ -2212,6 +2212,10 @@ class Compiler
 
                 list(, $delim, $items) = $value;
 
+                if ($delim !== ' ') {
+                    $delim .= ' ';
+                }
+
                 $filtered = array();
 
                 foreach ($items as $item) {
@@ -2222,7 +2226,7 @@ class Compiler
                     $filtered[] = $this->compileValue($item);
                 }
 
-                return implode("$delim ", $filtered);
+                return implode("$delim", $filtered);
 
             case 'map':
                 $keys = $value[1];
@@ -4214,7 +4218,13 @@ class Compiler
     protected function libNth($args)
     {
         $list = $this->coerceList($args[0]);
-        $n = $this->assertNumber($args[1]) - 1;
+        $n = $this->assertNumber($args[1]);
+
+        if ($n > 0) {
+            $n--;
+        } elseif ($n < 0) {
+            $n += count($list[2]);
+        }
 
         return isset($list[2][$n]) ? $list[2][$n] : self::$defaultValue;
     }
