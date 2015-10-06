@@ -3132,6 +3132,17 @@ class Compiler
                             $remaining[] = $item;
                         }
                     }
+                } elseif ($val[0] === 'map') {
+                    foreach ($val[1] as $i => $name) {
+                        $name = $this->compileStringContent($this->coerceString($name));
+                        $item = $val[2][$i];
+
+                        if (! is_numeric($name)) {
+                            $keywordArgs[$name] = $item;
+                        } else {
+                            $remaining[] = $item;
+                        }
+                    }
                 } else {
                     $remaining[] = $val;
                 }

@@ -668,6 +668,7 @@ class Parser
 
                     return true;
                 }
+
                 // goes below...
             } else {
                 return false;
