@@ -12,3 +12,9 @@ div {
   bar: color; }
   .black {
     background-color: #000 !important; }
+
+div {
+  a: 1;
+  b: 2;
+  color: 1;
+  background-color: 2; }

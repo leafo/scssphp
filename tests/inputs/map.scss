@@ -28,7 +28,28 @@ div {
 $color: ("black" : #000000);
 
 @each $color_name, $color_value in $color {
-  .#{$color_name} {
-    background-color: $color_value !important;
-  }
+    .#{$color_name} {
+        background-color: $color_value !important;
+    }
+}
+
+$args: ('a': 1, 'b': 2);
+
+@mixin output($args) {
+    @each $k, $v in $args {
+        #{$k}: $v;
+    }
+}
+
+@mixin output-varargs(
+  $a,
+  $b
+) {
+    color: $a;
+    background-color: $b;
+}
+
+div {
+    @include output($args);
+    @include output-varargs($args...);
 }
