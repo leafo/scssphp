@@ -143,6 +143,11 @@ class Server
                     return true;
                 }
             }
+            
+            $metaVars = crc32(serialize($this->scss->getVariables()));
+            if ($metaVars!=$metadata['vars']) {
+                return true;
+            }
 
             $etag = $metadata['etag'];
 
@@ -213,6 +218,7 @@ class Server
             serialize(array(
                 'etag'    => $etag,
                 'imports' => $this->scss->getParsedFiles(),
+                'vars' => crc32(serialize($this->scss->getVariables())),
             ))
         );
 

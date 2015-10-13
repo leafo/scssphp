@@ -2702,6 +2702,18 @@ class Compiler
     }
 
     /**
+     * Returns list of variables
+     *
+     * @api
+     *
+     * @return array
+     */
+    public function getVariables()
+    {
+        return $this->registeredVars;
+    }
+
+    /**
      * Adds to list of parsed files
      *
      * @api
