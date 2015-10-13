@@ -139,7 +139,7 @@ class Server
             $metadata = unserialize(file_get_contents($metadataName));
 
             foreach ($metadata['imports'] as $import => $importMtime) {
-                if ($importMtime > $mtime) {
+                if (filemtime($import) > $mtime) {
                     return true;
                 }
             }
