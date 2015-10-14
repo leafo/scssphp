@@ -1379,7 +1379,7 @@ class Compiler
                 break;
 
             case 'mixin_content':
-			$content = $this->get(self::$namespaces['special'] . 'content', false, $this->getStoreEnv());
+                $content = $this->get(self::$namespaces['special'] . 'content', false, $this->getStoreEnv());
 
                 if (! $content) {
                     $this->throwError('Expected @content inside of mixin');
