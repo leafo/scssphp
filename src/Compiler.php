@@ -2440,6 +2440,7 @@ class Compiler
         }
 
         $parentQueries = $env->block->queryList;
+
         if ($childQueries === null) {
             $childQueries = $parentQueries;
         } else {
