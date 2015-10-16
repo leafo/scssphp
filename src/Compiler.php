@@ -109,6 +109,12 @@ class Compiler
     protected $importCache = array();
     protected $userFunctions = array();
     protected $registeredVars = array();
+    protected $features = array(
+        'extend-selector-pseudoclass' => false,
+        'at-error' => true,
+        'units-level-3' => false,
+        'global-variable-shadowing' => false,
+    );
 
     protected $numberPrecision = 5;
     protected $lineNumberStyle = null;
@@ -2827,6 +2833,18 @@ class Compiler
     }
 
     /**
+     * Add feature
+     *
+     * @api
+     *
+     * @param string $name
+     */
+    public function addFeature($name)
+    {
+        $this->features[$name] = true;
+    }
+
+    /**
      * Import file
      *
      * @param string $path
@@ -4545,14 +4563,10 @@ class Compiler
     protected static $libFeatureExists = array('feature');
     protected function libFeatureExists($args)
     {
-        /*
-         * The following features not not (yet) supported:
-         * - global-variable-shadowing
-         * - extend-selector-pseudoclass
-         * - units-level-3
-         * - at-error
-         */
-        return self::$false;
+        $string = $this->coerceString($args[0]);
+        $name = $this->compileStringContent($string);
+
+        return $this->toBool(array_key_exists($name, $this->feature) ? $this->features[$name] : false);
     }
 
     protected static $libFunctionExists = array('name');
