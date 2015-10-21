@@ -83,6 +83,13 @@ $scss->addImportPath(function($path) {
 echo $scss->compile('{% raw %}@{% endraw %}import "vanilla.css";');
 {% endhighlight %}
 
+A list of the compiled files (both the primary file and its imports) can be
+retrieved using the `getParsedFiles` method.
+
+* `getParsedFiles()` returns an associative array where the keys are
+  the file names and the values are the corresponding file's last-modified
+  timestamp.
+
 ### Preset Variables
 
 You can set variables before compilation by using the `setVariables($vars)`
@@ -99,6 +106,9 @@ $scss->setVariables(array(
 
 echo $scss->compile('$var: true !default;');
 {% endhighlight %}
+
+Likewise, you can retrieve the preset variables using the `getVariables()`
+method, and unset a variable using the `unsetVariable($name)` method.
 
 ### Output Formatting
 
@@ -195,6 +205,9 @@ The formatters output the following:
 .navigation ul{line-height:20px;color:blue;}.navigation ul a{color:red;}.footer .copyright{color:silver;}
 {% endhighlight %}
 
+You can also change the number precision using the `setNumberPrecision($precision)`
+method. (The default precision is 5.)
+
 ### Source Line Debugging
 
 You can output the original SCSS line numbers within the compiled CSS file for better frontend debugging.
@@ -249,7 +262,6 @@ We can add and remove functions using the methods `registerFunction` and
 * `unregisterFunction($functionName)` removes `$functionName` from the list of
   available functions.
 
-
 The `$callable` can be anything that PHP knows how to call using
 `call_user_func`. The function receives two arguments when invoked. The first
 is an array of SCSS typed arguments that the function was sent. The second is a
@@ -286,6 +298,11 @@ $scss->compile('.ex1 { result: add-two(10, 10); }');
 It's worth noting that in this example we lose the units of the number, and we
 also don't do any type checking. This will have undefined results if we give it
 anything other than two numbers.
+
+For feature detection via the `feature-exists()` built-in function, you can register
+your custom feature using the `addFeature` method:
+
+* `addFeature($name)` registers the `$name`.
 
 ## SCSS Server
 
@@ -375,7 +392,7 @@ If passed the flag `-h` (or `--help`), input is ignored and a summary of the com
 
 If passed the flag `-v` (or `--version`), input is ignored and the current version is returned.
 
-If passed the flag `-T`, a formatted parse tree is returned instead of the compiled CSS..
+If passed the flag `-T`, a formatted parse tree is returned instead of the compiled CSS.
 
 The flag `-f` (or `--style`) can be used to set the [formatter](#output-formatting):
 
