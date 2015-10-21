@@ -109,7 +109,7 @@ class Compiler
     protected $importCache = array();
     protected $userFunctions = array();
     protected $registeredVars = array();
-    protected $features = array(
+    protected $registeredFeatures = array(
         'extend-selector-pseudoclass' => false,
         'at-error' => true,
         'units-level-3' => false,
@@ -120,6 +120,9 @@ class Compiler
     protected $lineNumberStyle = null;
 
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
+
+    protected $rootEnv;
+    protected $rootBlock;
 
     private $indentLevel;
     private $commentsSeen;
@@ -252,7 +255,7 @@ class Compiler
      */
     protected function compileRoot($rootBlock)
     {
-        $this->scope = $this->makeOutputBlock('root');
+        $this->rootBlock = $this->scope = $this->makeOutputBlock('root');
 
         $this->compileChildren($rootBlock->children, $this->scope);
         $this->flattenSelectors($this->scope);
@@ -2842,7 +2845,7 @@ class Compiler
      */
     public function addFeature($name)
     {
-        $this->features[$name] = true;
+        $this->registeredFeatures[$name] = true;
     }
 
     /**
@@ -4567,7 +4570,7 @@ class Compiler
         $string = $this->coerceString($args[0]);
         $name = $this->compileStringContent($string);
 
-        return $this->toBool(array_key_exists($name, $this->feature) ? $this->features[$name] : false);
+        return $this->toBool(array_key_exists($name, $this->registeredFeatures) ? $this->registeredFeatures[$name] : false);
     }
 
     protected static $libFunctionExists = array('name');
