@@ -55,7 +55,7 @@ Complete documentation for **scssphp** is located at <a href="{{ site.baseurl }}
 If you just want to start serving compiled `scss` files as quick as possible
 then start here.
 
-**scssphp** comes with a easy to use class that automatically compiles modified
+**scssphp** comes with an easy to use class that automatically compiles modified
 `scss` files and serves them from a directory you specify.
 
 Create a file, like `style.php`:
