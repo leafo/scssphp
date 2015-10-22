@@ -121,8 +121,8 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 ## Changelog
 
 * **0.3.2** -- October 4, 2015
-  * Fix {% raw %}@{% endraw %}extend behavior when interpolating variable containing a selector list
-  * Hoist {% raw %}@{% endraw %}keyframes so children selectors are not be prefixed by parent selector
+  * Fix {% raw %}@{% endraw %}extend behavior when interpolating a variable that contains a selector list
+  * Hoist {% raw %}@{% endraw %}keyframes so children selectors are not prefixed by parent selector
   * Don't wrap {% raw %}@{% endraw %}import inside {% raw %}@{% endraw %}media query
   * Partial {% raw %}@{% endraw %}at-root support; `with:` and `without:` not yet supported
   * Partial `call()` support; `kwargs` not yet supported
