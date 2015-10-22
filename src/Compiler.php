@@ -133,7 +133,8 @@ class Compiler
     private $scope;
     private $parser;
     private $sourcePos;
-    private $sourceParser;
+    private $sourceParsers;
+    private $sourceIndex;
     private $storeEnv;
     private $charsetSeen;
     private $stderr;
@@ -151,26 +152,24 @@ class Compiler
      */
     public function compile($code, $path = null)
     {
-        $this->indentLevel  = -1;
-        $this->commentsSeen = array();
-        $this->extends      = array();
-        $this->extendsMap   = array();
-        $this->parsedFiles  = array();
-        $this->env          = null;
-        $this->scope        = null;
-
-        $this->stderr = fopen('php://stderr', 'w');
-
         $locale = setlocale(LC_NUMERIC, 0);
         setlocale(LC_NUMERIC, 'C');
 
-        $this->parser = new Parser($path);
+        $this->indentLevel   = -1;
+        $this->commentsSeen  = array();
+        $this->extends       = array();
+        $this->extendsMap    = array();
+        $this->parsedFiles   = array();
+        $this->sourceParsers = array();
+        $this->sourceIndex   = null;
+        $this->env           = null;
+        $this->scope         = null;
+        $this->stderr        = fopen('php://stderr', 'w');
 
+        $this->parser = $this->parserFactory($path);
         $tree = $this->parser->parse($code);
 
         $this->formatter = new $this->formatter();
-
-        $this->addParsedFile($path);
 
         $this->rootEnv = $this->pushEnv($tree);
         $this->injectVariables($this->registeredVars);
@@ -182,6 +181,24 @@ class Compiler
         setlocale(LC_NUMERIC, $locale);
 
         return $out;
+    }
+
+    /**
+     * Instantiate parser
+     *
+     * @param string  $path
+     * @param boolean $isRoot
+     *
+     * @return \Leafo\Parser
+     */
+    private function parserFactory($path, $isRoot = true)
+    {
+        $parser = new Parser($path, count($this->sourceParsers), $isRoot);
+
+        $this->sourceParsers[] = $parser;
+        $this->addParsedFile($path);
+
+        return $parser;
     }
 
     /**
@@ -566,7 +583,7 @@ class Compiler
             $wrapped = (object) array(
                 'parent' => $block,
                 'sourcePosition' => $block->sourcePosition,
-                'sourceParser' => $block->sourceParser,
+                'sourceIndex' => $block->sourceIndex,
                 'selectors' => $block->selector,
                 'comments' => array(),
                 'children' => $block->children,
@@ -660,8 +677,9 @@ class Compiler
             $annotation = $this->makeOutputBlock('comment');
             $annotation->depth = 0;
 
-            $file = $block->sourceParser->getSourceName();
-            $line = $block->sourceParser->getLineNo($block->sourcePosition);
+            $parser = $this->sourceParsers[$block->sourceIndex];
+            $file = $parser->getSourceName();
+            $line = $parser->getLineNo($block->sourcePosition);
 
             switch ($this->lineNumberStyle) {
                 case self::LINE_COMMENTS:
@@ -718,7 +736,7 @@ class Compiler
         // after evaluating interpolates, we might need a second pass
         if ($this->shouldEvaluate) {
             $buffer = $this->collapseSelectors($selectors);
-            $parser = new Parser(__METHOD__, false);
+            $parser = $this->parserFactory(__METHOD__, false);
 
             if ($parser->parseSelector($buffer, $newSelectors)) {
                 $selectors = array_map(array($this, 'evalSelector'), $newSelectors);
@@ -1106,8 +1124,8 @@ class Compiler
      */
     protected function compileChild($child, $out)
     {
+        $this->sourceIndex = isset($child[Parser::SOURCE_INDEX]) ? $child[Parser::SOURCE_INDEX] : null;
         $this->sourcePos = isset($child[Parser::SOURCE_POSITION]) ? $child[Parser::SOURCE_POSITION] : -1;
-        $this->sourceParser = isset($child[Parser::SOURCE_PARSER]) ? $child[Parser::SOURCE_PARSER] : $this->parser;
 
         switch ($child[0]) {
             case 'import':
@@ -2672,7 +2690,7 @@ class Compiler
             return;
         }
 
-        $parser = new Parser(__METHOD__, false);
+        $parser = $this->parserFactory(__METHOD__, false);
 
         foreach ($args as $name => $strValue) {
             if ($name[0] === '$') {
@@ -2732,7 +2750,7 @@ class Compiler
      */
     public function addParsedFile($path)
     {
-        if (isset($path)) {
+        if (isset($path) && file_exists($path)) {
             $this->parsedFiles[realpath($path)] = filemtime($path);
         }
     }
@@ -2864,11 +2882,10 @@ class Compiler
 
             $tree = $this->importCache[$realPath];
         } else {
-            $code = file_get_contents($path);
-            $parser = new Parser($path, false);
-            $tree = $parser->parse($code);
+            $code   = file_get_contents($path);
+            $parser = $this->parserFactory($path, false);
+            $tree   = $parser->parse($code);
 
-            $this->addParsedFile($path);
             $this->importCache[$realPath] = $tree;
         }
 
@@ -2939,8 +2956,9 @@ class Compiler
             $msg = call_user_func_array('sprintf', func_get_args());
         }
 
-        if ($this->sourcePos >= 0 && isset($this->sourceParser)) {
-            $this->sourceParser->throwParseError($msg, $this->sourcePos);
+        if ($this->sourcePos >= 0 && isset($this->sourceIndex)) {
+            $parser = $this->sourceParsers[$this->sourceIndex];
+            $parser->throwParseError($msg, $this->sourcePos);
         }
 
         throw new \Exception($msg);
@@ -2956,14 +2974,11 @@ class Compiler
     private function handleImportLoop($name)
     {
         for ($env = $this->env; $env; $env = $env->parent) {
-            $file = $env->block->sourceParser->getSourceName();
+            $parser = $this->sourceParsers[$env->block->sourceIndex];
+            $file = $parser->getSourceName();
 
             if (realpath($file) === $name) {
-                $this->throwError(
-                    'An @import loop has been found: %s imports %s',
-                    $this->env->block->sourceParser->getSourceName(),
-                    basename($file)
-                );
+                $this->throwError('An @import loop has been found: %s imports %s', $file, basename($file));
             }
         }
     }

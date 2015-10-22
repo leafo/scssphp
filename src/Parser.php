@@ -20,8 +20,8 @@ use Leafo\ScssPhp\Compiler;
  */
 class Parser
 {
-    const SOURCE_POSITION = -1;
-    const SOURCE_PARSER   = -2;
+    const SOURCE_INDEX    = -1;
+    const SOURCE_POSITION = -2;
 
     /**
      * @var array
@@ -71,6 +71,7 @@ class Parser
     protected static $commentMultiRight = '*/';
 
     private $sourceName;
+    private $sourceIndex;
     private $rootParser;
     private $charset;
     private $count;
@@ -83,13 +84,15 @@ class Parser
      * Constructor
      *
      * @param string  $sourceName
+     * @param integer $sourceIndex
      * @param boolean $rootParser
      */
-    public function __construct($sourceName = null, $rootParser = true)
+    public function __construct($sourceName = null, $sourceIndex = null, $rootParser = true)
     {
-        $this->sourceName = $sourceName ?: '(stdin)';
-        $this->rootParser = $rootParser;
-        $this->charset = null;
+        $this->sourceName  = $sourceName ?: '(stdin)';
+        $this->sourceIndex = $sourceIndex;
+        $this->rootParser  = $rootParser;
+        $this->charset     = null;
 
         if (empty(self::$operatorStr)) {
             self::$operatorStr = $this->makeOperatorStr(self::$operators);
@@ -493,7 +496,7 @@ class Parser
                     $statement[self::SOURCE_POSITION] = $s;
 
                     if (! $this->rootParser) {
-                        $statement[self::SOURCE_PARSER] = $this;
+                        $statement[self::SOURCE_INDEX] = $this->sourceIndex;
                     }
 
                     $this->charset = $statement;
@@ -692,7 +695,7 @@ class Parser
         $b->parent = $this->env;
 
         $b->sourcePosition = $pos;
-        $b->sourceParser = $this;
+        $b->sourceIndex = $this->sourceIndex;
         $b->selectors = $selectors;
         $b->comments = array();
 
@@ -779,7 +782,7 @@ class Parser
             $statement[self::SOURCE_POSITION] = $pos;
 
             if (! $this->rootParser) {
-                $statement[self::SOURCE_PARSER] = $this;
+                $statement[self::SOURCE_INDEX] = $this->sourceIndex;
             }
         }
 
