@@ -114,6 +114,10 @@ class Nested extends Formatter
             $this->adjustAllChildren($block);
         }
 
+        if (empty($block->lines) && empty($block->children)) {
+            return;
+        }
+
         $this->depth = $block->depth;
 
         if (! empty($block->selectors)) {
