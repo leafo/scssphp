@@ -4585,7 +4585,9 @@ class Compiler
         $string = $this->coerceString($args[0]);
         $name = $this->compileStringContent($string);
 
-        return $this->toBool(array_key_exists($name, $this->registeredFeatures) ? $this->registeredFeatures[$name] : false);
+        return $this->toBool(
+            array_key_exists($name, $this->registeredFeatures) ? $this->registeredFeatures[$name] : false
+        );
     }
 
     protected static $libFunctionExists = array('name');
