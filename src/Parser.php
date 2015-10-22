@@ -72,7 +72,6 @@ class Parser
 
     private $sourceName;
     private $sourceIndex;
-    private $rootParser;
     private $charset;
     private $count;
     private $env;
@@ -85,13 +84,11 @@ class Parser
      *
      * @param string  $sourceName
      * @param integer $sourceIndex
-     * @param boolean $rootParser
      */
-    public function __construct($sourceName = null, $sourceIndex = null, $rootParser = true)
+    public function __construct($sourceName, $sourceIndex = 0)
     {
         $this->sourceName  = $sourceName ?: '(stdin)';
         $this->sourceIndex = $sourceIndex;
-        $this->rootParser  = $rootParser;
         $this->charset     = null;
 
         if (empty(self::$operatorStr)) {
@@ -494,10 +491,7 @@ class Parser
                     $statement = array('charset', $charset);
 
                     $statement[self::SOURCE_POSITION] = $s;
-
-                    if (! $this->rootParser) {
-                        $statement[self::SOURCE_INDEX] = $this->sourceIndex;
-                    }
+                    $statement[self::SOURCE_INDEX] = $this->sourceIndex;
 
                     $this->charset = $statement;
                 }
@@ -780,10 +774,7 @@ class Parser
     {
         if ($pos !== null) {
             $statement[self::SOURCE_POSITION] = $pos;
-
-            if (! $this->rootParser) {
-                $statement[self::SOURCE_INDEX] = $this->sourceIndex;
-            }
+            $statement[self::SOURCE_INDEX] = $this->sourceIndex;
         }
 
         $this->env->children[] = $statement;

@@ -186,14 +186,13 @@ class Compiler
     /**
      * Instantiate parser
      *
-     * @param string  $path
-     * @param boolean $isRoot
+     * @param string $path
      *
-     * @return \Leafo\Parser
+     * @return \Leafo\ScssPhp\Parser
      */
-    private function parserFactory($path, $isRoot = true)
+    private function parserFactory($path)
     {
-        $parser = new Parser($path, count($this->sourceParsers), $isRoot);
+        $parser = new Parser($path, count($this->sourceParsers));
 
         $this->sourceParsers[] = $parser;
         $this->addParsedFile($path);
@@ -736,7 +735,7 @@ class Compiler
         // after evaluating interpolates, we might need a second pass
         if ($this->shouldEvaluate) {
             $buffer = $this->collapseSelectors($selectors);
-            $parser = $this->parserFactory(__METHOD__, false);
+            $parser = $this->parserFactory(__METHOD__);
 
             if ($parser->parseSelector($buffer, $newSelectors)) {
                 $selectors = array_map(array($this, 'evalSelector'), $newSelectors);
@@ -2690,7 +2689,7 @@ class Compiler
             return;
         }
 
-        $parser = $this->parserFactory(__METHOD__, false);
+        $parser = $this->parserFactory(__METHOD__);
 
         foreach ($args as $name => $strValue) {
             if ($name[0] === '$') {
@@ -2883,7 +2882,7 @@ class Compiler
             $tree = $this->importCache[$realPath];
         } else {
             $code   = file_get_contents($path);
-            $parser = $this->parserFactory($path, false);
+            $parser = $this->parserFactory($path);
             $tree   = $parser->parse($code);
 
             $this->importCache[$realPath] = $tree;
