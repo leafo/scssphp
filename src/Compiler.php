@@ -556,6 +556,26 @@ class Compiler
     }
 
     /**
+     * Compile directive
+     *
+     * @param \stdClass $block
+     */
+    protected function compileDirective($block)
+    {
+        $s = '@' . $block->name;
+
+        if (! empty($block->value)) {
+            $s .= ' ' . $this->compileValue($block->value);
+        }
+
+        if ($block->name === 'keyframes' || substr($block->name, -10) === '-keyframes') {
+            $this->compileKeyframeBlock($block, array($s));
+        } else {
+            $this->compileNestedBlock($block, array($s));
+        }
+    }
+
+    /**
      * Compile at-root
      *
      * @param \stdClass $block
@@ -1138,19 +1158,7 @@ class Compiler
                 break;
 
             case 'directive':
-                list(, $directive) = $child;
-
-                $s = '@' . $directive->name;
-
-                if (! empty($directive->value)) {
-                    $s .= ' ' . $this->compileValue($directive->value);
-                }
-
-                if ($directive->name === 'keyframes' || substr($directive->name, -10) === '-keyframes') {
-                    $this->compileKeyframeBlock($directive, array($s));
-                } else {
-                    $this->compileNestedBlock($directive, array($s));
-                }
+                $this->compileDirective($child[1]);
                 break;
 
             case 'at-root':
