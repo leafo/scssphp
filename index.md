@@ -120,6 +120,13 @@ Find any issues? I'd love to fix them for you, post about them on [the issues tr
 
 ## Changelog
 
+* **0.3.3** -- October 23, 2015
+  * Compiler: add `getVariables()` and `addFeature()` API methods
+  * Compiler: can pass negative indices to `nth()` and `set-nth()`
+  * Compiler: can pass map as args to mixin expecting varargs
+  * Compiler: add coerceList(map)
+  * Compiler: improve {% raw %}@{% endraw %}at-root support
+  * Nested formatter: suppress empty blocks
 * **0.3.2** -- October 4, 2015
   * Fix {% raw %}@{% endraw %}extend behavior when interpolating a variable that contains a selector list
   * Hoist {% raw %}@{% endraw %}keyframes so children selectors are not prefixed by parent selector
