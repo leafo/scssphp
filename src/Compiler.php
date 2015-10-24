@@ -505,7 +505,13 @@ class Compiler
     {
         $this->pushEnv($media);
 
-        $mediaQuery = $this->compileMediaQuery($this->multiplyMedia($this->env));
+        $queryList = $this->multiplyMedia($this->env);
+
+        $mediaQuery = $queryList
+            ? $this->compileMediaQuery($queryList)
+            : (isset($media->value)
+                ? '@media ' . $this->compileStringContent($media->value)
+                : null);
 
         if (! empty($mediaQuery)) {
             $this->scope = $this->makeOutputBlock('media', array($mediaQuery));

@@ -507,8 +507,12 @@ class Parser
                 ($this->variable($dirValue) || $this->openString('{', $dirValue) || true) &&
                 $this->literal('{')
             ) {
-                $directive = $this->pushSpecialBlock('directive', $s);
-                $directive->name = $dirName;
+                if ($dirName === 'media') {
+                    $directive = $this->pushSpecialBlock('media', $s);
+                } else {
+                    $directive = $this->pushSpecialBlock('directive', $s);
+                    $directive->name = $dirName;
+                }
 
                 if (isset($dirValue)) {
                     $directive->value = $dirValue;
