@@ -1985,6 +1985,9 @@ class Compiler
             case 'number':
                 return $this->normalizeNumber($value);
 
+            case 'interpolate':
+                return array('keyword', $this->compileValue($value));
+
             default:
                 return $value;
         }
@@ -3874,7 +3877,7 @@ class Compiler
             return self::$null;
         }
 
-        if ($list[0] === 'map') {
+        if ($list[0] === 'map' || $list[0] === 'string' || $list[0] === 'keyword' || $list[0] === 'interpolate') {
             $list = $this->coerceList($list, ' ');
         }
 

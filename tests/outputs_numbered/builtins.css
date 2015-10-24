@@ -84,13 +84,14 @@
   index: 2;
   index: 2;
   index: 1;
+  display: 1;
   world: one, two, three, great, job;
   world: one, two, three, great job;
   cool: one two three great job;
   cool: great job one two three;
   zip: 1px solid, 2px dashed;
   zip: 1px solid red, 2px dashed green; }
-/* line 135, inputs/builtins.scss */
+/* line 136, inputs/builtins.scss */
 #introspection {
   t: number;
   t: string;
@@ -110,31 +111,31 @@
   c: true;
   c: false;
   c: true; }
-/* line 159, inputs/builtins.scss */
+/* line 160, inputs/builtins.scss */
 #if {
   color: yes;
   color: no;
   color: yes;
   color: yes; }
-/* line 166, inputs/builtins.scss */
+/* line 167, inputs/builtins.scss */
 .transparent {
   r: 0;
   g: 0;
   b: 0;
   a: 0; }
-/* line 173, inputs/builtins.scss */
+/* line 174, inputs/builtins.scss */
 .alpha {
   a: 1;
   a: 1;
   a: 1;
   a: 0.5;
   a: alpha(currentColor); }
-/* line 182, inputs/builtins.scss */
+/* line 183, inputs/builtins.scss */
 #exists {
   a: true;
   b: true;
   c: false; }
-/* line 189, inputs/builtins.scss */
+/* line 190, inputs/builtins.scss */
 div.call-tests {
   a: #0a64ff;
   c: b; }
