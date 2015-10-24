@@ -79,3 +79,21 @@ $color: white;
     background-image: url(/logo.gif);
   }
 }
+
+@mixin foo {
+    @content;
+}
+
+@mixin bar {
+    @content;
+}
+
+A {
+    @include foo {
+        $top: 10px;
+
+        @include bar {
+            top: $top;
+        }
+    }
+}

@@ -39,3 +39,6 @@
   /* line 78, inputs/content.scss */
     * html * body #logo {
       background-image: url(/logo.gif); }
+/* line 91, inputs/content.scss */
+A {
+  top: 10px; }

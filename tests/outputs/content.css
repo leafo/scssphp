@@ -30,3 +30,6 @@
 
 * html * body #logo {
   background-image: url(/logo.gif); }
+
+A {
+  top: 10px; }
