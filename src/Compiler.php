@@ -505,13 +505,7 @@ class Compiler
     {
         $this->pushEnv($media);
 
-        $queryList = $this->multiplyMedia($this->env);
-
-        $mediaQuery = $queryList
-            ? $this->compileMediaQuery($queryList)
-            : (isset($media->value)
-                ? '@media ' . $this->compileStringContent($media->value)
-                : null);
+        $mediaQuery = $this->compileMediaQuery($this->multiplyMedia($this->env));
 
         if (! empty($mediaQuery)) {
             $this->scope = $this->makeOutputBlock('media', array($mediaQuery));
@@ -1195,6 +1189,10 @@ class Compiler
                                 . $this->compileValue($q[1])
                                 . ')';
                         }
+                        break;
+
+                    case 'mediaValue':
+                        $parts[] = $this->compileValue($q[1]);
                         break;
                 }
             }
@@ -2665,7 +2663,9 @@ class Compiler
             return $this->multiplyMedia($env->parent, $childQueries);
         }
 
-        $parentQueries = $env->block->queryList;
+        $parentQueries = isset($env->block->queryList)
+            ? $env->block->queryList
+            : array(array(array('mediaValue', $env->block->value)));
 
         if ($childQueries === null) {
             $childQueries = $parentQueries;
