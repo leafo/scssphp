@@ -4746,7 +4746,7 @@ class Compiler
     protected function libStrSlice($args)
     {
         if ($args[2][1] == 0) {
-            return self::$emptyString;
+            return self::$null;
         }
 
         $string = $this->coerceString($args[0]);
@@ -4755,7 +4755,7 @@ class Compiler
         $start = (int) $args[1][1] ?: 1;
         $end = (int) $args[2][1];
 
-        $string[2] = array(substr($stringContent, $start - 1, $end < 0 ? $end : $end - $start + 1));
+        $string[2] = array(substr($stringContent, $start - 1, ($end < 0 ? $end : $end - $start) + 1));
 
         return $string;
     }

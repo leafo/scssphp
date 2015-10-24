@@ -80,6 +80,8 @@
     color: str_insert(string, insert, 2);
     color: str_length(string);
     color: str_slice(string, 2, 4);
+    color: str-slice(string, 2, 0);
+    color: str-slice(string, 2, -2);
     color: to_lower_case('StRiNg');
     color: to_upper_case(StRiNg);
 }
