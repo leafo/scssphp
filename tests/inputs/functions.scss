@@ -95,3 +95,22 @@ div {
 p{
     color: test("a", "s", "d", "f");
 }
+
+@function test-function() {
+  $str: 'test-function';
+  @return $str;
+}
+
+@mixin test-mixin {
+  $str: 'test-mixin';
+  display: $str;
+  $new-bp: test-function();
+  display: $str;
+}
+
+$str: 'global';
+.test{
+  display: $str;
+  @include test-mixin;
+  display: $str;
+}

@@ -26,3 +26,9 @@ div {
 
 p {
   color: arglist; }
+
+.test {
+  display: 'global';
+  display: 'test-mixin';
+  display: 'test-mixin';
+  display: 'global'; }

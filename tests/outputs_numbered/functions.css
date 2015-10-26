@@ -28,3 +28,9 @@ div {
 /* line 95, inputs/functions.scss */
 p {
   color: arglist; }
+/* line 112, inputs/functions.scss */
+.test {
+  display: 'global';
+  display: 'test-mixin';
+  display: 'test-mixin';
+  display: 'global'; }
