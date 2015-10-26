@@ -181,3 +181,12 @@ div.parameter-name-scope {
     0% { color: green; }
     100% { color: red; }
 }
+
+@mixin test-mixin($color: #000) {
+  @media screen and (min-width:0\0) {
+    color: $color;
+  }
+}
+.test{
+  @include test-mixin();
+}

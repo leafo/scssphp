@@ -95,3 +95,24 @@ body {
 .bold, .icon-ajax {
   font-weight: 700; }
 /* line 125, inputs/directives.scss */
+/* line 129, inputs/directives.scss */
+
+/* line 131, inputs/directives.scss */
+  .custom-selector {
+    color: blue; }
+
+@-webkit-keyframes zoomer {
+/* line 136, inputs/directives.scss */
+from {
+  transform: scale(0.5); }
+/* line 140, inputs/directives.scss */
+to {
+  transform: scale(1); } }
+
+@keyframes zoomer {
+/* line 146, inputs/directives.scss */
+from {
+  transform: scale(0.5); }
+/* line 150, inputs/directives.scss */
+to {
+  transform: scale(1); } }

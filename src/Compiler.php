@@ -53,6 +53,11 @@ class Compiler
     const LINE_COMMENTS = 1;
     const DEBUG_INFO    = 2;
 
+    const WITH_RULE = 1;
+    const WITH_MEDIA = 2;
+    const WITH_SUPPORTS = 4;
+    const WITH_ALL = 7;
+
     /**
      * @var array
      */
@@ -93,7 +98,7 @@ class Compiler
             'mm' => 25.4,
             'px' => 96,
             'q'  => 101.6,
-        )
+        ),
     );
 
     static public $true = array('keyword', 'true');
@@ -104,17 +109,28 @@ class Compiler
     static public $emptyList = array('list', '', array());
     static public $emptyMap = array('map', array(), array());
     static public $emptyString = array('string', '"', array());
+    static public $with = array('keyword', 'with');
+    static public $without = array('keyword', 'without');
 
     protected $importPaths = array('');
     protected $importCache = array();
     protected $importedFiles = array();
     protected $userFunctions = array();
     protected $registeredVars = array();
+    protected $registeredFeatures = array(
+        'extend-selector-pseudoclass' => false,
+        'at-error' => true,
+        'units-level-3' => false,
+        'global-variable-shadowing' => false,
+    );
 
     protected $numberPrecision = 5;
     protected $lineNumberStyle = null;
 
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
+
+    protected $rootEnv;
+    protected $rootBlock;
 
     private $indentLevel;
     private $commentsSeen;
@@ -125,7 +141,8 @@ class Compiler
     private $scope;
     private $parser;
     private $sourcePos;
-    private $sourceParser;
+    private $sourceParsers;
+    private $sourceIndex;
     private $storeEnv;
     private $charsetSeen;
     private $stderr;
@@ -137,27 +154,27 @@ class Compiler
      * @api
      *
      * @param string $code
-     * @param string $name
+     * @param string $path
      *
      * @return string
      */
-    public function compile($code, $name = null)
+    public function compile($code, $path = null)
     {
-        $this->indentLevel  = -1;
-        $this->commentsSeen = array();
-        $this->extends      = array();
-        $this->extendsMap   = array();
-        $this->parsedFiles  = array();
-        $this->env          = null;
-        $this->scope        = null;
-
-        $this->stderr = fopen('php://stderr', 'w');
-
         $locale = setlocale(LC_NUMERIC, 0);
         setlocale(LC_NUMERIC, 'C');
 
-        $this->parser = new Parser($name);
+        $this->indentLevel   = -1;
+        $this->commentsSeen  = array();
+        $this->extends       = array();
+        $this->extendsMap    = array();
+        $this->parsedFiles   = array();
+        $this->sourceParsers = array();
+        $this->sourceIndex   = null;
+        $this->env           = null;
+        $this->scope         = null;
+        $this->stderr        = fopen('php://stderr', 'w');
 
+        $this->parser = $this->parserFactory($path);
         $tree = $this->parser->parse($code);
 
         $this->formatter = new $this->formatter();
@@ -172,6 +189,23 @@ class Compiler
         setlocale(LC_NUMERIC, $locale);
 
         return $out;
+    }
+
+    /**
+     * Instantiate parser
+     *
+     * @param string $path
+     *
+     * @return \Leafo\ScssPhp\Parser
+     */
+    private function parserFactory($path)
+    {
+        $parser = new Parser($path, count($this->sourceParsers));
+
+        $this->sourceParsers[] = $parser;
+        $this->addParsedFile($path);
+
+        return $parser;
     }
 
     /**
@@ -245,7 +279,7 @@ class Compiler
      */
     protected function compileRoot($rootBlock)
     {
-        $this->scope = $this->makeOutputBlock('root');
+        $this->rootBlock = $this->scope = $this->makeOutputBlock('root');
 
         $this->compileChildren($rootBlock->children, $this->scope);
         $this->flattenSelectors($this->scope);
@@ -486,17 +520,18 @@ class Compiler
             foreach ($media->children as $child) {
                 $type = $child[0];
 
-                if ($type !== 'block' && $type !== 'media' && $type !== 'directive') {
+                if ($type !== 'block' && $type !== 'media' && $type !== 'directive' && $type !== 'import') {
                     $needsWrap = true;
                     break;
                 }
             }
 
             if ($needsWrap) {
-                $wrapped = (object)array(
+                $wrapped = (object) array(
                     'selectors' => array(),
-                    'children' => $media->children
+                    'children' => $media->children,
                 );
+
                 $media->children = array(array('block', $wrapped));
             }
 
@@ -529,9 +564,281 @@ class Compiler
     }
 
     /**
-     * Compile nested block
+     * Compile directive
      *
-     * @todo refactor compileNestedBlock and compileMedia into same thing?
+     * @param \stdClass $block
+     */
+    protected function compileDirective($block)
+    {
+        $s = '@' . $block->name;
+
+        if (! empty($block->value)) {
+            $s .= ' ' . $this->compileValue($block->value);
+        }
+
+        if ($block->name === 'keyframes' || substr($block->name, -10) === '-keyframes') {
+            $this->compileKeyframeBlock($block, array($s));
+        } else {
+            $this->compileNestedBlock($block, array($s));
+        }
+    }
+
+    /**
+     * Compile at-root
+     *
+     * @param \stdClass $block
+     */
+    protected function compileAtRoot($block)
+    {
+        $env     = $this->pushEnv($block);
+        $envs    = $this->compactEnv($env);
+        $without = isset($block->with) ? $this->compileWith($block->with) : self::WITH_RULE;
+
+        // wrap inline selector
+        if ($block->selector) {
+            $wrapped = (object) array(
+                'parent' => $block,
+                'sourcePosition' => $block->sourcePosition,
+                'sourceIndex' => $block->sourceIndex,
+                'selectors' => $block->selector,
+                'comments' => array(),
+                'children' => $block->children,
+            );
+
+            $block->children = array(array('block', $wrapped));
+        }
+
+        $this->env = $this->filterWithout($envs, $without);
+        $newBlock  = $this->spliceTree($envs, $block, $without);
+
+        $saveScope   = $this->scope;
+        $this->scope = $this->rootBlock;
+
+        $this->compileChild($newBlock, $this->scope);
+
+        $this->scope = $saveScope;
+        $this->env   = $this->extractEnv($envs);
+
+        $this->popEnv();
+    }
+
+    /**
+     * Splice parse tree
+     *
+     * @param array     $envs
+     * @param \stdClass $block
+     * @param integer   $without
+     *
+     * @return \stdClass
+     */
+    private function spliceTree($envs, $block, $without)
+    {
+        $newBlock = null;
+
+        foreach ($envs as $e) {
+            if (! isset($e->block)) {
+                continue;
+            }
+
+            if (isset($e->block) && $e->block === $block) {
+                continue;
+            }
+
+            if (isset($e->block->type) && $e->block->type === 'at-root') {
+                continue;
+            }
+
+            if (($without & self::WITH_RULE) && isset($e->block->selectors)) {
+                continue;
+            }
+
+            if (($without & self::WITH_MEDIA) &&
+                isset($e->block->type) && $e->block->type === 'media'
+            ) {
+                continue;
+            }
+
+            if (($without & self::WITH_SUPPORTS) &&
+                isset($e->block->type) && $e->block->type === 'directive' &&
+                isset($e->block->name) && $e->block->name === 'supports'
+            ) {
+                continue;
+            }
+
+            $b = new \stdClass;
+
+            if (isset($e->block->sourcePosition)) {
+                $b->sourcePosition = $e->block->sourcePosition;
+            }
+
+            if (isset($e->block->sourceIndex)) {
+                $b->sourceIndex = $e->block->sourceIndex;
+            }
+
+            $b->selectors = array();
+
+            if (isset($e->block->comments)) {
+                $b->comments = $e->block->comments;
+            }
+
+            if (isset($e->block->type)) {
+                $b->type = $e->block->type;
+            }
+
+            if (isset($e->block->name)) {
+                $b->name = $e->block->name;
+            }
+
+            if (isset($e->block->queryList)) {
+                $b->queryList = $e->block->queryList;
+            }
+
+            if (isset($e->block->value)) {
+                $b->value = $e->block->value;
+            }
+
+            if ($newBlock) {
+                $type = isset($newBlock->type) ? $newBlock->type : 'block';
+
+                $b->children = array(array($type, $newBlock));
+
+                $newBlock->parent = $b;
+            } elseif (count($block->children)) {
+                foreach ($block->children as $child) {
+                    if ($child[0] === 'block') {
+                        $child[1]->parent = $b;
+                    }
+                }
+
+                $b->children = $block->children;
+            }
+
+            $b->parent = null;
+
+            $newBlock = $b;
+        }
+
+        $type = isset($newBlock->type) ? $newBlock->type : 'block';
+
+        return array($type, $newBlock);
+    }
+
+    /**
+     * Compile @at-root's with: inclusion / without: exclusion into filter flags
+     *
+     * @param array $with
+     *
+     * @return integer
+     */
+    private function compileWith($with)
+    {
+        static $mapping = array(
+            'rule' => self::WITH_RULE,
+            'media' => self::WITH_MEDIA,
+            'supports' => self::WITH_SUPPORTS,
+            'all' => self::WITH_ALL,
+        );
+
+        // exclude selectors by default
+        $without = self::WITH_RULE;
+
+        if ($this->libMapHasKey(array($with, self::$with))) {
+            $without = self::WITH_ALL;
+
+            $list = $this->coerceList($this->libMapGet(array($with, self::$with)));
+
+            foreach ($list[2] as $item) {
+                $keyword = $this->compileStringContent($this->coerceString($item));
+
+                if (array_key_exists($keyword, $mapping)) {
+                    $without &= ~($mapping[$keyword]);
+                }
+            }
+        }
+
+        if ($this->libMapHasKey(array($with, self::$without))) {
+            $without = 0;
+
+            $list = $this->coerceList($this->libMapGet(array($with, self::$without)));
+
+            foreach ($list[2] as $item) {
+                $keyword = $this->compileStringContent($this->coerceString($item));
+
+                if (array_key_exists($keyword, $mapping)) {
+                    $without |= $mapping[$keyword];
+                }
+            }
+        }
+
+        return $without;
+    }
+
+    /**
+     * Filter env stack
+     *
+     * @param array   $envs
+     * @param integer $without
+     *
+     * @return \stdClass
+     */
+    private function filterWithout($envs, $without)
+    {
+        $filtered = array();
+
+        foreach ($envs as $e) {
+            if (($without & self::WITH_RULE) && isset($e->block->selectors)) {
+                continue;
+            }
+
+            if (($without & self::WITH_MEDIA) &&
+                isset($e->block->type) && $e->block->type === 'media'
+            ) {
+                continue;
+            }
+
+            if (($without & self::WITH_SUPPORTS) &&
+                isset($e->block->type) && $e->block->type === 'directive' &&
+                isset($e->block->name) && $e->block->name === 'supports'
+            ) {
+                continue;
+            }
+
+            $filtered[] = $e;
+        }
+
+        return $this->extractEnv($filtered);
+    }
+
+    /**
+     * Compile keyframe block
+     *
+     * @param \stdClass $block
+     * @param array     $selectors
+     */
+    protected function compileKeyframeBlock($block, $selectors)
+    {
+        $env = $this->pushEnv($block);
+
+        $envs = $this->compactEnv($env);
+
+        $this->env = $this->extractEnv(array_filter($envs, function ($e) {
+            return ! isset($e->block->selectors);
+        }));
+
+        $this->scope = $this->makeOutputBlock($block->type, $selectors);
+        $this->scope->depth = 1;
+        $this->scope->parent->children[] = $this->scope;
+
+        $this->compileChildren($block->children, $this->scope);
+
+        $this->scope = $this->scope->parent;
+        $this->env   = $this->extractEnv($envs);
+
+        $this->popEnv();
+    }
+
+    /**
+     * Compile nested block
      *
      * @param \stdClass $block
      * @param array     $selectors
@@ -571,17 +878,17 @@ class Compiler
     protected function compileBlock($block)
     {
         $env = $this->pushEnv($block);
-
         $env->selectors = $this->evalSelectors($block->selectors);
 
-        $out = $this->makeOutputBlock(null, $this->multiplySelectors($env));
+        $out = $this->makeOutputBlock(null);
 
         if (isset($this->lineNumberStyle) && count($env->selectors) && count($block->children)) {
             $annotation = $this->makeOutputBlock('comment');
             $annotation->depth = 0;
 
-            $file = $block->sourceParser->getSourceName();
-            $line = $block->sourceParser->getLineNo($block->sourcePosition);
+            $parser = $this->sourceParsers[$block->sourceIndex];
+            $file = $parser->getSourceName();
+            $line = $parser->getLineNo($block->sourcePosition);
 
             switch ($this->lineNumberStyle) {
                 case self::LINE_COMMENTS:
@@ -599,7 +906,11 @@ class Compiler
 
         $this->scope->children[] = $out;
 
-        $this->compileChildren($block->children, $out);
+        if (count($block->children)) {
+            $out->selectors = $this->multiplySelectors($env);
+
+            $this->compileChildren($block->children, $out);
+        }
 
         $this->formatter->stripSemicolon($out->lines);
 
@@ -634,7 +945,7 @@ class Compiler
         // after evaluating interpolates, we might need a second pass
         if ($this->shouldEvaluate) {
             $buffer = $this->collapseSelectors($selectors);
-            $parser = new Parser(__METHOD__, false);
+            $parser = $this->parserFactory(__METHOD__);
 
             if ($parser->parseSelector($buffer, $newSelectors)) {
                 $selectors = array_map(array($this, 'evalSelector'), $newSelectors);
@@ -818,8 +1129,8 @@ class Compiler
     /**
      * Compile children
      *
-     * @param array $stms
-     * @param array $out
+     * @param array     $stms
+     * @param \stdClass $out
      *
      * @return array
      */
@@ -879,6 +1190,10 @@ class Compiler
                                 . $this->compileValue($q[1])
                                 . ')';
                         }
+                        break;
+
+                    case 'mediaValue':
+                        $parts[] = $this->compileValue($q[1]);
                         break;
                 }
             }
@@ -947,7 +1262,7 @@ class Compiler
 
             return array(
                 $m1 === 'not' ? $m2 : $m1,
-                $m1 === 'not' ? $t2 : $t1
+                $m1 === 'not' ? $t2 : $t1,
             );
         }
 
@@ -1069,8 +1384,8 @@ class Compiler
      */
     protected function compileChild($child, $out)
     {
+        $this->sourceIndex = isset($child[Parser::SOURCE_INDEX]) ? $child[Parser::SOURCE_INDEX] : null;
         $this->sourcePos = isset($child[Parser::SOURCE_POSITION]) ? $child[Parser::SOURCE_POSITION] : -1;
-        $this->sourceParser = isset($child[Parser::SOURCE_PARSER]) ? $child[Parser::SOURCE_PARSER] : $this->parser;
 
         switch ($child[0]) {
             case 'scssphp-import-once':
@@ -1094,15 +1409,11 @@ class Compiler
                 break;
 
             case 'directive':
-                list(, $directive) = $child;
+                $this->compileDirective($child[1]);
+                break;
 
-                $s = '@' . $directive->name;
-
-                if (! empty($directive->value)) {
-                    $s .= ' ' . $this->compileValue($directive->value);
-                }
-
-                $this->compileNestedBlock($directive, array($s));
+            case 'at-root':
+                $this->compileAtRoot($child[1]);
                 break;
 
             case 'media':
@@ -1197,11 +1508,14 @@ class Compiler
                 list(, $selectors) = $child;
 
                 foreach ($selectors as $sel) {
-                    // only use the first one
-                    $result = $this->evalSelectors(array($sel));
-                    $result = current($result[0]);
+                    $results = $this->evalSelectors(array($sel));
 
-                    $this->pushExtends($result, $out->selectors);
+                    foreach ($results as $result) {
+                        // only use the first one
+                        $result = current($result);
+
+                        $this->pushExtends($result, $out->selectors);
+                    }
                 }
                 break;
 
@@ -1333,7 +1647,7 @@ class Compiler
                 if (isset($content)) {
                     $content->scope = $callingScope;
 
-                    $this->setRaw(self::$namespaces['special'] . 'content', $content);
+                    $this->setRaw(self::$namespaces['special'] . 'content', $content, $this->getStoreEnv());
                 }
 
                 if (isset($mixin->args)) {
@@ -1350,7 +1664,7 @@ class Compiler
                 break;
 
             case 'mixin_content':
-                $content = $this->get(self::$namespaces['special'] . 'content', false);
+                $content = $this->get(self::$namespaces['special'] . 'content', false, $this->getStoreEnv());
 
                 if (! $content) {
                     $this->throwError('Expected @content inside of mixin');
@@ -1361,13 +1675,11 @@ class Compiler
                 }
 
                 $this->storeEnv = $content->scope;
-                //$this->pushEnv();
 
                 foreach ($content->children as $child) {
                     $this->compileChild($child, $out);
                 }
 
-                //$this->popEnv();
                 $this->storeEnv = null;
 
                 break;
@@ -1485,7 +1797,10 @@ class Compiler
                 $inExp = $inExp || $this->shouldEval($left) || $this->shouldEval($right);
 
                 $left = $this->reduce($left, true);
-                $right = $this->reduce($right, true);
+
+                if ($op !== 'and' && $op !== 'or') {
+                    $right = $this->reduce($right, true);
+                }
 
                 // special case: looks like css short-hand
                 if ($opName === 'div' && ! $inParens && ! $inExp && isset($right[2]) && $right[2] !== '') {
@@ -1655,9 +1970,9 @@ class Compiler
                     }
 
                     // throw away lines and children
-                    $tmp = (object)array(
+                    $tmp = (object) array(
                         'lines' => array(),
-                        'children' => array()
+                        'children' => array(),
                     );
 
                     $ret = $this->compileChildren($func->children, $tmp);
@@ -1731,6 +2046,9 @@ class Compiler
 
             case 'number':
                 return $this->normalizeNumber($value);
+
+            case 'interpolate':
+                return array('keyword', $this->compileValue($value));
 
             default:
                 return $value;
@@ -1873,7 +2191,7 @@ class Compiler
         }
 
         if ($left !== self::$false) {
-            return $right;
+            return $this->reduce($right, true);
         }
 
         return $left;
@@ -1898,7 +2216,7 @@ class Compiler
             return $left;
         }
 
-        return $right;
+        return $this->reduce($right, true);
     }
 
     /**
@@ -2182,6 +2500,10 @@ class Compiler
 
                 list(, $delim, $items) = $value;
 
+                if ($delim !== ' ') {
+                    $delim .= ' ';
+                }
+
                 $filtered = array();
 
                 foreach ($items as $item) {
@@ -2192,7 +2514,7 @@ class Compiler
                     $filtered[] = $this->compileValue($item);
                 }
 
-                return implode("$delim ", $filtered);
+                return implode("$delim", $filtered);
 
             case 'map':
                 $keys = $value[1];
@@ -2228,6 +2550,7 @@ class Compiler
 
                 // strip quotes if it's a string
                 $reduced = $this->reduce($exp);
+
                 switch ($reduced[0]) {
                     case 'string':
                         $reduced = array('keyword', $this->compileStringContent($reduced));
@@ -2295,7 +2618,7 @@ class Compiler
         foreach ($items as $i => $item) {
             if ($item[0] === 'interpolate') {
                 $before = array('list', $list[1], array_slice($items, 0, $i));
-                $after = array('list', $list[1], array_slice($items, $i + 1));
+                $after  = array('list', $list[1], array_slice($items, $i + 1));
 
                 return array('interpolated', $item, $before, $after);
             }
@@ -2313,20 +2636,15 @@ class Compiler
      */
     protected function multiplySelectors($env)
     {
-        $envs = array();
-
-        while (null !== $env) {
-            if (! empty($env->selectors)) {
-                $envs[] = $env;
-            }
-
-            $env = $env->parent;
-        };
-
-        $selectors = array();
+        $envs            = $this->compactEnv($env);
+        $selectors       = array();
         $parentSelectors = array(array());
 
         while ($env = array_pop($envs)) {
+            if (empty($env->selectors)) {
+                continue;
+            }
+
             $selectors = array();
 
             foreach ($env->selectors as $selector) {
@@ -2403,7 +2721,10 @@ class Compiler
             return $this->multiplyMedia($env->parent, $childQueries);
         }
 
-        $parentQueries = $env->block->queryList;
+        $parentQueries = isset($env->block->queryList)
+            ? $env->block->queryList
+            : array(array(array('mediaValue', $env->block->value)));
+
         if ($childQueries === null) {
             $childQueries = $parentQueries;
         } else {
@@ -2418,6 +2739,39 @@ class Compiler
         }
 
         return $this->multiplyMedia($env->parent, $childQueries);
+    }
+
+    /**
+     * Convert env linked list to stack
+     *
+     * @param \stdClass $env
+     *
+     * @return array
+     */
+    private function compactEnv($env)
+    {
+        for ($envs = array(); $env; $env = $env->parent) {
+            $envs[] = $env;
+        }
+
+        return $envs;
+    }
+
+    /**
+     * Convert env stack to singly linked list
+     *
+     * @param array $envs
+     *
+     * @return \stdClass
+     */
+    private function extractEnv($envs)
+    {
+        for ($env = null; $e = array_pop($envs);) {
+            $e->parent = $env;
+            $env = $e;
+        }
+
+        return $env;
     }
 
     /**
@@ -2473,6 +2827,10 @@ class Compiler
     {
         $name = $this->normalizeName($name);
 
+        if (! isset($env)) {
+            $env = $this->getStoreEnv();
+        }
+
         if ($shadow) {
             $this->setRaw($name, $value, $env);
         } else {
@@ -2487,12 +2845,8 @@ class Compiler
      * @param mixed     $value
      * @param \stdClass $env
      */
-    protected function setExisting($name, $value, $env = null)
+    protected function setExisting($name, $value, $env)
     {
-        if (! isset($env)) {
-            $env = $this->getStoreEnv();
-        }
-
         $storeEnv = $env;
 
         $hasNamespace = $name[0] === '^' || $name[0] === '@' || $name[0] === '%';
@@ -2525,12 +2879,8 @@ class Compiler
      * @param mixed     $value
      * @param \stdClass $env
      */
-    protected function setRaw($name, $value, $env = null)
+    protected function setRaw($name, $value, $env)
     {
-        if (! isset($env)) {
-            $env = $this->getStoreEnv();
-        }
-
         $env->store[$name] = $value;
     }
 
@@ -2603,7 +2953,7 @@ class Compiler
             return;
         }
 
-        $parser = new Parser(__METHOD__, false);
+        $parser = $this->parserFactory(__METHOD__);
 
         foreach ($args as $name => $strValue) {
             if ($name[0] === '$') {
@@ -2640,6 +2990,32 @@ class Compiler
     public function unsetVariable($name)
     {
         unset($this->registeredVars[$name]);
+    }
+
+    /**
+     * Returns list of variables
+     *
+     * @api
+     *
+     * @return array
+     */
+    public function getVariables()
+    {
+        return $this->registeredVars;
+    }
+
+    /**
+     * Adds to list of parsed files
+     *
+     * @api
+     *
+     * @param string $path
+     */
+    public function addParsedFile($path)
+    {
+        if (isset($path) && file_exists($path)) {
+            $this->parsedFiles[realpath($path)] = filemtime($path);
+        }
     }
 
     /**
@@ -2742,6 +3118,18 @@ class Compiler
     }
 
     /**
+     * Add feature
+     *
+     * @api
+     *
+     * @param string $name
+     */
+    public function addFeature($name)
+    {
+        $this->registeredFeatures[$name] = true;
+    }
+
+    /**
      * Import file
      *
      * @param string $path
@@ -2757,11 +3145,10 @@ class Compiler
 
             $tree = $this->importCache[$realPath];
         } else {
-            $code = file_get_contents($path);
-            $parser = new Parser($path, false);
-            $tree = $parser->parse($code);
+            $code   = file_get_contents($path);
+            $parser = $this->parserFactory($path);
+            $tree   = $parser->parse($code);
 
-            $this->parsedFiles[$realPath] = filemtime($path);
             $this->importCache[$realPath] = $tree;
         }
 
@@ -2832,8 +3219,9 @@ class Compiler
             $msg = call_user_func_array('sprintf', func_get_args());
         }
 
-        if ($this->sourcePos >= 0 && isset($this->sourceParser)) {
-            $this->sourceParser->throwParseError($msg, $this->sourcePos);
+        if ($this->sourcePos >= 0 && isset($this->sourceIndex)) {
+            $parser = $this->sourceParsers[$this->sourceIndex];
+            $parser->throwParseError($msg, $this->sourcePos);
         }
 
         throw new \Exception($msg);
@@ -2849,14 +3237,11 @@ class Compiler
     private function handleImportLoop($name)
     {
         for ($env = $this->env; $env; $env = $env->parent) {
-            $file = $env->block->sourceParser->getSourceName();
+            $parser = $this->sourceParsers[$env->block->sourceIndex];
+            $file = $parser->getSourceName();
 
             if (realpath($file) === $name) {
-                $this->throwError(
-                    'An @import loop has been found: %s imports %s',
-                    $this->env->block->sourceParser->getSourceName(),
-                    basename($file)
-                );
+                $this->throwError('An @import loop has been found: %s imports %s', $file, basename($file));
             }
         }
     }
@@ -2891,8 +3276,10 @@ class Compiler
             // see if we can find a user function
             $fn = $this->userFunctions[$name];
 
-            foreach ($args as &$val) {
-                $val = $this->reduce($val[1], true);
+            if ($name !== 'if' && $name !== 'call') {
+                foreach ($args as &$val) {
+                    $val = $this->reduce($val[1], true);
+                }
             }
 
             $returnValue = call_user_func($fn, $args, $this);
@@ -2905,8 +3292,10 @@ class Compiler
                 $prototype = isset(self::$$libName) ? self::$$libName : null;
                 $sorted = $this->sortArgs($prototype, $args);
 
-                foreach ($sorted as &$val) {
-                    $val = $this->reduce($val, true);
+                if ($name !== 'if' && $name !== 'call') {
+                    foreach ($sorted as &$val) {
+                        $val = $this->reduce($val, true);
+                    }
                 }
 
                 $returnValue = call_user_func($f, $sorted, $this);
@@ -3055,6 +3444,17 @@ class Compiler
                             $remaining[] = $item;
                         }
                     }
+                } elseif ($val[0] === 'map') {
+                    foreach ($val[1] as $i => $name) {
+                        $name = $this->compileStringContent($this->coerceString($name));
+                        $item = $val[2][$i];
+
+                        if (! is_numeric($name)) {
+                            $keywordArgs[$name] = $item;
+                        } else {
+                            $remaining[] = $item;
+                        }
+                    }
                 } else {
                     $remaining[] = $val;
                 }
@@ -3195,7 +3595,11 @@ class Compiler
                 $key = $keys[$i];
                 $value = $values[$i];
 
-                $list[] = array('list', '', array(array('keyword', $this->compileValue($key)), $value));
+                $list[] = array(
+                    'list',
+                    '',
+                    array(array('keyword', $this->compileStringContent($this->coerceString($key))), $value)
+                );
             }
 
             return array('list', ',', $list);
@@ -3497,16 +3901,35 @@ class Compiler
 
     // Built in functions
 
+    //protected static $libCall = array('name', 'args...');
+    protected function libCall($args)
+    {
+        $name = $this->compileStringContent($this->coerceString($this->reduce(array_shift($args), true)));
+
+        return $this->reduce(
+            array(
+                'fncall',
+                $name,
+                array_map(
+                    function ($a) {
+                        return array(null, $a);
+                    },
+                    $args
+                )
+            )
+        );
+    }
+
     protected static $libIf = array('condition', 'if-true', 'if-false');
     protected function libIf($args)
     {
         list($cond, $t, $f) = $args;
 
-        if (! $this->isTruthy($cond)) {
-            return $f;
+        if (! $this->isTruthy($this->reduce($cond, true))) {
+            return $this->reduce($f, true);
         }
 
-        return $t;
+        return $this->reduce($t, true);
     }
 
     protected static $libIndex = array('list', 'value');
@@ -3518,7 +3941,7 @@ class Compiler
             return self::$null;
         }
 
-        if ($list[0] === 'map') {
+        if ($list[0] === 'map' || $list[0] === 'string' || $list[0] === 'keyword' || $list[0] === 'interpolate') {
             $list = $this->coerceList($list, ' ');
         }
 
@@ -3766,8 +4189,7 @@ class Compiler
         return $this->toRGB($h[1], $s[1], $l[1]);
     }
 
-    protected static $libHsla = array('hue', 'saturation',
-        'lightness', 'alpha');
+    protected static $libHsla = array('hue', 'saturation', 'lightness', 'alpha');
     protected function libHsla($args)
     {
         list($h, $s, $l, $a) = $args;
@@ -3969,9 +4391,7 @@ class Compiler
     protected static $libPercentage = array('value');
     protected function libPercentage($args)
     {
-        return array('number',
-            $this->coercePercent($args[0]) * 100,
-            '%');
+        return array('number', $this->coercePercent($args[0]) * 100, '%');
     }
 
     protected static $libRound = array('value');
@@ -4104,7 +4524,13 @@ class Compiler
     protected function libNth($args)
     {
         $list = $this->coerceList($args[0]);
-        $n = $this->assertNumber($args[1]) - 1;
+        $n = $this->assertNumber($args[1]);
+
+        if ($n > 0) {
+            $n--;
+        } elseif ($n < 0) {
+            $n += count($list[2]);
+        }
 
         return isset($list[2][$n]) ? $list[2][$n] : self::$defaultValue;
     }
@@ -4113,7 +4539,13 @@ class Compiler
     protected function libSetNth($args)
     {
         $list = $this->coerceList($args[0]);
-        $n = $this->assertNumber($args[1]) - 1;
+        $n = $this->assertNumber($args[1]);
+
+        if ($n > 0) {
+            $n--;
+        } elseif ($n < 0) {
+            $n += count($list[2]);
+        }
 
         if (! isset($list[2][$n])) {
             $this->throwError('Invalid argument for "n"');
@@ -4128,11 +4560,10 @@ class Compiler
     protected function libMapGet($args)
     {
         $map = $this->assertMap($args[0]);
-
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
         for ($i = count($map[1]) - 1; $i >= 0; $i--) {
-            if ($key === $this->compileValue($map[1][$i])) {
+            if ($key === $this->compileStringContent($this->coerceString($map[1][$i]))) {
                 return $map[2][$i];
             }
         }
@@ -4144,7 +4575,6 @@ class Compiler
     protected function libMapKeys($args)
     {
         $map = $this->assertMap($args[0]);
-
         $keys = $map[1];
 
         return array('list', ',', $keys);
@@ -4154,7 +4584,6 @@ class Compiler
     protected function libMapValues($args)
     {
         $map = $this->assertMap($args[0]);
-
         $values = $map[2];
 
         return array('list', ',', $values);
@@ -4164,11 +4593,10 @@ class Compiler
     protected function libMapRemove($args)
     {
         $map = $this->assertMap($args[0]);
-
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
         for ($i = count($map[1]) - 1; $i >= 0; $i--) {
-            if ($key === $this->compileValue($map[1][$i])) {
+            if ($key === $this->compileStringContent($this->coerceString($map[1][$i]))) {
                 array_splice($map[1], $i, 1);
                 array_splice($map[2], $i, 1);
             }
@@ -4181,16 +4609,15 @@ class Compiler
     protected function libMapHasKey($args)
     {
         $map = $this->assertMap($args[0]);
-
         $key = $this->compileStringContent($this->coerceString($args[1]));
 
         for ($i = count($map[1]) - 1; $i >= 0; $i--) {
-            if ($key === $this->compileValue($map[1][$i])) {
-                return self::$true;
+            if ($key === $this->compileStringContent($this->coerceString($map[1][$i]))) {
+                return true;
             }
         }
 
-        return self::$false;
+        return false;
     }
 
     protected static $libMapMerge = array('map-1', 'map-2');
@@ -4262,6 +4689,7 @@ class Compiler
                     break 2;
                 }
             }
+
             $lists[] = $list;
         }
 
@@ -4376,7 +4804,7 @@ class Compiler
     protected function libStrSlice($args)
     {
         if ($args[2][1] == 0) {
-            return self::$emptyString;
+            return self::$null;
         }
 
         $string = $this->coerceString($args[0]);
@@ -4385,7 +4813,7 @@ class Compiler
         $start = (int) $args[1][1] ?: 1;
         $end = (int) $args[2][1];
 
-        $string[2] = array(substr($stringContent, $start - 1, $end < 0 ? $end : $end - $start + 1));
+        $string[2] = array(substr($stringContent, $start - 1, ($end < 0 ? $end : $end - $start) + 1));
 
         return $string;
     }
@@ -4415,14 +4843,12 @@ class Compiler
     protected static $libFeatureExists = array('feature');
     protected function libFeatureExists($args)
     {
-        /*
-         * The following features not not (yet) supported:
-         * - global-variable-shadowing
-         * - extend-selector-pseudoclass
-         * - units-level-3
-         * - at-error
-         */
-        return self::$false;
+        $string = $this->coerceString($args[0]);
+        $name = $this->compileStringContent($string);
+
+        return $this->toBool(
+            array_key_exists($name, $this->registeredFeatures) ? $this->registeredFeatures[$name] : false
+        );
     }
 
     protected static $libFunctionExists = array('name');
@@ -4433,13 +4859,13 @@ class Compiler
 
         // user defined functions
         if ($this->has(self::$namespaces['function'] . $name)) {
-            return self::$true;
+            return true;
         }
 
         $name = $this->normalizeName($name);
 
         if (isset($this->userFunctions[$name])) {
-            return self::$true;
+            return true;
         }
 
         // built-in functions

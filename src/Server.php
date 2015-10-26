@@ -129,19 +129,23 @@ class Server
 
         $mtime = filemtime($out);
 
-        if (filemtime($in) > $mtime) {
-            return true;
-        }
-
         $metadataName = $this->metadataName($out);
 
         if (is_readable($metadataName)) {
             $metadata = unserialize(file_get_contents($metadataName));
 
-            foreach ($metadata['imports'] as $import => $importMtime) {
-                if ($importMtime > $mtime) {
+            foreach ($metadata['imports'] as $import => $originalMtime) {
+                $currentMtime = filemtime($import);
+
+                if ($currentMtime !== $originalMtime || $currentMtime > $mtime) {
                     return true;
                 }
+            }
+
+            $metaVars = crc32(serialize($this->scss->getVariables()));
+
+            if ($metaVars !== $metadata['vars']) {
+                return true;
             }
 
             $etag = $metadata['etag'];
@@ -213,6 +217,7 @@ class Server
             serialize(array(
                 'etag'    => $etag,
                 'imports' => $this->scss->getParsedFiles(),
+                'vars'    => crc32(serialize($this->scss->getVariables())),
             ))
         );
 

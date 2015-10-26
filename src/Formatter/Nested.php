@@ -21,6 +21,11 @@ use Leafo\ScssPhp\Formatter;
 class Nested extends Formatter
 {
     /**
+     * @var integer
+     */
+    private $depth;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct()
@@ -37,9 +42,19 @@ class Nested extends Formatter
     /**
      * {@inheritdoc}
      */
+    protected function indentStr()
+    {
+        $n = $this->depth - 1;
+
+        return str_repeat($this->indentChar, max($this->indentLevel + $n, 0));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function blockLines($block)
     {
-        $inner = $this->indentStr($block->depth - 1);
+        $inner = $this->indentStr();
 
         $glue = $this->break . $inner;
 
@@ -61,7 +76,7 @@ class Nested extends Formatter
      */
     protected function blockSelectors($block)
     {
-        $inner = $this->indentStr($block->depth - 1);
+        $inner = $this->indentStr();
 
         echo $inner
             . implode($this->tagSeparator, $block->selectors)
@@ -71,22 +86,8 @@ class Nested extends Formatter
     /**
      * {@inheritdoc}
      */
-    protected function block($block)
+    protected function blockChildren($block)
     {
-        if ($block->type === 'root') {
-            $this->adjustAllChildren($block);
-        }
-
-        if (! empty($block->selectors)) {
-            $this->blockSelectors($block);
-
-            $this->indentLevel++;
-        }
-
-        if (! empty($block->lines)) {
-            $this->blockLines($block);
-        }
-
         foreach ($block->children as $i => $child) {
             $this->block($child);
 
@@ -101,6 +102,36 @@ class Nested extends Formatter
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function block($block)
+    {
+        if ($block->type === 'root') {
+            $this->adjustAllChildren($block);
+        }
+
+        if (empty($block->lines) && empty($block->children)) {
+            return;
+        }
+
+        $this->depth = $block->depth;
+
+        if (! empty($block->selectors)) {
+            $this->blockSelectors($block);
+
+            $this->indentLevel++;
+        }
+
+        if (! empty($block->lines)) {
+            $this->blockLines($block);
+        }
+
+        if (! empty($block->children)) {
+            $this->blockChildren($block);
         }
 
         if (! empty($block->selectors)) {

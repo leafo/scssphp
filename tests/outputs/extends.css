@@ -118,3 +118,9 @@ body .to-extend, body .test {
     color: #fff; }
   .foo__bar#test, input {
     background: red; }
+
+.selector1, .master-class {
+  color: blue; }
+
+.selector2, .master-class {
+  background: #ccc; }

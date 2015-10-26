@@ -1,0 +1,3 @@
+$test: if(true, 1, $undefined);
+$test: false and $undefined;
+$test: true or $undefined;

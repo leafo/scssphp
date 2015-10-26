@@ -14,8 +14,9 @@ div {
 div {
   a: 10px;
   b: -20px;
-  c: 30px; }
-/* line 30, inputs/list.scss */
+  c: 30px;
+  d: 30px; }
+/* line 31, inputs/list.scss */
 div {
   x: space;
   y: comma;

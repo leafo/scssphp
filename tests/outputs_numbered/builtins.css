@@ -56,9 +56,10 @@
   color: sinserttring;
   color: 6;
   color: tri;
+  color: trin;
   color: 'string';
   color: STRING; }
-/* line 87, inputs/builtins.scss */
+/* line 89, inputs/builtins.scss */
 #number {
   color: 250%;
   color: 3;
@@ -69,7 +70,7 @@
   width: 200%;
   bottom: 10px;
   padding: 3em 1in 96px 72pt; }
-/* line 100, inputs/builtins.scss */
+/* line 102, inputs/builtins.scss */
 #list {
   len: 3;
   len: 1;
@@ -84,13 +85,14 @@
   index: 2;
   index: 2;
   index: 1;
+  display: 1;
   world: one, two, three, great, job;
   world: one, two, three, great job;
   cool: one two three great job;
   cool: great job one two three;
   zip: 1px solid, 2px dashed;
   zip: 1px solid red, 2px dashed green; }
-/* line 135, inputs/builtins.scss */
+/* line 138, inputs/builtins.scss */
 #introspection {
   t: number;
   t: string;
@@ -110,27 +112,31 @@
   c: true;
   c: false;
   c: true; }
-/* line 159, inputs/builtins.scss */
+/* line 162, inputs/builtins.scss */
 #if {
   color: yes;
   color: no;
   color: yes;
   color: yes; }
-/* line 166, inputs/builtins.scss */
+/* line 169, inputs/builtins.scss */
 .transparent {
   r: 0;
   g: 0;
   b: 0;
   a: 0; }
-/* line 173, inputs/builtins.scss */
+/* line 176, inputs/builtins.scss */
 .alpha {
   a: 1;
   a: 1;
   a: 1;
   a: 0.5;
   a: alpha(currentColor); }
-/* line 182, inputs/builtins.scss */
+/* line 185, inputs/builtins.scss */
 #exists {
   a: true;
   b: true;
   c: false; }
+/* line 192, inputs/builtins.scss */
+div.call-tests {
+  a: #0a64ff;
+  c: b; }

@@ -11,3 +11,12 @@ div {
 div {
   foo: color black;
   bar: color; }
+/* line 31, inputs/map.scss */
+.black {
+  background-color: #000 !important; }
+/* line 52, inputs/map.scss */
+div {
+  a: 1;
+  b: 2;
+  color: 1;
+  background-color: 2; }

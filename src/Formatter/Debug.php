@@ -37,10 +37,26 @@ class Debug extends Formatter
     /**
      * {@inheritdoc}
      */
+    protected function indentStr()
+    {
+        return str_repeat('  ', $this->indentLevel);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function blockLines($block)
     {
+        $indent = $this->indentStr();
+
+        if (empty($block->lines)) {
+            echo "{$indent}block->lines: []\n";
+
+            return;
+        }
+
         foreach ($block->lines as $index => $line) {
-            echo "block->lines[{$index}]: $line\n";
+            echo "{$indent}block->lines[{$index}]: $line\n";
         }
     }
 
@@ -49,9 +65,39 @@ class Debug extends Formatter
      */
     protected function blockSelectors($block)
     {
-        foreach ($block->selectors as $index => $selector) {
-            echo "block->selectors[{$index}]: $selector\n";
+        $indent = $this->indentStr();
+
+        if (empty($block->selectors)) {
+            echo "{$indent}block->selectors: []\n";
+
+            return;
         }
+
+        foreach ($block->selectors as $index => $selector) {
+            echo "{$indent}block->selectors[{$index}]: $selector\n";
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function blockChildren($block)
+    {
+        $indent = $this->indentStr();
+
+        if (empty($block->children)) {
+            echo "{$indent}block->children: []\n";
+
+            return;
+        }
+
+        $this->indentLevel++;
+
+        foreach ($block->children as $i => $child) {
+            $this->block($child);
+        }
+
+        $this->indentLevel--;
     }
 
     /**
@@ -59,19 +105,13 @@ class Debug extends Formatter
      */
     protected function block($block)
     {
-        echo "block->type: {$block->type}\n" .
-             "block->depth: {$block->depth}\n";
+        $indent = $this->indentStr();
 
-        if (! empty($block->selectors)) {
-            $this->blockSelectors($block);
-        }
+        echo "{$indent}block->type: {$block->type}\n" .
+             "{$indent}block->depth: {$block->depth}\n";
 
-        if (! empty($block->lines)) {
-            $this->blockLines($block);
-        }
-
-        foreach ($block->children as $i => $child) {
-            $this->block($child);
-        }
+        $this->blockSelectors($block);
+        $this->blockLines($block);
+        $this->blockChildren($block);
     }
 }

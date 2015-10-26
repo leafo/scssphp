@@ -37,14 +37,6 @@ class Crunched extends Formatter
     /**
      * {@inheritdoc}
      */
-    public function indentStr($n = 0)
-    {
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function stripSemicolon(&$lines)
     {
         if (($count = count($lines))

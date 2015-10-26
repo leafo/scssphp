@@ -91,3 +91,7 @@ div.parameter-name-scope {
 
   100% {
     color: red; } }
+
+@media screen and (min-width:0\0) {
+    .test {
+      color: #000; } }

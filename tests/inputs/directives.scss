@@ -125,3 +125,31 @@ div {
 .icon-ajax {
     @extend .bold;
 }
+
+.custom-selector {
+
+& {
+  color:blue;
+}
+
+@-webkit-keyframes zoomer {
+  from {
+    transform:scale(0.5);
+  }
+
+  to {
+    transform:scale(1);
+  }
+}
+
+@keyframes zoomer {
+  from {
+    transform:scale(0.5);
+  }
+
+  to {
+    transform:scale(1);
+  }
+}
+
+}

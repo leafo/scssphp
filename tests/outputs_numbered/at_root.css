@@ -1,0 +1,109 @@
+/* line 1, inputs/at_root.scss */
+.parent-inline-selector {
+  color: white; }
+  /* line 3, inputs/at_root.scss */
+    .child {
+      color: black; }
+/* line 6, inputs/at_root.scss */
+.parent-block {
+  color: white; }
+  /* line 9, inputs/at_root.scss */
+    .child1 {
+      color: green; }
+/* line 10, inputs/at_root.scss */
+.child2 {
+  color: blue; }
+/* line 12, inputs/at_root.scss */
+.parent-block .step-child {
+  color: black; }
+/* line 15, inputs/at_root.scss */
+.first {
+  color: red; }
+/* line 18, inputs/at_root.scss */
+/* line 19, inputs/at_root.scss */
+
+body .second {
+  color: white;
+  color: black; }
+
+/* line 23, inputs/at_root.scss */
+  .nested1 {
+    color: blue;
+    color: orange; }
+    /* line 26, inputs/at_root.scss */
+      .nested2 {
+        color: yellow; }
+/* line 36, inputs/at_root.scss */
+.third {
+  color: green; }
+
+@media print {
+/* line 41, inputs/at_root.scss */
+.page {
+  width: 8in; } }
+
+.page {
+  color: red; }
+/* line 49, inputs/at_root.scss */
+@media (min-width: 300px) {
+    /* line 51, inputs/at_root.scss */
+      .my-widget .inside-mq {
+        inside-style: mq; } }
+  /* line 56, inputs/at_root.scss */
+    .my-widget .outside-mq {
+      outside-style: mq; }
+  /* line 63, inputs/at_root.scss */
+    .outside-class {
+      color: blue; }
+  @media (min-width: 300px) {
+/* line 71, inputs/at_root.scss */
+.with-only {
+color: pink; } }
+
+@media screen and (max-width: 320px) {
+/* line 81, inputs/at_root.scss */
+.foo {
+  margin: 0; } }
+
+@media screen and (max-width: 320px) {
+/* line 85, inputs/at_root.scss */
+.bar {
+  padding: 0; } }
+
+/* line 90, inputs/at_root.scss */
+  .baar {
+    padding: 0; }
+
+/* line 95, inputs/at_root.scss */
+  .foo .barr {
+    padding: 0; }
+
+@media screen and (max-width: 640px) {
+/* line 104, inputs/at_root.scss */ }
+  /* line 107, inputs/at_root.scss */
+  .foo .bar {
+    width: 0; }
+  @supports ( display: flex ) {
+/* line 112, inputs/at_root.scss */
+.baz {
+height: 0; } }
+  @media screen and (max-width: 640px) {
+/* line 117, inputs/at_root.scss */
+.qux {
+margin: 0; } }
+  @media screen and (max-width: 640px) {
+          /* line 122, inputs/at_root.scss */
+            .foo .quux {
+              padding: 0; } }
+  /* line 127, inputs/at_root.scss */
+  .foo .quix {
+    padding: 0; }
+/* line 144, inputs/at_root.scss */
+/* line 145, inputs/at_root.scss */
+
+.test .test2 {
+  padding: 0px; }
+
+/* line 139, inputs/at_root.scss */
+  tbody {
+    padding: 10px; }
