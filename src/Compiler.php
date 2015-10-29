@@ -2067,7 +2067,7 @@ class Compiler
     protected function opDivNumberNumber($left, $right)
     {
         if ($right[1] == 0) {
-            $this->throwError('Division by zero');
+            return array('string', '', $left[1] . $left[2] . '/' . $right[1] . $right[2]);
         }
 
         return array('number', $left[1] / $right[1], $left[2]);
