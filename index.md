@@ -5,8 +5,7 @@ layout: default
 **scssphp** is a compiler for [SCSS][0] 3.x written in PHP.
 
 SCSS is a CSS preprocessor language that adds many features like variables,
-mixins, imports, color manipulation, functions, and tons of other powerful
-features.
+mixins, imports, nesting, color manipulation, functions, and control directives.
 
 **scssphp** is ready for inclusion in any project. It includes a command
 line tool for running the compiler from a terminal/shell or script.
@@ -114,7 +113,7 @@ For a more detailed guide consult <a href="{{ site.baseurl }}docs/">{{ site.base
 
 ## Issues
 
-Find any issues? I'd love to fix them for you, post about them on [the issues tracker][3].
+Please submit bug reports and feature requests to the [the issue tracker][3]. Pull requests also welcome.
 
 <div id="changelog"></div>
 
