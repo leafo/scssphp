@@ -171,6 +171,7 @@ class Compiler
         $this->sourceIndex   = null;
         $this->env           = null;
         $this->scope         = null;
+        $this->storeEnv      = null;
         $this->stderr        = fopen('php://stderr', 'w');
 
         $this->parser = $this->parserFactory($path);
@@ -280,7 +281,7 @@ class Compiler
     {
         $this->rootBlock = $this->scope = $this->makeOutputBlock('root');
 
-        $this->compileChildren($rootBlock->children, $this->scope);
+        $this->compileChildrenNoReturn($rootBlock->children, $this->scope);
         $this->flattenSelectors($this->scope);
     }
 
@@ -534,7 +535,7 @@ class Compiler
                 $media->children = array(array('block', $wrapped));
             }
 
-            $this->compileChildren($media->children, $this->scope);
+            $this->compileChildrenNoReturn($media->children, $this->scope);
 
             $this->scope = $this->scope->parent;
         }
@@ -828,7 +829,7 @@ class Compiler
         $this->scope->depth = 1;
         $this->scope->parent->children[] = $this->scope;
 
-        $this->compileChildren($block->children, $this->scope);
+        $this->compileChildrenNoReturn($block->children, $this->scope);
 
         $this->scope = $this->scope->parent;
         $this->env   = $this->extractEnv($envs);
@@ -849,7 +850,7 @@ class Compiler
         $this->scope = $this->makeOutputBlock($block->type, $selectors);
         $this->scope->parent->children[] = $this->scope;
 
-        $this->compileChildren($block->children, $this->scope);
+        $this->compileChildrenNoReturn($block->children, $this->scope);
 
         $this->scope = $this->scope->parent;
 
@@ -908,7 +909,7 @@ class Compiler
         if (count($block->children)) {
             $out->selectors = $this->multiplySelectors($env);
 
-            $this->compileChildren($block->children, $out);
+            $this->compileChildrenNoReturn($block->children, $out);
         }
 
         $this->formatter->stripSemicolon($out->lines);
@@ -1126,7 +1127,7 @@ class Compiler
     }
 
     /**
-     * Compile children
+     * Compile children and return result
      *
      * @param array     $stms
      * @param \stdClass $out
@@ -1140,6 +1141,25 @@ class Compiler
 
             if (isset($ret)) {
                 return $ret;
+            }
+        }
+    }
+
+    /**
+     * Compile children and throw exception if unexpected @return
+     *
+     * @param array     $stms
+     * @param \stdClass $out
+     *
+     * @throws \Exception
+     */
+    protected function compileChildrenNoReturn($stms, $out)
+    {
+        foreach ($stms as $stm) {
+            $ret = $this->compileChild($stm, $out);
+
+            if (isset($ret)) {
+                $this->throwError('@return may only be used within a function');
             }
         }
     }
@@ -1567,7 +1587,7 @@ class Compiler
                     $prefixed[] = $child;
                 }
 
-                $this->compileChildren($prefixed, $out);
+                $this->compileChildrenNoReturn($prefixed, $out);
                 break;
 
             case 'include':
@@ -1587,7 +1607,7 @@ class Compiler
                 $this->env->depth--;
 
                 if (isset($content)) {
-                    $content->scope = $callingScope;
+                    $content->scope = $this->storeEnv ? $this->storeEnv : $callingScope;
 
                     $this->setRaw(self::$namespaces['special'] . 'content', $content, $this->getStoreEnv());
                 }
@@ -1598,9 +1618,7 @@ class Compiler
 
                 $this->env->marker = 'mixin';
 
-                foreach ($mixin->children as $child) {
-                    $this->compileChild($child, $out);
-                }
+                $this->compileChildrenNoReturn($mixin->children, $out);
 
                 $this->popEnv();
                 break;
@@ -1616,14 +1634,12 @@ class Compiler
                     break;
                 }
 
+                $storeEnv = $this->storeEnv;
                 $this->storeEnv = $content->scope;
 
-                foreach ($content->children as $child) {
-                    $this->compileChild($child, $out);
-                }
+                $this->compileChildrenNoReturn($content->children, $out);
 
-                $this->storeEnv = null;
-
+                $this->storeEnv = $storeEnv;
                 break;
 
             case 'debug':
@@ -1916,6 +1932,8 @@ class Compiler
                         'lines' => array(),
                         'children' => array(),
                     );
+
+                    $this->env->marker = 'function';
 
                     $ret = $this->compileChildren($func->children, $tmp);
 
@@ -2741,10 +2759,7 @@ class Compiler
      */
     protected function popEnv()
     {
-        $env = $this->env;
         $this->env = $this->env->parent;
-
-        return $env;
     }
 
     /**
@@ -3096,7 +3111,7 @@ class Compiler
 
         $pi = pathinfo($path);
         array_unshift($this->importPaths, $pi['dirname']);
-        $this->compileChildren($tree->children, $out);
+        $this->compileChildrenNoReturn($tree->children, $out);
         array_shift($this->importPaths);
     }
 
