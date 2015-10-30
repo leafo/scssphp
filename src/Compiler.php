@@ -1600,14 +1600,14 @@ class Compiler
                     $this->throwError("Undefined mixin $name");
                 }
 
-                $callingScope = $this->env;
+                $callingScope = $this->getStoreEnv();
 
                 // push scope, apply args
                 $this->pushEnv();
                 $this->env->depth--;
 
                 if (isset($content)) {
-                    $content->scope = $this->storeEnv ? $this->storeEnv : $callingScope;
+                    $content->scope = $callingScope;
 
                     $this->setRaw(self::$namespaces['special'] . 'content', $content, $this->getStoreEnv());
                 }
