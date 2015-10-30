@@ -1984,7 +1984,7 @@ class Compiler
                 return $value;
 
             case 'string':
-                return array($type, '"', $this->compileStringContent($value));
+                return array($type, '"', array($this->compileStringContent($value)));
 
             case 'number':
                 return $this->normalizeNumber($value);
@@ -2067,7 +2067,7 @@ class Compiler
     protected function opDivNumberNumber($left, $right)
     {
         if ($right[1] == 0) {
-            return array('string', '', $left[1] . $left[2] . '/' . $right[1] . $right[2]);
+            return array('string', '', array($left[1] . $left[2] . '/' . $right[1] . $right[2]));
         }
 
         return array('number', $left[1] / $right[1], $left[2]);
