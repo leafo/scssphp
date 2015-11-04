@@ -41,6 +41,8 @@ To install the unit tests, download the complete package source using `composer`
 
 <a name="quickstart"></a>
 
+**scssphp** requires PHP version 5.3 (or above).
+
 ## Language Reference
 
 For a complete guide to the syntax of SCSS, consult the [official documentation][1].
