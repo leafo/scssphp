@@ -12,7 +12,10 @@
 namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Base\Range;
+use Leafo\ScssPhp\Block;
 use Leafo\ScssPhp\Colors;
+use Leafo\ScssPhp\Compiler\Environment;
+use Leafo\ScssPhp\Formatter\OutputBlock;
 use Leafo\ScssPhp\Parser;
 use Leafo\ScssPhp\Util;
 
@@ -257,17 +260,17 @@ class Compiler
      * @param string $type
      * @param array  $selectors
      *
-     * @return \stdClass
+     * @return \Leafo\ScssPhp\Formatter\OutputBlock
      */
     protected function makeOutputBlock($type, $selectors = null)
     {
-        $out = new \stdClass;
-        $out->type = $type;
-        $out->lines = array();
-        $out->children = array();
-        $out->parent = $this->scope;
+        $out = new OutputBlock;
+        $out->type      = $type;
+        $out->lines     = array();
+        $out->children  = array();
+        $out->parent    = $this->scope;
         $out->selectors = $selectors;
-        $out->depth = $this->env->depth;
+        $out->depth     = $this->env->depth;
 
         return $out;
     }
@@ -275,9 +278,9 @@ class Compiler
     /**
      * Compile root
      *
-     * @param \stdClass $rootBlock
+     * @param \Leafo\ScssPhp\Block $rootBlock
      */
-    protected function compileRoot($rootBlock)
+    protected function compileRoot(Block $rootBlock)
     {
         $this->rootBlock = $this->scope = $this->makeOutputBlock('root');
 
@@ -288,10 +291,10 @@ class Compiler
     /**
      * Flatten selectors
      *
-     * @param \stdClass $block
-     * @parent string   $parentKey
+     * @param \Leafo\ScssPhp\Formatter\OutputBlock $block
+     * @param string                               $parentKey
      */
-    protected function flattenSelectors($block, $parentKey = null)
+    protected function flattenSelectors(OutputBlock $block, $parentKey = null)
     {
         if ($block->selectors) {
             $selectors = array();
@@ -500,9 +503,9 @@ class Compiler
     /**
      * Compile media
      *
-     * @param \stdClass $media
+     * @param \Leafo\ScssPhp\Block $media
      */
-    protected function compileMedia($media)
+    protected function compileMedia(Block $media)
     {
         $this->pushEnv($media);
 
@@ -527,10 +530,9 @@ class Compiler
             }
 
             if ($needsWrap) {
-                $wrapped = (object) array(
-                    'selectors' => array(),
-                    'children' => $media->children,
-                );
+                $wrapped = new Block;
+                $wrapped->selectors = array();
+                $wrapped->children  = $media->children;
 
                 $media->children = array(array('block', $wrapped));
             }
@@ -546,11 +548,11 @@ class Compiler
     /**
      * Media parent
      *
-     * @param \stdClass $scope
+     * @param \Leafo\ScssPhp\Formatter\OutputBlock $scope
      *
-     * @return \stdClass
+     * @return \Leafo\ScssPhp\Formatter\OutputBlock
      */
-    protected function mediaParent($scope)
+    protected function mediaParent(OutputBlock $scope)
     {
         while (! empty($scope->parent)) {
             if (! empty($scope->type) && $scope->type !== 'media') {
@@ -566,9 +568,9 @@ class Compiler
     /**
      * Compile directive
      *
-     * @param \stdClass $block
+     * @param \Leafo\ScssPhp\Block $block
      */
-    protected function compileDirective($block)
+    protected function compileDirective(Block $block)
     {
         $s = '@' . $block->name;
 
@@ -586,9 +588,9 @@ class Compiler
     /**
      * Compile at-root
      *
-     * @param \stdClass $block
+     * @param \Leafo\ScssPhp\Block $block
      */
-    protected function compileAtRoot($block)
+    protected function compileAtRoot(Block $block)
     {
         $env     = $this->pushEnv($block);
         $envs    = $this->compactEnv($env);
@@ -596,14 +598,13 @@ class Compiler
 
         // wrap inline selector
         if ($block->selector) {
-            $wrapped = (object) array(
-                'parent' => $block,
-                'sourcePosition' => $block->sourcePosition,
-                'sourceIndex' => $block->sourceIndex,
-                'selectors' => $block->selector,
-                'comments' => array(),
-                'children' => $block->children,
-            );
+            $wrapped = new Block;
+            $wrapped->parent         = $block;
+            $wrapped->sourcePosition = $block->sourcePosition;
+            $wrapped->sourceIndex    = $block->sourceIndex;
+            $wrapped->selectors      = $block->selector;
+            $wrapped->comments       = array();
+            $wrapped->children       = $block->children;
 
             $block->children = array(array('block', $wrapped));
         }
@@ -625,13 +626,13 @@ class Compiler
     /**
      * Splice parse tree
      *
-     * @param array     $envs
-     * @param \stdClass $block
-     * @param integer   $without
+     * @param array                $envs
+     * @param \Leafo\ScssPhp\Block $block
+     * @param integer              $without
      *
-     * @return \stdClass
+     * @return array
      */
-    private function spliceTree($envs, $block, $without)
+    private function spliceTree($envs, Block $block, $without)
     {
         $newBlock = null;
 
@@ -665,7 +666,7 @@ class Compiler
                 continue;
             }
 
-            $b = new \stdClass;
+            $b = new Block;
 
             if (isset($e->block->sourcePosition)) {
                 $b->sourcePosition = $e->block->sourcePosition;
@@ -779,7 +780,7 @@ class Compiler
      * @param array   $envs
      * @param integer $without
      *
-     * @return \stdClass
+     * @return \Leafo\ScssPhp\Compiler\Environment
      */
     private function filterWithout($envs, $without)
     {
@@ -812,10 +813,10 @@ class Compiler
     /**
      * Compile keyframe block
      *
-     * @param \stdClass $block
-     * @param array     $selectors
+     * @param \Leafo\ScssPhp\Block $block
+     * @param array                $selectors
      */
-    protected function compileKeyframeBlock($block, $selectors)
+    protected function compileKeyframeBlock(Block $block, $selectors)
     {
         $env = $this->pushEnv($block);
 
@@ -840,10 +841,10 @@ class Compiler
     /**
      * Compile nested block
      *
-     * @param \stdClass $block
-     * @param array     $selectors
+     * @param \Leafo\ScssPhp\Block $block
+     * @param array                $selectors
      */
-    protected function compileNestedBlock($block, $selectors)
+    protected function compileNestedBlock(Block $block, $selectors)
     {
         $this->pushEnv($block);
 
@@ -873,9 +874,9 @@ class Compiler
      *
      * @see Compiler::compileChild()
      *
-     * @param \stdClass $block
+     * @param \Leafo\ScssPhp\Block $block
      */
-    protected function compileBlock($block)
+    protected function compileBlock(Block $block)
     {
         $env = $this->pushEnv($block);
         $env->selectors = $this->evalSelectors($block->selectors);
@@ -1129,12 +1130,12 @@ class Compiler
     /**
      * Compile children and return result
      *
-     * @param array     $stms
-     * @param \stdClass $out
+     * @param array                                $stms
+     * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
      *
      * @return array
      */
-    protected function compileChildren($stms, $out)
+    protected function compileChildren($stms, OutputBlock $out)
     {
         foreach ($stms as $stm) {
             $ret = $this->compileChild($stm, $out);
@@ -1148,12 +1149,12 @@ class Compiler
     /**
      * Compile children and throw exception if unexpected @return
      *
-     * @param array     $stms
-     * @param \stdClass $out
+     * @param array                                $stms
+     * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
      *
      * @throws \Exception
      */
-    protected function compileChildrenNoReturn($stms, $out)
+    protected function compileChildrenNoReturn($stms, OutputBlock $out)
     {
         foreach ($stms as $stm) {
             $ret = $this->compileChild($stm, $out);
@@ -1349,12 +1350,12 @@ class Compiler
     /**
      * Compile child; returns a value to halt execution
      *
-     * @param array     $child
-     * @param \stdClass $out
+     * @param array                                $child
+     * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
      *
      * @return array
      */
-    protected function compileChild($child, $out)
+    protected function compileChild($child, OutputBlock $out)
     {
         $this->sourceIndex = isset($child[Parser::SOURCE_INDEX]) ? $child[Parser::SOURCE_INDEX] : null;
         $this->sourcePos = isset($child[Parser::SOURCE_POSITION]) ? $child[Parser::SOURCE_POSITION] : -1;
@@ -2582,11 +2583,11 @@ class Compiler
     /**
      * Find the final set of selectors
      *
-     * @param \stdClass $env
+     * @param \Leafo\ScssPhp\Compiler\Environment $env
      *
      * @return array
      */
-    protected function multiplySelectors($env)
+    protected function multiplySelectors(Environment $env)
     {
         $envs            = $this->compactEnv($env);
         $selectors       = array();
@@ -2655,12 +2656,12 @@ class Compiler
     /**
      * Multiply media
      *
-     * @param \stdClass $env
-     * @param array     $childQueries
+     * @param \Leafo\ScssPhp\Compiler\Environment $env
+     * @param array                               $childQueries
      *
      * @return array
      */
-    protected function multiplyMedia($env, $childQueries = null)
+    protected function multiplyMedia(Environment $env = null, $childQueries = null)
     {
         if (! isset($env) ||
             ! empty($env->block->type) && $env->block->type !== 'media'
@@ -2696,11 +2697,11 @@ class Compiler
     /**
      * Convert env linked list to stack
      *
-     * @param \stdClass $env
+     * @param \Leafo\ScssPhp\Compiler\Environment $env
      *
      * @return array
      */
-    private function compactEnv($env)
+    private function compactEnv(Environment $env)
     {
         for ($envs = array(); $env; $env = $env->parent) {
             $envs[] = $env;
@@ -2714,7 +2715,7 @@ class Compiler
      *
      * @param array $envs
      *
-     * @return \stdClass
+     * @return \Leafo\ScssPhp\Compiler\Environment
      */
     private function extractEnv($envs)
     {
@@ -2729,17 +2730,17 @@ class Compiler
     /**
      * Push environment
      *
-     * @param \stdClass $block
+     * @param \Leafo\ScssPhp\Block $block
      *
-     * @return \stdClass
+     * @return \Leafo\ScssPhp\Compiler\Environment
      */
-    protected function pushEnv($block = null)
+    protected function pushEnv(Block $block = null)
     {
-        $env = new \stdClass;
+        $env = new Environment;
         $env->parent = $this->env;
-        $env->store = array();
-        $env->block = $block;
-        $env->depth = isset($this->env->depth) ? $this->env->depth + 1 : 0;
+        $env->store  = array();
+        $env->block  = $block;
+        $env->depth  = isset($this->env->depth) ? $this->env->depth + 1 : 0;
 
         $this->env = $env;
 
@@ -2757,7 +2758,7 @@ class Compiler
     /**
      * Get store environment
      *
-     * @return \stdClass
+     * @return \Leafo\ScssPhp\Compiler\Environment
      */
     protected function getStoreEnv()
     {
@@ -2767,12 +2768,12 @@ class Compiler
     /**
      * Set variable
      *
-     * @param string    $name
-     * @param mixed     $value
-     * @param boolean   $shadow
-     * @param \stdClass $env
+     * @param string                              $name
+     * @param mixed                               $value
+     * @param boolean                             $shadow
+     * @param \Leafo\ScssPhp\Compiler\Environment $env
      */
-    protected function set($name, $value, $shadow = false, $env = null)
+    protected function set($name, $value, $shadow = false, Environment $env = null)
     {
         $name = $this->normalizeName($name);
 
@@ -2790,11 +2791,11 @@ class Compiler
     /**
      * Set existing variable
      *
-     * @param string    $name
-     * @param mixed     $value
-     * @param \stdClass $env
+     * @param string                              $name
+     * @param mixed                               $value
+     * @param \Leafo\ScssPhp\Compiler\Environment $env
      */
-    protected function setExisting($name, $value, $env)
+    protected function setExisting($name, $value, Environment $env)
     {
         $storeEnv = $env;
 
@@ -2824,11 +2825,11 @@ class Compiler
     /**
      * Set raw variable
      *
-     * @param string    $name
-     * @param mixed     $value
-     * @param \stdClass $env
+     * @param string                              $name
+     * @param mixed                               $value
+     * @param \Leafo\ScssPhp\Compiler\Environment $env
      */
-    protected function setRaw($name, $value, $env)
+    protected function setRaw($name, $value, Environment $env)
     {
         $env->store[$name] = $value;
     }
@@ -2838,13 +2839,13 @@ class Compiler
      *
      * @api
      *
-     * @param string    $name
-     * @param boolean   $shouldThrow
-     * @param \stdClass $env
+     * @param string                              $name
+     * @param boolean                             $shouldThrow
+     * @param \Leafo\ScssPhp\Compiler\Environment $env
      *
      * @return mixed
      */
-    public function get($name, $shouldThrow = true, $env = null)
+    public function get($name, $shouldThrow = true, Environment $env = null)
     {
         $name = $this->normalizeName($name);
 
@@ -2881,12 +2882,12 @@ class Compiler
     /**
      * Has variable?
      *
-     * @param string    $name
-     * @param \stdClass $env
+     * @param string                              $name
+     * @param \Leafo\ScssPhp\Compiler\Environment $env
      *
      * @return boolean
      */
-    protected function has($name, $env = null)
+    protected function has($name, Environment $env = null)
     {
         return $this->get($name, false, $env) !== null;
     }
@@ -3233,10 +3234,9 @@ class Compiler
         }
 
         // throw away lines and children
-        $tmp = (object) array(
-            'lines'    => array(),
-            'children' => array(),
-        );
+        $tmp = new OutputBlock;
+        $tmp->lines    = array();
+        $tmp->children = array();
 
         $this->env->marker = 'function';
 
@@ -3371,7 +3371,7 @@ class Compiler
     {
         $storeEnv = $this->getStoreEnv();
 
-        $env = new \stdClass;
+        $env = new Environment;
         $env->store = $storeEnv->store;
 
         $hasVariable = false;

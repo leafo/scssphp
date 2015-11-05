@@ -11,6 +11,7 @@
 
 namespace Leafo\ScssPhp;
 
+use Leafo\ScssPhp\Block;
 use Leafo\ScssPhp\Compiler;
 
 /**
@@ -121,7 +122,7 @@ class Parser
      *
      * @param string $buffer;
      *
-     * @return \stdClass
+     * @return \Leafo\ScssPhp\Block
      */
     public function parse($buffer)
     {
@@ -685,11 +686,11 @@ class Parser
      * @param array   $selectors
      * @param integer $pos
      *
-     * @return \stdClass
+     * @return \Leafo\ScssPhp\Block
      */
     protected function pushBlock($selectors, $pos = 0)
     {
-        $b = new \stdClass;
+        $b = new Block;
         $b->parent = $this->env;
 
         $b->sourcePosition = $pos;
@@ -719,7 +720,7 @@ class Parser
      * @param string  $type
      * @param integer $pos
      *
-     * @return \stdClass
+     * @return \Leafo\ScssPhp\Block
      */
     protected function pushSpecialBlock($type, $pos)
     {
@@ -732,7 +733,7 @@ class Parser
     /**
      * Pop scope and return last block
      *
-     * @return \stdClass
+     * @return \Leafo\ScssPhp\Block
      *
      * @throws \Exception
      */

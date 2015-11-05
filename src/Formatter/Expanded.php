@@ -12,6 +12,7 @@
 namespace Leafo\ScssPhp\Formatter;
 
 use Leafo\ScssPhp\Formatter;
+use Leafo\ScssPhp\Formatter\OutputBlock;
 
 /**
  * SCSS expanded formatter
@@ -45,7 +46,7 @@ class Expanded extends Formatter
     /**
      * {@inheritdoc}
      */
-    protected function blockLines($block)
+    protected function blockLines(OutputBlock $block)
     {
         $inner = $this->indentStr();
 
