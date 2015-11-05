@@ -1933,38 +1933,17 @@ class Compiler
      */
     private function fncall($name, $argValues)
     {
-        // user defined function?
-        $func = $this->get(self::$namespaces['function'] . $name, false);
-
-        if ($func) {
-            $this->pushEnv();
-
-            // set the args
-            if (isset($func->args)) {
-                $this->applyArguments($func->args, $argValues);
-            }
-
-            // throw away lines and children
-            $tmp = (object) array(
-                'lines'    => array(),
-                'children' => array(),
-            );
-
-            $this->env->marker = 'function';
-
-            $ret = $this->compileChildren($func->children, $tmp);
-
-            $this->popEnv();
-
-            return ! isset($ret) ? self::$defaultValue : $ret;
-        }
-
-        // built in function
-        if ($this->callBuiltin($name, $argValues, $returnValue)) {
+        // SCSS @function
+        if ($this->callScssFunction($name, $argValues, $returnValue)) {
             return $returnValue;
         }
 
-        // need to flatten the arguments into a list
+        // native PHP functions
+        if ($this->callNativeFunction($name, $argValues, $returnValue)) {
+            return $returnValue;
+        }
+
+        // for CSS functions, simply flatten the arguments into a list
         $listArgs = array();
 
         foreach ((array) $argValues as $arg) {
@@ -3069,10 +3048,11 @@ class Compiler
      *
      * @param string   $name
      * @param callable $func
+     * @param array    $prototype
      */
-    public function registerFunction($name, $func)
+    public function registerFunction($name, $func, $prototype = null)
     {
-        $this->userFunctions[$this->normalizeName($name)] = $func;
+        $this->userFunctions[$this->normalizeName($name)] = array($func, $prototype);
     }
 
     /**
@@ -3229,6 +3209,47 @@ class Compiler
     }
 
     /**
+     * Call SCSS @function
+     *
+     * @param string $name
+     * @param array  $args
+     * @param array  $returnValue
+     *
+     * @return boolean Returns true if returnValue is set; otherwise, false
+     */
+    protected function callScssFunction($name, $argValues, &$returnValue)
+    {
+        $func = $this->get(self::$namespaces['function'] . $name, false);
+
+        if (! $func) {
+            return false;
+        }
+
+        $this->pushEnv();
+
+        // set the args
+        if (isset($func->args)) {
+            $this->applyArguments($func->args, $argValues);
+        }
+
+        // throw away lines and children
+        $tmp = (object) array(
+            'lines'    => array(),
+            'children' => array(),
+        );
+
+        $this->env->marker = 'function';
+
+        $ret = $this->compileChildren($func->children, $tmp);
+
+        $this->popEnv();
+
+        $returnValue = ! isset($ret) ? self::$defaultValue : $ret;
+
+        return true;
+    }
+
+    /**
      * Call built-in and registered (PHP) functions
      *
      * @param string $name
@@ -3237,14 +3258,14 @@ class Compiler
      *
      * @return boolean Returns true if returnValue is set; otherwise, false
      */
-    protected function callBuiltin($name, $args, &$returnValue)
+    protected function callNativeFunction($name, $args, &$returnValue)
     {
         // try a lib function
         $name = $this->normalizeName($name);
 
         if (isset($this->userFunctions[$name])) {
             // see if we can find a user function
-            $fn = $this->userFunctions[$name];
+            list($fn, $prototype) = $this->userFunctions[$name];
 
             if ($name !== 'if' && $name !== 'call') {
                 foreach ($args as &$val) {
