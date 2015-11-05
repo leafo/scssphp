@@ -22,6 +22,8 @@ class Colors
      * CSS Colors
      *
      * @see http://www.w3.org/TR/css3-color
+     *
+     * @var array
      */
     public static $cssColors = array(
         'aliceblue' => '240,248,255',

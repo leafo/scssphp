@@ -53,6 +53,11 @@ abstract class Formatter
      */
     public $assignSeparator;
 
+    /**
+     * Initialize formatter
+     *
+     * @api
+     */
     abstract public function __construct();
 
     /**
@@ -68,6 +73,8 @@ abstract class Formatter
     /**
      * Return property assignment
      *
+     * @api
+     *
      * @param string $name
      * @param mixed  $value
      *
@@ -80,6 +87,8 @@ abstract class Formatter
 
     /**
      * Strip semi-colon appended by property(); it's a separator, not a terminator
+     *
+     * @api
      *
      * @param array $lines
      */
@@ -171,6 +180,8 @@ abstract class Formatter
 
     /**
      * Entry point to formatting a block
+     *
+     * @api
      *
      * @param \stdClass $block An abstract syntax tree
      *
