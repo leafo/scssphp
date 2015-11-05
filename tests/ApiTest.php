@@ -38,6 +38,22 @@ class ApiTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testUserFunctionKwargs()
+    {
+        $this->scss->registerFunction(
+            'divide',
+            function ($args, $kwargs) {
+                return $kwargs['dividend'][1] / $kwargs['divisor'][1];
+            },
+            array('dividend', 'divisor')
+        );
+
+        $this->assertEquals(
+            'result: 15;',
+            $this->compile('result: divide($divisor: 2, $dividend: 30);')
+        );
+    }
+
     public function testImportMissing()
     {
         $this->assertEquals(
