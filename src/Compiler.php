@@ -3265,33 +3265,23 @@ class Compiler
 
         if (isset($this->userFunctions[$name])) {
             // see if we can find a user function
-            list($fn, $prototype) = $this->userFunctions[$name];
-
-            if ($name !== 'if' && $name !== 'call') {
-                foreach ($args as &$val) {
-                    $val = $this->reduce($val[1], true);
-                }
-            }
-
-            $returnValue = call_user_func($fn, $args);
+            list($f, $prototype) = $this->userFunctions[$name];
+        } elseif (($f = $this->getBuiltinFunction($name)) && is_callable($f)) {
+            $libName   = $f[1];
+            $prototype = isset(self::$$libName) ? self::$$libName : null;
         } else {
-            $f = $this->getBuiltinFunction($name);
+            return false;
+        }
 
-            if (is_callable($f)) {
-                $libName = $f[1];
+        list($sorted, $kwargs) = $this->sortArgs($prototype, $args);
 
-                $prototype = isset(self::$$libName) ? self::$$libName : null;
-                $sorted = $this->sortArgs($prototype, $args);
-
-                if ($name !== 'if' && $name !== 'call') {
-                    foreach ($sorted as &$val) {
-                        $val = $this->reduce($val, true);
-                    }
-                }
-
-                $returnValue = call_user_func($f, $sorted);
+        if ($name !== 'if' && $name !== 'call') {
+            foreach ($sorted as &$val) {
+                $val = $this->reduce($val, true);
             }
         }
+
+        $returnValue = call_user_func($f, $sorted, $kwargs);
 
         if (! isset($returnValue)) {
             return false;
@@ -3337,6 +3327,7 @@ class Compiler
         $keyArgs = array();
         $posArgs = array();
 
+        // separate positional and keyword arguments
         foreach ($args as $arg) {
             list($key, $value) = $arg;
 
@@ -3350,33 +3341,22 @@ class Compiler
         }
 
         if (! isset($prototype)) {
-            return $posArgs;
+            return array($posArgs, $keyArgs);
         }
 
-        $finalArgs = array();
+        // copy positional args
+        $finalArgs = array_pad($posArgs, count($prototype), null);
 
+        // overwrite positional args with keyword args
         foreach ($prototype as $i => $names) {
-            if (isset($posArgs[$i])) {
-                $finalArgs[] = $posArgs[$i];
-                continue;
-            }
-
-            $set = false;
-
             foreach ((array) $names as $name) {
                 if (isset($keyArgs[$name])) {
-                    $finalArgs[] = $keyArgs[$name];
-                    $set = true;
-                    break;
+                    $finalArgs[$i] = $keyArgs[$name];
                 }
-            }
-
-            if (! $set) {
-                $finalArgs[] = null;
             }
         }
 
-        return $finalArgs;
+        return array($finalArgs, $keyArgs);
     }
 
     /**
