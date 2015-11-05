@@ -3873,22 +3873,24 @@ class Compiler
     // Built in functions
 
     //protected static $libCall = array('name', 'args...');
-    protected function libCall($args)
+    protected function libCall($args, $kwargs)
     {
         $name = $this->compileStringContent($this->coerceString($this->reduce(array_shift($args), true)));
 
-        return $this->reduce(
-            array(
-                'fncall',
-                $name,
-                array_map(
-                    function ($a) {
-                        return array(null, $a);
-                    },
-                    $args
-                )
-            )
+        $args = array_map(
+            function ($a) {
+                return array(null, $a, false);
+            },
+            $args
         );
+
+        if (count($kwargs)) {
+            foreach ($kwargs as $key => $value) {
+                $args[] = array(array('var', $key), $value, false);
+            }
+        }
+
+        return $this->reduce(array('fncall', $name, $args));
     }
 
     protected static $libIf = array('condition', 'if-true', 'if-false');
