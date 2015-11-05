@@ -191,6 +191,6 @@ $a-false-value: false;
 $fn: nth;
 div.call-tests {
   a: call(rgb, 10, 100, 255);
-  //b: call(scale-color, #0a64ff, $lightness: -10%);
+  b: call(scale-color, #0a64ff, $lightness: -10%);
   c: call($fn, (a b c), 2);
 }
