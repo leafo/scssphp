@@ -1916,51 +1916,64 @@ class Compiler
             case 'fncall':
                 list(, $name, $argValues) = $value;
 
-                // user defined function?
-                $func = $this->get(self::$namespaces['function'] . $name, false);
-
-                if ($func) {
-                    $this->pushEnv();
-
-                    // set the args
-                    if (isset($func->args)) {
-                        $this->applyArguments($func->args, $argValues);
-                    }
-
-                    // throw away lines and children
-                    $tmp = (object) array(
-                        'lines' => array(),
-                        'children' => array(),
-                    );
-
-                    $this->env->marker = 'function';
-
-                    $ret = $this->compileChildren($func->children, $tmp);
-
-                    $this->popEnv();
-
-                    return ! isset($ret) ? self::$defaultValue : $ret;
-                }
-
-                // built in function
-                if ($this->callBuiltin($name, $argValues, $returnValue)) {
-                    return $returnValue;
-                }
-
-                // need to flatten the arguments into a list
-                $listArgs = array();
-
-                foreach ((array)$argValues as $arg) {
-                    if (empty($arg[0])) {
-                        $listArgs[] = $this->reduce($arg[1]);
-                    }
-                }
-
-                return array('function', $name, array('list', ',', $listArgs));
+                return $this->fncall($name, $argValues);
 
             default:
                 return $value;
         }
+    }
+
+    /**
+     * Function caller
+     *
+     * @param string $name
+     * @param array  $argValues
+     *
+     * @return array|null
+     */
+    private function fncall($name, $argValues)
+    {
+        // user defined function?
+        $func = $this->get(self::$namespaces['function'] . $name, false);
+
+        if ($func) {
+            $this->pushEnv();
+
+            // set the args
+            if (isset($func->args)) {
+                $this->applyArguments($func->args, $argValues);
+            }
+
+            // throw away lines and children
+            $tmp = (object) array(
+                'lines'    => array(),
+                'children' => array(),
+            );
+
+            $this->env->marker = 'function';
+
+            $ret = $this->compileChildren($func->children, $tmp);
+
+            $this->popEnv();
+
+            return ! isset($ret) ? self::$defaultValue : $ret;
+        }
+
+        // built in function
+        if ($this->callBuiltin($name, $argValues, $returnValue)) {
+            return $returnValue;
+        }
+
+        // need to flatten the arguments into a list
+        $listArgs = array();
+
+        foreach ((array) $argValues as $arg) {
+            if (empty($arg[0])) {
+                $listArgs[] = $this->reduce($arg[1]);
+            }
+        }
+
+        return array('function', $name, array('list', ',', $listArgs));
     }
 
     /**
@@ -3010,7 +3023,7 @@ class Compiler
      */
     public function setImportPaths($path)
     {
-        $this->importPaths = (array)$path;
+        $this->importPaths = (array) $path;
     }
 
     /**
@@ -3150,7 +3163,7 @@ class Compiler
                 }
             } elseif (is_callable($dir)) {
                 // check custom callback for import path
-                $file = call_user_func($dir, $url, $this);
+                $file = call_user_func($dir, $url);
 
                 if ($file !== null) {
                     return $file;
@@ -3239,7 +3252,7 @@ class Compiler
                 }
             }
 
-            $returnValue = call_user_func($fn, $args, $this);
+            $returnValue = call_user_func($fn, $args);
         } else {
             $f = $this->getBuiltinFunction($name);
 
@@ -3255,17 +3268,17 @@ class Compiler
                     }
                 }
 
-                $returnValue = call_user_func($f, $sorted, $this);
+                $returnValue = call_user_func($f, $sorted);
             }
         }
 
-        if (isset($returnValue)) {
-            $returnValue = $this->coerceValue($returnValue);
-
-            return true;
+        if (! isset($returnValue)) {
+            return false;
         }
 
-        return false;
+        $returnValue = $this->coerceValue($returnValue);
+
+        return true;
     }
 
     /**
@@ -3329,7 +3342,7 @@ class Compiler
 
             $set = false;
 
-            foreach ((array)$names as $name) {
+            foreach ((array) $names as $name) {
                 if (isset($keyArgs[$name])) {
                     $finalArgs[] = $keyArgs[$name];
                     $set = true;
