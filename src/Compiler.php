@@ -16,6 +16,7 @@ use Leafo\ScssPhp\Block;
 use Leafo\ScssPhp\Colors;
 use Leafo\ScssPhp\Compiler\Environment;
 use Leafo\ScssPhp\Formatter\OutputBlock;
+use Leafo\ScssPhp\Node;
 use Leafo\ScssPhp\Type;
 use Leafo\ScssPhp\Parser;
 use Leafo\ScssPhp\Util;
@@ -91,21 +92,6 @@ class Compiler
         'function' => '^',
     );
 
-    /**
-     * @var array
-     */
-    static protected $unitTable = array(
-        'in' => array(
-            'in' => 1,
-            'pt' => 72,
-            'pc' => 6,
-            'cm' => 2.54,
-            'mm' => 25.4,
-            'px' => 96,
-            'q'  => 101.6,
-        ),
-    );
-
     static public $true = array(Type::T_KEYWORD, 'true');
     static public $false = array(Type::T_KEYWORD, 'false');
     static public $null = array(Type::T_NULL);
@@ -128,7 +114,6 @@ class Compiler
         'global-variable-shadowing'   => false,
     );
 
-    protected $numberPrecision = 5;
     protected $lineNumberStyle = null;
 
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
@@ -314,13 +299,13 @@ class Compiler
 
                     // remove duplicates
                     array_walk($selectors, function (&$value) {
-                        $value = json_encode($value);
+                        $value = serialize($value);
                     });
 
                     $selectors = array_unique($selectors);
 
                     array_walk($selectors, function (&$value) {
-                        $value = json_decode($value);
+                        $value = unserialize($value);
                     });
                 }
             }
@@ -1576,7 +1561,7 @@ class Compiler
                         break;
                     }
 
-                    $this->set($for->var, array(Type::T_NUMBER, $start, ''));
+                    $this->set($for->var, new Node\Number($start, ''));
                     $start += $d;
 
                     $ret = $this->compileChildren($for->children, $out);
@@ -1797,8 +1782,11 @@ class Compiler
                     $right = $this->reduce($right, true);
                 }
 
-                // special case: looks like css short-hand
-                if ($opName === 'div' && ! $inParens && ! $inExp && isset($right[2]) && $right[2] !== '') {
+                // special case: looks like css shorthand
+                if ($opName == 'div' && ! $inParens && ! $inExp && isset($right[2])
+                    && (($right[0] !== Type::T_NUMBER && $right[2] != '')
+                    || ($right[0] === Type::T_NUMBER && ! $right->unitless()))
+                ) {
                     return $this->expToString($value);
                 }
 
@@ -1831,22 +1819,22 @@ class Compiler
                     if (! isset($genOp) &&
                         $left[0] === Type::T_NUMBER && $right[0] === Type::T_NUMBER
                     ) {
-                        if ($opName === 'mod' && $right[2] !== '') {
-                            $this->throwError("Cannot modulo by a number with units: $right[1]$right[2].");
+                        if ($opName === 'mod' && ! $right->unitless()) {
+                            $this->throwError("Cannot modulo by a number with units: %s%s", $right[1], $right->unitStr());
                         }
 
                         $unitChange = true;
-                        $emptyUnit = $left[2] === '' || $right[2] === '';
-                        $targetUnit = '' !== $left[2] ? $left[2] : $right[2];
+                        $emptyUnit = $left->unitless() || $right->unitless();
+                        $targetUnit = $left->unitless() ? $right[2] : $left[2];
 
                         if ($opName !== 'mul') {
-                            $left[2] = '' !== $left[2] ? $left[2] : $targetUnit;
-                            $right[2] = '' !== $right[2] ? $right[2] : $targetUnit;
+                            $left[2] = $left->unitless() ? $targetUnit : $left[2];
+                            $right[2] = $right->unitless() ? $targetUnit : $right[2];
                         }
 
                         if ($opName !== 'mod') {
-                            $left = $this->normalizeNumber($left);
-                            $right = $this->normalizeNumber($right);
+                            $left = $left->normalize();
+                            $right = $right->normalize();
                         }
 
                         if ($opName === 'div' && ! $emptyUnit && $left[2] === $right[2]) {
@@ -1854,8 +1842,8 @@ class Compiler
                         }
 
                         if ($opName === 'mul') {
-                            $left[2] = '' !== $left[2] ? $left[2] : $right[2];
-                            $right[2] = '' !== $right[2] ? $right[2] : $left[2];
+                            $left[2] = $left->unitless() ? $right[2] : $left[2];
+                            $right[2] = $right->unitless() ? $left[2] : $right[2];
                         } elseif ($opName === 'div' && $left[2] === $right[2]) {
                             $left[2] = '';
                             $right[2] = '';
@@ -1872,7 +1860,7 @@ class Compiler
 
                     if (isset($out)) {
                         if ($unitChange && $out[0] === Type::T_NUMBER) {
-                            $out = $this->coerceUnit($out, $targetUnit);
+                            $out = $out->coerce($targetUnit);
                         }
 
                         return $out;
@@ -1890,12 +1878,10 @@ class Compiler
                 if ($exp[0] === Type::T_NUMBER) {
                     switch ($op) {
                         case '+':
-                            return $exp;
+                            return new Node\Number($exp[1], $exp[2]);
 
                         case '-':
-                            $exp[1] *= -1;
-
-                            return $exp;
+                            return new Node\Number(-$exp[1], $exp[2]);
                     }
                 }
 
@@ -1938,7 +1924,7 @@ class Compiler
 
             case Type::T_STRING:
                 foreach ($value[2] as &$item) {
-                    if (is_array($item)) {
+                    if (is_array($item) || $item instanceof \ArrayAccess) {
                         $item = $this->reduce($item);
                     }
                 }
@@ -2034,7 +2020,7 @@ class Compiler
                 return array($type, '"', array($this->compileStringContent($value)));
 
             case Type::T_NUMBER:
-                return $this->normalizeNumber($value);
+                return $value->normalize();
 
             case Type::T_INTERPOLATE:
                 return array(Type::T_KEYWORD, $this->compileValue($value));
@@ -2042,26 +2028,6 @@ class Compiler
             default:
                 return $value;
         }
-    }
-
-    /**
-     * Normalize number; just does physical lengths for now
-     *
-     * @param array $number
-     *
-     * @return array
-     */
-    protected function normalizeNumber($number)
-    {
-        list(, $value, $unit) = $number;
-
-        if (isset(self::$unitTable['in'][$unit])) {
-            $conv = self::$unitTable['in'][$unit];
-
-            return array(Type::T_NUMBER, $value / $conv, 'in');
-        }
-
-        return $number;
     }
 
     /**
@@ -2074,7 +2040,7 @@ class Compiler
      */
     protected function opAddNumberNumber($left, $right)
     {
-        return array(Type::T_NUMBER, $left[1] + $right[1], $left[2]);
+        return new Node\Number($left[1] + $right[1], $left[2]);
     }
 
     /**
@@ -2087,7 +2053,7 @@ class Compiler
      */
     protected function opMulNumberNumber($left, $right)
     {
-        return array(Type::T_NUMBER, $left[1] * $right[1], $left[2]);
+        return new Node\Number($left[1] * $right[1], $left[2]);
     }
 
     /**
@@ -2100,7 +2066,7 @@ class Compiler
      */
     protected function opSubNumberNumber($left, $right)
     {
-        return array(Type::T_NUMBER, $left[1] - $right[1], $left[2]);
+        return new Node\Number($left[1] - $right[1], $left[2]);
     }
 
     /**
@@ -2117,7 +2083,7 @@ class Compiler
             return array(Type::T_STRING, '', array($left[1] . $left[2] . '/' . $right[1] . $right[2]));
         }
 
-        return array(Type::T_NUMBER, $left[1] / $right[1], $left[2]);
+        return new Node\Number($left[1] / $right[1], $left[2]);
     }
 
     /**
@@ -2130,7 +2096,7 @@ class Compiler
      */
     protected function opModNumberNumber($left, $right)
     {
-        return array(Type::T_NUMBER, $left[1] % $right[1], $left[2]);
+        return new Node\Number($left[1] % $right[1], $left[2]);
     }
 
     /**
@@ -2416,7 +2382,7 @@ class Compiler
     {
         $n = $left[1] - $right[1];
 
-        return array(Type::T_NUMBER, $n ? $n / abs($n) : 0, '');
+        return new Node\Number($n ? $n / abs($n) : 0, '');
     }
 
     /**
@@ -2485,7 +2451,7 @@ class Compiler
                 return $h;
 
             case Type::T_NUMBER:
-                return round($value[1], $this->numberPrecision) . $value[2];
+                return (string) $value;
 
             case Type::T_STRING:
                 return $value[1] . $this->compileStringContent($value) . $value[1];
@@ -2598,7 +2564,7 @@ class Compiler
         $parts = array();
 
         foreach ($string[2] as $part) {
-            if (is_array($part)) {
+            if (is_array($part) || $part instanceof \ArrayAccess) {
                 $parts[] = $this->compileValue($part);
             } else {
                 $parts[] = $part;
@@ -3066,7 +3032,7 @@ class Compiler
      */
     public function setNumberPrecision($numberPrecision)
     {
-        $this->numberPrecision = $numberPrecision;
+        Node\Number::$precision = $numberPrecision;
     }
 
     /**
@@ -3533,7 +3499,7 @@ class Compiler
      */
     private function coerceValue($value)
     {
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof \ArrayAccess) {
             return $value;
         }
 
@@ -3546,7 +3512,7 @@ class Compiler
         }
 
         if (is_numeric($value)) {
-            return array(Type::T_NUMBER, $value, '');
+            return new Node\Number($value, '');
         }
 
         if ($value === '') {
@@ -3554,25 +3520,6 @@ class Compiler
         }
 
         return array(Type::T_KEYWORD, $value);
-    }
-
-    /**
-     * Coerce unit on number to be normalized
-     *
-     * @param array  $number
-     * @param string $unit
-     *
-     * @return array
-     */
-    protected function coerceUnit($number, $unit)
-    {
-        list(, $value, $baseUnit) = $number;
-
-        if (isset(self::$unitTable[$baseUnit][$unit])) {
-            $value = $value * self::$unitTable[$baseUnit][$unit];
-        }
-
-        return array(Type::T_NUMBER, $value, $unit);
     }
 
     /**
@@ -4234,7 +4181,7 @@ class Compiler
         $color = $this->assertColor($args[0]);
         $hsl = $this->toHSL($color[1], $color[2], $color[3]);
 
-        return array(Type::T_NUMBER, $hsl[1], 'deg');
+        return new Node\Number($hsl[1], 'deg');
     }
 
     protected static $libSaturation = array('color');
@@ -4243,7 +4190,7 @@ class Compiler
         $color = $this->assertColor($args[0]);
         $hsl = $this->toHSL($color[1], $color[2], $color[3]);
 
-        return array(Type::T_NUMBER, $hsl[2], '%');
+        return new Node\Number($hsl[2], '%');
     }
 
     protected static $libLightness = array('color');
@@ -4252,7 +4199,7 @@ class Compiler
         $color = $this->assertColor($args[0]);
         $hsl = $this->toHSL($color[1], $color[2], $color[3]);
 
-        return array(Type::T_NUMBER, $hsl[3], '%');
+        return new Node\Number($hsl[3], '%');
     }
 
     protected function adjustHsl($color, $idx, $amount)
@@ -4305,7 +4252,7 @@ class Compiler
         }
 
         $color = $this->assertColor($value);
-        $amount = 100*$this->coercePercent($args[1]);
+        $amount = 100 * $this->coercePercent($args[1]);
 
         return $this->adjustHsl($color, 2, $amount);
     }
@@ -4314,7 +4261,7 @@ class Compiler
     protected function libDesaturate($args)
     {
         $color = $this->assertColor($args[0]);
-        $amount = 100*$this->coercePercent($args[1]);
+        $amount = 100 * $this->coercePercent($args[1]);
 
         return $this->adjustHsl($color, 2, -$amount);
     }
@@ -4419,7 +4366,7 @@ class Compiler
     protected static $libPercentage = array('value');
     protected function libPercentage($args)
     {
-        return array(Type::T_NUMBER, $this->coercePercent($args[0]) * 100, '%');
+        return new Node\Number($this->coercePercent($args[0]) * 100, '%');
     }
 
     protected static $libRound = array('value');
@@ -4504,13 +4451,13 @@ class Compiler
                 $this->throwError('%s is not a number', $item[0]);
             }
 
-            $number = $this->normalizeNumber($item);
+            $number = $item->normalize();
 
             if (null === $unit) {
                 $unit = $number[2];
-                $originalUnit = $item[2];
+                $originalUnit = $item->unitStr();
             } elseif ($unit !== $number[2]) {
-                $this->throwError('Incompatible units: "%s" and "%s".', $originalUnit, $item[2]);
+                $this->throwError('Incompatible units: "%s" and "%s".', $originalUnit, $item->unitStr());
             }
 
             $numbers[$key] = $number;
@@ -4760,7 +4707,7 @@ class Compiler
         $num = $args[0];
 
         if ($num[0] === Type::T_NUMBER) {
-            return array(Type::T_STRING, '"', array($num[2]));
+            return array(Type::T_STRING, '"', array($num->unitStr()));
         }
 
         return '';
@@ -4771,7 +4718,7 @@ class Compiler
     {
         $value = $args[0];
 
-        return $value[0] === Type::T_NUMBER && empty($value[2]);
+        return $value[0] === Type::T_NUMBER && $value->unitless();
     }
 
     protected static $libComparable = array('number-1', 'number-2');
@@ -4785,10 +4732,10 @@ class Compiler
             $this->throwError('Invalid argument(s) for "comparable"');
         }
 
-        $number1 = $this->normalizeNumber($number1);
-        $number2 = $this->normalizeNumber($number2);
+        $number1 = $number1->normalize();
+        $number2 = $number2->normalize();
 
-        return $number1[2] === $number2[2] || $number1[2] === '' || $number2[2] === '';
+        return $number1[2] === $number2[2] || $number1->unitless() || $number2->unitless();
     }
 
     protected static $libStrIndex = array('string', 'substring');
@@ -4802,7 +4749,7 @@ class Compiler
 
         $result = strpos($stringContent, $substringContent);
 
-        return $result === false ? self::$null : array(Type::T_NUMBER, $result + 1, '');
+        return $result === false ? self::$null : new Node\Number($result + 1, '');
     }
 
     protected static $libStrInsert = array('string', 'insert', 'index');
@@ -4827,7 +4774,7 @@ class Compiler
         $string = $this->coerceString($args[0]);
         $stringContent = $this->compileStringContent($string);
 
-        return array(Type::T_NUMBER, strlen($stringContent), '');
+        return new Node\Number(strlen($stringContent), '');
     }
 
     protected static $libStrSlice = array('string', 'start-at', 'end-at');
@@ -4952,10 +4899,10 @@ class Compiler
                 $this->throwError("limit must be greater than or equal to 1");
             }
 
-            return array(Type::T_NUMBER, mt_rand(1, $n), '');
+            return new Node\Number(mt_rand(1, $n), '');
         }
 
-        return array(Type::T_NUMBER, mt_rand(1, mt_getrandmax()), '');
+        return new Node\Number(mt_rand(1, mt_getrandmax()), '');
     }
 
     protected function libUniqueId()

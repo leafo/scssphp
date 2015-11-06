@@ -13,6 +13,7 @@ namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Block;
 use Leafo\ScssPhp\Compiler;
+use Leafo\ScssPhp\Node;
 use Leafo\ScssPhp\Type;
 
 /**
@@ -1678,7 +1679,7 @@ class Parser
     protected function unit(&$unit)
     {
         if ($this->match('([0-9]*(\.)?[0-9]+)([%a-zA-Z]+)?', $m)) {
-            $unit = array(Type::T_NUMBER, $m[1], empty($m[3]) ? '' : $m[3]);
+            $unit = new Node\Number($m[1], empty($m[3]) ? '' : $m[3]);
 
             return true;
         }

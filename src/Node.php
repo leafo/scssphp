@@ -18,4 +18,18 @@ namespace Leafo\ScssPhp;
  */
 abstract class Node
 {
+    /**
+     * @var string
+     */
+    public $type;
+
+    /**
+     * @var integer
+     */
+    public $sourcePosition;
+
+    /**
+     * @var integer
+     */
+    public $sourceIndex;
 }
