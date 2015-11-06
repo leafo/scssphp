@@ -84,6 +84,8 @@ class Parser
     /**
      * Constructor
      *
+     * @api
+     *
      * @param string  $sourceName
      * @param integer $sourceIndex
      */
@@ -105,23 +107,66 @@ class Parser
     }
 
     /**
-     * Make operator regex
+     * Get source file name
      *
-     * @param array $operators
+     * @api
      *
      * @return string
      */
-    protected static function makeOperatorStr($operators)
+    public function getSourceName()
     {
-        return '('
-            . implode('|', array_map(array('Leafo\ScssPhp\Parser', 'pregQuote'), $operators))
-            . ')';
+        return $this->sourceName;
+    }
+
+    /**
+     * Get source line number (given character position in the buffer)
+     *
+     * @api
+     *
+     * @param integer $pos
+     *
+     * @return integer
+     */
+    public function getLineNo($pos)
+    {
+        return 1 + substr_count(substr($this->buffer, 0, $pos), "\n");
+    }
+
+    /**
+     * Throw parser error
+     *
+     * @api
+     *
+     * @param string  $msg
+     * @param integer $count
+     *
+     * @throws \Exception
+     */
+    public function throwParseError($msg = 'parse error', $count = null)
+    {
+        $count = ! isset($count) ? $this->count : $count;
+
+        $line = $this->getLineNo($count);
+
+        if (! empty($this->sourceName)) {
+            $loc = "$this->sourceName on line $line";
+        } else {
+            $loc = "line: $line";
+        }
+
+        if ($this->peek("(.*?)(\n|$)", $m, $count)) {
+            throw new \Exception("$msg: failed at `$m[1]` $loc");
+        }
+
+        throw new \Exception("$msg: $loc");
     }
 
     /**
      * Parser buffer
      *
-     * @param string $buffer;
+     * @api
+     *
+     * @param string $buffer
      *
      * @return \Leafo\ScssPhp\Block
      */
@@ -163,6 +208,8 @@ class Parser
     /**
      * Parse a value or value list
      *
+     * @api
+     *
      * @param string $buffer
      * @param string $out
      *
@@ -182,6 +229,8 @@ class Parser
     /**
      * Parse a selector or selector list
      *
+     * @api
+     *
      * @param string $buffer
      * @param string $out
      *
@@ -196,6 +245,32 @@ class Parser
         $this->buffer          = (string) $buffer;
 
         return $this->selectors($out);
+    }
+
+    /**
+     * Quote regular expression
+     *
+     * @param string $what
+     *
+     * @return string
+     */
+    public static function pregQuote($what)
+    {
+        return preg_quote($what, '/');
+    }
+
+    /**
+     * Make operator regex
+     *
+     * @param array $operators
+     *
+     * @return string
+     */
+    protected static function makeOperatorStr($operators)
+    {
+        return '('
+            . implode('|', array_map(array('Leafo\ScssPhp\Parser', 'pregQuote'), $operators))
+            . ')';
     }
 
     /**
@@ -624,64 +699,6 @@ class Parser
     }
 
     /**
-     * Strip assignment flag from the list
-     *
-     * @param array $value
-     *
-     * @return string
-     */
-    protected function stripAssignmentFlag(&$value)
-    {
-        $token = &$value;
-
-        for ($token = &$value; $token[0] === Type::T_LIST && ($s = count($token[2])); $token = &$lastNode) {
-            $lastNode = &$token[2][$s - 1];
-
-            if ($lastNode[0] === Type::T_KEYWORD && in_array($lastNode[1], array('!default', '!global'))) {
-                array_pop($token[2]);
-
-                $token = $this->flattenList($token);
-
-                return $lastNode[1];
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Match literal string
-     *
-     * @param string  $what
-     * @param boolean $eatWhitespace
-     *
-     * @return boolean
-     */
-    protected function literal($what, $eatWhitespace = null)
-    {
-        if (! isset($eatWhitespace)) {
-            $eatWhitespace = $this->eatWhiteDefault;
-        }
-
-        // shortcut on single letter
-        if (! isset($what[1]) && isset($this->buffer[$this->count])) {
-            if ($this->buffer[$this->count] === $what) {
-                if (! $eatWhitespace) {
-                    $this->count++;
-
-                    return true;
-                }
-
-                // goes below...
-            } else {
-                return false;
-            }
-        }
-
-        return $this->match($this->pregQuote($what), $m, $eatWhitespace);
-    }
-
-    /**
      * Push block onto parse tree
      *
      * @param array   $selectors
@@ -756,6 +773,171 @@ class Parser
         }
 
         return $block;
+    }
+
+    /**
+     * Peek input stream
+     *
+     * @param string  $regex
+     * @param array   $out
+     * @param integer $from
+     *
+     * @return integer
+     */
+    protected function peek($regex, &$out, $from = null)
+    {
+        if (! isset($from)) {
+            $from = $this->count;
+        }
+
+        $r = '/' . $regex . '/Ais';
+        $result = preg_match($r, $this->buffer, $out, null, $from);
+
+        return $result;
+    }
+
+    /**
+     * Seek to position in input stream (or return current position in input stream)
+     *
+     * @param integer $where
+     *
+     * @return integer
+     */
+    protected function seek($where = null)
+    {
+        if ($where === null) {
+            return $this->count;
+        }
+
+        $this->count = $where;
+
+        return true;
+    }
+
+    /**
+     * Match string looking for either ending delim, escape, or string interpolation
+     *
+     * {@internal This is a workaround for preg_match's 250K string match limit. }}
+     *
+     * @param array  $m     Matches (passed by reference)
+     * @param string $delim Delimeter
+     *
+     * @return boolean True if match; false otherwise
+     */
+    protected function matchString(&$m, $delim)
+    {
+        $token = null;
+
+        $end = strlen($this->buffer);
+
+        // look for either ending delim, escape, or string interpolation
+        foreach (array('#{', '\\', $delim) as $lookahead) {
+            $pos = strpos($this->buffer, $lookahead, $this->count);
+
+            if ($pos !== false && $pos < $end) {
+                $end = $pos;
+                $token = $lookahead;
+            }
+        }
+
+        if (! isset($token)) {
+            return false;
+        }
+
+        $match = substr($this->buffer, $this->count, $end - $this->count);
+        $m = array(
+            $match . $token,
+            $match,
+            $token
+        );
+        $this->count = $end + strlen($token);
+
+        return true;
+    }
+
+    /**
+     * Try to match something on head of buffer
+     *
+     * @param string  $regex
+     * @param array   $out
+     * @param boolean $eatWhitespace
+     *
+     * @return boolean
+     */
+    protected function match($regex, &$out, $eatWhitespace = null)
+    {
+        if (! isset($eatWhitespace)) {
+            $eatWhitespace = $this->eatWhiteDefault;
+        }
+
+        $r = '/' . $regex . '/Ais';
+
+        if (preg_match($r, $this->buffer, $out, null, $this->count)) {
+            $this->count += strlen($out[0]);
+
+            if ($eatWhitespace) {
+                $this->whitespace();
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Match literal string
+     *
+     * @param string  $what
+     * @param boolean $eatWhitespace
+     *
+     * @return boolean
+     */
+    protected function literal($what, $eatWhitespace = null)
+    {
+        if (! isset($eatWhitespace)) {
+            $eatWhitespace = $this->eatWhiteDefault;
+        }
+
+        // shortcut on single letter
+        if (! isset($what[1]) && isset($this->buffer[$this->count])) {
+            if ($this->buffer[$this->count] === $what) {
+                if (! $eatWhitespace) {
+                    $this->count++;
+
+                    return true;
+                }
+
+                // goes below...
+            } else {
+                return false;
+            }
+        }
+
+        return $this->match($this->pregQuote($what), $m, $eatWhitespace);
+    }
+
+    /**
+     * Match some whitespace
+     *
+     * @return boolean
+     */
+    protected function whitespace()
+    {
+        $gotWhite = false;
+
+        while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
+            if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
+                $this->appendComment(array(Type::T_COMMENT, $m[1]));
+
+                $this->commentsSeen[$this->count] = true;
+            }
+
+            $this->count += strlen($m[0]);
+            $gotWhite = true;
+        }
+
+        return $gotWhite;
     }
 
     /**
@@ -957,7 +1139,7 @@ class Parser
     }
 
     /**
-     * Parse list
+     * Parse comma separated value list
      *
      * @param string $out
      *
@@ -969,7 +1151,7 @@ class Parser
     }
 
     /**
-     * Parse space list
+     * Parse space separated value list
      *
      * @param array $out
      *
@@ -2117,6 +2299,48 @@ class Parser
     }
 
     /**
+     * Strip assignment flag from the list
+     *
+     * @param array $value
+     *
+     * @return string
+     */
+    protected function stripAssignmentFlag(&$value)
+    {
+        $token = &$value;
+
+        for ($token = &$value; $token[0] === Type::T_LIST && ($s = count($token[2])); $token = &$lastNode) {
+            $lastNode = &$token[2][$s - 1];
+
+            if ($lastNode[0] === Type::T_KEYWORD && in_array($lastNode[1], array('!default', '!global'))) {
+                array_pop($token[2]);
+
+                $token = $this->flattenList($token);
+
+                return $lastNode[1];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Turn list of length 1 into value type
+     *
+     * @param array $value
+     *
+     * @return array
+     */
+    protected function flattenList($value)
+    {
+        if ($value[0] === Type::T_LIST && count($value[2]) === 1) {
+            return $this->flattenList($value[2][0]);
+        }
+
+        return $value;
+    }
+
+    /**
      * @deprecated
      *
      * {@internal
@@ -2147,200 +2371,6 @@ class Parser
     }
 
     /**
-     * Throw parser error
-     *
-     * @param string  $msg
-     * @param integer $count
-     *
-     * @throws \Exception
-     */
-    public function throwParseError($msg = 'parse error', $count = null)
-    {
-        $count = ! isset($count) ? $this->count : $count;
-
-        $line = $this->getLineNo($count);
-
-        if (! empty($this->sourceName)) {
-            $loc = "$this->sourceName on line $line";
-        } else {
-            $loc = "line: $line";
-        }
-
-        if ($this->peek("(.*?)(\n|$)", $m, $count)) {
-            throw new \Exception("$msg: failed at `$m[1]` $loc");
-        }
-
-        throw new \Exception("$msg: $loc");
-    }
-
-    /**
-     * Get source file name
-     *
-     * @return string
-     */
-    public function getSourceName()
-    {
-        return $this->sourceName;
-    }
-
-    /**
-     * Get source line number (given character position in the buffer)
-     *
-     * @param integer $pos
-     *
-     * @return integer
-     */
-    public function getLineNo($pos)
-    {
-        return 1 + substr_count(substr($this->buffer, 0, $pos), "\n");
-    }
-
-    /**
-     * Match string looking for either ending delim, escape, or string interpolation
-     *
-     * {@internal This is a workaround for preg_match's 250K string match limit. }}
-     *
-     * @param array  $m     Matches (passed by reference)
-     * @param string $delim Delimeter
-     *
-     * @return boolean True if match; false otherwise
-     */
-    protected function matchString(&$m, $delim)
-    {
-        $token = null;
-
-        $end = strlen($this->buffer);
-
-        // look for either ending delim, escape, or string interpolation
-        foreach (array('#{', '\\', $delim) as $lookahead) {
-            $pos = strpos($this->buffer, $lookahead, $this->count);
-
-            if ($pos !== false && $pos < $end) {
-                $end = $pos;
-                $token = $lookahead;
-            }
-        }
-
-        if (! isset($token)) {
-            return false;
-        }
-
-        $match = substr($this->buffer, $this->count, $end - $this->count);
-        $m = array(
-            $match . $token,
-            $match,
-            $token
-        );
-        $this->count = $end + strlen($token);
-
-        return true;
-    }
-
-    /**
-     * Try to match something on head of buffer
-     *
-     * @param string  $regex
-     * @param array   $out
-     * @param boolean $eatWhitespace
-     *
-     * @return boolean
-     */
-    protected function match($regex, &$out, $eatWhitespace = null)
-    {
-        if (! isset($eatWhitespace)) {
-            $eatWhitespace = $this->eatWhiteDefault;
-        }
-
-        $r = '/' . $regex . '/Ais';
-
-        if (preg_match($r, $this->buffer, $out, null, $this->count)) {
-            $this->count += strlen($out[0]);
-
-            if ($eatWhitespace) {
-                $this->whitespace();
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Match some whitespace
-     *
-     * @return boolean
-     */
-    protected function whitespace()
-    {
-        $gotWhite = false;
-
-        while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
-            if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
-                $this->appendComment(array(Type::T_COMMENT, $m[1]));
-
-                $this->commentsSeen[$this->count] = true;
-            }
-
-            $this->count += strlen($m[0]);
-            $gotWhite = true;
-        }
-
-        return $gotWhite;
-    }
-
-    /**
-     * Peek input stream
-     *
-     * @param string  $regex
-     * @param array   $out
-     * @param integer $from
-     *
-     * @return integer
-     */
-    protected function peek($regex, &$out, $from = null)
-    {
-        if (! isset($from)) {
-            $from = $this->count;
-        }
-
-        $r = '/' . $regex . '/Ais';
-        $result = preg_match($r, $this->buffer, $out, null, $from);
-
-        return $result;
-    }
-
-    /**
-     * Seek to position in input stream (or return current position in input stream)
-     *
-     * @param integer $where
-     *
-     * @return integer
-     */
-    protected function seek($where = null)
-    {
-        if ($where === null) {
-            return $this->count;
-        }
-
-        $this->count = $where;
-
-        return true;
-    }
-
-    /**
-     * Quote regular expression
-     *
-     * @param string $what
-     *
-     * @return string
-     */
-    public static function pregQuote($what)
-    {
-        return preg_quote($what, '/');
-    }
-
-    /**
      * @deprecated
      */
     protected function show()
@@ -2350,21 +2380,5 @@ class Parser
         }
 
         return '';
-    }
-
-    /**
-     * Turn list of length 1 into value type
-     *
-     * @param array $value
-     *
-     * @return array
-     */
-    protected function flattenList($value)
-    {
-        if ($value[0] === Type::T_LIST && count($value[2]) === 1) {
-            return $this->flattenList($value[2][0]);
-        }
-
-        return $value;
     }
 }
