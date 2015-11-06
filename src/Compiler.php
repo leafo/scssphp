@@ -3494,7 +3494,7 @@ class Compiler
         }
 
         if (is_bool($value)) {
-            return $value ? self::$true : self::$false;
+            return $this->toBool($value);
         }
 
         if ($value === null) {
@@ -4866,7 +4866,7 @@ class Compiler
         $string = $this->coerceString($args[0]);
         $name = $this->compileStringContent($string);
 
-        return $this->has($name, $this->rootEnv) ? self::$true : self::$false;
+        return $this->has($name, $this->rootEnv);
     }
 
     protected static $libMixinExists = array('name');
@@ -4875,7 +4875,7 @@ class Compiler
         $string = $this->coerceString($args[0]);
         $name = $this->compileStringContent($string);
 
-        return $this->has(self::$namespaces['mixin'] . $name) ? self::$true : self::$false;
+        return $this->has(self::$namespaces['mixin'] . $name);
     }
 
     protected static $libVariableExists = array('name');
@@ -4884,7 +4884,7 @@ class Compiler
         $string = $this->coerceString($args[0]);
         $name = $this->compileStringContent($string);
 
-        return $this->has($name) ? self::$true : self::$false;
+        return $this->has($name);
     }
 
     /**

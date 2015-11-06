@@ -96,7 +96,7 @@ class Parser
         $this->charset     = null;
 
         if (empty(self::$operatorStr)) {
-            self::$operatorStr = $this->makeOperatorStr(self::$operators);
+            self::$operatorStr = '(' . implode('|', array_map(array($this, 'pregQuote'), self::$operators)) . ')';
 
             $commentSingle      = $this->pregQuote(self::$commentSingle);
             $commentMultiLeft   = $this->pregQuote(self::$commentMultiLeft);
@@ -257,20 +257,6 @@ class Parser
     public static function pregQuote($what)
     {
         return preg_quote($what, '/');
-    }
-
-    /**
-     * Make operator regex
-     *
-     * @param array $operators
-     *
-     * @return string
-     */
-    protected static function makeOperatorStr($operators)
-    {
-        return '('
-            . implode('|', array_map(array('Leafo\ScssPhp\Parser', 'pregQuote'), $operators))
-            . ')';
     }
 
     /**
