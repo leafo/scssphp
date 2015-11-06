@@ -13,6 +13,7 @@ namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Block;
 use Leafo\ScssPhp\Compiler;
+use Leafo\ScssPhp\Type;
 
 /**
  * SCSS parser
@@ -247,7 +248,7 @@ class Parser
                 ($this->map($with) || true) &&
                 $this->literal('{')
             ) {
-                $atRoot = $this->pushSpecialBlock('at-root', $s);
+                $atRoot = $this->pushSpecialBlock(Type::T_AT_ROOT, $s);
                 $atRoot->selector = $selector;
                 $atRoot->with = $with;
 
@@ -257,7 +258,7 @@ class Parser
             $this->seek($s);
 
             if ($this->literal('@media') && $this->mediaQueryList($mediaQueryList) && $this->literal('{')) {
-                $media = $this->pushSpecialBlock('media', $s);
+                $media = $this->pushSpecialBlock(Type::T_MEDIA, $s);
                 $media->queryList = $mediaQueryList[2];
 
                 return true;
@@ -270,7 +271,7 @@ class Parser
                 ($this->argumentDef($args) || true) &&
                 $this->literal('{')
             ) {
-                $mixin = $this->pushSpecialBlock('mixin', $s);
+                $mixin = $this->pushSpecialBlock(Type::T_MIXIN, $s);
                 $mixin->name = $mixinName;
                 $mixin->args = $args;
 
@@ -287,11 +288,11 @@ class Parser
                 ($this->end() ||
                     $this->literal('{') && $hasBlock = true)
             ) {
-                $child = array('include',
+                $child = array(Type::T_INCLUDE,
                     $mixinName, isset($argValues) ? $argValues : null, null);
 
                 if (! empty($hasBlock)) {
-                    $include = $this->pushSpecialBlock('include', $s);
+                    $include = $this->pushSpecialBlock(Type::T_INCLUDE, $s);
                     $include->child = $child;
                 } else {
                     $this->append($child, $s);
@@ -306,7 +307,7 @@ class Parser
                 $this->valueList($importPath) &&
                 $this->end()
             ) {
-                $this->append(array('import', $importPath), $s);
+                $this->append(array(Type::T_IMPORT, $importPath), $s);
 
                 return true;
             }
@@ -317,7 +318,7 @@ class Parser
                 $this->url($importPath) &&
                 $this->end()
             ) {
-                $this->append(array('import', $importPath), $s);
+                $this->append(array(Type::T_IMPORT, $importPath), $s);
 
                 return true;
             }
@@ -328,7 +329,7 @@ class Parser
                 $this->selectors($selector) &&
                 $this->end()
             ) {
-                $this->append(array('extend', $selector), $s);
+                $this->append(array(Type::T_EXTEND, $selector), $s);
 
                 return true;
             }
@@ -340,7 +341,7 @@ class Parser
                 $this->argumentDef($args) &&
                 $this->literal('{')
             ) {
-                $func = $this->pushSpecialBlock('function', $s);
+                $func = $this->pushSpecialBlock(Type::T_FUNCTION, $s);
                 $func->name = $fnName;
                 $func->args = $args;
 
@@ -350,7 +351,7 @@ class Parser
             $this->seek($s);
 
             if ($this->literal('@return') && $this->valueList($retVal) && $this->end()) {
-                $this->append(array('return', $retVal), $s);
+                $this->append(array(Type::T_RETURN, $retVal), $s);
 
                 return true;
             }
@@ -363,7 +364,7 @@ class Parser
                 $this->valueList($list) &&
                 $this->literal('{')
             ) {
-                $each = $this->pushSpecialBlock('each', $s);
+                $each = $this->pushSpecialBlock(Type::T_EACH, $s);
 
                 foreach ($varNames[2] as $varName) {
                     $each->vars[] = $varName[1];
@@ -380,7 +381,7 @@ class Parser
                 $this->expression($cond) &&
                 $this->literal('{')
             ) {
-                $while = $this->pushSpecialBlock('while', $s);
+                $while = $this->pushSpecialBlock(Type::T_WHILE, $s);
                 $while->cond = $cond;
 
                 return true;
@@ -397,7 +398,7 @@ class Parser
                 $this->expression($end) &&
                 $this->literal('{')
             ) {
-                $for = $this->pushSpecialBlock('for', $s);
+                $for = $this->pushSpecialBlock(Type::T_FOR, $s);
                 $for->var = $varName[1];
                 $for->start = $start;
                 $for->end = $end;
@@ -409,7 +410,7 @@ class Parser
             $this->seek($s);
 
             if ($this->literal('@if') && $this->valueList($cond) && $this->literal('{')) {
-                $if = $this->pushSpecialBlock('if', $s);
+                $if = $this->pushSpecialBlock(Type::T_IF, $s);
                 $if->cond = $cond;
                 $if->cases = array();
 
@@ -422,7 +423,7 @@ class Parser
                 $this->valueList($value) &&
                 $this->end()
             ) {
-                $this->append(array('debug', $value), $s);
+                $this->append(array(Type::T_DEBUG, $value), $s);
 
                 return true;
             }
@@ -433,7 +434,7 @@ class Parser
                 $this->valueList($value) &&
                 $this->end()
             ) {
-                $this->append(array('warn', $value), $s);
+                $this->append(array(Type::T_WARN, $value), $s);
 
                 return true;
             }
@@ -444,7 +445,7 @@ class Parser
                 $this->valueList($value) &&
                 $this->end()
             ) {
-                $this->append(array('error', $value), $s);
+                $this->append(array(Type::T_ERROR, $value), $s);
 
                 return true;
             }
@@ -452,7 +453,7 @@ class Parser
             $this->seek($s);
 
             if ($this->literal('@content') && $this->end()) {
-                $this->append(array('mixin_content'), $s);
+                $this->append(array(Type::T_MIXIN_CONTENT), $s);
 
                 return true;
             }
@@ -461,14 +462,14 @@ class Parser
 
             $last = $this->last();
 
-            if (isset($last) && $last[0] === 'if') {
+            if (isset($last) && $last[0] === Type::T_IF) {
                 list(, $if) = $last;
 
                 if ($this->literal('@else')) {
                     if ($this->literal('{')) {
-                        $else = $this->pushSpecialBlock('else', $s);
+                        $else = $this->pushSpecialBlock(Type::T_ELSE, $s);
                     } elseif ($this->literal('if') && $this->valueList($cond) && $this->literal('{')) {
-                        $else = $this->pushSpecialBlock('elseif', $s);
+                        $else = $this->pushSpecialBlock(Type::T_ELSEIF, $s);
                         $else->cond = $cond;
                     }
 
@@ -489,7 +490,7 @@ class Parser
                 $this->end()
             ) {
                 if (! isset($this->charset)) {
-                    $statement = array('charset', $charset);
+                    $statement = array(Type::T_CHARSET, $charset);
 
                     $statement[self::SOURCE_POSITION] = $s;
                     $statement[self::SOURCE_INDEX] = $this->sourceIndex;
@@ -509,9 +510,9 @@ class Parser
                 $this->literal('{')
             ) {
                 if ($dirName === 'media') {
-                    $directive = $this->pushSpecialBlock('media', $s);
+                    $directive = $this->pushSpecialBlock(Type::T_MEDIA, $s);
                 } else {
-                    $directive = $this->pushSpecialBlock('directive', $s);
+                    $directive = $this->pushSpecialBlock(Type::T_DIRECTIVE, $s);
                     $directive->name = $dirName;
                 }
 
@@ -534,8 +535,8 @@ class Parser
             $this->valueList($value) &&
             $this->end()
         ) {
-            $name = array('string', '', array($name));
-            $this->append(array('assign', $name, $value), $s);
+            $name = array(Type::T_STRING, '', array($name));
+            $this->append(array(Type::T_ASSIGN, $name, $value), $s);
 
             return true;
         }
@@ -550,7 +551,7 @@ class Parser
         ) {
             // check for '!flag'
             $assignmentFlag = $this->stripAssignmentFlag($value);
-            $this->append(array('assign', $name, $value, $assignmentFlag), $s);
+            $this->append(array(Type::T_ASSIGN, $name, $value, $assignmentFlag), $s);
 
             return true;
         }
@@ -576,12 +577,12 @@ class Parser
             $foundSomething = false;
 
             if ($this->valueList($value)) {
-                $this->append(array('assign', $name, $value), $s);
+                $this->append(array(Type::T_ASSIGN, $name, $value), $s);
                 $foundSomething = true;
             }
 
             if ($this->literal('{')) {
-                $propBlock = $this->pushSpecialBlock('nestedprop', $s);
+                $propBlock = $this->pushSpecialBlock(Type::T_NESTED_PROPERTY, $s);
                 $propBlock->prefix = $name;
                 $foundSomething = true;
             } elseif ($foundSomething) {
@@ -599,13 +600,13 @@ class Parser
         if ($this->literal('}')) {
             $block = $this->popBlock();
 
-            if (isset($block->type) && $block->type === 'include') {
+            if (isset($block->type) && $block->type === Type::T_INCLUDE) {
                 $include = $block->child;
                 unset($block->child);
                 $include[3] = $block;
                 $this->append($include, $s);
             } elseif (empty($block->dontAppend)) {
-                $type = isset($block->type) ? $block->type : 'block';
+                $type = isset($block->type) ? $block->type : Type::T_BLOCK;
                 $this->append(array($type, $block), $s);
             }
 
@@ -633,10 +634,10 @@ class Parser
     {
         $token = &$value;
 
-        for ($token = &$value; $token[0] === 'list' && ($s = count($token[2])); $token = &$lastNode) {
+        for ($token = &$value; $token[0] === Type::T_LIST && ($s = count($token[2])); $token = &$lastNode) {
             $lastNode = &$token[2][$s - 1];
 
-            if ($lastNode[0] === 'keyword' && in_array($lastNode[1], array('!default', '!global'))) {
+            if ($lastNode[0] === Type::T_KEYWORD && in_array($lastNode[1], array('!default', '!global'))) {
                 array_pop($token[2]);
 
                 $token = $this->flattenList($token);
@@ -835,23 +836,23 @@ class Parser
         if (($this->literal('only') && ($only = true) || $this->literal('not') && ($not = true) || true) &&
             $this->mixedKeyword($mediaType)
         ) {
-            $prop = array('mediaType');
+            $prop = array(Type::T_MEDIA_TYPE);
 
             if (isset($only)) {
-                $prop[] = array('keyword', 'only');
+                $prop[] = array(Type::T_KEYWORD, 'only');
             }
 
             if (isset($not)) {
-                $prop[] = array('keyword', 'not');
+                $prop[] = array(Type::T_KEYWORD, 'not');
             }
 
-            $media = array('list', '', array());
+            $media = array(Type::T_LIST, '', array());
 
             foreach ((array)$mediaType as $type) {
                 if (is_array($type)) {
                     $media[2][] = $type;
                 } else {
-                    $media[2][] = array('keyword', $type);
+                    $media[2][] = array(Type::T_KEYWORD, $type);
                 }
             }
 
@@ -889,7 +890,7 @@ class Parser
             ($this->literal(':') && $this->expression($value) || true) &&
             $this->literal(')')
         ) {
-            $out = array('mediaExp', $feature);
+            $out = array(Type::T_MEDIA_EXPRESSION, $feature);
 
             if ($value) {
                 $out[] = $value;
@@ -1013,7 +1014,7 @@ class Parser
         if ($flatten && count($items) === 1) {
             $out = $items[0];
         } else {
-            $out = array('list', $delim, $items);
+            $out = array(Type::T_LIST, $delim, $items);
         }
 
         return true;
@@ -1032,12 +1033,12 @@ class Parser
 
         if ($this->literal('(')) {
             if ($this->literal(')')) {
-                $out = array('list', '', array());
+                $out = array(Type::T_LIST, '', array());
 
                 return true;
             }
 
-            if ($this->valueList($out) && $this->literal(')') && $out[0] === 'list') {
+            if ($this->valueList($out) && $this->literal(')') && $out[0] === Type::T_LIST) {
                 return true;
             }
 
@@ -1099,7 +1100,7 @@ class Parser
                 $rhs = $this->expHelper($rhs, self::$precedence[$next[1]]);
             }
 
-            $lhs = array('exp', $op, $lhs, $rhs, $this->inParens, $whiteBefore, $whiteAfter);
+            $lhs = array(Type::T_EXPRESSION, $op, $lhs, $rhs, $this->inParens, $whiteBefore, $whiteAfter);
             $ss = $this->seek();
             $whiteBefore = isset($this->buffer[$this->count - 1]) &&
                 ctype_space($this->buffer[$this->count - 1]);
@@ -1122,7 +1123,7 @@ class Parser
         $s = $this->seek();
 
         if ($this->literal('not', false) && $this->whitespace() && $this->value($inner)) {
-            $out = array('unary', 'not', $inner, $this->inParens);
+            $out = array(Type::T_UNARY, 'not', $inner, $this->inParens);
 
             return true;
         }
@@ -1130,7 +1131,7 @@ class Parser
         $this->seek($s);
 
         if ($this->literal('not', false) && $this->parenValue($inner)) {
-            $out = array('unary', 'not', $inner, $this->inParens);
+            $out = array(Type::T_UNARY, 'not', $inner, $this->inParens);
 
             return true;
         }
@@ -1138,7 +1139,7 @@ class Parser
         $this->seek($s);
 
         if ($this->literal('+') && $this->value($inner)) {
-            $out = array('unary', '+', $inner, $this->inParens);
+            $out = array(Type::T_UNARY, '+', $inner, $this->inParens);
 
             return true;
         }
@@ -1151,7 +1152,7 @@ class Parser
             $this->unit($inner) ||
             $this->parenValue($inner))
         ) {
-            $out = array('unary', '-', $inner, $this->inParens);
+            $out = array(Type::T_UNARY, '-', $inner, $this->inParens);
 
             return true;
         }
@@ -1172,9 +1173,9 @@ class Parser
 
         if ($this->keyword($keyword)) {
             if ($keyword === 'null') {
-                $out = array('null');
+                $out = array(Type::T_NULL);
             } else {
-                $out = array('keyword', $keyword);
+                $out = array(Type::T_KEYWORD, $keyword);
             }
 
             return true;
@@ -1198,7 +1199,7 @@ class Parser
 
         if ($this->literal('(')) {
             if ($this->literal(')')) {
-                $out = array('list', '', array());
+                $out = array(Type::T_LIST, '', array());
 
                 return true;
             }
@@ -1237,7 +1238,7 @@ class Parser
             $this->openString(')', $args, '(');
 
             if ($this->literal(')')) {
-                $out = array('string', '', array(
+                $out = array(Type::T_STRING, '', array(
                     'progid:', $fn, '(', $args, ')'
                 ));
 
@@ -1265,7 +1266,7 @@ class Parser
             $this->literal('(')
         ) {
             if ($name === 'alpha' && $this->argumentList($args)) {
-                $func = array('function', $name, array('string', '', $args));
+                $func = array(Type::T_FUNCTION, $name, array(Type::T_STRING, '', $args));
 
                 return true;
             }
@@ -1274,7 +1275,7 @@ class Parser
                 $ss = $this->seek();
 
                 if ($this->argValues($args) && $this->literal(')')) {
-                    $func = array('fncall', $name, $args);
+                    $func = array(Type::T_FUNCTION_CALL, $name, $args);
 
                     return true;
                 }
@@ -1288,10 +1289,10 @@ class Parser
                 $args = array();
 
                 if (! empty($str)) {
-                    $args[] = array(null, array('string', '', array($str)));
+                    $args[] = array(null, array(Type::T_STRING, '', array($str)));
                 }
 
-                $func = array('fncall', $name, $args);
+                $func = array(Type::T_FUNCTION_CALL, $name, $args);
 
                 return true;
             }
@@ -1320,7 +1321,7 @@ class Parser
             $ss = $this->seek();
 
             if ($this->literal('=') && $this->expression($exp)) {
-                $args[] = array('string', '', array($var . '='));
+                $args[] = array(Type::T_STRING, '', array($var . '='));
                 $arg = $exp;
             } else {
                 break;
@@ -1332,7 +1333,7 @@ class Parser
                 break;
             }
 
-            $args[] = array('string', '', array(', '));
+            $args[] = array(Type::T_STRING, '', array(', '));
         }
 
         if (! $this->literal(')') || ! count($args)) {
@@ -1439,7 +1440,7 @@ class Parser
             return false;
         }
 
-        $out = array('map', $keys, $values);
+        $out = array(Type::T_MAP, $keys, $values);
 
         return true;
     }
@@ -1453,7 +1454,7 @@ class Parser
      */
     protected function color(&$out)
     {
-        $color = array('color');
+        $color = array(Type::T_COLOR);
 
         if ($this->match('(#([0-9a-f]{6})|#([0-9a-f]{3}))', $m)) {
             if (isset($m[3])) {
@@ -1491,7 +1492,7 @@ class Parser
     protected function unit(&$unit)
     {
         if ($this->match('([0-9]*(\.)?[0-9]+)([%a-zA-Z]+)?', $m)) {
-            $unit = array('number', $m[1], empty($m[3]) ? '' : $m[3]);
+            $unit = array(Type::T_NUMBER, $m[1], empty($m[3]) ? '' : $m[3]);
 
             return true;
         }
@@ -1549,7 +1550,7 @@ class Parser
         $this->eatWhiteDefault = $oldWhite;
 
         if ($this->literal($delim)) {
-            $out = array('string', $delim, $content);
+            $out = array(Type::T_STRING, $delim, $content);
 
             return true;
         }
@@ -1670,7 +1671,7 @@ class Parser
             $content[count($content) - 1] = rtrim(end($content));
         }
 
-        $out = array('string', '', $content);
+        $out = array(Type::T_STRING, '', $content);
 
         return true;
     }
@@ -1700,7 +1701,7 @@ class Parser
                 $left = $right = false;
             }
 
-            $out = array('interpolate', $value, $left, $right);
+            $out = array(Type::T_INTERPOLATE, $value, $left, $right);
             $this->eatWhiteDefault = $oldWhite;
 
             if ($this->eatWhiteDefault) {
@@ -1764,7 +1765,7 @@ class Parser
 
         $this->whitespace(); // get any extra whitespace
 
-        $out = array('string', '', $parts);
+        $out = array(Type::T_STRING, '', $parts);
 
         return true;
     }
@@ -2027,7 +2028,7 @@ class Parser
         $s = $this->seek();
 
         if ($this->literal('$', false) && $this->keyword($name)) {
-            $out = array('var', $name);
+            $out = array(Type::T_VARIABLE, $name);
 
             return true;
         }
@@ -2088,7 +2089,7 @@ class Parser
     protected function url(&$out)
     {
         if ($this->match('(url\(\s*(["\']?)([^)]+)\2\s*\))', $m)) {
-            $out = array('string', '', array('url(' . $m[2] . $m[3] . $m[2] . ')'));
+            $out = array(Type::T_STRING, '', array('url(' . $m[2] . $m[3] . $m[2] . ')'));
 
             return true;
         }
@@ -2276,7 +2277,7 @@ class Parser
 
         while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
             if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
-                $this->appendComment(array('comment', $m[1]));
+                $this->appendComment(array(Type::T_COMMENT, $m[1]));
 
                 $this->commentsSeen[$this->count] = true;
             }
@@ -2360,7 +2361,7 @@ class Parser
      */
     protected function flattenList($value)
     {
-        if ($value[0] === 'list' && count($value[2]) === 1) {
+        if ($value[0] === Type::T_LIST && count($value[2]) === 1) {
             return $this->flattenList($value[2][0]);
         }
 

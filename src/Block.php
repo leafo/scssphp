@@ -18,23 +18,6 @@ namespace Leafo\ScssPhp;
  */
 class Block
 {
-    const T_MEDIA = 'media';
-    const T_MIXIN = 'mixin';
-    const T_INCLUDE = 'include';
-    const T_FUNCTION = 'function';
-    const T_EACH = 'each';
-    const T_WHILE = 'while';
-    const T_FOR = 'for';
-    const T_IF = 'if';
-    const T_ELSE = 'else';
-    const T_ELSEIF = 'elseif';
-    const T_DIRECTIVE = 'directive';
-    const T_NESTED_PROPERTY = 'nestedprop';
-    const T_BLOCK = 'block';
-    const T_ROOT = 'root';
-    const T_NULL = null;
-    const T_COMMENT = 'comment';
-
     /**
      * @var string
      */
