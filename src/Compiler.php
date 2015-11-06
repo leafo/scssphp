@@ -79,6 +79,7 @@ class Compiler
 
         '<='  => 'lte',
         '>='  => 'gte',
+        '<=>' => 'cmp',
     );
 
     /**
@@ -1505,9 +1506,6 @@ class Compiler
                 }
                 break;
 
-            case Type::T_RETURN:
-                return $this->reduce($child[1], true);
-
             case Type::T_EACH:
                 list(, $each) = $child;
 
@@ -1529,9 +1527,15 @@ class Compiler
                     $ret = $this->compileChildren($each->children, $out);
 
                     if ($ret) {
-                        $this->popEnv();
+                        if ($ret[0] !== Type::T_CONTROL) {
+                            $this->popEnv();
 
-                        return $ret;
+                            return $ret;
+                        }
+
+                        if ($ret[1]) {
+                            break;
+                        }
                     }
                 }
 
@@ -1545,7 +1549,13 @@ class Compiler
                     $ret = $this->compileChildren($while->children, $out);
 
                     if ($ret) {
-                        return $ret;
+                        if ($ret[0] !== Type::T_CONTROL) {
+                            return $ret;
+                        }
+
+                        if ($ret[1]) {
+                            break;
+                        }
                     }
                 }
                 break;
@@ -1572,10 +1582,25 @@ class Compiler
                     $ret = $this->compileChildren($for->children, $out);
 
                     if ($ret) {
-                        return $ret;
+                        if ($ret[0] !== Type::T_CONTROL) {
+                            return $ret;
+                        }
+
+                        if ($ret[1]) {
+                            break;
+                        }
                     }
                 }
                 break;
+
+            case Type::T_BREAK:
+                return array(Type::T_CONTROL, true);
+
+            case Type::T_CONTINUE:
+                return array(Type::T_CONTROL, false);
+
+            case Type::T_RETURN:
+                return $this->reduce($child[1], true);
 
             case Type::T_NESTED_PROPERTY:
                 list(, $prop) = $child;
@@ -1672,6 +1697,10 @@ class Compiler
                 $line = $this->parser->getLineNo($this->sourcePos);
                 $value = $this->compileValue($this->reduce($value, true));
                 $this->throwError("Line $line ERROR: $value\n");
+                break;
+
+            case Type::T_CONTROL:
+                $this->throwError('@break/@continue not permitted in this scope');
                 break;
 
             default:
@@ -2373,6 +2402,21 @@ class Compiler
     protected function opLtNumberNumber($left, $right)
     {
         return $this->toBool($left[1] < $right[1]);
+    }
+
+    /**
+     * Three-way comparison, aka spaceship operator
+     *
+     * @param array $left
+     * @param array $right
+     *
+     * @return array
+     */
+    protected function opCmpNumberNumber($left, $right)
+    {
+        $n = $left[1] - $right[1];
+
+        return array(Type::T_NUMBER, $n ? $n / abs($n) : 0, '');
     }
 
     /**

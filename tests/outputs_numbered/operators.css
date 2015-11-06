@@ -15,19 +15,22 @@ div {
   color: true;
   color: true;
   color: false;
-  color: what > 3; }
-/* line 25, inputs/operators.scss */
+  color: what > 3;
+  color: 0;
+  color: -1;
+  color: 1; }
+/* line 29, inputs/operators.scss */
 #units {
   test: 2.5748in;
   test: 13mm;
   test: 4em;
   test: 11mm;
   test: 1.1cm; }
-/* line 33, inputs/operators.scss */
+/* line 37, inputs/operators.scss */
 #modulo {
   test: 1;
   test: 1cm; }
-/* line 38, inputs/operators.scss */
+/* line 42, inputs/operators.scss */
 #colors {
   color: #ff0203;
   color: #fe0000;
@@ -42,11 +45,11 @@ div {
   color: true;
   color: true;
   color: false; }
-/* line 59, inputs/operators.scss */
+/* line 63, inputs/operators.scss */
 #preserve {
   hello: what -going;
   hello: what - going; }
-/* line 64, inputs/operators.scss */
+/* line 68, inputs/operators.scss */
 #strings {
   hello: what -going;
   hello: whatgoing;
@@ -56,12 +59,12 @@ div {
   hello: "whatgoing";
   hello: goingwhat;
   hello: "whatwhat"; }
-/* line 77, inputs/operators.scss */
+/* line 81, inputs/operators.scss */
 #negation {
   a: -60;
   b: -90;
   b: -90; }
-/* line 84, inputs/operators.scss */
+/* line 88, inputs/operators.scss */
 #bools-fail {
   and: false and two;
   and: one and two;
@@ -69,7 +72,7 @@ div {
   or: false or two;
   or: one or two;
   or: one or false; }
-/* line 94, inputs/operators.scss */
+/* line 98, inputs/operators.scss */
 #bools {
   and: false;
   and: two;
@@ -77,7 +80,7 @@ div {
   or: two;
   or: one;
   or: one; }
-/* line 105, inputs/operators.scss */
+/* line 109, inputs/operators.scss */
 #nots-fail {
   not: false2;
   not: not false;
@@ -85,7 +88,7 @@ div {
   not: not 1;
   not: not "";
   not: not hello; }
-/* line 114, inputs/operators.scss */
+/* line 118, inputs/operators.scss */
 #nots {
   not: false2;
   not: true;
@@ -93,7 +96,7 @@ div {
   not: false;
   not: false;
   not: false; }
-/* line 123, inputs/operators.scss */
+/* line 127, inputs/operators.scss */
 #string-test {
   str: true;
   str: false;
@@ -101,66 +104,66 @@ div {
   str: true;
   str: xhellohellofalse;
   str: true; }
-/* line 139, inputs/operators.scss */
+/* line 143, inputs/operators.scss */
 #special {
   cancel-unit: 1; }
-/* line 146, inputs/operators.scss */
+/* line 150, inputs/operators.scss */
 .row .a {
   margin: -0.5em; }
-/* line 147, inputs/operators.scss */
+/* line 151, inputs/operators.scss */
 .row .b {
   margin: -0.5em; }
-/* line 148, inputs/operators.scss */
+/* line 152, inputs/operators.scss */
 .row .c {
   margin: -0.5em; }
-/* line 149, inputs/operators.scss */
+/* line 153, inputs/operators.scss */
 .row .d {
   margin: -0.5em; }
-/* line 150, inputs/operators.scss */
+/* line 154, inputs/operators.scss */
 .row .e {
   margin: 0 -0.5em; }
-/* line 152, inputs/operators.scss */
+/* line 156, inputs/operators.scss */
 .alt .a {
   margin: -0.5em; }
-/* line 153, inputs/operators.scss */
+/* line 157, inputs/operators.scss */
 .alt .b {
   margin: -0.5em; }
-/* line 154, inputs/operators.scss */
+/* line 158, inputs/operators.scss */
 .alt .c {
   margin: -0.5em; }
-/* line 155, inputs/operators.scss */
+/* line 159, inputs/operators.scss */
 .alt .d {
   margin: 0 -0.5em; }
-/* line 156, inputs/operators.scss */
+/* line 160, inputs/operators.scss */
 .alt .e {
   margin: 0 -0.5em; }
-/* line 158, inputs/operators.scss */
+/* line 162, inputs/operators.scss */
 .row .f {
   margin: -2em; }
-/* line 159, inputs/operators.scss */
+/* line 163, inputs/operators.scss */
 .row .g {
   margin: -2em; }
-/* line 160, inputs/operators.scss */
+/* line 164, inputs/operators.scss */
 .row .h {
   margin: -2em; }
-/* line 161, inputs/operators.scss */
+/* line 165, inputs/operators.scss */
 .row .i {
   margin: -2em; }
-/* line 162, inputs/operators.scss */
+/* line 166, inputs/operators.scss */
 .row .j {
   margin: 0 -2em; }
-/* line 164, inputs/operators.scss */
+/* line 168, inputs/operators.scss */
 .alt .f {
   margin: -2em; }
-/* line 165, inputs/operators.scss */
+/* line 169, inputs/operators.scss */
 .alt .g {
   margin: -2em; }
-/* line 166, inputs/operators.scss */
+/* line 170, inputs/operators.scss */
 .alt .h {
   margin: -2em; }
-/* line 167, inputs/operators.scss */
+/* line 171, inputs/operators.scss */
 .alt .i {
   margin: 0 -2em; }
-/* line 168, inputs/operators.scss */
+/* line 172, inputs/operators.scss */
 .alt .j {
   margin: 0 -2em; }
