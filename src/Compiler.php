@@ -57,36 +57,36 @@ class Compiler
     const LINE_COMMENTS = 1;
     const DEBUG_INFO    = 2;
 
-    const WITH_RULE = 1;
-    const WITH_MEDIA = 2;
+    const WITH_RULE     = 1;
+    const WITH_MEDIA    = 2;
     const WITH_SUPPORTS = 4;
-    const WITH_ALL = 7;
+    const WITH_ALL      = 7;
 
     /**
      * @var array
      */
     static protected $operatorNames = array(
-        '+' => 'add',
-        '-' => 'sub',
-        '*' => 'mul',
-        '/' => 'div',
-        '%' => 'mod',
+        '+'   => 'add',
+        '-'   => 'sub',
+        '*'   => 'mul',
+        '/'   => 'div',
+        '%'   => 'mod',
 
-        '==' => 'eq',
-        '!=' => 'neq',
-        '<' => 'lt',
-        '>' => 'gt',
+        '=='  => 'eq',
+        '!='  => 'neq',
+        '<'   => 'lt',
+        '>'   => 'gt',
 
-        '<=' => 'lte',
-        '>=' => 'gte',
+        '<='  => 'lte',
+        '>='  => 'gte',
     );
 
     /**
      * @var array
      */
     static protected $namespaces = array(
-        'special' => '%',
-        'mixin' => '@',
+        'special'  => '%',
+        'mixin'    => '@',
         'function' => '^',
     );
 
@@ -122,9 +122,9 @@ class Compiler
     protected $registeredVars = array();
     protected $registeredFeatures = array(
         'extend-selector-pseudoclass' => false,
-        'at-error' => true,
-        'units-level-3' => false,
-        'global-variable-shadowing' => false,
+        'at-error'                    => true,
+        'units-level-3'               => false,
+        'global-variable-shadowing'   => false,
     );
 
     protected $numberPrecision = 5;
@@ -526,7 +526,11 @@ class Compiler
             foreach ($media->children as $child) {
                 $type = $child[0];
 
-                if ($type !== Type::T_BLOCK && $type !== Type::T_MEDIA && $type !== Type::T_DIRECTIVE && $type !== Type::T_IMPORT) {
+                if ($type !== Type::T_BLOCK &&
+                    $type !== Type::T_MEDIA &&
+                    $type !== Type::T_DIRECTIVE &&
+                    $type !== Type::T_IMPORT
+                ) {
                     $needsWrap = true;
                     break;
                 }
@@ -737,10 +741,10 @@ class Compiler
     private function compileWith($with)
     {
         static $mapping = array(
-            'rule' => self::WITH_RULE,
-            'media' => self::WITH_MEDIA,
+            'rule'     => self::WITH_RULE,
+            'media'    => self::WITH_MEDIA,
             'supports' => self::WITH_SUPPORTS,
-            'all' => self::WITH_ALL,
+            'all'      => self::WITH_ALL,
         );
 
         // exclude selectors by default
@@ -3917,7 +3921,11 @@ class Compiler
             return self::$null;
         }
 
-        if ($list[0] === Type::T_MAP || $list[0] === Type::T_STRING || $list[0] === Type::T_KEYWORD || $list[0] === Type::T_INTERPOLATE) {
+        if ($list[0] === Type::T_MAP ||
+            $list[0] === Type::T_STRING ||
+            $list[0] === Type::T_KEYWORD ||
+            $list[0] === Type::T_INTERPOLATE
+        ) {
             $list = $this->coerceList($list, ' ');
         }
 
@@ -4727,7 +4735,9 @@ class Compiler
     {
         list($number1, $number2) = $args;
 
-        if (! isset($number1[0]) || $number1[0] !== Type::T_NUMBER || ! isset($number2[0]) || $number2[0] !== Type::T_NUMBER) {
+        if (! isset($number1[0]) || $number1[0] !== Type::T_NUMBER ||
+            ! isset($number2[0]) || $number2[0] !== Type::T_NUMBER
+        ) {
             $this->throwError('Invalid argument(s) for "comparable"');
         }
 

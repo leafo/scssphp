@@ -29,20 +29,20 @@ class Parser
      * @var array
      */
     protected static $precedence = array(
-        '=' => 0,
-        'or' => 1,
+        '='   => 0,
+        'or'  => 1,
         'and' => 2,
-        '==' => 3,
-        '!=' => 3,
-        '<=' => 4,
-        '>=' => 4,
-        '<' => 4,
-        '>' => 4,
-        '+' => 5,
-        '-' => 5,
-        '*' => 6,
-        '/' => 6,
-        '%' => 6,
+        '=='  => 3,
+        '!='  => 3,
+        '<='  => 4,
+        '>='  => 4,
+        '<'   => 4,
+        '>'   => 4,
+        '+'   => 5,
+        '-'   => 5,
+        '*'   => 6,
+        '/'   => 6,
+        '%'   => 6,
     );
 
     /**
@@ -98,9 +98,9 @@ class Parser
         if (empty(self::$operatorStr)) {
             self::$operatorStr = $this->makeOperatorStr(self::$operators);
 
-            $commentSingle = $this->pregQuote(self::$commentSingle);
-            $commentMultiLeft = $this->pregQuote(self::$commentMultiLeft);
-            $commentMultiRight = $this->pregQuote(self::$commentMultiRight);
+            $commentSingle      = $this->pregQuote(self::$commentSingle);
+            $commentMultiLeft   = $this->pregQuote(self::$commentMultiLeft);
+            $commentMultiRight  = $this->pregQuote(self::$commentMultiRight);
             self::$commentMulti = $commentMultiLeft . '.*?' . $commentMultiRight;
             self::$whitePattern = '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentMulti . ')\s*|\s+/Ais';
         }
@@ -709,12 +709,11 @@ class Parser
     protected function pushBlock($selectors, $pos = 0)
     {
         $b = new Block;
-        $b->parent = $this->env;
-
+        $b->parent         = $this->env;
         $b->sourcePosition = $pos;
-        $b->sourceIndex = $this->sourceIndex;
-        $b->selectors = $selectors;
-        $b->comments = array();
+        $b->sourceIndex    = $this->sourceIndex;
+        $b->selectors      = $selectors;
+        $b->comments       = array();
 
         if (! $this->env) {
             $b->children = array();
@@ -962,7 +961,7 @@ class Parser
     {
         if ($pos !== null) {
             $statement[self::SOURCE_POSITION] = $pos;
-            $statement[self::SOURCE_INDEX] = $this->sourceIndex;
+            $statement[self::SOURCE_INDEX]    = $this->sourceIndex;
         }
 
         $this->env->children[] = $statement;
@@ -1038,7 +1037,7 @@ class Parser
                 }
             }
 
-            $prop[] = $media;
+            $prop[]  = $media;
             $parts[] = $prop;
         }
 
@@ -1801,8 +1800,8 @@ class Parser
         $oldWhite = $this->eatWhiteDefault;
         $this->eatWhiteDefault = false;
 
-        $stop = array('\'', '"', '#{', $end);
-        $stop = array_map(array($this, 'pregQuote'), $stop);
+        $stop   = array('\'', '"', '#{', $end);
+        $stop   = array_map(array($this, 'pregQuote'), $stop);
         $stop[] = self::$commentMulti;
 
         $patt = '(.*?)(' . implode('|', $stop) . ')';
