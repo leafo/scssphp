@@ -21,9 +21,12 @@ class Type
     const T_ASSIGN = 'assign';
     const T_AT_ROOT = 'at-root';
     const T_BLOCK = 'block';
+    const T_BREAK = 'break';
     const T_CHARSET = 'charset';
     const T_COLOR = 'color';
     const T_COMMENT = 'comment';
+    const T_CONTINUE = 'continue';
+    const T_CONTROL = 'control';
     const T_DEBUG = 'debug';
     const T_DIRECTIVE = 'directive';
     const T_EACH = 'each';

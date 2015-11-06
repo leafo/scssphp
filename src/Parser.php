@@ -34,6 +34,7 @@ class Parser
         'and' => 2,
         '=='  => 3,
         '!='  => 3,
+        '<=>' => 3,
         '<='  => 4,
         '>='  => 4,
         '<'   => 4,
@@ -56,6 +57,7 @@ class Parser
         '%',
         '==',
         '!=',
+        '<=>',
         '<=',
         '>=',
         '<',
@@ -411,8 +413,25 @@ class Parser
 
             $this->seek($s);
 
-            if ($this->literal('@return') && $this->valueList($retVal) && $this->end()) {
-                $this->append(array(Type::T_RETURN, $retVal), $s);
+            if ($this->literal('@break') && $this->end()) {
+                $this->append(array(Type::T_BREAK), $s);
+
+                return true;
+            }
+
+            $this->seek($s);
+
+            if ($this->literal('@continue') && $this->end()) {
+                $this->append(array(Type::T_CONTINUE), $s);
+
+                return true;
+            }
+
+            $this->seek($s);
+
+
+            if ($this->literal('@return') && ($this->valueList($retVal) || true) && $this->end()) {
+                $this->append(array(Type::T_RETURN, isset($retVal) ? $retVal : array(Type::T_NULL)), $s);
 
                 return true;
             }
