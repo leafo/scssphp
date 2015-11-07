@@ -1820,7 +1820,11 @@ class Compiler
                         $left[0] === Type::T_NUMBER && $right[0] === Type::T_NUMBER
                     ) {
                         if ($opName === 'mod' && ! $right->unitless()) {
-                            $this->throwError("Cannot modulo by a number with units: %s%s", $right[1], $right->unitStr());
+                            $this->throwError(
+                                'Cannot modulo by a number with units: %s%s',
+                                $right[1],
+                                $right->unitStr()
+                            );
                         }
 
                         $unitChange = true;
