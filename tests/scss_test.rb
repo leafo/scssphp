@@ -457,6 +457,15 @@ foo {a: 1 + // flang }
 SCSS
   end
 
+  def test_static_hyphenated_unit
+    assert_equal <<CSS, render(<<SCSS)
+foo {
+  a: 0px; }
+CSS
+foo {a: 10px-10px }
+SCSS
+  end
+
   ## Nested Rules
 
   def test_nested_rules
@@ -4116,4 +4125,23 @@ CSS
 }
 SCSS
   end
+
+  def test_import_with_supports_clause_interp
+    assert_equal(<<CSS, render(<<'SASS', :style => :compressed))
+@import url("fallback-layout.css") supports(not (display: flex))
+CSS
+$display-type: flex;
+@import url("fallback-layout.css") supports(not (display: #{$display-type}));
+SASS
+  end
+
+  def test_import_with_supports_clause
+    assert_equal(<<CSS, render(<<SASS, :style => :compressed))
+@import url("fallback-layout.css") supports(not (display: flex));.foo{bar:baz}
+CSS
+@import url("fallback-layout.css") supports(not (display: flex));
+.foo { bar: baz; }
+SASS
+  end
+
 end
