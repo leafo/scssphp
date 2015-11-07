@@ -178,7 +178,7 @@ class Parser
         $this->env             = null;
         $this->inParens        = false;
         $this->eatWhiteDefault = true;
-        $this->buffer          = $buffer;
+        $this->buffer          = rtrim($buffer, "\x00..\x1f");
 
         $this->pushBlock(null); // root block
 
