@@ -2191,7 +2191,7 @@ class Compiler
     {
         $out = array(Type::T_COLOR);
 
-        foreach (range(1, 3) as $i) {
+        foreach (array(1, 2, 3) as $i) {
             $lval = isset($left[$i]) ? $left[$i] : 0;
             $rval = isset($right[$i]) ? $right[$i] : 0;
 
@@ -3754,7 +3754,7 @@ class Compiler
      */
     protected function fixColor($c)
     {
-        foreach (range(1, 3) as $i) {
+        foreach (array(1, 2, 3) as $i) {
             if ($c[$i] < 0) {
                 $c[$i] = 0;
             }

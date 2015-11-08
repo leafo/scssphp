@@ -1645,20 +1645,20 @@ class Parser
 
         if ($this->match('(#([0-9a-f]{6})|#([0-9a-f]{3}))', $m)) {
             if (isset($m[3])) {
-                $num = $m[3];
-                $width = 16;
+                $num = hexdec($m[3]);
+
+                foreach (array(3, 2, 1) as $i) {
+                    $t = $num & 0xf;
+                    $color[$i] = $t << 4 | $t;
+                    $num >>= 4;
+                }
             } else {
-                $num = $m[2];
-                $width = 256;
-            }
+                $num = hexdec($m[2]);
 
-            $num = hexdec($num);
-
-            foreach (array(3, 2, 1) as $i) {
-                $t = $num % $width;
-                $num /= $width;
-
-                $color[$i] = $t * (256/$width) + $t * floor(16/$width);
+                foreach (array(3, 2, 1) as $i) {
+                    $color[$i] = $num & 0xff;
+                    $num >>= 8;
+                }
             }
 
             $out = $color;
@@ -1894,11 +1894,13 @@ class Parser
             if ($this->eatWhiteDefault) {
                 $this->whitespace();
             }
+
             return true;
         }
 
         $this->seek($s);
         $this->eatWhiteDefault = $oldWhite;
+
         return false;
     }
 
@@ -1920,14 +1922,21 @@ class Parser
         for (;;) {
             if ($this->interpolation($inter)) {
                 $parts[] = $inter;
-            } elseif ($this->keyword($text)) {
+                continue;
+            }
+
+            if ($this->keyword($text)) {
                 $parts[] = $text;
-            } elseif (count($parts) === 0 && $this->match('[:.#]', $m, false)) {
+                continue;
+            }
+
+            if (count($parts) === 0 && $this->match('[:.#]', $m, false)) {
                 // css hacks
                 $parts[] = $m[0];
-            } else {
-                break;
+                continue;
             }
+
+            break;
         }
 
         $this->eatWhiteDefault = $oldWhite;
@@ -2006,15 +2015,21 @@ class Parser
         for (;;) {
             if ($this->match('[>+~]+', $m)) {
                 $selector[] = array($m[0]);
-            } elseif ($this->selectorSingle($part)) {
-                $selector[] = $part;
-                $this->match('\s+', $m);
-            } elseif ($this->match('\/[^\/]+\/', $m)) {
-                $selector[] = array($m[0]);
-            } else {
-                break;
+                continue;
             }
 
+            if ($this->selectorSingle($part)) {
+                $selector[] = $part;
+                $this->match('\s+', $m);
+                continue;
+            }
+
+            if ($this->match('\/[^\/]+\/', $m)) {
+                $selector[] = array($m[0]);
+                continue;
+            }
+
+            break;
         }
 
         if (count($selector) === 0) {
