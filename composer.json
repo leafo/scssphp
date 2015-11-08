@@ -15,7 +15,6 @@
         }
     ],
     "autoload": {
-        "classmap": ["classmap.php"],
         "psr-4": { "Leafo\\ScssPhp\\": "src/" }
     },
     "autoload-dev": {
