@@ -41,7 +41,7 @@ To install the unit tests, download the complete package source using `composer`
 
 <a name="quickstart"></a>
 
-**scssphp** requires PHP version 5.3 (or above).
+**scssphp** requires PHP version 5.4 (or above).
 
 ## Language Reference
 
@@ -109,7 +109,7 @@ is an error when compiling then an exception is thrown with an appropriate
 message.
 
 
-For a more detailed guide consult <a href="{{ site.baseurl }}docs/">{{ site.baseurl }}docs/</a>.
+For a more detailed guide, consult <a href="{{ site.baseurl }}docs/">{{ site.baseurl }}docs/</a>.
 
 <a name="issues"></a>
 
@@ -121,6 +121,16 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.4.0** -- November 8, 2015
+  * Parser: remove deprecated `show()` and `to()` methods
+  * Parser, Compiler: convert stdClass to Block, Node, and OutputBlock abstractions
+  * New control directives: {% raw %}@{% endraw %}break, {% raw %}@{% endraw %}continue, and naked {% raw %}@{% endraw %}return
+  * New operator: {% raw %}<=>{% endraw %} (spaceship) operator
+  * Compiler: `index()` - coerce first argument to list
+  * Compiler/Parser: fix {% raw %}@{% endraw %}media nested in mixin
+  * Compiler: output literal string instead of division-by-zero exception
+  * Compiler: `str-slice()` - handle negative index
+  * Compiler: pass kwargs to built-ins and user registered functions as 2nd argument (instead of Compiler instance)
 * **0.3.3** -- October 23, 2015
   * Compiler: add `getVariables()` and `addFeature()` API methods
   * Compiler: can pass negative indices to `nth()` and `set-nth()`
