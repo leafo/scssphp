@@ -1,6 +1,6 @@
 <?php
-if (version_compare(PHP_VERSION, '5.3') < 0) {
-    die('Requires PHP 5.3 or above');
+if (version_compare(PHP_VERSION, '5.4') < 0) {
+    die('Requires PHP 5.4 or above');
 }
 
 if (! class_exists('scssc', false)) {
