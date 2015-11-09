@@ -47,33 +47,9 @@ class Parser
         '%'   => 6,
     );
 
-    /**
-     * @var array
-     */
-    protected static $operators = array(
-        '+',
-        '-',
-        '*',
-        '/',
-        '%',
-        '==',
-        '!=',
-        '<=>',
-        '<=',
-        '>=',
-        '<',
-        '>',
-        'and',
-        'or',
-    );
-
-    protected static $operatorStr;
+    protected static $commentPattern;
+    protected static $operatorPattern;
     protected static $whitePattern;
-    protected static $commentMulti;
-
-    protected static $commentSingle = '//';
-    protected static $commentMultiLeft = '/*';
-    protected static $commentMultiRight = '*/';
 
     private $sourceName;
     private $sourceIndex;
@@ -98,14 +74,15 @@ class Parser
         $this->sourceIndex = $sourceIndex;
         $this->charset     = null;
 
-        if (empty(self::$operatorStr)) {
-            self::$operatorStr = '(' . implode('|', array_map(array($this, 'pregQuote'), self::$operators)) . ')';
+        if (empty(self::$operatorPattern)) {
+            self::$operatorPattern = '([*\/%+-]|[!=]\=|\>\=?|\<\=\>|\<\=?|and|or)';
 
-            $commentSingle      = $this->pregQuote(self::$commentSingle);
-            $commentMultiLeft   = $this->pregQuote(self::$commentMultiLeft);
-            $commentMultiRight  = $this->pregQuote(self::$commentMultiRight);
-            self::$commentMulti = $commentMultiLeft . '.*?' . $commentMultiRight;
-            self::$whitePattern = '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentMulti . ')\s*|\s+/Ais';
+            $commentSingle      = '\/\/';
+            $commentMultiLeft   = '\/\*';
+            $commentMultiRight  = '\*\/';
+
+            self::$commentPattern = $commentMultiLeft . '.*?' . $commentMultiRight;
+            self::$whitePattern = '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentPattern . ')\s*|\s+/Ais';
         }
     }
 
@@ -248,18 +225,6 @@ class Parser
         $this->buffer          = (string) $buffer;
 
         return $this->selectors($out);
-    }
-
-    /**
-     * Quote regular expression
-     *
-     * @param string $what
-     *
-     * @return string
-     */
-    public static function pregQuote($what)
-    {
-        return preg_quote($what, '/');
     }
 
     /**
@@ -1257,13 +1222,13 @@ class Parser
      */
     protected function expHelper($lhs, $minP)
     {
-        $opstr = self::$operatorStr;
+        $operators = self::$operatorPattern;
 
         $ss = $this->seek();
         $whiteBefore = isset($this->buffer[$this->count - 1]) &&
             ctype_space($this->buffer[$this->count - 1]);
 
-        while ($this->match($opstr, $m, false) && self::$precedence[$m[1]] >= $minP) {
+        while ($this->match($operators, $m, false) && self::$precedence[$m[1]] >= $minP) {
             $whiteAfter = isset($this->buffer[$this->count]) &&
                 ctype_space($this->buffer[$this->count]);
             $varAfter = isset($this->buffer[$this->count]) &&
@@ -1283,7 +1248,7 @@ class Parser
             }
 
             // peek and see if rhs belongs to next operator
-            if ($this->peek($opstr, $next) && self::$precedence[$next[1]] > self::$precedence[$op]) {
+            if ($this->peek($operators, $next) && self::$precedence[$next[1]] > self::$precedence[$op]) {
                 $rhs = $this->expHelper($rhs, self::$precedence[$next[1]]);
             }
 
@@ -1806,11 +1771,7 @@ class Parser
         $oldWhite = $this->eatWhiteDefault;
         $this->eatWhiteDefault = false;
 
-        $stop   = array('\'', '"', '#{', $end);
-        $stop   = array_map(array($this, 'pregQuote'), $stop);
-        $stop[] = self::$commentMulti;
-
-        $patt = '(.*?)(' . implode('|', $stop) . ')';
+        $patt = '(.*?)([\'"]|#\{|' . $this->pregQuote($end) . '|' . self::$commentPattern . ')';
 
         $nestingLevel = 0;
 
@@ -2400,5 +2361,17 @@ class Parser
         }
 
         return '';
+    }
+
+    /**
+     * Quote regular expression
+     *
+     * @param string $what
+     *
+     * @return string
+     */
+    private function pregQuote($what)
+    {
+        return preg_quote($what, '/');
     }
 }
