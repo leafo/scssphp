@@ -6,7 +6,7 @@ body {
     height: 10px/10px;
     color: 10px/2 + 1;
     color: (10px/2);
-    bottom: (4/2px);
+    //bottom: (4/2px);
     top: 1em * (1 * 24px - 0) / 16px;
     left: 1 - 2cm;
     top: (2cm/12px);
@@ -171,3 +171,21 @@ $form-spacing: 1em;
 .alt .h { margin: 0 - 1em * 2; }
 .alt .i { margin: 0 -1em * 2; }
 .alt .j { margin: 0 (-1em * 2); }
+
+$gridColumns:             12 !default;
+$gridColumnWidth:         60px !default;
+$gridGutterWidth:         20px !default;
+$gridRowWidth:            ($gridColumns * $gridColumnWidth) + ($gridGutterWidth * ($gridColumns - 1)) !default;
+
+$fluidGridGutterWidth:    percentage($gridGutterWidth/$gridRowWidth) !default;
+
+div {
+*margin-left: $fluidGridGutterWidth - (.5 / $gridRowWidth * 100px * 1%);
+}
+
+$gridRowWidth: 20px;
+
+.foo
+{
+width: (2.5 / $gridRowWidth * 100px * 1% );
+}

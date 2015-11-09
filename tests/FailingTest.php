@@ -87,20 +87,6 @@ END_OF_SCSS
 END_OF_EXPECTED
             ),
             array(
-                '#107 - incompatible units (example 2)', <<<'END_OF_SCSS'
-$gridRowWidth: 20px;
-
-.foo
-{
-width: (2.5 / $gridRowWidth * 100px * 1% );
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-.foo {
-  width: 12.5%; }
-END_OF_EXPECTED
-            ),
-            array(
                 '#199 - issue with selectors', <<<'END_OF_SCSS'
 .abc {
   color: #ddd;

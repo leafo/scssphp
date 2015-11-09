@@ -1817,43 +1817,41 @@ class Compiler
                         is_callable(array($this, $fn)) &&
                         $genOp = true)
                 ) {
-                    $unitChange = false;
+                    $coerceUnit = false;
 
                     if (! isset($genOp) &&
                         $left[0] === Type::T_NUMBER && $right[0] === Type::T_NUMBER
                     ) {
-                        if ($opName === 'mod' && ! $right->unitless()) {
-                            $this->throwError(
-                                'Cannot modulo by a number with units: %s%s',
-                                $right[1],
-                                $right->unitStr()
-                            );
+                        $coerceUnit = true;
+
+                        switch ($opName) {
+                            case 'mul':
+                                $targetUnit = $left[2];
+
+                                foreach ($right[2] as $unit => $exp) {
+                                    @$targetUnit[$unit] += $exp;
+                                }
+                                break;
+
+                            case 'div':
+                                $targetUnit = $left[2];
+
+                                foreach ($right[2] as $unit => $exp) {
+                                    @$targetUnit[$unit] -= $exp;
+                                }
+                                break;
+
+                            case 'mod':
+                                $targetUnit = $left[2];
+                                break;
+
+                            default:
+                                $targetUnit = $left->unitless() ? $right[2] : $left[2];
                         }
 
-                        $unitChange = true;
-                        $emptyUnit = $left->unitless() || $right->unitless();
-                        $targetUnit = $left->unitless() ? $right[2] : $left[2];
-
-                        if ($opName !== 'mul') {
-                            $left[2] = $left->unitless() ? $targetUnit : $left[2];
-                            $right[2] = $right->unitless() ? $targetUnit : $right[2];
-                        }
-
-                        if ($opName !== 'mod') {
+                        if (! $left->unitless() && ! $right->unitless()) {
                             $left = $left->normalize();
                             $right = $right->normalize();
-                        }
-
-                        if ($opName === 'div' && ! $emptyUnit && $left[2] === $right[2]) {
-                            $targetUnit = '';
-                        }
-
-                        if ($opName === 'mul') {
-                            $left[2] = $left->unitless() ? $right[2] : $left[2];
-                            $right[2] = $right->unitless() ? $left[2] : $right[2];
-                        } elseif ($opName === 'div' && $left[2] === $right[2]) {
-                            $left[2] = '';
-                            $right[2] = '';
                         }
                     }
 
@@ -1866,7 +1864,7 @@ class Compiler
                     }
 
                     if (isset($out)) {
-                        if ($unitChange && $out[0] === Type::T_NUMBER) {
+                        if ($coerceUnit && $out[0] === Type::T_NUMBER) {
                             $out = $out->coerce($targetUnit);
                         }
 
@@ -2458,7 +2456,7 @@ class Compiler
                 return $h;
 
             case Type::T_NUMBER:
-                return (string) $value;
+                return $value->output($this);
 
             case Type::T_STRING:
                 return $value[1] . $this->compileStringContent($value) . $value[1];
@@ -3339,8 +3337,6 @@ class Compiler
     /**
      * Sorts keyword arguments
      *
-     * @todo Merge with applyArguments()?
-     *
      * @param array $prototype
      * @param array $args
      *
@@ -3656,7 +3652,7 @@ class Compiler
     protected function coercePercent($value)
     {
         if ($value[0] === Type::T_NUMBER) {
-            if ($value[2] === '%') {
+            if (isset($value[2]['%'])) {
                 return $value[1] / 100;
             }
 
@@ -4068,7 +4064,7 @@ class Compiler
     protected function libIeHexStr($args)
     {
         $color = $this->coerceColor($args[0]);
-        $color[4] = isset($color[4]) ? round(255*$color[4]) : 255;
+        $color[4] = isset($color[4]) ? round(255 * $color[4]) : 255;
 
         return sprintf('#%02X%02X%02X%02X', $color[4], $color[1], $color[2], $color[3]);
     }

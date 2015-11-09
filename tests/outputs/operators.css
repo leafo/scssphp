@@ -4,7 +4,6 @@ body {
   height: 10px/10px;
   color: 6px;
   color: 5px;
-  bottom: 2px;
   top: 1.5em;
   left: -1cm;
   top: 6.29921; }
@@ -167,3 +166,9 @@ div {
 
 .alt .j {
   margin: 0 -2em; }
+
+div {
+  *margin-left: 2.07447%; }
+
+.foo {
+  width: 12.5%; }
