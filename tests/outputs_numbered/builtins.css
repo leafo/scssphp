@@ -58,8 +58,23 @@
   color: tri;
   color: trin;
   color: 'string';
-  color: STRING; }
-/* line 89, inputs/builtins.scss */
+  color: STRING;
+  color: string;
+  color: string;
+  color: tring;
+  color: ring;
+  color: ing;
+  color: ng;
+  color: g;
+  color: ng;
+  color: ing;
+  color: ring;
+  color: tring;
+  color: s;
+  color: st;
+  color: string;
+  color: strin; }
+/* line 105, inputs/builtins.scss */
 #number {
   color: 250%;
   color: 3;
@@ -70,7 +85,7 @@
   width: 200%;
   bottom: 10px;
   padding: 3em 1in 96px 72pt; }
-/* line 102, inputs/builtins.scss */
+/* line 118, inputs/builtins.scss */
 #list {
   len: 3;
   len: 1;
@@ -92,7 +107,7 @@
   cool: great job one two three;
   zip: 1px solid, 2px dashed;
   zip: 1px solid red, 2px dashed green; }
-/* line 138, inputs/builtins.scss */
+/* line 154, inputs/builtins.scss */
 #introspection {
   t: number;
   t: string;
@@ -112,31 +127,31 @@
   c: true;
   c: false;
   c: true; }
-/* line 162, inputs/builtins.scss */
+/* line 178, inputs/builtins.scss */
 #if {
   color: yes;
   color: no;
   color: yes;
   color: yes; }
-/* line 169, inputs/builtins.scss */
+/* line 185, inputs/builtins.scss */
 .transparent {
   r: 0;
   g: 0;
   b: 0;
   a: 0; }
-/* line 176, inputs/builtins.scss */
+/* line 192, inputs/builtins.scss */
 .alpha {
   a: 1;
   a: 1;
   a: 1;
   a: 0.5;
   a: alpha(currentColor); }
-/* line 185, inputs/builtins.scss */
+/* line 201, inputs/builtins.scss */
 #exists {
   a: true;
   b: true;
   c: false; }
-/* line 192, inputs/builtins.scss */
+/* line 208, inputs/builtins.scss */
 div.call-tests {
   a: #0a64ff;
   b: #0058ef;

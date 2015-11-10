@@ -84,6 +84,22 @@
     color: str-slice(string, 2, -2);
     color: to_lower_case('StRiNg');
     color: to_upper_case(StRiNg);
+    color: str-slice(string, 0);
+    color: str-slice(string, 1);
+    color: str-slice(string, 2);
+    color: str-slice(string, 3);
+    color: str-slice(string, 4);
+    color: str-slice(string, 5);
+    color: str-slice(string, -1);
+    color: str-slice(string, -2);
+    color: str-slice(string, -3);
+    color: str-slice(string, -4);
+    color: str-slice(string, -5);
+    color: str-slice(string, 1, 0);
+    color: str-slice(string, 1, 1);
+    color: str-slice(string, 1, 2);
+    color: str-slice(string, 1, -1);
+    color: str-slice(string, 1, -2);
 }
 
 #number {

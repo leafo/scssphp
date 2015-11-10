@@ -95,6 +95,7 @@ class Compiler
     static public $true = array(Type::T_KEYWORD, 'true');
     static public $false = array(Type::T_KEYWORD, 'false');
     static public $null = array(Type::T_NULL);
+    static public $nullString = array(Type::T_STRING, '', array());
     static public $defaultValue = array(Type::T_KEYWORD, '');
     static public $selfSelector = array(Type::T_SELF);
     static public $emptyList = array(Type::T_LIST, '', array());
@@ -1431,7 +1432,7 @@ class Compiler
                 if ($value[0] !== Type::T_NULL) {
                     $value = $this->reduce($value);
 
-                    if ($value[0] === Type::T_NULL) {
+                    if ($value[0] === Type::T_NULL || $value === self::$nullString) {
                         break;
                     }
                 }
@@ -1594,12 +1595,14 @@ class Compiler
                 $prefix = $this->compileValue($prop->prefix) . '-';
 
                 foreach ($prop->children as $child) {
-                    if ($child[0] === Type::T_ASSIGN) {
-                        array_unshift($child[1][2], $prefix);
-                    }
+                    switch ($child[0]) {
+                        case Type::T_ASSIGN:
+                            array_unshift($child[1][2], $prefix);
+                            break;
 
-                    if ($child[0] === Type::T_NESTED_PROPERTY) {
-                        array_unshift($child[1]->prefix[2], $prefix);
+                        case Type::T_NESTED_PROPERTY:
+                            array_unshift($child[1]->prefix[2], $prefix);
+                            break;
                     }
 
                     $prefixed[] = $child;
@@ -4784,17 +4787,30 @@ class Compiler
     protected static $libStrSlice = array('string', 'start-at', 'end-at');
     protected function libStrSlice($args)
     {
-        if ($args[2][1] == 0) {
-            return self::$null;
+        if (isset($args[2]) && $args[2][1] == 0) {
+            return self::$nullString;
         }
 
         $string = $this->coerceString($args[0]);
         $stringContent = $this->compileStringContent($string);
 
-        $start = (int) $args[1][1] ?: 1;
-        $end = (int) $args[2][1];
+        $start = (int) $args[1][1];
+        if ($start > 0) {
+            $start--;
+        }
 
-        $string[2] = array(substr($stringContent, $start - 1, ($end < 0 ? $end : $end - $start) + 1));
+        $end = (int) $args[2][1];
+        if ($end < 0) {
+            $end++;
+        } elseif ($end > 0) {
+            $end -= $start;
+        }
+
+        if ($end === 0 || $end > strlen($stringContent)) {
+            $end = strlen($stringContent);
+        }
+
+        $string[2] = array(substr($stringContent, $start, $end));
 
         return $string;
     }
