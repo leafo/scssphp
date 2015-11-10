@@ -1891,7 +1891,7 @@ class Compiler
 
                 if ($op === 'not') {
                     if ($inExp || $inParens) {
-                        if ($exp === self::$false) {
+                        if ($exp === self::$false || $exp === self::$null) {
                             return self::$true;
                         }
 

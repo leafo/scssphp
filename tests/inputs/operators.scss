@@ -122,6 +122,7 @@ div {
     not: (not 1);
     not: (not "");
     not: (not hello);
+    not: (not null);
 }
 
 #string-test {

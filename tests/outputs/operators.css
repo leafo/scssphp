@@ -94,7 +94,8 @@ div {
   not: false;
   not: false;
   not: false;
-  not: false; }
+  not: false;
+  not: true; }
 
 #string-test {
   str: true;

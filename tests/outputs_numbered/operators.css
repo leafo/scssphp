@@ -95,8 +95,9 @@ div {
   not: false;
   not: false;
   not: false;
-  not: false; }
-/* line 127, inputs/operators.scss */
+  not: false;
+  not: true; }
+/* line 128, inputs/operators.scss */
 #string-test {
   str: true;
   str: false;
@@ -104,66 +105,66 @@ div {
   str: true;
   str: xhellohellofalse;
   str: true; }
-/* line 143, inputs/operators.scss */
+/* line 144, inputs/operators.scss */
 #special {
   cancel-unit: 1; }
-/* line 150, inputs/operators.scss */
+/* line 151, inputs/operators.scss */
 .row .a {
   margin: -0.5em; }
-/* line 151, inputs/operators.scss */
+/* line 152, inputs/operators.scss */
 .row .b {
   margin: -0.5em; }
-/* line 152, inputs/operators.scss */
+/* line 153, inputs/operators.scss */
 .row .c {
   margin: -0.5em; }
-/* line 153, inputs/operators.scss */
+/* line 154, inputs/operators.scss */
 .row .d {
   margin: -0.5em; }
-/* line 154, inputs/operators.scss */
+/* line 155, inputs/operators.scss */
 .row .e {
   margin: 0 -0.5em; }
-/* line 156, inputs/operators.scss */
+/* line 157, inputs/operators.scss */
 .alt .a {
   margin: -0.5em; }
-/* line 157, inputs/operators.scss */
+/* line 158, inputs/operators.scss */
 .alt .b {
   margin: -0.5em; }
-/* line 158, inputs/operators.scss */
+/* line 159, inputs/operators.scss */
 .alt .c {
   margin: -0.5em; }
-/* line 159, inputs/operators.scss */
+/* line 160, inputs/operators.scss */
 .alt .d {
   margin: 0 -0.5em; }
-/* line 160, inputs/operators.scss */
+/* line 161, inputs/operators.scss */
 .alt .e {
   margin: 0 -0.5em; }
-/* line 162, inputs/operators.scss */
+/* line 163, inputs/operators.scss */
 .row .f {
   margin: -2em; }
-/* line 163, inputs/operators.scss */
+/* line 164, inputs/operators.scss */
 .row .g {
   margin: -2em; }
-/* line 164, inputs/operators.scss */
+/* line 165, inputs/operators.scss */
 .row .h {
   margin: -2em; }
-/* line 165, inputs/operators.scss */
+/* line 166, inputs/operators.scss */
 .row .i {
   margin: -2em; }
-/* line 166, inputs/operators.scss */
+/* line 167, inputs/operators.scss */
 .row .j {
   margin: 0 -2em; }
-/* line 168, inputs/operators.scss */
+/* line 169, inputs/operators.scss */
 .alt .f {
   margin: -2em; }
-/* line 169, inputs/operators.scss */
+/* line 170, inputs/operators.scss */
 .alt .g {
   margin: -2em; }
-/* line 170, inputs/operators.scss */
+/* line 171, inputs/operators.scss */
 .alt .h {
   margin: -2em; }
-/* line 171, inputs/operators.scss */
+/* line 172, inputs/operators.scss */
 .alt .i {
   margin: 0 -2em; }
-/* line 172, inputs/operators.scss */
+/* line 173, inputs/operators.scss */
 .alt .j {
   margin: 0 -2em; }
