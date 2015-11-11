@@ -125,7 +125,7 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
   * Raise minimum supported version to PHP 5.4
   * Drop HHVM support/hacks
   * Remove deprecated classmap.php
-  * Breaking changes to Node\Number implementation
+  * Node\Number units reimplemented as array
   * Compiler: treat `! null === true`
   * Compiler: `str-splice()` fixes
   * Node\Number: fixes incompatible units
