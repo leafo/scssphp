@@ -59,6 +59,7 @@ class Type
     const T_NUMBER = 'number';
     const T_RETURN = 'return';
     const T_ROOT = 'root';
+    const T_SCSSPHP_IMPORT_ONCE = 'scssphp-import-once';
     const T_SELF = 'self';
     const T_STRING = 'string';
     const T_UNARY = 'unary';

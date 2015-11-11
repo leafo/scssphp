@@ -1301,62 +1301,19 @@ class Compiler
     /**
      * Compile import; returns true if the value was something that could be imported
      *
-     * @param array $rawPath
-     * @param array $out
+     * @param array   $rawPath
+     * @param array   $out
+     * @param boolean $once
      *
      * @return boolean
      */
-    protected function compileImport($rawPath, $out)
+    protected function compileImport($rawPath, $out, $once = false)
     {
         if ($rawPath[0] === Type::T_STRING) {
             $path = $this->compileStringContent($rawPath);
 
             if ($path = $this->findImport($path)) {
-                $this->importFile($path, $out);
-                $this->importedFiles[] = $path;
-
-                return true;
-            }
-
-            return false;
-        }
-
-        if ($rawPath[0] === 'list') {
-            // handle a list of strings
-            if (count($rawPath[2]) === 0) {
-                return false;
-            }
-
-            foreach ($rawPath[2] as $path) {
-                if ($path[0] !== 'string') {
-                    return false;
-                }
-            }
-
-            foreach ($rawPath[2] as $path) {
-                $this->compileImport($path, $out);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Compile importOnce; returns true if the value was something that could be imported
-     *
-     * @param array $rawPath
-     * @param array $out
-     *
-     * @return boolean
-     */
-    protected function compileImportOnce($rawPath, $out)
-    {
-        if ($rawPath[0] === 'string') {
-            $path = $this->compileStringContent($rawPath);
-            if ($path = $this->findImport($path)) {
-                if (!in_array($path, $this->importedFiles)) {
+                if (! $once || ! in_array($path, $this->importedFiles)) {
                     $this->importFile($path, $out);
                     $this->importedFiles[] = $path;
                 }
@@ -1403,13 +1360,13 @@ class Compiler
         $this->sourcePos = isset($child[Parser::SOURCE_POSITION]) ? $child[Parser::SOURCE_POSITION] : -1;
 
         switch ($child[0]) {
-            case 'scssphp-import-once':
+            case Type::T_SCSSPHP_IMPORT_ONCE:
                 list(, $rawPath) = $child;
 
                 $rawPath = $this->reduce($rawPath);
 
                 if (! $this->compileImportOnce($rawPath, $out)) {
-                    $out->lines[] = '@scssphp-import-once ' . $this->compileValue($rawPath) . ';';
+                    $out->lines[] = '@import ' . $this->compileValue($rawPath) . ';';
                 }
                 break;
 

@@ -336,7 +336,7 @@ class Parser
                 $this->valueList($importPath) &&
                 $this->end()
             ) {
-                $this->append(array('scssphp-import-once', $importPath), $s);
+                $this->append(array(Type::T_SCSSPHP_IMPORT_ONCE, $importPath), $s);
 
                 return true;
             }
