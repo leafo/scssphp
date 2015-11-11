@@ -3956,9 +3956,6 @@ class Compiler
     protected function libRgba($args)
     {
         if ($color = $this->coerceColor($args[0])) {
-            // workaround https://github.com/facebook/hhvm/issues/5457
-            reset($args);
-
             $num = ! isset($args[1]) ? $args[3] : $args[1];
             $alpha = $this->assertNumber($num);
             $color[4] = $alpha;
@@ -3975,9 +3972,6 @@ class Compiler
     protected function alterColor($args, $fn)
     {
         $color = $this->assertColor($args[0]);
-
-        // workaround https://github.com/facebook/hhvm/issues/5457
-        reset($args);
 
         foreach (array(1, 2, 3, 7) as $i) {
             if (isset($args[$i])) {
