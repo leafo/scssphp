@@ -4789,22 +4789,17 @@ class Compiler
         $stringContent = $this->compileStringContent($string);
 
         $start = (int) $args[1][1];
+
         if ($start > 0) {
             $start--;
         }
 
-        $end = (int) $args[2][1];
-        if ($end < 0) {
-            $end++;
-        } elseif ($end > 0) {
-            $end -= $start;
-        }
+        $end    = (int) $args[2][1];
+        $length = $end < 0 ? $end + 1 : ($end > 0 ? $end - $start : $end);
 
-        if ($end === 0 || $end > strlen($stringContent)) {
-            $end = strlen($stringContent);
-        }
-
-        $string[2] = array(substr($stringContent, $start, $end));
+        $string[2] = $length
+            ? array(substr($stringContent, $start, $length))
+            : array(substr($stringContent, $start));
 
         return $string;
     }
