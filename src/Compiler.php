@@ -1365,7 +1365,7 @@ class Compiler
 
                 $rawPath = $this->reduce($rawPath);
 
-                if (! $this->compileImportOnce($rawPath, $out)) {
+                if (! $this->compileImport($rawPath, $out, true)) {
                     $out->lines[] = '@import ' . $this->compileValue($rawPath) . ';';
                 }
                 break;
