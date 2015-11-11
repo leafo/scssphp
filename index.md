@@ -121,6 +121,14 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.5.0** -- November 11, 2015
+  * Raise minimum supported version to PHP 5.4
+  * Drop HHVM support/hacks
+  * Remove deprecated classmap.php
+  * Breaking changes to Node\Number implementation
+  * Compiler: treat `! null === true`
+  * Compiler: `str-splice()` fixes
+  * Node\Number: fixes incompatible units
 * **0.4.0** -- November 8, 2015
   * Parser: remove deprecated `show()` and `to()` methods
   * Parser, Compiler: convert stdClass to Block, Node, and OutputBlock abstractions
