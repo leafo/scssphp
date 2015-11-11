@@ -1844,7 +1844,7 @@ class Compiler
                                 $targetUnit = $left[2];
 
                                 foreach ($right[2] as $unit => $exp) {
-                                    @$targetUnit[$unit] += $exp;
+                                    $targetUnit[$unit] = (isset($targetUnit[$unit]) ? $targetUnit[$unit] : 0) + $exp;
                                 }
                                 break;
 
@@ -1852,7 +1852,7 @@ class Compiler
                                 $targetUnit = $left[2];
 
                                 foreach ($right[2] as $unit => $exp) {
-                                    @$targetUnit[$unit] -= $exp;
+                                    $targetUnit[$unit] = (isset($targetUnit[$unit]) ? $targetUnit[$unit] : 0) - $exp;
                                 }
                                 break;
 

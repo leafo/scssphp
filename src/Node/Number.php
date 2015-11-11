@@ -111,8 +111,9 @@ class Number extends Node implements \ArrayAccess
         $dimension = $this->dimension;
 
         foreach (self::$unitTable['in'] as $unit => $conv) {
-            $exp = @$this->units[$unit] - @$units[$unit];
-            $factor = pow($conv, $exp);
+            $from       = isset($this->units[$unit]) ? $this->units[$unit] : 0;
+            $to         = isset($units[$unit]) ? $units[$unit] : 0;
+            $factor     = pow($conv, $from - $to);
             $dimension /= $factor;
         }
 
@@ -312,7 +313,7 @@ class Number extends Node implements \ArrayAccess
                 $dimension /= $factor;
             }
 
-            @$units[$unit] += $exp;
+            $units[$unit] = $exp + (isset($units[$unit]) ? $units[$unit] : 0);
         }
     }
 }
