@@ -121,6 +121,9 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.5.1** -- November 11, 2015
+  * {% raw %}@{% endraw %}scssphp-import-once 
+  * avoid notices with custom error handlers that don't check if `error_reporting()` returns 0
 * **0.5.0** -- November 11, 2015
   * Raise minimum supported version to PHP 5.4
   * Drop HHVM support/hacks
