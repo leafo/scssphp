@@ -142,6 +142,11 @@ class Compiler
     private $shouldEvaluate;
 
     /**
+     * @var boolean ignore SCSS errors or throw an error
+     */
+    private $ignoreErrors;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -3214,6 +3219,10 @@ class Compiler
      */
     public function throwError($msg)
     {
+        if ($this->isIgnoreErrors()) {
+            return;
+        }
+
         if (func_num_args() > 1) {
             $msg = call_user_func_array('sprintf', func_get_args());
         }
@@ -4944,5 +4953,31 @@ class Compiler
         $id += mt_rand(0, 10) + 1;
 
         return array(Type::T_STRING, '', array('u' . str_pad(base_convert($id, 10, 36), 8, '0', STR_PAD_LEFT)));
+    }
+
+    /**
+     * is IgnoreErrors
+     *
+     * @return boolean
+     */
+    private function isIgnoreErrors()
+    {
+        return $this->ignoreErrors;
+    }
+
+    /**
+     * Set IgnoreErrors
+     *
+     * @api
+     *
+     * @param boolean $ignoreErrors
+     *
+     * @return \Leafo\ScssPhp\Compiler
+     */
+    public function setIgnoreErrors($ignoreErrors)
+    {
+        $this->ignoreErrors = $ignoreErrors;
+
+        return $this;
     }
 }
