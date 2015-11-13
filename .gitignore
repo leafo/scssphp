@@ -1,3 +1,4 @@
+# Project
 .sass-cache
 composer.lock
 pscss.phar
@@ -8,3 +9,11 @@ pscss.phar
 /compass/
 /vendor/
 /frameworks/
+
+# IDE
+.idea/
+nbproject/
+.project
+
+# Filesystem
+.DS_Store
