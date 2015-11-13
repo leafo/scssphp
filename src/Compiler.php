@@ -15,6 +15,7 @@ use Leafo\ScssPhp\Base\Range;
 use Leafo\ScssPhp\Block;
 use Leafo\ScssPhp\Colors;
 use Leafo\ScssPhp\Compiler\Environment;
+use Leafo\ScssPhp\Exception\CompilerException;
 use Leafo\ScssPhp\Formatter\OutputBlock;
 use Leafo\ScssPhp\Node;
 use Leafo\ScssPhp\Type;
@@ -3199,7 +3200,8 @@ class Compiler
      *
      * @param string $msg Message with optional sprintf()-style vararg parameters
      *
-     * @throws \Exception
+     * @throws \Leafo\ScssPhp\Exception\CompilerException
+     * @throws \Leafo\ScssPhp\Exception\ParseException
      */
     public function throwError($msg)
     {
@@ -3212,7 +3214,7 @@ class Compiler
             $parser->throwParseError($msg, $this->sourcePos);
         }
 
-        throw new \Exception($msg);
+        throw new CompilerException($msg);
     }
 
     /**

@@ -13,6 +13,7 @@ namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Block;
 use Leafo\ScssPhp\Compiler;
+use Leafo\ScssPhp\Exception\ParseException;
 use Leafo\ScssPhp\Node;
 use Leafo\ScssPhp\Type;
 
@@ -120,7 +121,7 @@ class Parser
      * @param string  $msg
      * @param integer $count
      *
-     * @throws \Exception
+     * @throws \Leafo\ScssPhp\Exception\ParseException
      */
     public function throwParseError($msg = 'parse error', $count = null)
     {
@@ -135,10 +136,10 @@ class Parser
         }
 
         if ($this->peek("(.*?)(\n|$)", $m, $count)) {
-            throw new \Exception("$msg: failed at `$m[1]` $loc");
+            throw new ParseException("$msg: failed at `$m[1]` $loc");
         }
 
-        throw new \Exception("$msg: $loc");
+        throw new ParseException("$msg: $loc");
     }
 
     /**
