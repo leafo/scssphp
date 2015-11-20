@@ -526,8 +526,12 @@ class Compiler
 
             if ($needsWrap) {
                 $wrapped = new Block;
-                $wrapped->selectors = array();
-                $wrapped->children  = $media->children;
+                $wrapped->sourcePosition = $media->sourcePosition;
+                $wrapped->sourceIndex    = $media->sourceIndex;
+                $wrapped->selectors      = array();
+                $wrapped->comments       = array();
+                $wrapped->parent         = $media;
+                $wrapped->children       = $media->children;
 
                 $media->children = array(array(Type::T_BLOCK, $wrapped));
             }
@@ -594,11 +598,11 @@ class Compiler
         // wrap inline selector
         if ($block->selector) {
             $wrapped = new Block;
-            $wrapped->parent         = $block;
             $wrapped->sourcePosition = $block->sourcePosition;
             $wrapped->sourceIndex    = $block->sourceIndex;
             $wrapped->selectors      = $block->selector;
             $wrapped->comments       = array();
+            $wrapped->parent         = $block;
             $wrapped->children       = $block->children;
 
             $block->children = array(array(Type::T_BLOCK, $wrapped));
@@ -636,7 +640,7 @@ class Compiler
                 continue;
             }
 
-            if (isset($e->block) && $e->block === $block) {
+            if ($e->block === $block) {
                 continue;
             }
 
@@ -662,36 +666,11 @@ class Compiler
             }
 
             $b = new Block;
-
-            if (isset($e->block->sourcePosition)) {
-                $b->sourcePosition = $e->block->sourcePosition;
-            }
-
-            if (isset($e->block->sourceIndex)) {
-                $b->sourceIndex = $e->block->sourceIndex;
-            }
-
-            $b->selectors = array();
-
-            if (isset($e->block->comments)) {
-                $b->comments = $e->block->comments;
-            }
-
-            if (isset($e->block->type)) {
-                $b->type = $e->block->type;
-            }
-
-            if (isset($e->block->name)) {
-                $b->name = $e->block->name;
-            }
-
-            if (isset($e->block->queryList)) {
-                $b->queryList = $e->block->queryList;
-            }
-
-            if (isset($e->block->value)) {
-                $b->value = $e->block->value;
-            }
+            $b->sourcePosition = $e->block->sourcePosition;
+            $b->sourceIndex    = $e->block->sourceIndex;
+            $b->selectors      = array();
+            $b->comments       = $e->block->comments;
+            $b->parent         = null;
 
             if ($newBlock) {
                 $type = isset($newBlock->type) ? $newBlock->type : Type::T_BLOCK;
@@ -709,7 +688,21 @@ class Compiler
                 $b->children = $block->children;
             }
 
-            $b->parent = null;
+            if (isset($e->block->type)) {
+                $b->type = $e->block->type;
+            }
+
+            if (isset($e->block->name)) {
+                $b->name = $e->block->name;
+            }
+
+            if (isset($e->block->queryList)) {
+                $b->queryList = $e->block->queryList;
+            }
+
+            if (isset($e->block->value)) {
+                $b->value = $e->block->value;
+            }
 
             $newBlock = $b;
         }

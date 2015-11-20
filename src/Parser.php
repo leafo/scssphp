@@ -691,11 +691,11 @@ class Parser
     protected function pushBlock($selectors, $pos = 0)
     {
         $b = new Block;
-        $b->parent         = $this->env;
         $b->sourcePosition = $pos;
         $b->sourceIndex    = $this->sourceIndex;
         $b->selectors      = $selectors;
         $b->comments       = array();
+        $b->parent         = $this->env;
 
         if (! $this->env) {
             $b->children = array();
