@@ -154,24 +154,28 @@ class Compiler
         $locale = setlocale(LC_NUMERIC, 0);
         setlocale(LC_NUMERIC, 'C');
 
-        $this->indentLevel   = -1;
-        $this->commentsSeen  = array();
-        $this->extends       = array();
-        $this->extendsMap    = array();
-        $this->parsedFiles   = array();
-        $this->sourceParsers = array();
-        $this->sourceIndex   = null;
-        $this->env           = null;
-        $this->scope         = null;
-        $this->storeEnv      = null;
-        $this->stderr        = fopen('php://stderr', 'w');
+        $this->indentLevel    = -1;
+        $this->commentsSeen   = array();
+        $this->extends        = array();
+        $this->extendsMap     = array();
+        $this->parsedFiles    = array();
+        $this->sourceParsers  = array();
+        $this->sourceIndex    = null;
+        $this->sourcePos      = null;
+        $this->env            = null;
+        $this->scope          = null;
+        $this->storeEnv       = null;
+        $this->charsetSeen    = null;
+        $this->shouldEvaluate = null;
+        $this->stderr         = fopen('php://stderr', 'w');
 
         $this->parser = $this->parserFactory($path);
         $tree = $this->parser->parse($code);
 
         $this->formatter = new $this->formatter();
+        $this->rootBlock = null;
+        $this->rootEnv   = $this->pushEnv($tree);
 
-        $this->rootEnv = $this->pushEnv($tree);
         $this->injectVariables($this->registeredVars);
         $this->compileRoot($tree);
         $this->popEnv();
