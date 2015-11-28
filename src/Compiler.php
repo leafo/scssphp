@@ -140,6 +140,15 @@ class Compiler
     private $shouldEvaluate;
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->parsedFiles   = array();
+        $this->sourceParsers = array();
+    }
+
+    /**
      * Compile scss
      *
      * @api
@@ -158,8 +167,6 @@ class Compiler
         $this->commentsSeen   = array();
         $this->extends        = array();
         $this->extendsMap     = array();
-        $this->parsedFiles    = array();
-        $this->sourceParsers  = array();
         $this->sourceIndex    = null;
         $this->sourcePos      = null;
         $this->env            = null;
