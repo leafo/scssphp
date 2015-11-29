@@ -2384,7 +2384,7 @@ class Parser
         $this->sourcePositions[] = strlen($buffer);
 
 	if (substr($buffer, -1) !== "\n") {
-            $this->sourcePositions[] = strlen(buffer) + 1;
+            $this->sourcePositions[] = strlen($buffer) + 1;
 	}
     }
 
