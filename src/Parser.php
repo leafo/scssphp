@@ -2424,9 +2424,9 @@ class Parser
                 continue;
             }
 
-            return array($mid + 1, $pos - $this->sourcePosition[$mid]);
+            return array($mid + 1, $pos - $this->sourcePositions[$mid]);
         }
 
-        return array($low + 1, $pos - $this->sourcePosition[$low]);
+        return array($low + 1, $pos - $this->sourcePositions[$low]);
     }
 }
