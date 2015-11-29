@@ -131,8 +131,8 @@ class Compiler
     private $env;
     private $scope;
     private $parser;
-    private $sourcePos;
-    private $sourceParsers;
+    private $sourceNames;
+    private $sourceLine;
     private $sourceIndex;
     private $storeEnv;
     private $charsetSeen;
@@ -144,8 +144,8 @@ class Compiler
      */
     public function __construct()
     {
-        $this->parsedFiles   = array();
-        $this->sourceParsers = array();
+        $this->parsedFiles = array();
+        $this->sourceNames = array();
     }
 
     /**
@@ -168,7 +168,7 @@ class Compiler
         $this->extends        = array();
         $this->extendsMap     = array();
         $this->sourceIndex    = null;
-        $this->sourcePos      = null;
+        $this->sourceLine     = null;
         $this->env            = null;
         $this->scope          = null;
         $this->storeEnv       = null;
@@ -178,6 +178,7 @@ class Compiler
 
         $this->parser = $this->parserFactory($path);
         $tree = $this->parser->parse($code);
+        $this->parser = null;
 
         $this->formatter = new $this->formatter();
         $this->rootBlock = null;
@@ -203,9 +204,9 @@ class Compiler
      */
     private function parserFactory($path)
     {
-        $parser = new Parser($path, count($this->sourceParsers));
+        $parser = new Parser($path, count($this->sourceNames));
 
-        $this->sourceParsers[] = $parser;
+        $this->sourceNames[] = $path;
         $this->addParsedFile($path);
 
         return $parser;
@@ -537,12 +538,12 @@ class Compiler
 
             if ($needsWrap) {
                 $wrapped = new Block;
-                $wrapped->sourcePosition = $media->sourcePosition;
-                $wrapped->sourceIndex    = $media->sourceIndex;
-                $wrapped->selectors      = array();
-                $wrapped->comments       = array();
-                $wrapped->parent         = $media;
-                $wrapped->children       = $media->children;
+                $wrapped->sourceLine  = $media->sourceLine;
+                $wrapped->sourceIndex = $media->sourceIndex;
+                $wrapped->selectors   = array();
+                $wrapped->comments    = array();
+                $wrapped->parent      = $media;
+                $wrapped->children    = $media->children;
 
                 $media->children = array(array(Type::T_BLOCK, $wrapped));
             }
@@ -609,12 +610,12 @@ class Compiler
         // wrap inline selector
         if ($block->selector) {
             $wrapped = new Block;
-            $wrapped->sourcePosition = $block->sourcePosition;
-            $wrapped->sourceIndex    = $block->sourceIndex;
-            $wrapped->selectors      = $block->selector;
-            $wrapped->comments       = array();
-            $wrapped->parent         = $block;
-            $wrapped->children       = $block->children;
+            $wrapped->sourceLine  = $block->sourceLine;
+            $wrapped->sourceIndex = $block->sourceIndex;
+            $wrapped->selectors   = $block->selector;
+            $wrapped->comments    = array();
+            $wrapped->parent      = $block;
+            $wrapped->children    = $block->children;
 
             $block->children = array(array(Type::T_BLOCK, $wrapped));
         }
@@ -677,11 +678,11 @@ class Compiler
             }
 
             $b = new Block;
-            $b->sourcePosition = $e->block->sourcePosition;
-            $b->sourceIndex    = $e->block->sourceIndex;
-            $b->selectors      = array();
-            $b->comments       = $e->block->comments;
-            $b->parent         = null;
+            $b->sourceLine  = $e->block->sourceLine;
+            $b->sourceIndex = $e->block->sourceIndex;
+            $b->selectors   = array();
+            $b->comments    = $e->block->comments;
+            $b->parent      = null;
 
             if ($newBlock) {
                 $type = isset($newBlock->type) ? $newBlock->type : Type::T_BLOCK;
@@ -886,9 +887,8 @@ class Compiler
             $annotation = $this->makeOutputBlock(Type::T_COMMENT);
             $annotation->depth = 0;
 
-            $parser = $this->sourceParsers[$block->sourceIndex];
-            $file = $parser->getSourceName();
-            $line = $parser->getLineNo($block->sourcePosition);
+            $file = $this->sourceNames[$block->sourceIndex];
+            $line = $block->sourceLine;
 
             switch ($this->lineNumberStyle) {
                 case self::LINE_COMMENTS:
@@ -1361,7 +1361,7 @@ class Compiler
     protected function compileChild($child, OutputBlock $out)
     {
         $this->sourceIndex = isset($child[Parser::SOURCE_INDEX]) ? $child[Parser::SOURCE_INDEX] : null;
-        $this->sourcePos = isset($child[Parser::SOURCE_POSITION]) ? $child[Parser::SOURCE_POSITION] : -1;
+        $this->sourceLine  = isset($child[Parser::SOURCE_LINE]) ? $child[Parser::SOURCE_LINE] : -1;
 
         switch ($child[0]) {
             case Type::T_SCSSPHP_IMPORT_ONCE:
@@ -1685,7 +1685,7 @@ class Compiler
             case Type::T_DEBUG:
                 list(, $value) = $child;
 
-                $line = $this->parser->getLineNo($this->sourcePos);
+                $line = $this->sourceLine;
                 $value = $this->compileValue($this->reduce($value, true));
                 fwrite($this->stderr, "Line $line DEBUG: $value\n");
                 break;
@@ -1693,7 +1693,7 @@ class Compiler
             case Type::T_WARN:
                 list(, $value) = $child;
 
-                $line = $this->parser->getLineNo($this->sourcePos);
+                $line = $this->sourceLine;
                 $value = $this->compileValue($this->reduce($value, true));
                 echo "Line $line WARN: $value\n";
                 break;
@@ -1701,7 +1701,7 @@ class Compiler
             case Type::T_ERROR:
                 list(, $value) = $child;
 
-                $line = $this->parser->getLineNo($this->sourcePos);
+                $line = $this->sourceLine;
                 $value = $this->compileValue($this->reduce($value, true));
                 $this->throwError("Line $line ERROR: $value\n");
                 break;
@@ -3211,10 +3211,8 @@ class Compiler
             $msg = call_user_func_array('sprintf', func_get_args());
         }
 
-        if ($this->sourcePos >= 0 && isset($this->sourceIndex)) {
-            $parser = $this->sourceParsers[$this->sourceIndex];
-            $parser->throwParseError($msg, $this->sourcePos);
-        }
+        $line = $this->sourceLine;
+        $msg = "$msg: line: $line";
 
         throw new \Exception($msg);
     }
@@ -3229,8 +3227,7 @@ class Compiler
     private function handleImportLoop($name)
     {
         for ($env = $this->env; $env; $env = $env->parent) {
-            $parser = $this->sourceParsers[$env->block->sourceIndex];
-            $file = $parser->getSourceName();
+            $file = $this->sourceNames[$env->block->sourceIndex];
 
             if (realpath($file) === $name) {
                 $this->throwError('An @import loop has been found: %s imports %s', $file, basename($file));

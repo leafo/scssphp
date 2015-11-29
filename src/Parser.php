@@ -23,8 +23,8 @@ use Leafo\ScssPhp\Type;
  */
 class Parser
 {
-    const SOURCE_INDEX    = -1;
-    const SOURCE_POSITION = -2;
+    const SOURCE_INDEX = -1;
+    const SOURCE_LINE  = -2;
 
     /**
      * @var array
@@ -53,6 +53,7 @@ class Parser
 
     private $sourceName;
     private $sourceIndex;
+    private $sourcePositions;
     private $charset;
     private $count;
     private $env;
@@ -99,46 +100,21 @@ class Parser
     }
 
     /**
-     * Get source line number (given character position in the buffer)
-     *
-     * @api
-     *
-     * @param integer $pos
-     *
-     * @return integer
-     */
-    public function getLineNo($pos)
-    {
-        return 1 + substr_count(substr($this->buffer, 0, $pos), "\n");
-    }
-
-    /**
      * Throw parser error
      *
      * @api
      *
-     * @param string  $msg
-     * @param integer $count
+     * @param string $msg
      *
      * @throws \Exception
      */
-    public function throwParseError($msg = 'parse error', $count = null)
+    public function throwParseError($msg = 'parse error')
     {
-        $count = ! isset($count) ? $this->count : $count;
+        $line = $this->getSourceLineNumber($this->count);
+        $loc  = empty($this->sourceName) ? "line: $line" : "$this->sourceName on line $line";
 
-        $line = $this->getLineNo($count);
-
-        if (! empty($this->sourceName)) {
-            $loc = "$this->sourceName on line $line";
-        } else {
-            $loc = "line: $line";
-        }
-
-        if ($this->peek("(.*?)(\n|$)", $m, $count)) {
-            throw new \Exception("$msg: failed at `$m[1]` $loc");
-        }
-
-        throw new \Exception("$msg: $loc");
+        throw new \Exception("$msg: failed at `$m[1]` $loc");
+        //throw new \Exception("$msg: $loc");
     }
 
     /**
@@ -158,8 +134,9 @@ class Parser
         $this->eatWhiteDefault = true;
         $this->buffer          = rtrim($buffer, "\x00..\x1f");
 
-        $this->pushBlock(null); // root block
+        $this->extractLineNumbers($buffer);
 
+        $this->pushBlock(null); // root block
         $this->whitespace();
         $this->pushBlock(null);
         $this->popBlock();
@@ -549,7 +526,7 @@ class Parser
                 if (! isset($this->charset)) {
                     $statement = array(Type::T_CHARSET, $charset);
 
-                    $statement[self::SOURCE_POSITION] = $s;
+                    $statement[self::SOURCE_LINE]  = $this->getSourceLineNumber($s);
                     $statement[self::SOURCE_INDEX] = $this->sourceIndex;
 
                     $this->charset = $statement;
@@ -691,11 +668,11 @@ class Parser
     protected function pushBlock($selectors, $pos = 0)
     {
         $b = new Block;
-        $b->sourcePosition = $pos;
-        $b->sourceIndex    = $this->sourceIndex;
-        $b->selectors      = $selectors;
-        $b->comments       = array();
-        $b->parent         = $this->env;
+        $b->sourceLine  = $this->getSourceLineNumber($pos);
+        $b->sourceIndex = $this->sourceIndex;
+        $b->selectors   = $selectors;
+        $b->comments    = array();
+        $b->parent      = $this->env;
 
         if (! $this->env) {
             $b->children = array();
@@ -942,8 +919,8 @@ class Parser
     protected function append($statement, $pos = null)
     {
         if ($pos !== null) {
-            $statement[self::SOURCE_POSITION] = $pos;
-            $statement[self::SOURCE_INDEX]    = $this->sourceIndex;
+            $statement[self::SOURCE_LINE]  = $this->getSourceLineNumber($pos);
+            $statement[self::SOURCE_INDEX] = $this->sourceIndex;
         }
 
         $this->env->children[] = $statement;
@@ -2384,5 +2361,54 @@ class Parser
     private function pregQuote($what)
     {
         return preg_quote($what, '/');
+    }
+
+    /**
+     * Extract line numbers from buffer
+     *
+     * @param string $buffer
+     */
+    private function extractLineNumbers($buffer)
+    {
+        $this->sourcePositions = array(0 => 0);
+        $pos = 0;
+
+        while (($pos = strpos($buffer, "\n", $prev)) !== false) {
+            $this->sourcePositions[] = $pos;
+            $prev = $pos + 1;
+        }
+
+        $this->sourcePositions[] = strlen($buffer);
+    }
+
+    /**
+     * Get source line number (given character position in the buffer)
+     *
+     * @param integer $pos
+     *
+     * @return integer
+     */
+    private function getSourceLineNumber($pos)
+    {
+        $low = 0;
+        $high = count($this->sourcePositions);
+
+        while ($low < $high) {
+            $mid = (int) (($high + $low) / 2);
+
+            if ($pos < $this->sourcePositions[$mid]) {
+                $high = $mid - 1;
+                continue;
+            }
+
+            if ($pos >= $this->sourcePositions[$mid + 1]) {
+                $low = $mid + 1;
+                continue;
+            }
+
+            return $mid + 1;
+        }
+
+        return $low + 1;
     }
 }
