@@ -113,8 +113,11 @@ class Parser
         $line = $this->getSourceLineNumber($this->count);
         $loc  = empty($this->sourceName) ? "line: $line" : "$this->sourceName on line $line";
 
-        throw new \Exception("$msg: failed at `$m[1]` $loc");
-        //throw new \Exception("$msg: $loc");
+        if ($this->peek("(.*?)(\n|$)", $m, $this->count)) {
+            throw new \Exception("$msg: failed at `$m[1]` $loc");
+        }
+
+        throw new \Exception("$msg: $loc");
     }
 
     /**
@@ -2371,7 +2374,7 @@ class Parser
     private function extractLineNumbers($buffer)
     {
         $this->sourcePositions = array(0 => 0);
-        $pos = 0;
+        $prev = 0;
 
         while (($pos = strpos($buffer, "\n", $prev)) !== false) {
             $this->sourcePositions[] = $pos;
