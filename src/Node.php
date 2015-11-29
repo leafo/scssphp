@@ -26,10 +26,15 @@ abstract class Node
     /**
      * @var integer
      */
-    public $sourcePosition;
+    public $sourceIndex;
 
     /**
      * @var integer
      */
-    public $sourceIndex;
+    public $sourceLine;
+
+    /**
+     * @var integer
+     */
+    public $sourceColumn;
 }

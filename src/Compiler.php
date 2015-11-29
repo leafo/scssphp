@@ -132,8 +132,9 @@ class Compiler
     private $scope;
     private $parser;
     private $sourceNames;
-    private $sourceLine;
     private $sourceIndex;
+    private $sourceLine;
+    private $sourceColumn;
     private $storeEnv;
     private $charsetSeen;
     private $stderr;
@@ -169,6 +170,7 @@ class Compiler
         $this->extendsMap     = array();
         $this->sourceIndex    = null;
         $this->sourceLine     = null;
+        $this->sourceColumn   = null;
         $this->env            = null;
         $this->scope          = null;
         $this->storeEnv       = null;
@@ -538,12 +540,13 @@ class Compiler
 
             if ($needsWrap) {
                 $wrapped = new Block;
-                $wrapped->sourceLine  = $media->sourceLine;
-                $wrapped->sourceIndex = $media->sourceIndex;
-                $wrapped->selectors   = array();
-                $wrapped->comments    = array();
-                $wrapped->parent      = $media;
-                $wrapped->children    = $media->children;
+                $wrapped->sourceIndex  = $media->sourceIndex;
+                $wrapped->sourceLine   = $media->sourceLine;
+                $wrapped->sourceColumn = $media->sourceColumn;
+                $wrapped->selectors    = array();
+                $wrapped->comments     = array();
+                $wrapped->parent       = $media;
+                $wrapped->children     = $media->children;
 
                 $media->children = array(array(Type::T_BLOCK, $wrapped));
             }
@@ -610,12 +613,13 @@ class Compiler
         // wrap inline selector
         if ($block->selector) {
             $wrapped = new Block;
-            $wrapped->sourceLine  = $block->sourceLine;
-            $wrapped->sourceIndex = $block->sourceIndex;
-            $wrapped->selectors   = $block->selector;
-            $wrapped->comments    = array();
-            $wrapped->parent      = $block;
-            $wrapped->children    = $block->children;
+            $wrapped->sourceIndex  = $block->sourceIndex;
+            $wrapped->sourceLine   = $block->sourceLine;
+            $wrapped->sourceColumn = $block->sourceColumn;
+            $wrapped->selectors    = $block->selector;
+            $wrapped->comments     = array();
+            $wrapped->parent       = $block;
+            $wrapped->children     = $block->children;
 
             $block->children = array(array(Type::T_BLOCK, $wrapped));
         }
@@ -678,11 +682,12 @@ class Compiler
             }
 
             $b = new Block;
-            $b->sourceLine  = $e->block->sourceLine;
-            $b->sourceIndex = $e->block->sourceIndex;
-            $b->selectors   = array();
-            $b->comments    = $e->block->comments;
-            $b->parent      = null;
+            $b->sourceIndex  = $e->block->sourceIndex;
+            $b->sourceLine   = $e->block->sourceLine;
+            $b->sourceColumn = $e->block->sourceColumn;
+            $b->selectors    = array();
+            $b->comments     = $e->block->comments;
+            $b->parent       = null;
 
             if ($newBlock) {
                 $type = isset($newBlock->type) ? $newBlock->type : Type::T_BLOCK;
@@ -1360,8 +1365,9 @@ class Compiler
      */
     protected function compileChild($child, OutputBlock $out)
     {
-        $this->sourceIndex = isset($child[Parser::SOURCE_INDEX]) ? $child[Parser::SOURCE_INDEX] : null;
-        $this->sourceLine  = isset($child[Parser::SOURCE_LINE]) ? $child[Parser::SOURCE_LINE] : -1;
+        $this->sourceIndex  = isset($child[Parser::SOURCE_INDEX]) ? $child[Parser::SOURCE_INDEX] : null;
+        $this->sourceLine   = isset($child[Parser::SOURCE_LINE]) ? $child[Parser::SOURCE_LINE] : -1;
+        $this->sourceColumn = isset($child[Parser::SOURCE_COLUMN]) ? $child[Parser::SOURCE_COLUMN] : -1;
 
         switch ($child[0]) {
             case Type::T_SCSSPHP_IMPORT_ONCE:

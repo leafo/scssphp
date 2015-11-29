@@ -23,8 +23,9 @@ use Leafo\ScssPhp\Type;
  */
 class Parser
 {
-    const SOURCE_INDEX = -1;
-    const SOURCE_LINE  = -2;
+    const SOURCE_INDEX  = -1;
+    const SOURCE_LINE   = -2;
+    const SOURCE_COLUMN = -3;
 
     /**
      * @var array
@@ -110,7 +111,8 @@ class Parser
      */
     public function throwParseError($msg = 'parse error')
     {
-        $line = $this->getSourceLineNumber($this->count);
+        list($line, $column) = $this->getSourcePosition($this->count);
+
         $loc  = empty($this->sourceName) ? "line: $line" : "$this->sourceName on line $line";
 
         if ($this->peek("(.*?)(\n|$)", $m, $this->count)) {
@@ -529,8 +531,11 @@ class Parser
                 if (! isset($this->charset)) {
                     $statement = array(Type::T_CHARSET, $charset);
 
-                    $statement[self::SOURCE_LINE]  = $this->getSourceLineNumber($s);
-                    $statement[self::SOURCE_INDEX] = $this->sourceIndex;
+                    list($line, $column) = $this->getSourcePosition($s);
+
+                    $statement[self::SOURCE_LINE]   = $line;
+                    $statement[self::SOURCE_COLUMN] = $column;
+                    $statement[self::SOURCE_INDEX]  = $this->sourceIndex;
 
                     $this->charset = $statement;
                 }
@@ -670,12 +675,15 @@ class Parser
      */
     protected function pushBlock($selectors, $pos = 0)
     {
+        list($line, $column) = $this->getSourcePosition($pos);
+
         $b = new Block;
-        $b->sourceLine  = $this->getSourceLineNumber($pos);
-        $b->sourceIndex = $this->sourceIndex;
-        $b->selectors   = $selectors;
-        $b->comments    = array();
-        $b->parent      = $this->env;
+        $b->sourceLine   = $line;
+        $b->sourceColumn = $column;
+        $b->sourceIndex  = $this->sourceIndex;
+        $b->selectors    = $selectors;
+        $b->comments     = array();
+        $b->parent       = $this->env;
 
         if (! $this->env) {
             $b->children = array();
@@ -922,8 +930,11 @@ class Parser
     protected function append($statement, $pos = null)
     {
         if ($pos !== null) {
-            $statement[self::SOURCE_LINE]  = $this->getSourceLineNumber($pos);
-            $statement[self::SOURCE_INDEX] = $this->sourceIndex;
+            list($line, $column) = $this->getSourcePosition($pos);
+
+            $statement[self::SOURCE_LINE]   = $line;
+            $statement[self::SOURCE_COLUMN] = $column;
+            $statement[self::SOURCE_INDEX]  = $this->sourceIndex;
         }
 
         $this->env->children[] = $statement;
@@ -2389,13 +2400,13 @@ class Parser
     }
 
     /**
-     * Get source line number (given character position in the buffer)
+     * Get source line number and column (given character position in the buffer)
      *
      * @param integer $pos
      *
      * @return integer
      */
-    private function getSourceLineNumber($pos)
+    private function getSourcePosition($pos)
     {
         $low = 0;
         $high = count($this->sourcePositions);
@@ -2413,9 +2424,9 @@ class Parser
                 continue;
             }
 
-            return $mid + 1;
+            return array($mid + 1, $pos - $this->sourcePosition[$mid]);
         }
 
-        return $low + 1;
+        return array($low + 1, $pos - $this->sourcePosition[$low]);
     }
 }

@@ -140,8 +140,12 @@ class Number extends Node implements \ArrayAccess
      */
     public function offsetExists($offset)
     {
+        if ($offset === -3) {
+            return $this->sourceColumn !== null;
+        }
+
         if ($offset === -2) {
-            return $sourceIndex !== null;
+            return $this->sourceLine !== null;
         }
 
         if ($offset === -1
@@ -161,11 +165,14 @@ class Number extends Node implements \ArrayAccess
     public function offsetGet($offset)
     {
         switch ($offset) {
+            case -3:
+                return $this->sourceColumn;
+
             case -2:
-                return $this->sourceIndex;
+                return $this->sourceLine;
 
             case -1:
-                return $this->sourcePosition;
+                return $this->sourceIndex;
 
             case 0:
                 return $this->type;
@@ -188,9 +195,11 @@ class Number extends Node implements \ArrayAccess
         } elseif ($offset === 2) {
             $this->units = $value;
         } elseif ($offset == -1) {
-            $this->sourcePosition = $value;
-        } elseif ($offset == -2) {
             $this->sourceIndex = $value;
+        } elseif ($offset == -2) {
+            $this->sourceLine = $value;
+        } elseif ($offset == -3) {
+            $this->sourceColumn = $value;
         }
     }
 
@@ -204,9 +213,11 @@ class Number extends Node implements \ArrayAccess
         } elseif ($offset === 2) {
             $this->units = null;
         } elseif ($offset === -1) {
-            $this->sourcePosition = null;
-        } elseif ($offset === -2) {
             $this->sourceIndex = null;
+        } elseif ($offset === -2) {
+            $this->sourceLine = null;
+        } elseif ($offset === -3) {
+            $this->sourceColumn = null;
         }
     }
 
