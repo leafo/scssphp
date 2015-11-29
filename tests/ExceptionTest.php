@@ -36,9 +36,11 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
         try {
             $this->compile($scss);
         } catch (\Exception $e) {
-            if (strpos($e->getMessage(), $expectedExceptionMessage) !== false) {
-                return;
-            };
+            if (strpos($e->getMessage(), $expectedExceptionMessage) === false) {
+                $this->fail('Unexpected exception raised: ' . $e->getMessage() . ' vs ' . $expectedExceptionMessage);
+            }
+
+            return;
         }
 
         $this->fail('Expected exception to be raised: ' . $expectedExceptionMessage);
