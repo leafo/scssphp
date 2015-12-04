@@ -121,6 +121,10 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.6.0** -- December 5, 2015
+  * handle escaped single quotes differently from escaped double quotes in quoted strings
+  * Compiler: undefined sourceParser when re-using a single Compiler instance
+  * Parser: `getLineNo()` removed
 * **0.5.1** -- November 11, 2015
   * {% raw %}@{% endraw %}scssphp-import-once 
   * avoid notices with custom error handlers that don't check if `error_reporting()` returns 0
