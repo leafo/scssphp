@@ -92,9 +92,9 @@ retrieved using the `getParsedFiles` method.
 
 ### Preset Variables
 
-You can set variables before compilation by using the `setVariables($vars)`
-method. To override a variable already defined in your scss source, use
-the `!default` flag.
+You can preset variables before compilation by using the `setVariables($vars)`
+method. If the variable is also defined in your scss source, use the `!default`
+flag to prevent your preset variables from being overridden.
 
 {% highlight php startinline=true %}
 use Leafo\ScssPhp\Compiler;
