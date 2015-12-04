@@ -1676,22 +1676,28 @@ class Parser
         $content = array();
         $oldWhite = $this->eatWhiteDefault;
         $this->eatWhiteDefault = false;
+        $hasInterpolation = false;
 
         while ($this->matchString($m, $delim)) {
-            $content[] = $m[1];
+            if ($m[1] !== '') {
+                $content[] = $m[1];
+            }
 
             if ($m[2] === '#{') {
                 $this->count -= strlen($m[2]);
 
                 if ($this->interpolation($inter, false)) {
                     $content[] = $inter;
+                    $hasInterpolation = true;
                 } else {
                     $this->count += strlen($m[2]);
                     $content[] = '#{'; // ignore it
                 }
             } elseif ($m[2] === '\\') {
-                if ($this->literal($delim, false)) {
-                    $content[] = $delim === '"' ? $m[2] . $delim : $delim;
+                if ($this->literal('"', false)) {
+                    $content[] = $m[2] . '"';
+                } elseif ($this->literal("'", false)) {
+                    $content[] = $m[2] . "'";
                 } else {
                     $content[] = $m[2];
                 }
@@ -1704,6 +1710,18 @@ class Parser
         $this->eatWhiteDefault = $oldWhite;
 
         if ($this->literal($delim)) {
+            if ($hasInterpolation) {
+                $delim = '"';
+
+                foreach ($content as &$string) {
+                    if ($string === "\\'") {
+                        $string = "'";
+                    } elseif ($string === '\\"') {
+                        $string = '"';
+                    }
+                }
+            }
+
             $out = array(Type::T_STRING, $delim, $content);
 
             return true;
@@ -2394,9 +2412,9 @@ class Parser
 
         $this->sourcePositions[] = strlen($buffer);
 
-	if (substr($buffer, -1) !== "\n") {
+        if (substr($buffer, -1) !== "\n") {
             $this->sourcePositions[] = strlen($buffer) + 1;
-	}
+        }
     }
 
     /**
