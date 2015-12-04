@@ -155,3 +155,6 @@ div.call-tests {
   a: #0a64ff;
   b: #0058ef;
   c: b; }
+
+div.unquote-test {
+  a: [type='text']; }

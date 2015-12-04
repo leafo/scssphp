@@ -1667,8 +1667,8 @@ class Parser
 
         if ($this->literal('"', false)) {
             $delim = '"';
-        } elseif ($this->literal('\'', false)) {
-            $delim = '\'';
+        } elseif ($this->literal("'", false)) {
+            $delim = "'";
         } else {
             return false;
         }
@@ -1690,10 +1690,10 @@ class Parser
                     $content[] = '#{'; // ignore it
                 }
             } elseif ($m[2] === '\\') {
-                $content[] = $m[2];
-
                 if ($this->literal($delim, false)) {
-                    $content[] = $delim;
+                    $content[] = $delim === '"' ? $m[2] . $delim : $delim;
+                } else {
+                    $content[] = $m[2];
                 }
             } else {
                 $this->count -= strlen($delim);
@@ -1796,7 +1796,7 @@ class Parser
                 break;
             }
 
-            if (($tok === '\'' || $tok === '"') && $this->string($str)) {
+            if (($tok === "'" || $tok === '"') && $this->string($str)) {
                 $content[] = $str;
                 continue;
             }

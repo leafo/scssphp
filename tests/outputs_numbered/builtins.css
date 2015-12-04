@@ -156,3 +156,6 @@ div.call-tests {
   a: #0a64ff;
   b: #0058ef;
   c: b; }
+/* line 215, inputs/builtins.scss */
+div.unquote-test {
+  a: [type='text']; }
