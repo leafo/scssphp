@@ -16,6 +16,6 @@ namespace Leafo\ScssPhp\Exception;
  *
  * @author Oleksandr Savchenko <traveltino@gmail.com>
  */
-class CompileException extends \Exception
+class CompilerException extends \Exception
 {
 }

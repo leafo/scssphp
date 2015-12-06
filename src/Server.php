@@ -12,6 +12,7 @@
 namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Compiler;
+use Leafo\ScssPhp\Exception\ServerException;
 use Leafo\ScssPhp\Version;
 
 /**
@@ -231,7 +232,7 @@ class Server
      *
      * @return string
      */
-    protected function createErrorCSS($error)
+    protected function createErrorCSS(\Exception $error)
     {
         $message = str_replace(
             array("'", "\n"),
@@ -269,11 +270,13 @@ class Server
      * @param string $out Output file (.css) optional
      *
      * @return string|bool
+     *
+     * @throws \Leafo\ScssPhp\Exception\ServerException
      */
     public function compileFile($in, $out = null)
     {
         if (! is_readable($in)) {
-            throw new \Exception('load error: failed to find ' . $in);
+            throw new ServerException('load error: failed to find ' . $in);
         }
 
         $pi = pathinfo($in);
@@ -334,7 +337,6 @@ class Server
                     header('ETag: "' . $etag . '"');
 
                     echo $css;
-
                 } catch (\Exception $e) {
                     if ($this->showErrorsAsCSS) {
                         header('Content-type: text/css');
@@ -346,7 +348,6 @@ class Server
 
                         echo 'Parse error: ' . $e->getMessage() . "\n";
                     }
-
                 }
 
                 return;
@@ -395,16 +396,16 @@ class Server
      *
      * @return string Compiled CSS results
      *
-     * @throws \Exception
+     * @throws \Leafo\ScssPhp\Exception\ServerException
      */
     public function checkedCachedCompile($in, $out, $force = false)
     {
         if (! is_file($in) || ! is_readable($in)) {
-            throw new \Exception('Invalid or unreadable input file specified.');
+            throw new ServerException('Invalid or unreadable input file specified.');
         }
 
         if (is_dir($out) || ! is_writable(file_exists($out) ? $out : dirname($out))) {
-            throw new \Exception('Invalid or unwritable output file specified.');
+            throw new ServerException('Invalid or unwritable output file specified.');
         }
 
         if ($force || $this->needsCompile($in, $out, $etag)) {
