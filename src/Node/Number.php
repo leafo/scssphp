@@ -16,7 +16,7 @@ use Leafo\ScssPhp\Node;
 use Leafo\ScssPhp\Type;
 
 /**
- * SCSS dimension + optional units
+ * Dimension + optional units
  *
  * {@internal
  *     This is a work-in-progress.

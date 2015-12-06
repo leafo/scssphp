@@ -12,7 +12,7 @@
 namespace Leafo\ScssPhp;
 
 /**
- * SCSS block/node types
+ * Block/node types
  *
  * @author Anthon Pang <anthon.pang@gmail.com>
  */

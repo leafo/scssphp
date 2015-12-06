@@ -15,7 +15,7 @@ use Leafo\ScssPhp\Compiler;
 use Leafo\ScssPhp\Version;
 
 /**
- * SCSS server
+ * Server
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */

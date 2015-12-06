@@ -9,7 +9,7 @@ if (! class_exists('scssc', false)) {
     include_once __DIR__ . '/src/Colors.php';
     include_once __DIR__ . '/src/Compiler.php';
     include_once __DIR__ . '/src/Compiler/Environment.php';
-    include_once __DIR__ . '/src/Exception/CompilerException.php';
+    include_once __DIR__ . '/src/Exception/CompileException.php';
     include_once __DIR__ . '/src/Exception/ParseException.php';
     include_once __DIR__ . '/src/Formatter.php';
     include_once __DIR__ . '/src/Formatter/Compact.php';

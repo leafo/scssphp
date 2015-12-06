@@ -14,7 +14,7 @@ namespace Leafo\ScssPhp;
 use Leafo\ScssPhp\Formatter\OutputBlock;
 
 /**
- * SCSS base formatter
+ * Base formatter
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */

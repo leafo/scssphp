@@ -12,7 +12,7 @@
 namespace Leafo\ScssPhp\Formatter;
 
 /**
- * SCSS output block
+ * Output block
  *
  * @author Anthon Pang <anthon.pang@gmail.com>
  */

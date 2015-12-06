@@ -15,7 +15,7 @@ use Leafo\ScssPhp\Formatter;
 use Leafo\ScssPhp\Formatter\OutputBlock;
 
 /**
- * SCSS debug formatter
+ * Debug formatter
  *
  * @author Anthon Pang <anthon.pang@gmail.com>
  */

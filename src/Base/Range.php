@@ -12,7 +12,7 @@
 namespace Leafo\ScssPhp\Base;
 
 /**
- * Range class
+ * Range
  *
  * @author Anthon Pang <anthon.pang@gmail.com>
  */

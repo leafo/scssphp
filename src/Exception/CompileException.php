@@ -12,10 +12,10 @@
 namespace Leafo\ScssPhp\Exception;
 
 /**
- * Parse Exception
+ * Compiler exception
  *
  * @author Oleksandr Savchenko <traveltino@gmail.com>
  */
-class ParseException extends \Exception
+class CompileException extends \Exception
 {
 }

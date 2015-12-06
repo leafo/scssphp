@@ -14,7 +14,7 @@ namespace Leafo\ScssPhp\Compiler;
 use Leafo\ScssPhp\Block;
 
 /**
- * SCSS compiler environment
+ * Compiler environment
  *
  * @author Anthon Pang <anthon.pang@gmail.com>
  */

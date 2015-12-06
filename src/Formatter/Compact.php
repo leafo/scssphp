@@ -14,7 +14,7 @@ namespace Leafo\ScssPhp\Formatter;
 use Leafo\ScssPhp\Formatter;
 
 /**
- * SCSS compact formatter
+ * Compact formatter
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */

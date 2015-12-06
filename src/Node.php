@@ -12,7 +12,7 @@
 namespace Leafo\ScssPhp;
 
 /**
- * SCSS node
+ * Base node
  *
  * @author Anthon Pang <anthon.pang@gmail.com>
  */

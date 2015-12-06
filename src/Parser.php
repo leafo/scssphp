@@ -18,7 +18,7 @@ use Leafo\ScssPhp\Node;
 use Leafo\ScssPhp\Type;
 
 /**
- * SCSS parser
+ * Parser
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */

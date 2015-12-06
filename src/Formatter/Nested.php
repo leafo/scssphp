@@ -15,7 +15,7 @@ use Leafo\ScssPhp\Formatter;
 use Leafo\ScssPhp\Formatter\OutputBlock;
 
 /**
- * SCSS nested formatter
+ * Nested formatter
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */
