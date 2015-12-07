@@ -112,6 +112,32 @@ small {
   font-weight: italic; }
 END_OF_EXPECTED
             ),
+            array(
+                '#368 - self in selector', <<<'END_OF_SCSS'
+.test {
+    &:last-child:not(+ &:first-child) {
+      padding-left: 10px;
+    }
+}
+END_OF_SCSS
+                , <<<END_OF_EXPECTED
+.test:last-child:not(+ .test:first-child) {
+  padding-left: 10px; }
+END_OF_EXPECTED
+            ),
+            array(
+                '#371 - nested self selector', <<<'END_OF_SCSS'
+ul, ol {
+    & & {
+      display: block;
+    }
+  }
+END_OF_SCSS
+                , <<<END_OF_EXPECTED
+ul ul, ol ul, ul ol, ol ol {
+  display: block; }
+END_OF_EXPECTED
+            ),
 /*************************************************************
             array(
                 '', <<<'END_OF_SCSS'
