@@ -140,10 +140,6 @@ class Compiler
     private $charsetSeen;
     private $stderr;
     private $shouldEvaluate;
-
-    /**
-     * @var boolean ignore SCSS errors or throw an error
-     */
     private $ignoreErrors;
 
     /**
@@ -3209,6 +3205,20 @@ class Compiler
     }
 
     /**
+     * Ignore errors?
+     *
+     * @api
+     *
+     * @param boolean $ignoreErrors
+     *
+     * @return \Leafo\ScssPhp\Compiler
+     */
+    public function setIgnoreErrors($ignoreErrors)
+    {
+        $this->ignoreErrors = $ignoreErrors;
+    }
+
+    /**
      * Throw error (exception)
      *
      * @api
@@ -3219,7 +3229,7 @@ class Compiler
      */
     public function throwError($msg)
     {
-        if ($this->isIgnoreErrors()) {
+        if ($this->ignoreErrors) {
             return;
         }
 
@@ -4953,31 +4963,5 @@ class Compiler
         $id += mt_rand(0, 10) + 1;
 
         return array(Type::T_STRING, '', array('u' . str_pad(base_convert($id, 10, 36), 8, '0', STR_PAD_LEFT)));
-    }
-
-    /**
-     * is IgnoreErrors
-     *
-     * @return boolean
-     */
-    private function isIgnoreErrors()
-    {
-        return $this->ignoreErrors;
-    }
-
-    /**
-     * Set IgnoreErrors
-     *
-     * @api
-     *
-     * @param boolean $ignoreErrors
-     *
-     * @return \Leafo\ScssPhp\Compiler
-     */
-    public function setIgnoreErrors($ignoreErrors)
-    {
-        $this->ignoreErrors = $ignoreErrors;
-
-        return $this;
     }
 }

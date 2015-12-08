@@ -30,6 +30,7 @@ $inputFile = null;
 $changeDir = false;
 $debugInfo = false;
 $lineNumbers = false;
+$ignoreErrors = false;
 
 /**
  * Parse argument
@@ -67,14 +68,15 @@ Usage: $exe [options] [input-file]
 
 Options include:
 
-    --debug-info   Annotate selectors with CSS referring to the source file and line number
-    -h, --help     Show this message
-    -f=format      Set the output format (compact, compressed, crunched, expanded, or nested)
-    -i=path        Set import path
-    --line-numbers Annotate selectors with comments referring to the source file and line number
-    -p=precision   Set decimal number precision (default 5)
-    -T             Dump formatted parse tree
-    -v, --version  Print the version
+    -h, --help          Show this message
+    --continue-on-error Continue compilation (as best as possible) when error encountered
+    --debug-info        Annotate selectors with CSS referring to the source file and line number
+    -f=format           Set the output format (compact, compressed, crunched, expanded, or nested)
+    -i=path             Set import path
+    --line-numbers      Annotate selectors with comments referring to the source file and line number
+    -p=precision        Set decimal number precision (default 5)
+    -T                  Dump formatted parse tree
+    -v, --version       Print the version
 
 EOT;
         exit($HELP);
@@ -82,6 +84,11 @@ EOT;
 
     if ($argv[$i] === '-v' || $argv[$i] === '--version') {
         exit(Version::VERSION . "\n");
+    }
+
+    if ($argv[$i] === '--continue-on-error') {
+        $ignoreErrors = true;
+        continue;
     }
 
     if ($argv[$i] === '--debug-info') {
@@ -161,6 +168,10 @@ if ($debugInfo && $inputFile) {
 
 if ($lineNumbers && $inputFile) {
     $scss->setLineNumberStyle(Compiler::LINE_COMMENTS);
+}
+
+if ($ignoreErrors) {
+    $scss->setIgnoreErrors($ignoreErrors);
 }
 
 if ($loadPaths) {
