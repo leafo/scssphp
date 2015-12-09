@@ -191,3 +191,12 @@ body .to-extend, body .test {
 .selector2, .master-class {
   background: #ccc; }
 /* line 268, inputs/extends.scss */
+/* line 274, inputs/extends.scss */
+
+/* line 275, inputs/extends.scss */
+
+.main .block__element, .main .block__element--modifier {
+  font-size: 14px; }
+/* line 278, inputs/extends.scss */
+.main .block__element--modifier {
+  font-weight: bold; }

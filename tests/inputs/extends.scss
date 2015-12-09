@@ -269,3 +269,15 @@ $var: ".selector1, .selector2";
     // interpolation of the variable is needed since we have a selector in $var
     @extend #{$var};
 }
+
+// scss
+.main {
+  .block__element {
+    font-size: 14px;
+
+    &--modifier {
+      @extend .block__element;
+      font-weight: bold;
+    }
+  }
+}

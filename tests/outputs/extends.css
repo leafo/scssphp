@@ -124,3 +124,8 @@ body .to-extend, body .test {
 
 .selector2, .master-class {
   background: #ccc; }
+
+.main .block__element, .main .block__element--modifier {
+  font-size: 14px; }
+  .main .block__element--modifier {
+    font-weight: bold; }

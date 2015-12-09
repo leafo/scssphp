@@ -466,7 +466,11 @@ class Compiler
                     return false;
                 }
 
-                $origin[$j][count($origin[$j]) - 1] = $this->combineSelectorSingle(end($new), $rem);
+                $combined = $this->combineSelectorSingle(end($new), $rem);
+
+                if (count(array_diff($combined, $origin[$j][count($origin[$j]) - 1]))) {
+                    $origin[$j][count($origin[$j]) - 1] = $combined;
+                }
             }
 
             $outOrigin = array_merge($outOrigin, $origin);
