@@ -1171,6 +1171,8 @@ class Compiler
 
             if (isset($ret)) {
                 $this->throwError('@return may only be used within a function');
+
+                return;
             }
         }
     }
@@ -1650,6 +1652,7 @@ class Compiler
 
                 if (! $mixin) {
                     $this->throwError("Undefined mixin $name");
+                    break;
                 }
 
                 $callingScope = $this->getStoreEnv();
@@ -1680,9 +1683,6 @@ class Compiler
 
                 if (! $content) {
                     $this->throwError('Expected @content inside of mixin');
-                }
-
-                if (! isset($content->children)) {
                     break;
                 }
 
@@ -2247,6 +2247,7 @@ class Compiler
                 case '/':
                     if ($rval == 0) {
                         $this->throwError("color: Can't divide by zero");
+                        break 2;
                     }
 
                     $out[] = (int) ($lval / $rval);
@@ -2260,6 +2261,7 @@ class Compiler
 
                 default:
                     $this->throwError("color: unknown op $op");
+                    break 2;
             }
         }
 
@@ -3261,6 +3263,7 @@ class Compiler
 
             if (realpath($file) === $name) {
                 $this->throwError('An @import loop has been found: %s imports %s', $file, basename($file));
+                break;
             }
         }
     }
@@ -3462,14 +3465,17 @@ class Compiler
                         $deferredKeywordArgs[$arg[0][1]] = $arg[1];
                     } else {
                         $this->throwError("Mixin or function doesn't have an argument named $%s.", $arg[0][1]);
+                        break;
                     }
                 } elseif ($args[$arg[0][1]][0] < count($remaining)) {
                     $this->throwError("The argument $%s was passed both by position and by name.", $arg[0][1]);
+                    break;
                 } else {
                     $keywordArgs[$arg[0][1]] = $arg[1];
                 }
             } elseif (count($keywordArgs)) {
                 $this->throwError('Positional arguments must come before keyword arguments.');
+                break;
             } elseif ($arg[2] === true) {
                 $val = $this->reduce($arg[1], true);
 
@@ -3521,6 +3527,7 @@ class Compiler
                 continue;
             } else {
                 $this->throwError("Missing argument $name");
+                break;
             }
 
             $this->set($name, $this->reduce($val, true), true, $env);
@@ -4492,6 +4499,7 @@ class Compiler
         foreach ($args as $key => $item) {
             if ($item[0] !== Type::T_NUMBER) {
                 $this->throwError('%s is not a number', $item[0]);
+                break;
             }
 
             $number = $item->normalize();
@@ -4501,6 +4509,7 @@ class Compiler
                 $originalUnit = $item->unitStr();
             } elseif ($unit !== $number[2]) {
                 $this->throwError('Incompatible units: "%s" and "%s".', $originalUnit, $item->unitStr());
+                break;
             }
 
             $numbers[$key] = $number;
@@ -4567,6 +4576,8 @@ class Compiler
 
         if (! isset($list[2][$n])) {
             $this->throwError('Invalid argument for "n"');
+
+            return;
         }
 
         $list[2][$n] = $args[2];
@@ -4773,6 +4784,8 @@ class Compiler
             ! isset($number2[0]) || $number2[0] !== Type::T_NUMBER
         ) {
             $this->throwError('Invalid argument(s) for "comparable"');
+
+            return;
         }
 
         $number1 = $number1->normalize();
@@ -4948,6 +4961,8 @@ class Compiler
 
             if ($n < 1) {
                 $this->throwError("limit must be greater than or equal to 1");
+
+                return;
             }
 
             return new Node\Number(mt_rand(1, $n), '');
