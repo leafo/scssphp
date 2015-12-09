@@ -1128,7 +1128,7 @@ class Compiler
 
         foreach ($selector as $parts) {
             foreach ($parts as $part) {
-                if ('%' === $part[0]) {
+                if (strlen($part) && '%' === $part[0]) {
                     return true;
                 }
             }
