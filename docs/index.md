@@ -254,29 +254,30 @@ data URI to reduce the number of requests on a page with a `data-uri` function.
 We can add and remove functions using the methods `registerFunction` and
 `unregisterFunction`.
 
-* `registerFunction($functionName, $callable)` assigns the callable value to
+* `registerFunction($functionName, $callable, $prototype)` assigns the callable value to
   the name `$functionName`. The name is normalized using the rules of SCSS.
   Meaning underscores and dashes are interchangeable. If a function with the
-  same name already exists then it is replaced.
+  same name already exists then it is replaced. The optional `$prototype` is an
+  array of parameter names.
 
 * `unregisterFunction($functionName)` removes `$functionName` from the list of
   available functions.
 
 The `$callable` can be anything that PHP knows how to call using
 `call_user_func`. The function receives two arguments when invoked. The first
-is an array of SCSS typed arguments that the function was sent. The second is a
-reference to the current `scss` instance.
+is an array of SCSS typed arguments that the function was sent. The second is an
+array of SCSS values corresponding to keyword arguments (aka kwargs).
 
-The *SCSS typed arguments* are actually just arrays that represent SCSS values.
-SCSS has different types than PHP, and this is how **scssphp** represents them
-internally.
+The SCSS *typed arguments* and *kwargs* are actually just arrays that represent
+SCSS values.  SCSS has different types than PHP, and this is how **scssphp**
+represents them internally.
 
 For example, the value `10px` in PHP would be `array('number', 1, 'px')`. There
 is a large variety of types. Experiment with a debugging function like `print_r`
 to examine the possible inputs.
 
 The return value of the custom function can either be a SCSS type or a basic
-PHP type. (such as a string or a number) If it's a PHP type, it will be converted
+PHP type (such as a string or a number). If it's a PHP type, it will be converted
 automatically to the corresponding SCSS type.
 
 As an example, a function called `add-two` is registered, which adds two numbers
@@ -287,15 +288,38 @@ use Leafo\ScssPhp\Compiler;
 
 $scss = new Compiler();
 
-$scss->registerFunction('add-two', function($args) {
-  list($a, $b) = $args;
-  return $a[1] + $b[1];
-});
+$scss->registerFunction(
+  'add-two',
+  function($args) {
+    list($a, $b) = $args;
+
+    return $a[1] + $b[1];
+  }
+);
 
 $scss->compile('.ex1 { result: add-two(10, 10); }');
 {% endhighlight %}
 
-It's worth noting that in this example we lose the units of the number, and we
+Using a prototype and kwargs, functions can take named parameters. In this next example,
+we register a function called `divide` which divides a named dividend by a named divisor.
+
+{% highlight php startinline=true %}
+use Leafo\ScssPhp\Compiler;
+
+$scss = new Compiler();
+
+$scss->registerFunction(
+  'divide',
+  function($args, $kwargs) {
+    return $kwargs['dividend'][1] / $kwargs['divisor'][1];
+  },
+  array('dividend', 'divisor')
+);
+
+$scss->compile('.ex2 { result: divide($divisor: 2, $dividend: 30); }');
+{% endhighlight %}
+
+Note: in the above examples, we lose the units of the number, and we
 also don't do any type checking. This will have undefined results if we give it
 anything other than two numbers.
 
