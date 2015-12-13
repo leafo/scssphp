@@ -121,6 +121,12 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.6.1** -- December 13, 2015
+  * bin/pscss --continue-on-error
+  * fix BEM and {% raw %}@{% endraw %}extend infinite loop
+  * Compiler: setIgnoreErrors(boolean)
+  * exception refactoring
+  * implement {% raw %}@{% endraw %}extend !optional and `keywords($args)` built-in
 * **0.6.0** -- December 5, 2015
   * handle escaped quotes inside quoted strings (with and without interpolation present)
   * Compiler: undefined sourceParser when re-using a single Compiler instance
