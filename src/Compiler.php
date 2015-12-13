@@ -238,17 +238,18 @@ class Compiler
     /**
      * Push extends
      *
-     * @param array $target
-     * @param array $origin
+     * @param array     $target
+     * @param array     $origin
+     * @param \stdClass $block
      */
-    protected function pushExtends($target, $origin)
+    protected function pushExtends($target, $origin, $block)
     {
         if ($this->isSelfExtend($target, $origin)) {
             return;
         }
 
         $i = count($this->extends);
-        $this->extends[] = array($target, $origin);
+        $this->extends[] = array($target, $origin, $block);
 
         foreach ($target as $part) {
             if (isset($this->extendsMap[$part])) {
@@ -291,6 +292,32 @@ class Compiler
 
         $this->compileChildrenNoReturn($rootBlock->children, $this->scope);
         $this->flattenSelectors($this->scope);
+        $this->missingSelectors();
+    }
+
+    /**
+     * Report missing selectors
+     */
+    protected function missingSelectors()
+    {
+        foreach ($this->extends as $extend) {
+            if (isset($extend[3])) {
+                continue;
+            }
+
+            list($target, $origin, $block) = $extend;
+
+            // ignore if !optional
+            if ($block[2]) {
+                continue;
+            }
+
+            $target = implode(' ', $target);
+            $origin = $this->collapseSelectors($origin);
+
+            $this->sourceLine = $block[Parser::SOURCE_LINE];
+            $this->throwError("\"$origin\" failed to @extend \"$target\". The selector \"$target\" was not found.");
+        }
     }
 
     /**
@@ -451,12 +478,14 @@ class Compiler
         $found = false;
 
         foreach ($counts as $idx => $count) {
-            list($target, $origin) = $this->extends[$idx];
+            list($target, $origin, $block) = $this->extends[$idx];
 
             // check count
             if ($count !== count($target)) {
                 continue;
             }
+
+            $this->extends[$idx][3] = true;
 
             $rem = array_diff($single, $target);
 
@@ -1504,7 +1533,7 @@ class Compiler
                         // only use the first one
                         $result = current($result);
 
-                        $this->pushExtends($result, $out->selectors);
+                        $this->pushExtends($result, $out->selectors, $child);
                     }
                 }
                 break;

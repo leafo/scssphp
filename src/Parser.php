@@ -349,10 +349,12 @@ class Parser
             $this->seek($s);
 
             if ($this->literal('@extend') &&
-                $this->selectors($selector) &&
+                $this->selectors($selectors) &&
                 $this->end()
             ) {
-                $this->append(array(Type::T_EXTEND, $selector), $s);
+                // check for '!flag'
+                $optional = $this->stripOptionalFlag($selectors);
+                $this->append(array(Type::T_EXTEND, $selectors, $optional), $s);
 
                 return true;
             }
@@ -2324,6 +2326,29 @@ class Parser
         }
 
         return false;
+    }
+
+    /**
+     * Strip optional flag from selector list
+     *
+     * @param array $selectors
+     *
+     * @return string
+     */
+    protected function stripOptionalFlag(&$selectors)
+    {
+        $optional = false;
+
+        $selector = end($selectors);
+        $part = end($selector);
+
+        if ($part === array('!optional')) {
+            array_pop($selectors[count($selectors) - 1]);
+
+            $optional = true;
+        }
+
+        return $optional;
     }
 
     /**

@@ -131,6 +131,14 @@ END_OF_SCSS
                 ,
                 'isn\'t a valid CSS value'
             ),
+            array(<<<'END_OF_SCSS'
+a.important {
+  @extend .notice;
+}
+END_OF_SCSS
+                ,
+                'was not found'
+            ),
         );
     }
 

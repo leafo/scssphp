@@ -281,3 +281,7 @@ $var: ".selector1, .selector2";
     }
   }
 }
+
+a.important {
+  @extend .notice !optional;
+}
