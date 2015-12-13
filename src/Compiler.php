@@ -4687,6 +4687,22 @@ class Compiler
         return array(Type::T_MAP, array_merge($map1[1], $map2[1]), array_merge($map1[2], $map2[2]));
     }
 
+    protected static $libKeywords = array('args');
+    protected function libKeywords($args)
+    {
+        $this->assertList($args[0]);
+
+        $keys = array();
+        $values = array();
+
+        foreach ($args[0][2] as $name => $arg) {
+            $keys[] = array(Type::T_KEYWORD, $name);
+            $values[] = $arg;
+        }
+
+        return array(Type::T_MAP, $keys, $values);
+    }
+
     protected function listSeparatorForJoin($list1, $sep)
     {
         if (! isset($sep)) {
