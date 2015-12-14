@@ -114,3 +114,17 @@ $str: 'global';
   @include test-mixin;
   display: $str;
 }
+
+.test-inspect {
+  n: inspect(null);
+  b1: inspect(true);
+  b2: inspect(false);
+  n1: inspect(0);
+  s1: inspect('');
+  s2: inspect('hello');
+  l1: inspect(1 2);
+  l2: inspect((3 4));
+  l3: inspect((5,6));
+  l4: inspect((a: 1, b: 2));
+  l5: inspect($value: (a: 1, b: 2));
+}

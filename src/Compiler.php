@@ -4999,6 +4999,7 @@ class Compiler
         return array(Type::T_STRING, '', array('counter(' . implode(',', $list) . ')'));
     }
 
+    protected static $libRandom = array('limit');
     protected function libRandom($args)
     {
         if (isset($args[0])) {
@@ -5027,5 +5028,15 @@ class Compiler
         $id += mt_rand(0, 10) + 1;
 
         return array(Type::T_STRING, '', array('u' . str_pad(base_convert($id, 10, 36), 8, '0', STR_PAD_LEFT)));
+    }
+
+    protected static $libInspect = array('value');
+    protected function libInspect($args)
+    {
+        if ($args[0] === self::$null) {
+            return array(Type::T_KEYWORD, 'null');
+        }
+
+        return $args[0];
     }
 }
