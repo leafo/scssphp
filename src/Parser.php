@@ -85,7 +85,7 @@ class Parser
             $commentMultiRight  = '\*\/';
 
             self::$commentPattern = $commentMultiLeft . '.*?' . $commentMultiRight;
-            self::$whitePattern = '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentPattern . ')\s*|\s+/Ais';
+            self::$whitePattern = '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentPattern . ')\s*|\s+/AisuS';
         }
     }
 
@@ -762,7 +762,7 @@ class Parser
             $from = $this->count;
         }
 
-        $r = '/' . $regex . '/Ais';
+        $r = '/' . $regex . '/Aisu';
         $result = preg_match($r, $this->buffer, $out, null, $from);
 
         return $result;
@@ -842,7 +842,7 @@ class Parser
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-        $r = '/' . $regex . '/Ais';
+        $r = '/' . $regex . '/Aisu';
 
         if (preg_match($r, $this->buffer, $out, null, $this->count)) {
             $this->count += strlen($out[0]);
@@ -2235,7 +2235,7 @@ class Parser
     protected function keyword(&$word, $eatWhitespace = null)
     {
         if ($this->match(
-            '(([\w_\-\*!"\']|[\\\\].)([\w\-_"\']|[\\\\].)*)',
+            '(([\pL\w_\-\*!"\']|[\\\\].)([\pL\w\-_"\']|[\\\\].)*)',
             $m,
             $eatWhitespace
         )) {
@@ -2256,7 +2256,7 @@ class Parser
      */
     protected function placeholder(&$placeholder)
     {
-        if ($this->match('([\w\-_]+|#[{][$][\w\-_]+[}])', $m)) {
+        if ($this->match('([\pL\w\-_]+|#[{][$][\pL\w\-_]+[}])', $m)) {
             $placeholder = $m[1];
 
             return true;

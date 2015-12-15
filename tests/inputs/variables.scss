@@ -73,3 +73,10 @@ A {
     @include example;
     color: $color;
 }
+
+$коммент : #000;
+
+body
+{
+	color: $коммент ;
+}
