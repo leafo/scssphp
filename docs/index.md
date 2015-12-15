@@ -107,6 +107,9 @@ $scss->setVariables(array(
 echo $scss->compile('$var: true !default;');
 {% endhighlight %}
 
+Note: the value is the scss source to be parsed. If you want to parse a string,
+you have to represent it as a string, e.g,, `'var' => '"string"'`.
+
 Likewise, you can retrieve the preset variables using the `getVariables()`
 method, and unset a variable using the `unsetVariable($name)` method.
 
