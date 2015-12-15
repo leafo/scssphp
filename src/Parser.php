@@ -62,6 +62,7 @@ class Parser
     private $inParens;
     private $eatWhiteDefault;
     private $buffer;
+    private $utf8;
 
     /**
      * Constructor
@@ -70,12 +71,14 @@ class Parser
      *
      * @param string  $sourceName
      * @param integer $sourceIndex
+     * @param string  $encoding
      */
-    public function __construct($sourceName, $sourceIndex = 0)
+    public function __construct($sourceName, $sourceIndex = 0, $encoding = 'utf-8')
     {
         $this->sourceName  = $sourceName ?: '(stdin)';
         $this->sourceIndex = $sourceIndex;
         $this->charset     = null;
+        $this->utf8        = ! $encoding || strtolower($encoding) === 'utf-8';
 
         if (empty(self::$operatorPattern)) {
             self::$operatorPattern = '([*\/%+-]|[!=]\=|\>\=?|\<\=\>|\<\=?|and|or)';
@@ -85,7 +88,9 @@ class Parser
             $commentMultiRight  = '\*\/';
 
             self::$commentPattern = $commentMultiLeft . '.*?' . $commentMultiRight;
-            self::$whitePattern = '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentPattern . ')\s*|\s+/AisuS';
+            self::$whitePattern = $this->utf8
+                ? '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentPattern . ')\s*|\s+/AisuS'
+                : '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentPattern . ')\s*|\s+/AisS';
         }
     }
 
@@ -762,7 +767,7 @@ class Parser
             $from = $this->count;
         }
 
-        $r = '/' . $regex . '/Aisu';
+        $r = $this->utf8 ? '/' . $regex . '/Aisu' : '/' . $regex . '/Ais';
         $result = preg_match($r, $this->buffer, $out, null, $from);
 
         return $result;
@@ -842,7 +847,7 @@ class Parser
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-        $r = '/' . $regex . '/Aisu';
+        $r = $this->utf8 ? '/' . $regex . '/Aisu' : '/' . $regex . '/Ais';
 
         if (preg_match($r, $this->buffer, $out, null, $this->count)) {
             $this->count += strlen($out[0]);
@@ -2235,7 +2240,9 @@ class Parser
     protected function keyword(&$word, $eatWhitespace = null)
     {
         if ($this->match(
-            '(([\pL\w_\-\*!"\']|[\\\\].)([\pL\w\-_"\']|[\\\\].)*)',
+            $this->utf8
+                ? '(([\pL\w_\-\*!"\']|[\\\\].)([\pL\w\-_"\']|[\\\\].)*)'
+                : '(([\w_\-\*!"\']|[\\\\].)([\w\-_"\']|[\\\\].)*)',
             $m,
             $eatWhitespace
         )) {
@@ -2256,7 +2263,12 @@ class Parser
      */
     protected function placeholder(&$placeholder)
     {
-        if ($this->match('([\pL\w\-_]+|#[{][$][\pL\w\-_]+[}])', $m)) {
+        if ($this->match(
+            $this->utf8
+                ? '([\pL\w\-_]+|#[{][$][\pL\w\-_]+[}])'
+                : '([\w\-_]+|#[{][$][\w\-_]+[}])',
+            $m
+        )) {
             $placeholder = $m[1];
 
             return true;

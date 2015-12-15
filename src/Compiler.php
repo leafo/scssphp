@@ -117,6 +117,7 @@ class Compiler
         'global-variable-shadowing'   => false,
     );
 
+    protected $encoding = null;
     protected $lineNumberStyle = null;
 
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
@@ -208,7 +209,7 @@ class Compiler
      */
     private function parserFactory($path)
     {
-        $parser = new Parser($path, count($this->sourceNames));
+        $parser = new Parser($path, count($this->sourceNames), $this->encoding);
 
         $this->sourceNames[] = $path;
         $this->addParsedFile($path);
@@ -3237,6 +3238,18 @@ class Compiler
         }
 
         return null;
+    }
+
+    /**
+     * Set encoding
+     *
+     * @api
+     *
+     * @param string $encoding
+     */
+    public function setEncoding($encoding)
+    {
+        $this->encoding = $encoding;
     }
 
     /**

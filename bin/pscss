@@ -31,6 +31,7 @@ $changeDir = false;
 $debugInfo = false;
 $lineNumbers = false;
 $ignoreErrors = false;
+$encoding = false;
 
 /**
  * Parse argument
@@ -73,6 +74,7 @@ Options include:
     --debug-info        Annotate selectors with CSS referring to the source file and line number
     -f=format           Set the output format (compact, compressed, crunched, expanded, or nested)
     -i=path             Set import path
+    --iso8859-1         Use iso8859-1 encoding instead of utf-8 (default utf-8)
     --line-numbers      Annotate selectors with comments referring to the source file and line number
     -p=precision        Set decimal number precision (default 5)
     -T                  Dump formatted parse tree
@@ -93,6 +95,11 @@ EOT;
 
     if ($argv[$i] === '--debug-info') {
         $debugInfo = true;
+        continue;
+    }
+
+    if ($argv[$i] === '--iso8859-1') {
+        $encoding = 'iso8859-1';
         continue;
     }
 
@@ -184,6 +191,10 @@ if ($precision) {
 
 if ($style) {
     $scss->setFormatter('Leafo\\ScssPhp\\Formatter\\' . ucfirst($style));
+}
+
+if ($encoding) {
+    $scss->setEncoding($encoding);
 }
 
 echo $scss->compile($data, $inputFile);
