@@ -631,7 +631,7 @@ class Parser
 
         // opening css block
         if ($this->selectors($selectors) && $this->literal('{')) {
-            $b = $this->pushBlock($selectors, $s);
+            $this->pushBlock($selectors, $s);
 
             return true;
         }
@@ -1006,8 +1006,6 @@ class Parser
      */
     protected function mediaQuery(&$out)
     {
-        $s = $this->seek();
-
         $expressions = null;
         $parts = array();
 
@@ -1496,8 +1494,6 @@ class Parser
         $args = array();
 
         while ($this->keyword($var)) {
-            $ss = $this->seek();
-
             if ($this->literal('=') && $this->expression($exp)) {
                 $args[] = array(Type::T_STRING, '', array($var . '='));
                 $arg = $exp;
@@ -1765,8 +1761,6 @@ class Parser
      */
     protected function mixedKeyword(&$out)
     {
-        $s = $this->seek();
-
         $parts = array();
 
         $oldWhite = $this->eatWhiteDefault;
@@ -1918,7 +1912,6 @@ class Parser
      */
     protected function propertyName(&$out)
     {
-        $s = $this->seek();
         $parts = array();
 
         $oldWhite = $this->eatWhiteDefault;
