@@ -33,6 +33,7 @@ class Expanded extends Formatter
         $this->close = '}';
         $this->tagSeparator = ', ';
         $this->assignSeparator = ': ';
+        $this->keepSemicolons = true;
     }
 
     /**

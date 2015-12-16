@@ -32,6 +32,7 @@ class Compact extends Formatter
         $this->close = "}\n\n";
         $this->tagSeparator = ',';
         $this->assignSeparator = ':';
+        $this->keepSemicolons = true;
     }
 
     /**

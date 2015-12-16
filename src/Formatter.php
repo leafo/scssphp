@@ -56,6 +56,11 @@ abstract class Formatter
     public $assignSeparator;
 
     /**
+     * @var boolea
+     */
+    public $keepSemicolons;
+
+    /**
      * Initialize formatter
      *
      * @api
@@ -96,6 +101,15 @@ abstract class Formatter
      */
     public function stripSemicolon(&$lines)
     {
+        if ($this->keepSemicolons) {
+            return;
+        }
+
+        if (($count = count($lines))
+            && substr($lines[$count - 1], -1) === ';'
+        ) {
+            $lines[$count - 1] = substr($lines[$count - 1], 0, -1);
+        }
     }
 
     /**

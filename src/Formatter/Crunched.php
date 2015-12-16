@@ -21,7 +21,20 @@ use Leafo\ScssPhp\Formatter\OutputBlock;
  */
 class Crunched extends Formatter
 {
-    use StripSemiColons;
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct()
+    {
+        $this->indentLevel = 0;
+        $this->indentChar = '  ';
+        $this->break = '';
+        $this->open = '{';
+        $this->close = '}';
+        $this->tagSeparator = ',';
+        $this->assignSeparator = ':';
+        $this->keepSemicolons = false;
+    }
 
     /**
      * {@inheritdoc}
