@@ -20,6 +20,7 @@ if (! class_exists('scssc', false)) {
     include_once __DIR__ . '/src/Formatter/Expanded.php';
     include_once __DIR__ . '/src/Formatter/Nested.php';
     include_once __DIR__ . '/src/Formatter/OutputBlock.php';
+    include_once __DIR__ . '/src/Formatter/StripSemiColons.php';
     include_once __DIR__ . '/src/Node.php';
     include_once __DIR__ . '/src/Node/Number.php';
     include_once __DIR__ . '/src/Parser.php';

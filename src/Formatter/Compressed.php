@@ -11,7 +11,7 @@
 
 namespace Leafo\ScssPhp\Formatter;
 
-use Leafo\ScssPhp\Formatter\Crunched;
+use Leafo\ScssPhp\Formatter;
 use Leafo\ScssPhp\Formatter\OutputBlock;
 
 /**
@@ -19,8 +19,10 @@ use Leafo\ScssPhp\Formatter\OutputBlock;
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */
-class Compressed extends Crunched
+class Compressed extends Formatter
 {
+    use StripSemiColons;
+
     /**
      * {@inheritdoc}
      */
