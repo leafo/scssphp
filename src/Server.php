@@ -207,7 +207,7 @@ class Server
         $elapsed = round((microtime(true) - $start), 4);
 
         $v    = Version::VERSION;
-        $t    = @date('r');
+        $t    = date('r');
         $css  = "/* compiled by scssphp $v on $t (${elapsed}s) */\n\n" . $css;
         $etag = md5($css);
 
@@ -365,7 +365,7 @@ class Server
             $modifiedSince = $this->getIfModifiedSinceHeader();
             $mtime = filemtime($output);
 
-            if (@strtotime($modifiedSince) === $mtime) {
+            if (strtotime($modifiedSince) === $mtime) {
                 header($protocol . ' 304 Not Modified');
 
                 return;
@@ -444,6 +444,10 @@ class Server
 
         $this->scss = $scss;
         $this->showErrorsAsCSS = false;
+
+        if (! ini_get('date.timezone')) {
+            date_default_timezone_set('UTC');
+        }
     }
 
     /**
