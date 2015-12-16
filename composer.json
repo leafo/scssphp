@@ -24,7 +24,7 @@
         "php": ">=5.4.0"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "~2.3",
+        "squizlabs/php_codesniffer": "~2.5",
         "phpunit/phpunit": "~3.7",
         "kherge/box": "~2.5"
     },
