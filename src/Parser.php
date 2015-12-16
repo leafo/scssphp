@@ -1461,7 +1461,7 @@ class Parser
                 $this->seek($ss);
             }
 
-            if (($this->openString(')', $str, '(') || true ) &&
+            if (($this->openString(')', $str, '(') || true) &&
                 $this->literal(')')
             ) {
                 $args = array();
@@ -2135,7 +2135,7 @@ class Parser
                 $ss = $this->seek();
 
                 if ($this->literal('(') &&
-                    ($this->openString(')', $str, '(') || true ) &&
+                    ($this->openString(')', $str, '(') || true) &&
                     $this->literal(')')
                 ) {
                     $parts[] = '(';
@@ -2155,59 +2155,22 @@ class Parser
             $this->seek($s);
 
             // attribute selector
-            // TODO: replace with open string?
-            if ($this->literal('[', false)) {
-                $attrParts = array('[');
+            if ($this->literal('[') &&
+               ($this->openString(']', $str, '[') || true) &&
+               $this->literal(']')
+            ) {
+                $parts[] = '[';
 
-                // keyword, string, operator
-                for (;;) {
-                    if ($this->literal(']', false)) {
-                        $this->count--;
-                        break; // get out early
-                    }
-
-                    if ($this->match('\s+', $m)) {
-                        $attrParts[] = ' ';
-                        continue;
-                    }
-
-                    if ($this->string($str)) {
-                        $attrParts[] = $str;
-                        continue;
-                    }
-
-                    if ($this->keyword($word)) {
-                        $attrParts[] = $word;
-                        continue;
-                    }
-
-                    if ($this->interpolation($inter, false)) {
-                        $attrParts[] = $inter;
-                        continue;
-                    }
-
-                    // operator, handles attr namespace too
-                    if ($this->match('[|-~\$\*\^=]+', $m)) {
-                        $attrParts[] = $m[0];
-                        continue;
-                    }
-
-                    break;
+                if (! empty($str)) {
+                    $parts[] = $str;
                 }
 
-                if ($this->literal(']', false)) {
-                    $attrParts[] = ']';
+                $parts[] = ']';
 
-                    foreach ($attrParts as $part) {
-                        $parts[] = $part;
-                    }
-
-                    continue;
-                }
-
-                $this->seek($s);
-                // TODO: should just break here?
+                continue;
             }
+
+            $this->seek($s);
 
             break;
         }
