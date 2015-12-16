@@ -25,7 +25,7 @@ class Colors
      *
      * @var array
      */
-    public static $cssColors = array(
+    public static $cssColors = [
         'aliceblue' => '240,248,255',
         'antiquewhite' => '250,235,215',
         'aqua' => '0,255,255',
@@ -175,5 +175,5 @@ class Colors
         'whitesmoke' => '245,245,245',
         'yellow' => '255,255,0',
         'yellowgreen' => '154,205,50',
-    );
+    ];
 }

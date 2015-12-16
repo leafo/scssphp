@@ -67,7 +67,7 @@ class Compiler
     /**
      * @var array
      */
-    static protected $operatorNames = array(
+    static protected $operatorNames = [
         '+'   => 'add',
         '-'   => 'sub',
         '*'   => 'mul',
@@ -82,40 +82,40 @@ class Compiler
         '<='  => 'lte',
         '>='  => 'gte',
         '<=>' => 'cmp',
-    );
+    ];
 
     /**
      * @var array
      */
-    static protected $namespaces = array(
+    static protected $namespaces = [
         'special'  => '%',
         'mixin'    => '@',
         'function' => '^',
-    );
+    ];
 
-    static public $true = array(Type::T_KEYWORD, 'true');
-    static public $false = array(Type::T_KEYWORD, 'false');
-    static public $null = array(Type::T_NULL);
-    static public $nullString = array(Type::T_STRING, '', array());
-    static public $defaultValue = array(Type::T_KEYWORD, '');
-    static public $selfSelector = array(Type::T_SELF);
-    static public $emptyList = array(Type::T_LIST, '', array());
-    static public $emptyMap = array(Type::T_MAP, array(), array());
-    static public $emptyString = array(Type::T_STRING, '"', array());
-    static public $with = array(Type::T_KEYWORD, 'with');
-    static public $without = array(Type::T_KEYWORD, 'without');
+    static public $true = [Type::T_KEYWORD, 'true'];
+    static public $false = [Type::T_KEYWORD, 'false'];
+    static public $null = [Type::T_NULL];
+    static public $nullString = [Type::T_STRING, '', []];
+    static public $defaultValue = [Type::T_KEYWORD, ''];
+    static public $selfSelector = [Type::T_SELF];
+    static public $emptyList = [Type::T_LIST, '', []];
+    static public $emptyMap = [Type::T_MAP, [], []];
+    static public $emptyString = [Type::T_STRING, '"', []];
+    static public $with = [Type::T_KEYWORD, 'with'];
+    static public $without = [Type::T_KEYWORD, 'without'];
 
-    protected $importPaths = array('');
-    protected $importCache = array();
-    protected $importedFiles = array();
-    protected $userFunctions = array();
-    protected $registeredVars = array();
-    protected $registeredFeatures = array(
+    protected $importPaths = [''];
+    protected $importCache = [];
+    protected $importedFiles = [];
+    protected $userFunctions = [];
+    protected $registeredVars = [];
+    protected $registeredFeatures = [
         'extend-selector-pseudoclass' => false,
         'at-error'                    => true,
         'units-level-3'               => false,
         'global-variable-shadowing'   => false,
-    );
+    ];
 
     protected $encoding = null;
     protected $lineNumberStyle = null;
@@ -148,8 +148,8 @@ class Compiler
      */
     public function __construct()
     {
-        $this->parsedFiles = array();
-        $this->sourceNames = array();
+        $this->parsedFiles = [];
+        $this->sourceNames = [];
     }
 
     /**
@@ -168,9 +168,9 @@ class Compiler
         setlocale(LC_NUMERIC, 'C');
 
         $this->indentLevel    = -1;
-        $this->commentsSeen   = array();
-        $this->extends        = array();
-        $this->extendsMap     = array();
+        $this->commentsSeen   = [];
+        $this->extends        = [];
+        $this->extendsMap     = [];
         $this->sourceIndex    = null;
         $this->sourceLine     = null;
         $this->sourceColumn   = null;
@@ -250,13 +250,13 @@ class Compiler
         }
 
         $i = count($this->extends);
-        $this->extends[] = array($target, $origin, $block);
+        $this->extends[] = [$target, $origin, $block];
 
         foreach ($target as $part) {
             if (isset($this->extendsMap[$part])) {
                 $this->extendsMap[$part][] = $i;
             } else {
-                $this->extendsMap[$part] = array($i);
+                $this->extendsMap[$part] = [$i];
             }
         }
     }
@@ -273,8 +273,8 @@ class Compiler
     {
         $out = new OutputBlock;
         $out->type      = $type;
-        $out->lines     = array();
-        $out->children  = array();
+        $out->lines     = [];
+        $out->children  = [];
         $out->parent    = $this->scope;
         $out->selectors = $selectors;
         $out->depth     = $this->env->depth;
@@ -330,7 +330,7 @@ class Compiler
     protected function flattenSelectors(OutputBlock $block, $parentKey = null)
     {
         if ($block->selectors) {
-            $selectors = array();
+            $selectors = [];
 
             foreach ($block->selectors as $s) {
                 $selectors[] = $s;
@@ -356,7 +356,7 @@ class Compiler
                 }
             }
 
-            $block->selectors = array();
+            $block->selectors = [];
             $placeholderSelector = false;
 
             foreach ($selectors as $selector) {
@@ -451,8 +451,8 @@ class Compiler
      */
     protected function matchExtendsSingle($rawSingle, &$outOrigin)
     {
-        $counts = array();
-        $single = array();
+        $counts = [];
+        $single = [];
 
         foreach ($rawSingle as $part) {
             // matches Number
@@ -475,7 +475,7 @@ class Compiler
             }
         }
 
-        $outOrigin = array();
+        $outOrigin = [];
         $found = false;
 
         foreach ($counts as $idx => $count) {
@@ -522,9 +522,9 @@ class Compiler
     protected function combineSelectorSingle($base, $other)
     {
         $tag = null;
-        $out = array();
+        $out = [];
 
-        foreach (array($base, $other) as $single) {
+        foreach ([$base, $other] as $single) {
             foreach ($single as $part) {
                 if (preg_match('/^[^\[.#:]/', $part)) {
                     $tag = $part;
@@ -553,7 +553,7 @@ class Compiler
         $mediaQuery = $this->compileMediaQuery($this->multiplyMedia($this->env));
 
         if (! empty($mediaQuery)) {
-            $this->scope = $this->makeOutputBlock(Type::T_MEDIA, array($mediaQuery));
+            $this->scope = $this->makeOutputBlock(Type::T_MEDIA, [$mediaQuery]);
 
             $parentScope = $this->mediaParent($this->scope);
             $parentScope->children[] = $this->scope;
@@ -579,12 +579,12 @@ class Compiler
                 $wrapped->sourceIndex  = $media->sourceIndex;
                 $wrapped->sourceLine   = $media->sourceLine;
                 $wrapped->sourceColumn = $media->sourceColumn;
-                $wrapped->selectors    = array();
-                $wrapped->comments     = array();
+                $wrapped->selectors    = [];
+                $wrapped->comments     = [];
                 $wrapped->parent       = $media;
                 $wrapped->children     = $media->children;
 
-                $media->children = array(array(Type::T_BLOCK, $wrapped));
+                $media->children = [[Type::T_BLOCK, $wrapped]];
             }
 
             $this->compileChildrenNoReturn($media->children, $this->scope);
@@ -629,9 +629,9 @@ class Compiler
         }
 
         if ($block->name === 'keyframes' || substr($block->name, -10) === '-keyframes') {
-            $this->compileKeyframeBlock($block, array($s));
+            $this->compileKeyframeBlock($block, [$s]);
         } else {
-            $this->compileNestedBlock($block, array($s));
+            $this->compileNestedBlock($block, [$s]);
         }
     }
 
@@ -653,11 +653,11 @@ class Compiler
             $wrapped->sourceLine   = $block->sourceLine;
             $wrapped->sourceColumn = $block->sourceColumn;
             $wrapped->selectors    = $block->selector;
-            $wrapped->comments     = array();
+            $wrapped->comments     = [];
             $wrapped->parent       = $block;
             $wrapped->children     = $block->children;
 
-            $block->children = array(array(Type::T_BLOCK, $wrapped));
+            $block->children = [[Type::T_BLOCK, $wrapped]];
         }
 
         $this->env = $this->filterWithout($envs, $without);
@@ -708,14 +708,14 @@ class Compiler
             $b->sourceIndex  = $e->block->sourceIndex;
             $b->sourceLine   = $e->block->sourceLine;
             $b->sourceColumn = $e->block->sourceColumn;
-            $b->selectors    = array();
+            $b->selectors    = [];
             $b->comments     = $e->block->comments;
             $b->parent       = null;
 
             if ($newBlock) {
                 $type = isset($newBlock->type) ? $newBlock->type : Type::T_BLOCK;
 
-                $b->children = array(array($type, $newBlock));
+                $b->children = [[$type, $newBlock]];
 
                 $newBlock->parent = $b;
             } elseif (count($block->children)) {
@@ -749,7 +749,7 @@ class Compiler
 
         $type = isset($newBlock->type) ? $newBlock->type : Type::T_BLOCK;
 
-        return array($type, $newBlock);
+        return [$type, $newBlock];
     }
 
     /**
@@ -761,20 +761,20 @@ class Compiler
      */
     private function compileWith($with)
     {
-        static $mapping = array(
+        static $mapping = [
             'rule'     => self::WITH_RULE,
             'media'    => self::WITH_MEDIA,
             'supports' => self::WITH_SUPPORTS,
             'all'      => self::WITH_ALL,
-        );
+        ];
 
         // exclude selectors by default
         $without = self::WITH_RULE;
 
-        if ($this->libMapHasKey(array($with, self::$with))) {
+        if ($this->libMapHasKey([$with, self::$with])) {
             $without = self::WITH_ALL;
 
-            $list = $this->coerceList($this->libMapGet(array($with, self::$with)));
+            $list = $this->coerceList($this->libMapGet([$with, self::$with]));
 
             foreach ($list[2] as $item) {
                 $keyword = $this->compileStringContent($this->coerceString($item));
@@ -785,10 +785,10 @@ class Compiler
             }
         }
 
-        if ($this->libMapHasKey(array($with, self::$without))) {
+        if ($this->libMapHasKey([$with, self::$without])) {
             $without = 0;
 
-            $list = $this->coerceList($this->libMapGet(array($with, self::$without)));
+            $list = $this->coerceList($this->libMapGet([$with, self::$without]));
 
             foreach ($list[2] as $item) {
                 $keyword = $this->compileStringContent($this->coerceString($item));
@@ -812,7 +812,7 @@ class Compiler
      */
     private function filterWithout($envs, $without)
     {
-        $filtered = array();
+        $filtered = [];
 
         foreach ($envs as $e) {
             if ($e->block && $this->isWithout($without, $e->block)) {
@@ -978,7 +978,7 @@ class Compiler
     {
         $this->shouldEvaluate = false;
 
-        $selectors = array_map(array($this, 'evalSelector'), $selectors);
+        $selectors = array_map([$this, 'evalSelector'], $selectors);
 
         // after evaluating interpolates, we might need a second pass
         if ($this->shouldEvaluate) {
@@ -986,7 +986,7 @@ class Compiler
             $parser = $this->parserFactory(__METHOD__);
 
             if ($parser->parseSelector($buffer, $newSelectors)) {
-                $selectors = array_map(array($this, 'evalSelector'), $newSelectors);
+                $selectors = array_map([$this, 'evalSelector'], $newSelectors);
             }
         }
 
@@ -1002,7 +1002,7 @@ class Compiler
      */
     protected function evalSelector($selector)
     {
-        return array_map(array($this, 'evalSelectorPart'), $selector);
+        return array_map([$this, 'evalSelectorPart'], $selector);
     }
 
     /**
@@ -1042,7 +1042,7 @@ class Compiler
      */
     protected function collapseSelectors($selectors)
     {
-        $parts = array();
+        $parts = [];
 
         foreach ($selectors as $selector) {
             $output = '';
@@ -1069,7 +1069,7 @@ class Compiler
      */
     protected function flattenSelectorSingle($single)
     {
-        $joined = array();
+        $joined = [];
 
         foreach ($single as $part) {
             if (empty($joined) ||
@@ -1106,7 +1106,7 @@ class Compiler
         return implode(
             ' ',
             array_map(
-                array($this, 'compileSelectorPart'),
+                [$this, 'compileSelectorPart'],
                 $selector
             )
         );
@@ -1218,7 +1218,7 @@ class Compiler
 
         foreach ($queryList as $query) {
             $type = null;
-            $parts = array();
+            $parts = [];
 
             foreach ($query as $q) {
                 switch ($q[0]) {
@@ -1226,14 +1226,14 @@ class Compiler
                         if ($type) {
                             $type = $this->mergeMediaTypes(
                                 $type,
-                                array_map(array($this, 'compileValue'), array_slice($q, 1))
+                                array_map([$this, 'compileValue'], array_slice($q, 1))
                             );
 
                             if (empty($type)) { // merge failed
                                 return null;
                             }
                         } else {
-                            $type = array_map(array($this, 'compileValue'), array_slice($q, 1));
+                            $type = array_map([$this, 'compileValue'], array_slice($q, 1));
                         }
                         break;
 
@@ -1319,10 +1319,10 @@ class Compiler
                 return null;
             }
 
-            return array(
+            return [
                 $m1 === Type::T_NOT ? $m2 : $m1,
                 $m1 === Type::T_NOT ? $t2 : $t1,
-            );
+            ];
         }
 
         if ($m1 === Type::T_NOT && $m2 === Type::T_NOT) {
@@ -1331,7 +1331,7 @@ class Compiler
                 return null;
             }
 
-            return array(Type::T_NOT, $t1);
+            return [Type::T_NOT, $t1];
         }
 
         if ($t1 !== $t2) {
@@ -1339,7 +1339,7 @@ class Compiler
         }
 
         // t1 == t2, neither m1 nor m2 are "not"
-        return array(empty($m1)? $m2 : $m1, $t1);
+        return [empty($m1)? $m2 : $m1, $t1];
     }
 
     /**
@@ -1525,7 +1525,7 @@ class Compiler
                 list(, $selectors) = $child;
 
                 foreach ($selectors as $sel) {
-                    $results = $this->evalSelectors(array($sel));
+                    $results = $this->evalSelectors([$sel]);
 
                     foreach ($results as $result) {
                         // only use the first one
@@ -1640,10 +1640,10 @@ class Compiler
                 break;
 
             case Type::T_BREAK:
-                return array(Type::T_CONTROL, true);
+                return [Type::T_CONTROL, true];
 
             case Type::T_CONTINUE:
-                return array(Type::T_CONTROL, false);
+                return [Type::T_CONTROL, false];
 
             case Type::T_RETURN:
                 return $this->reduce($child[1], true);
@@ -1651,7 +1651,7 @@ class Compiler
             case Type::T_NESTED_PROPERTY:
                 list(, $prop) = $child;
 
-                $prefixed = array();
+                $prefixed = [];
                 $prefix = $this->compileValue($prop->prefix) . '-';
 
                 foreach ($prop->children as $child) {
@@ -1765,7 +1765,7 @@ class Compiler
     {
         list(, $op, $left, $right, /* $inParens */, $whiteLeft, $whiteRight) = $exp;
 
-        $content = array($this->reduce($left));
+        $content = [$this->reduce($left)];
 
         if ($whiteLeft) {
             $content[] = ' ';
@@ -1779,7 +1779,7 @@ class Compiler
 
         $content[] = $this->reduce($right);
 
-        return array(Type::T_STRING, '', $content);
+        return [Type::T_STRING, '', $content];
     }
 
     /**
@@ -1867,12 +1867,12 @@ class Compiler
                 // 3. op[op name]
                 $fn = "op${ucOpName}${ucLType}${ucRType}";
 
-                if (is_callable(array($this, $fn)) ||
+                if (is_callable([$this, $fn]) ||
                     (($fn = "op${ucLType}${ucRType}") &&
-                        is_callable(array($this, $fn)) &&
+                        is_callable([$this, $fn]) &&
                         $passOp = true) ||
                     (($fn = "op${ucOpName}") &&
-                        is_callable(array($this, $fn)) &&
+                        is_callable([$this, $fn]) &&
                         $genOp = true)
                 ) {
                     $coerceUnit = false;
@@ -1960,7 +1960,7 @@ class Compiler
                     $op = $op . ' ';
                 }
 
-                return array(Type::T_STRING, '', array($op, $exp));
+                return [Type::T_STRING, '', [$op, $exp]];
 
             case Type::T_VARIABLE:
                 list(, $name) = $value;
@@ -2030,7 +2030,7 @@ class Compiler
         }
 
         // for CSS functions, simply flatten the arguments into a list
-        $listArgs = array();
+        $listArgs = [];
 
         foreach ((array) $argValues as $arg) {
             if (empty($arg[0])) {
@@ -2038,7 +2038,7 @@ class Compiler
             }
         }
 
-        return array(Type::T_FUNCTION, $name, array(Type::T_LIST, ',', $listArgs));
+        return [Type::T_FUNCTION, $name, [Type::T_LIST, ',', $listArgs]];
     }
 
     /**
@@ -2070,7 +2070,7 @@ class Compiler
                 $value = $this->extractInterpolation($value);
 
                 if ($value[0] !== Type::T_LIST) {
-                    return array(Type::T_KEYWORD, $this->compileValue($value));
+                    return [Type::T_KEYWORD, $this->compileValue($value)];
                 }
 
                 foreach ($value[2] as $key => $item) {
@@ -2080,13 +2080,13 @@ class Compiler
                 return $value;
 
             case Type::T_STRING:
-                return array($type, '"', array($this->compileStringContent($value)));
+                return [$type, '"', [$this->compileStringContent($value)]];
 
             case Type::T_NUMBER:
                 return $value->normalize();
 
             case Type::T_INTERPOLATE:
-                return array(Type::T_KEYWORD, $this->compileValue($value));
+                return [Type::T_KEYWORD, $this->compileValue($value)];
 
             default:
                 return $value;
@@ -2143,7 +2143,7 @@ class Compiler
     protected function opDivNumberNumber($left, $right)
     {
         if ($right[1] == 0) {
-            return array(Type::T_STRING, '', array($left[1] . $left[2] . '/' . $right[1] . $right[2]));
+            return [Type::T_STRING, '', [$left[1] . $left[2] . '/' . $right[1] . $right[2]]];
         }
 
         return new Node\Number($left[1] / $right[1], $left[2]);
@@ -2248,9 +2248,9 @@ class Compiler
      */
     protected function opColorColor($op, $left, $right)
     {
-        $out = array(Type::T_COLOR);
+        $out = [Type::T_COLOR];
 
-        foreach (array(1, 2, 3) as $i) {
+        foreach ([1, 2, 3] as $i) {
             $lval = isset($left[$i]) ? $left[$i] : 0;
             $rval = isset($right[$i]) ? $right[$i] : 0;
 
@@ -2317,7 +2317,7 @@ class Compiler
         return $this->opColorColor(
             $op,
             $left,
-            array(Type::T_COLOR, $value, $value, $value)
+            [Type::T_COLOR, $value, $value, $value]
         );
     }
 
@@ -2336,7 +2336,7 @@ class Compiler
 
         return $this->opColorColor(
             $op,
-            array(Type::T_COLOR, $value, $value, $value),
+            [Type::T_COLOR, $value, $value, $value],
             $right
         );
     }
@@ -2539,7 +2539,7 @@ class Compiler
                     $delim .= ' ';
                 }
 
-                $filtered = array();
+                $filtered = [];
 
                 foreach ($items as $item) {
                     if ($item[0] === Type::T_NULL) {
@@ -2554,7 +2554,7 @@ class Compiler
             case Type::T_MAP:
                 $keys = $value[1];
                 $values = $value[2];
-                $filtered = array();
+                $filtered = [];
 
                 for ($i = 0, $s = count($keys); $i < $s; $i++) {
                     $filtered[$this->compileValue($keys[$i])] = $this->compileValue($values[$i]);
@@ -2588,11 +2588,11 @@ class Compiler
 
                 switch ($reduced[0]) {
                     case Type::T_STRING:
-                        $reduced = array(Type::T_KEYWORD, $this->compileStringContent($reduced));
+                        $reduced = [Type::T_KEYWORD, $this->compileStringContent($reduced)];
                         break;
 
                     case Type::T_NULL:
-                        $reduced = array(Type::T_KEYWORD, '');
+                        $reduced = [Type::T_KEYWORD, ''];
                 }
 
                 return $this->compileValue($reduced);
@@ -2626,7 +2626,7 @@ class Compiler
      */
     protected function compileStringContent($string)
     {
-        $parts = array();
+        $parts = [];
 
         foreach ($string[2] as $part) {
             if (is_array($part) || $part instanceof \ArrayAccess) {
@@ -2652,10 +2652,10 @@ class Compiler
 
         foreach ($items as $i => $item) {
             if ($item[0] === Type::T_INTERPOLATE) {
-                $before = array(Type::T_LIST, $list[1], array_slice($items, 0, $i));
-                $after  = array(Type::T_LIST, $list[1], array_slice($items, $i + 1));
+                $before = [Type::T_LIST, $list[1], array_slice($items, 0, $i)];
+                $after  = [Type::T_LIST, $list[1], array_slice($items, $i + 1)];
 
-                return array(Type::T_INTERPOLATED, $item, $before, $after);
+                return [Type::T_INTERPOLATED, $item, $before, $after];
             }
         }
 
@@ -2672,15 +2672,15 @@ class Compiler
     protected function multiplySelectors(Environment $env)
     {
         $envs            = $this->compactEnv($env);
-        $selectors       = array();
-        $parentSelectors = array(array());
+        $selectors       = [];
+        $parentSelectors = [[]];
 
         while ($env = array_pop($envs)) {
             if (empty($env->selectors)) {
                 continue;
             }
 
-            $selectors = array();
+            $selectors = [];
 
             foreach ($env->selectors as $selector) {
                 foreach ($parentSelectors as $parent) {
@@ -2705,10 +2705,10 @@ class Compiler
     protected function joinSelectors($parent, $child)
     {
         $setSelf = false;
-        $out = array();
+        $out = [];
 
         foreach ($child as $part) {
-            $newPart = array();
+            $newPart = [];
 
             foreach ($part as $p) {
                 if ($p === self::$selfSelector) {
@@ -2717,7 +2717,7 @@ class Compiler
                     foreach ($parent as $i => $parentPart) {
                         if ($i > 0) {
                             $out[] = $newPart;
-                            $newPart = array();
+                            $newPart = [];
                         }
 
                         foreach ($parentPart as $pp) {
@@ -2758,13 +2758,13 @@ class Compiler
 
         $parentQueries = isset($env->block->queryList)
             ? $env->block->queryList
-            : array(array(array(Type::T_MEDIA_VALUE, $env->block->value)));
+            : [[[Type::T_MEDIA_VALUE, $env->block->value]]];
 
         if ($childQueries === null) {
             $childQueries = $parentQueries;
         } else {
             $originalQueries = $childQueries;
-            $childQueries = array();
+            $childQueries = [];
 
             foreach ($parentQueries as $parentQuery) {
                 foreach ($originalQueries as $childQuery) {
@@ -2785,7 +2785,7 @@ class Compiler
      */
     private function compactEnv(Environment $env)
     {
-        for ($envs = array(); $env; $env = $env->parent) {
+        for ($envs = []; $env; $env = $env->parent) {
             $envs[] = $env;
         }
 
@@ -2820,7 +2820,7 @@ class Compiler
     {
         $env = new Environment;
         $env->parent = $this->env;
-        $env->store  = array();
+        $env->store  = [];
         $env->block  = $block;
         $env->depth  = isset($this->env->depth) ? $this->env->depth + 1 : 0;
 
@@ -3135,7 +3135,7 @@ class Compiler
      */
     public function registerFunction($name, $func, $prototype = null)
     {
-        $this->userFunctions[$this->normalizeName($name)] = array($func, $prototype);
+        $this->userFunctions[$this->normalizeName($name)] = [$func, $prototype];
     }
 
     /**
@@ -3202,12 +3202,12 @@ class Compiler
      */
     public function findImport($url)
     {
-        $urls = array();
+        $urls = [];
 
         // for "normal" scss imports (ignore vanilla css and external requests)
         if (! preg_match('/\.css$|^https?:\/\//', $url)) {
             // try both normal and the _partial filename
-            $urls = array($url, preg_replace('/[^\/]+$/', '_\0', $url));
+            $urls = [$url, preg_replace('/[^\/]+$/', '_\0', $url)];
         }
 
         foreach ($this->importPaths as $dir) {
@@ -3345,8 +3345,8 @@ class Compiler
 
         // throw away lines and children
         $tmp = new OutputBlock;
-        $tmp->lines    = array();
-        $tmp->children = array();
+        $tmp->lines    = [];
+        $tmp->children = [];
 
         $this->env->marker = 'function';
 
@@ -3419,7 +3419,7 @@ class Compiler
             ucfirst($name)
         );
 
-        return array($this, $libName);
+        return [$this, $libName];
     }
 
     /**
@@ -3432,8 +3432,8 @@ class Compiler
      */
     protected function sortArgs($prototype, $args)
     {
-        $keyArgs = array();
-        $posArgs = array();
+        $keyArgs = [];
+        $posArgs = [];
 
         // separate positional and keyword arguments
         foreach ($args as $arg) {
@@ -3449,7 +3449,7 @@ class Compiler
         }
 
         if (! isset($prototype)) {
-            return array($posArgs, $keyArgs);
+            return [$posArgs, $keyArgs];
         }
 
         // copy positional args
@@ -3464,7 +3464,7 @@ class Compiler
             }
         }
 
-        return array($finalArgs, $keyArgs);
+        return [$finalArgs, $keyArgs];
     }
 
     /**
@@ -3483,18 +3483,18 @@ class Compiler
         $env->store = $storeEnv->store;
 
         $hasVariable = false;
-        $args = array();
+        $args = [];
 
         foreach ($argDef as $i => $arg) {
             list($name, $default, $isVariable) = $argDef[$i];
 
-            $args[$name] = array($i, $name, $default, $isVariable);
+            $args[$name] = [$i, $name, $default, $isVariable];
             $hasVariable |= $isVariable;
         }
 
-        $keywordArgs = array();
-        $deferredKeywordArgs = array();
-        $remaining = array();
+        $keywordArgs = [];
+        $deferredKeywordArgs = [];
+        $remaining = [];
 
         // assign the keyword args
         foreach ((array) $argValues as $arg) {
@@ -3549,7 +3549,7 @@ class Compiler
             list($i, $name, $default, $isVariable) = $arg;
 
             if ($isVariable) {
-                $val = array(Type::T_LIST, ',', array(), $isVariable);
+                $val = [Type::T_LIST, ',', [], $isVariable];
 
                 for ($count = count($remaining); $i < $count; $i++) {
                     $val[2][] = $remaining[$i];
@@ -3614,7 +3614,7 @@ class Compiler
             return self::$emptyString;
         }
 
-        return array(Type::T_KEYWORD, $value);
+        return [Type::T_KEYWORD, $value];
     }
 
     /**
@@ -3634,7 +3634,7 @@ class Compiler
             return self::$emptyMap;
         }
 
-        return array(Type::T_MAP, array($item), array(self::$null));
+        return [Type::T_MAP, [$item], [self::$null]];
     }
 
     /**
@@ -3653,23 +3653,23 @@ class Compiler
         if (isset($item) && $item[0] === Type::T_MAP) {
             $keys = $item[1];
             $values = $item[2];
-            $list = array();
+            $list = [];
 
             for ($i = 0, $s = count($keys); $i < $s; $i++) {
                 $key = $keys[$i];
                 $value = $values[$i];
 
-                $list[] = array(
+                $list[] = [
                     Type::T_LIST,
                     '',
-                    array(array(Type::T_KEYWORD, $this->compileStringContent($this->coerceString($key))), $value)
-                );
+                    [[Type::T_KEYWORD, $this->compileStringContent($this->coerceString($key))], $value]
+                ];
             }
 
-            return array(Type::T_LIST, ',', $list);
+            return [Type::T_LIST, ',', $list];
         }
 
-        return array(Type::T_LIST, $delim, ! isset($item) ? array(): array($item));
+        return [Type::T_LIST, $delim, ! isset($item) ? []: [$item]];
     }
 
     /**
@@ -3708,8 +3708,8 @@ class Compiler
                     $rgba = explode(',', Colors::$cssColors[$name]);
 
                     return isset($rgba[3])
-                        ? array(Type::T_COLOR, (int) $rgba[0], (int) $rgba[1], (int) $rgba[2], (int) $rgba[3])
-                        : array(Type::T_COLOR, (int) $rgba[0], (int) $rgba[1], (int) $rgba[2]);
+                        ? [Type::T_COLOR, (int) $rgba[0], (int) $rgba[1], (int) $rgba[2], (int) $rgba[3]]
+                        : [Type::T_COLOR, (int) $rgba[0], (int) $rgba[1], (int) $rgba[2]];
                 }
 
                 return null;
@@ -3731,7 +3731,7 @@ class Compiler
             return $value;
         }
 
-        return array(Type::T_STRING, '', array($this->compileValue($value)));
+        return [Type::T_STRING, '', [$this->compileValue($value)]];
     }
 
     /**
@@ -3845,7 +3845,7 @@ class Compiler
      */
     protected function fixColor($c)
     {
-        foreach (array(1, 2, 3) as $i) {
+        foreach ([1, 2, 3] as $i) {
             if ($c[$i] < 0) {
                 $c[$i] = 0;
             }
@@ -3895,7 +3895,7 @@ class Compiler
             }
         }
 
-        return array(Type::T_HSL, fmod($h, 360), $s * 100, $l / 5.1);
+        return [Type::T_HSL, fmod($h, 360), $s * 100, $l / 5.1];
     }
 
     /**
@@ -3958,35 +3958,35 @@ class Compiler
         $g = $this->hueToRGB($m1, $m2, $h) * 255;
         $b = $this->hueToRGB($m1, $m2, $h - 1/3) * 255;
 
-        $out = array(Type::T_COLOR, $r, $g, $b);
+        $out = [Type::T_COLOR, $r, $g, $b];
 
         return $out;
     }
 
     // Built in functions
 
-    //protected static $libCall = array('name', 'args...');
+    //protected static $libCall = ['name', 'args...'];
     protected function libCall($args, $kwargs)
     {
         $name = $this->compileStringContent($this->coerceString($this->reduce(array_shift($args), true)));
 
         $args = array_map(
             function ($a) {
-                return array(null, $a, false);
+                return [null, $a, false];
             },
             $args
         );
 
         if (count($kwargs)) {
             foreach ($kwargs as $key => $value) {
-                $args[] = array(array(Type::T_VARIABLE, $key), $value, false);
+                $args[] = [[Type::T_VARIABLE, $key], $value, false];
             }
         }
 
-        return $this->reduce(array(Type::T_FUNCTION_CALL, $name, $args));
+        return $this->reduce([Type::T_FUNCTION_CALL, $name, $args]);
     }
 
-    protected static $libIf = array('condition', 'if-true', 'if-false');
+    protected static $libIf = ['condition', 'if-true', 'if-false'];
     protected function libIf($args)
     {
         list($cond, $t, $f) = $args;
@@ -3998,7 +3998,7 @@ class Compiler
         return $this->reduce($t, true);
     }
 
-    protected static $libIndex = array('list', 'value');
+    protected static $libIndex = ['list', 'value'];
     protected function libIndex($args)
     {
         list($list, $value) = $args;
@@ -4019,7 +4019,7 @@ class Compiler
             return self::$null;
         }
 
-        $values = array();
+        $values = [];
 
         foreach ($list[2] as $item) {
             $values[] = $this->normalizeValue($item);
@@ -4030,17 +4030,17 @@ class Compiler
         return false === $key ? self::$null : $key + 1;
     }
 
-    protected static $libRgb = array('red', 'green', 'blue');
+    protected static $libRgb = ['red', 'green', 'blue'];
     protected function libRgb($args)
     {
         list($r, $g, $b) = $args;
 
-        return array(Type::T_COLOR, $r[1], $g[1], $b[1]);
+        return [Type::T_COLOR, $r[1], $g[1], $b[1]];
     }
 
-    protected static $libRgba = array(
-        array('red', 'color'),
-        'green', 'blue', 'alpha');
+    protected static $libRgba = [
+        ['red', 'color'],
+        'green', 'blue', 'alpha'];
     protected function libRgba($args)
     {
         if ($color = $this->coerceColor($args[0])) {
@@ -4053,7 +4053,7 @@ class Compiler
 
         list($r, $g, $b, $a) = $args;
 
-        return array(Type::T_COLOR, $r[1], $g[1], $b[1], $a[1]);
+        return [Type::T_COLOR, $r[1], $g[1], $b[1], $a[1]];
     }
 
     // helper function for adjust_color, change_color, and scale_color
@@ -4061,7 +4061,7 @@ class Compiler
     {
         $color = $this->assertColor($args[0]);
 
-        foreach (array(1, 2, 3, 7) as $i) {
+        foreach ([1, 2, 3, 7] as $i) {
             if (isset($args[$i])) {
                 $val = $this->assertNumber($args[$i]);
                 $ii = $i === 7 ? 4 : $i; // alpha
@@ -4072,7 +4072,7 @@ class Compiler
         if (isset($args[4]) || isset($args[5]) || isset($args[6])) {
             $hsl = $this->toHSL($color[1], $color[2], $color[3]);
 
-            foreach (array(4, 5, 6) as $i) {
+            foreach ([4, 5, 6] as $i) {
                 if (isset($args[$i])) {
                     $val = $this->assertNumber($args[$i]);
                     $hsl[$i - 3] = call_user_func($fn, $hsl[$i - 3], $val, $i);
@@ -4091,10 +4091,10 @@ class Compiler
         return $color;
     }
 
-    protected static $libAdjustColor = array(
+    protected static $libAdjustColor = [
         'color', 'red', 'green', 'blue',
         'hue', 'saturation', 'lightness', 'alpha'
-    );
+    ];
     protected function libAdjustColor($args)
     {
         return $this->alterColor($args, function ($base, $alter, $i) {
@@ -4102,10 +4102,10 @@ class Compiler
         });
     }
 
-    protected static $libChangeColor = array(
+    protected static $libChangeColor = [
         'color', 'red', 'green', 'blue',
         'hue', 'saturation', 'lightness', 'alpha'
-    );
+    ];
     protected function libChangeColor($args)
     {
         return $this->alterColor($args, function ($base, $alter, $i) {
@@ -4113,10 +4113,10 @@ class Compiler
         });
     }
 
-    protected static $libScaleColor = array(
+    protected static $libScaleColor = [
         'color', 'red', 'green', 'blue',
         'hue', 'saturation', 'lightness', 'alpha'
-    );
+    ];
     protected function libScaleColor($args)
     {
         return $this->alterColor($args, function ($base, $scale, $i) {
@@ -4152,7 +4152,7 @@ class Compiler
         });
     }
 
-    protected static $libIeHexStr = array('color');
+    protected static $libIeHexStr = ['color'];
     protected function libIeHexStr($args)
     {
         $color = $this->coerceColor($args[0]);
@@ -4161,7 +4161,7 @@ class Compiler
         return sprintf('#%02X%02X%02X%02X', $color[4], $color[1], $color[2], $color[3]);
     }
 
-    protected static $libRed = array('color');
+    protected static $libRed = ['color'];
     protected function libRed($args)
     {
         $color = $this->coerceColor($args[0]);
@@ -4169,7 +4169,7 @@ class Compiler
         return $color[1];
     }
 
-    protected static $libGreen = array('color');
+    protected static $libGreen = ['color'];
     protected function libGreen($args)
     {
         $color = $this->coerceColor($args[0]);
@@ -4177,7 +4177,7 @@ class Compiler
         return $color[2];
     }
 
-    protected static $libBlue = array('color');
+    protected static $libBlue = ['color'];
     protected function libBlue($args)
     {
         $color = $this->coerceColor($args[0]);
@@ -4185,7 +4185,7 @@ class Compiler
         return $color[3];
     }
 
-    protected static $libAlpha = array('color');
+    protected static $libAlpha = ['color'];
     protected function libAlpha($args)
     {
         if ($color = $this->coerceColor($args[0])) {
@@ -4196,7 +4196,7 @@ class Compiler
         return null;
     }
 
-    protected static $libOpacity = array('color');
+    protected static $libOpacity = ['color'];
     protected function libOpacity($args)
     {
         $value = $args[0];
@@ -4209,7 +4209,7 @@ class Compiler
     }
 
     // mix two colors
-    protected static $libMix = array('color-1', 'color-2', 'weight');
+    protected static $libMix = ['color-1', 'color-2', 'weight'];
     protected function libMix($args)
     {
         list($first, $second, $weight) = $args;
@@ -4232,11 +4232,11 @@ class Compiler
         $w1 = (($w * $a === -1 ? $w : ($w + $a) / (1 + $w * $a)) + 1) / 2.0;
         $w2 = 1.0 - $w1;
 
-        $new = array(Type::T_COLOR,
+        $new = [Type::T_COLOR,
             $w1 * $first[1] + $w2 * $second[1],
             $w1 * $first[2] + $w2 * $second[2],
             $w1 * $first[3] + $w2 * $second[3],
-        );
+        ];
 
         if ($firstAlpha != 1.0 || $secondAlpha != 1.0) {
             $new[] = $firstAlpha * $weight + $secondAlpha * ($weight - 1);
@@ -4245,7 +4245,7 @@ class Compiler
         return $this->fixColor($new);
     }
 
-    protected static $libHsl = array('hue', 'saturation', 'lightness');
+    protected static $libHsl = ['hue', 'saturation', 'lightness'];
     protected function libHsl($args)
     {
         list($h, $s, $l) = $args;
@@ -4253,7 +4253,7 @@ class Compiler
         return $this->toRGB($h[1], $s[1], $l[1]);
     }
 
-    protected static $libHsla = array('hue', 'saturation', 'lightness', 'alpha');
+    protected static $libHsla = ['hue', 'saturation', 'lightness', 'alpha'];
     protected function libHsla($args)
     {
         list($h, $s, $l, $a) = $args;
@@ -4264,7 +4264,7 @@ class Compiler
         return $color;
     }
 
-    protected static $libHue = array('color');
+    protected static $libHue = ['color'];
     protected function libHue($args)
     {
         $color = $this->assertColor($args[0]);
@@ -4273,7 +4273,7 @@ class Compiler
         return new Node\Number($hsl[1], 'deg');
     }
 
-    protected static $libSaturation = array('color');
+    protected static $libSaturation = ['color'];
     protected function libSaturation($args)
     {
         $color = $this->assertColor($args[0]);
@@ -4282,7 +4282,7 @@ class Compiler
         return new Node\Number($hsl[2], '%');
     }
 
-    protected static $libLightness = array('color');
+    protected static $libLightness = ['color'];
     protected function libLightness($args)
     {
         $color = $this->assertColor($args[0]);
@@ -4304,7 +4304,7 @@ class Compiler
         return $out;
     }
 
-    protected static $libAdjustHue = array('color', 'degrees');
+    protected static $libAdjustHue = ['color', 'degrees'];
     protected function libAdjustHue($args)
     {
         $color = $this->assertColor($args[0]);
@@ -4313,7 +4313,7 @@ class Compiler
         return $this->adjustHsl($color, 1, $degrees);
     }
 
-    protected static $libLighten = array('color', 'amount');
+    protected static $libLighten = ['color', 'amount'];
     protected function libLighten($args)
     {
         $color = $this->assertColor($args[0]);
@@ -4322,7 +4322,7 @@ class Compiler
         return $this->adjustHsl($color, 3, $amount);
     }
 
-    protected static $libDarken = array('color', 'amount');
+    protected static $libDarken = ['color', 'amount'];
     protected function libDarken($args)
     {
         $color = $this->assertColor($args[0]);
@@ -4331,7 +4331,7 @@ class Compiler
         return $this->adjustHsl($color, 3, -$amount);
     }
 
-    protected static $libSaturate = array('color', 'amount');
+    protected static $libSaturate = ['color', 'amount'];
     protected function libSaturate($args)
     {
         $value = $args[0];
@@ -4346,7 +4346,7 @@ class Compiler
         return $this->adjustHsl($color, 2, $amount);
     }
 
-    protected static $libDesaturate = array('color', 'amount');
+    protected static $libDesaturate = ['color', 'amount'];
     protected function libDesaturate($args)
     {
         $color = $this->assertColor($args[0]);
@@ -4355,7 +4355,7 @@ class Compiler
         return $this->adjustHsl($color, 2, -$amount);
     }
 
-    protected static $libGrayscale = array('color');
+    protected static $libGrayscale = ['color'];
     protected function libGrayscale($args)
     {
         $value = $args[0];
@@ -4367,13 +4367,13 @@ class Compiler
         return $this->adjustHsl($this->assertColor($value), 2, -100);
     }
 
-    protected static $libComplement = array('color');
+    protected static $libComplement = ['color'];
     protected function libComplement($args)
     {
         return $this->adjustHsl($this->assertColor($args[0]), 1, 180);
     }
 
-    protected static $libInvert = array('color');
+    protected static $libInvert = ['color'];
     protected function libInvert($args)
     {
         $value = $args[0];
@@ -4391,7 +4391,7 @@ class Compiler
     }
 
     // increases opacity by amount
-    protected static $libOpacify = array('color', 'amount');
+    protected static $libOpacify = ['color', 'amount'];
     protected function libOpacify($args)
     {
         $color = $this->assertColor($args[0]);
@@ -4403,14 +4403,14 @@ class Compiler
         return $color;
     }
 
-    protected static $libFadeIn = array('color', 'amount');
+    protected static $libFadeIn = ['color', 'amount'];
     protected function libFadeIn($args)
     {
         return $this->libOpacify($args);
     }
 
     // decreases opacity by amount
-    protected static $libTransparentize = array('color', 'amount');
+    protected static $libTransparentize = ['color', 'amount'];
     protected function libTransparentize($args)
     {
         $color = $this->assertColor($args[0]);
@@ -4422,13 +4422,13 @@ class Compiler
         return $color;
     }
 
-    protected static $libFadeOut = array('color', 'amount');
+    protected static $libFadeOut = ['color', 'amount'];
     protected function libFadeOut($args)
     {
         return $this->libTransparentize($args);
     }
 
-    protected static $libUnquote = array('string');
+    protected static $libUnquote = ['string'];
     protected function libUnquote($args)
     {
         $str = $args[0];
@@ -4440,7 +4440,7 @@ class Compiler
         return $str;
     }
 
-    protected static $libQuote = array('string');
+    protected static $libQuote = ['string'];
     protected function libQuote($args)
     {
         $value = $args[0];
@@ -4449,16 +4449,16 @@ class Compiler
             return $value;
         }
 
-        return array(Type::T_STRING, '"', array($value));
+        return [Type::T_STRING, '"', [$value]];
     }
 
-    protected static $libPercentage = array('value');
+    protected static $libPercentage = ['value'];
     protected function libPercentage($args)
     {
         return new Node\Number($this->coercePercent($args[0]) * 100, '%');
     }
 
-    protected static $libRound = array('value');
+    protected static $libRound = ['value'];
     protected function libRound($args)
     {
         $num = $args[0];
@@ -4467,7 +4467,7 @@ class Compiler
         return $num;
     }
 
-    protected static $libFloor = array('value');
+    protected static $libFloor = ['value'];
     protected function libFloor($args)
     {
         $num = $args[0];
@@ -4476,7 +4476,7 @@ class Compiler
         return $num;
     }
 
-    protected static $libCeil = array('value');
+    protected static $libCeil = ['value'];
     protected function libCeil($args)
     {
         $num = $args[0];
@@ -4485,7 +4485,7 @@ class Compiler
         return $num;
     }
 
-    protected static $libAbs = array('value');
+    protected static $libAbs = ['value'];
     protected function libAbs($args)
     {
         $num = $args[0];
@@ -4501,7 +4501,7 @@ class Compiler
 
         foreach ($numbers as $key => $number) {
             if (null === $min || $number[1] <= $min[1]) {
-                $min = array($key, $number[1]);
+                $min = [$key, $number[1]];
             }
         }
 
@@ -4515,7 +4515,7 @@ class Compiler
 
         foreach ($numbers as $key => $number) {
             if (null === $max || $number[1] >= $max[1]) {
-                $max = array($key, $number[1]);
+                $max = [$key, $number[1]];
             }
         }
 
@@ -4533,7 +4533,7 @@ class Compiler
     {
         $unit = null;
         $originalUnit = null;
-        $numbers = array();
+        $numbers = [];
 
         foreach ($args as $key => $item) {
             if ($item[0] !== Type::T_NUMBER) {
@@ -4557,7 +4557,7 @@ class Compiler
         return $numbers;
     }
 
-    protected static $libLength = array('list');
+    protected static $libLength = ['list'];
     protected function libLength($args)
     {
         $list = $this->coerceList($args[0]);
@@ -4565,7 +4565,7 @@ class Compiler
         return count($list[2]);
     }
 
-    //protected static $libListSeparator = array('list...');
+    //protected static $libListSeparator = ['list...'];
     protected function libListSeparator($args)
     {
         if (count($args) > 1) {
@@ -4585,7 +4585,7 @@ class Compiler
         return 'space';
     }
 
-    protected static $libNth = array('list', 'n');
+    protected static $libNth = ['list', 'n'];
     protected function libNth($args)
     {
         $list = $this->coerceList($args[0]);
@@ -4600,7 +4600,7 @@ class Compiler
         return isset($list[2][$n]) ? $list[2][$n] : self::$defaultValue;
     }
 
-    protected static $libSetNth = array('list', 'n', 'value');
+    protected static $libSetNth = ['list', 'n', 'value'];
     protected function libSetNth($args)
     {
         $list = $this->coerceList($args[0]);
@@ -4623,7 +4623,7 @@ class Compiler
         return $list;
     }
 
-    protected static $libMapGet = array('map', 'key');
+    protected static $libMapGet = ['map', 'key'];
     protected function libMapGet($args)
     {
         $map = $this->assertMap($args[0]);
@@ -4638,25 +4638,25 @@ class Compiler
         return self::$null;
     }
 
-    protected static $libMapKeys = array('map');
+    protected static $libMapKeys = ['map'];
     protected function libMapKeys($args)
     {
         $map = $this->assertMap($args[0]);
         $keys = $map[1];
 
-        return array(Type::T_LIST, ',', $keys);
+        return [Type::T_LIST, ',', $keys];
     }
 
-    protected static $libMapValues = array('map');
+    protected static $libMapValues = ['map'];
     protected function libMapValues($args)
     {
         $map = $this->assertMap($args[0]);
         $values = $map[2];
 
-        return array(Type::T_LIST, ',', $values);
+        return [Type::T_LIST, ',', $values];
     }
 
-    protected static $libMapRemove = array('map', 'key');
+    protected static $libMapRemove = ['map', 'key'];
     protected function libMapRemove($args)
     {
         $map = $this->assertMap($args[0]);
@@ -4672,7 +4672,7 @@ class Compiler
         return $map;
     }
 
-    protected static $libMapHasKey = array('map', 'key');
+    protected static $libMapHasKey = ['map', 'key'];
     protected function libMapHasKey($args)
     {
         $map = $this->assertMap($args[0]);
@@ -4687,29 +4687,29 @@ class Compiler
         return false;
     }
 
-    protected static $libMapMerge = array('map-1', 'map-2');
+    protected static $libMapMerge = ['map-1', 'map-2'];
     protected function libMapMerge($args)
     {
         $map1 = $this->assertMap($args[0]);
         $map2 = $this->assertMap($args[1]);
 
-        return array(Type::T_MAP, array_merge($map1[1], $map2[1]), array_merge($map1[2], $map2[2]));
+        return [Type::T_MAP, array_merge($map1[1], $map2[1]), array_merge($map1[2], $map2[2])];
     }
 
-    protected static $libKeywords = array('args');
+    protected static $libKeywords = ['args'];
     protected function libKeywords($args)
     {
         $this->assertList($args[0]);
 
-        $keys = array();
-        $values = array();
+        $keys = [];
+        $values = [];
 
         foreach ($args[0][2] as $name => $arg) {
-            $keys[] = array(Type::T_KEYWORD, $name);
+            $keys[] = [Type::T_KEYWORD, $name];
             $values[] = $arg;
         }
 
-        return array(Type::T_MAP, $keys, $values);
+        return [Type::T_MAP, $keys, $values];
     }
 
     protected function listSeparatorForJoin($list1, $sep)
@@ -4730,7 +4730,7 @@ class Compiler
         }
     }
 
-    protected static $libJoin = array('list1', 'list2', 'separator');
+    protected static $libJoin = ['list1', 'list2', 'separator'];
     protected function libJoin($args)
     {
         list($list1, $list2, $sep) = $args;
@@ -4739,10 +4739,10 @@ class Compiler
         $list2 = $this->coerceList($list2, ' ');
         $sep = $this->listSeparatorForJoin($list1, $sep);
 
-        return array(Type::T_LIST, $sep, array_merge($list1[2], $list2[2]));
+        return [Type::T_LIST, $sep, array_merge($list1[2], $list2[2])];
     }
 
-    protected static $libAppend = array('list', 'val', 'separator');
+    protected static $libAppend = ['list', 'val', 'separator'];
     protected function libAppend($args)
     {
         list($list1, $value, $sep) = $args;
@@ -4750,7 +4750,7 @@ class Compiler
         $list1 = $this->coerceList($list1, ' ');
         $sep = $this->listSeparatorForJoin($list1, $sep);
 
-        return array(Type::T_LIST, $sep, array_merge($list1[2], array($value)));
+        return [Type::T_LIST, $sep, array_merge($list1[2], [$value])];
     }
 
     protected function libZip($args)
@@ -4759,11 +4759,11 @@ class Compiler
             $this->assertList($arg);
         }
 
-        $lists = array();
+        $lists = [];
         $firstList = array_shift($args);
 
         foreach ($firstList[2] as $key => $item) {
-            $list = array(Type::T_LIST, '', array($item));
+            $list = [Type::T_LIST, '', [$item]];
 
             foreach ($args as $arg) {
                 if (isset($arg[2][$key])) {
@@ -4776,10 +4776,10 @@ class Compiler
             $lists[] = $list;
         }
 
-        return array(Type::T_LIST, ',', $lists);
+        return [Type::T_LIST, ',', $lists];
     }
 
-    protected static $libTypeOf = array('value');
+    protected static $libTypeOf = ['value'];
     protected function libTypeOf($args)
     {
         $value = $args[0];
@@ -4809,19 +4809,19 @@ class Compiler
         }
     }
 
-    protected static $libUnit = array('number');
+    protected static $libUnit = ['number'];
     protected function libUnit($args)
     {
         $num = $args[0];
 
         if ($num[0] === Type::T_NUMBER) {
-            return array(Type::T_STRING, '"', array($num->unitStr()));
+            return [Type::T_STRING, '"', [$num->unitStr()]];
         }
 
         return '';
     }
 
-    protected static $libUnitless = array('number');
+    protected static $libUnitless = ['number'];
     protected function libUnitless($args)
     {
         $value = $args[0];
@@ -4829,7 +4829,7 @@ class Compiler
         return $value[0] === Type::T_NUMBER && $value->unitless();
     }
 
-    protected static $libComparable = array('number-1', 'number-2');
+    protected static $libComparable = ['number-1', 'number-2'];
     protected function libComparable($args)
     {
         list($number1, $number2) = $args;
@@ -4848,7 +4848,7 @@ class Compiler
         return $number1[2] === $number2[2] || $number1->unitless() || $number2->unitless();
     }
 
-    protected static $libStrIndex = array('string', 'substring');
+    protected static $libStrIndex = ['string', 'substring'];
     protected function libStrIndex($args)
     {
         $string = $this->coerceString($args[0]);
@@ -4862,7 +4862,7 @@ class Compiler
         return $result === false ? self::$null : new Node\Number($result + 1, '');
     }
 
-    protected static $libStrInsert = array('string', 'insert', 'index');
+    protected static $libStrInsert = ['string', 'insert', 'index'];
     protected function libStrInsert($args)
     {
         $string = $this->coerceString($args[0]);
@@ -4873,12 +4873,12 @@ class Compiler
 
         list(, $index) = $args[2];
 
-        $string[2] = array(substr_replace($stringContent, $insertContent, $index - 1, 0));
+        $string[2] = [substr_replace($stringContent, $insertContent, $index - 1, 0)];
 
         return $string;
     }
 
-    protected static $libStrLength = array('string');
+    protected static $libStrLength = ['string'];
     protected function libStrLength($args)
     {
         $string = $this->coerceString($args[0]);
@@ -4887,7 +4887,7 @@ class Compiler
         return new Node\Number(strlen($stringContent), '');
     }
 
-    protected static $libStrSlice = array('string', 'start-at', 'end-at');
+    protected static $libStrSlice = ['string', 'start-at', 'end-at'];
     protected function libStrSlice($args)
     {
         if (isset($args[2]) && $args[2][1] == 0) {
@@ -4907,35 +4907,35 @@ class Compiler
         $length = $end < 0 ? $end + 1 : ($end > 0 ? $end - $start : $end);
 
         $string[2] = $length
-            ? array(substr($stringContent, $start, $length))
-            : array(substr($stringContent, $start));
+            ? [substr($stringContent, $start, $length)]
+            : [substr($stringContent, $start)];
 
         return $string;
     }
 
-    protected static $libToLowerCase = array('string');
+    protected static $libToLowerCase = ['string'];
     protected function libToLowerCase($args)
     {
         $string = $this->coerceString($args[0]);
         $stringContent = $this->compileStringContent($string);
 
-        $string[2] = array(mb_strtolower($stringContent));
+        $string[2] = [mb_strtolower($stringContent)];
 
         return $string;
     }
 
-    protected static $libToUpperCase = array('string');
+    protected static $libToUpperCase = ['string'];
     protected function libToUpperCase($args)
     {
         $string = $this->coerceString($args[0]);
         $stringContent = $this->compileStringContent($string);
 
-        $string[2] = array(mb_strtoupper($stringContent));
+        $string[2] = [mb_strtoupper($stringContent)];
 
         return $string;
     }
 
-    protected static $libFeatureExists = array('feature');
+    protected static $libFeatureExists = ['feature'];
     protected function libFeatureExists($args)
     {
         $string = $this->coerceString($args[0]);
@@ -4946,7 +4946,7 @@ class Compiler
         );
     }
 
-    protected static $libFunctionExists = array('name');
+    protected static $libFunctionExists = ['name'];
     protected function libFunctionExists($args)
     {
         $string = $this->coerceString($args[0]);
@@ -4969,7 +4969,7 @@ class Compiler
         return $this->toBool(is_callable($f));
     }
 
-    protected static $libGlobalVariableExists = array('name');
+    protected static $libGlobalVariableExists = ['name'];
     protected function libGlobalVariableExists($args)
     {
         $string = $this->coerceString($args[0]);
@@ -4978,7 +4978,7 @@ class Compiler
         return $this->has($name, $this->rootEnv);
     }
 
-    protected static $libMixinExists = array('name');
+    protected static $libMixinExists = ['name'];
     protected function libMixinExists($args)
     {
         $string = $this->coerceString($args[0]);
@@ -4987,7 +4987,7 @@ class Compiler
         return $this->has(self::$namespaces['mixin'] . $name);
     }
 
-    protected static $libVariableExists = array('name');
+    protected static $libVariableExists = ['name'];
     protected function libVariableExists($args)
     {
         $string = $this->coerceString($args[0]);
@@ -5003,12 +5003,12 @@ class Compiler
      */
     protected function libCounter($args)
     {
-        $list = array_map(array($this, 'compileValue'), $args);
+        $list = array_map([$this, 'compileValue'], $args);
 
-        return array(Type::T_STRING, '', array('counter(' . implode(',', $list) . ')'));
+        return [Type::T_STRING, '', ['counter(' . implode(',', $list) . ')']];
     }
 
-    protected static $libRandom = array('limit');
+    protected static $libRandom = ['limit'];
     protected function libRandom($args)
     {
         if (isset($args[0])) {
@@ -5036,14 +5036,14 @@ class Compiler
 
         $id += mt_rand(0, 10) + 1;
 
-        return array(Type::T_STRING, '', array('u' . str_pad(base_convert($id, 10, 36), 8, '0', STR_PAD_LEFT)));
+        return [Type::T_STRING, '', ['u' . str_pad(base_convert($id, 10, 36), 8, '0', STR_PAD_LEFT)]];
     }
 
-    protected static $libInspect = array('value');
+    protected static $libInspect = ['value'];
     protected function libInspect($args)
     {
         if ($args[0] === self::$null) {
-            return array(Type::T_KEYWORD, 'null');
+            return [Type::T_KEYWORD, 'null'];
         }
 
         return $args[0];

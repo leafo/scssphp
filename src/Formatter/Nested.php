@@ -154,7 +154,7 @@ class Nested extends Formatter
     private function adjustAllChildren(OutputBlock $block)
     {
         // flatten empty nested blocks
-        $children = array();
+        $children = [];
 
         foreach ($block->children as $i => $child) {
             if (empty($child->lines) && empty($child->children)) {

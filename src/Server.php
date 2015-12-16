@@ -214,14 +214,14 @@ class Server
         file_put_contents($out, $css);
         file_put_contents(
             $this->metadataName($out),
-            serialize(array(
+            serialize([
                 'etag'    => $etag,
                 'imports' => $this->scss->getParsedFiles(),
                 'vars'    => crc32(serialize($this->scss->getVariables())),
-            ))
+            ])
         );
 
-        return array($css, $etag);
+        return [$css, $etag];
     }
 
     /**
@@ -234,8 +234,8 @@ class Server
     protected function createErrorCSS(\Exception $error)
     {
         $message = str_replace(
-            array("'", "\n"),
-            array("\\'", "\\A"),
+            ["'", "\n"],
+            ["\\'", "\\A"],
             $error->getfile() . ":\n\n" . $error->getMessage()
         );
 
