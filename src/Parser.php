@@ -63,6 +63,7 @@ class Parser
     private $eatWhiteDefault;
     private $buffer;
     private $utf8;
+    private $encoding;
 
     /**
      * Constructor
@@ -119,7 +120,7 @@ class Parser
     {
         list($line, $column) = $this->getSourcePosition($this->count);
 
-        $loc  = empty($this->sourceName) ? "line: $line" : "$this->sourceName on line $line";
+        $loc = empty($this->sourceName) ? "line: $line" : "$this->sourceName on line $line";
 
         if ($this->peek("(.*?)(\n|$)", $m, $this->count)) {
             throw new ParserException("$msg: failed at `$m[1]` $loc");
@@ -145,6 +146,7 @@ class Parser
         $this->eatWhiteDefault = true;
         $this->buffer          = rtrim($buffer, "\x00..\x1f");
 
+        $this->saveEncoding();
         $this->extractLineNumbers($buffer);
 
         $this->pushBlock(null); // root block
@@ -170,6 +172,8 @@ class Parser
 
         $this->env->isRoot    = true;
 
+        $this->restoreEncoding();
+
         return $this->env;
     }
 
@@ -191,7 +195,13 @@ class Parser
         $this->eatWhiteDefault = true;
         $this->buffer          = (string) $buffer;
 
-        return $this->valueList($out);
+        $this->saveEncoding();
+
+        $list = $this->valueList($out);
+
+        $this->restoreEncoding();
+
+        return $list;
     }
 
     /**
@@ -212,7 +222,13 @@ class Parser
         $this->eatWhiteDefault = true;
         $this->buffer          = (string) $buffer;
 
-        return $this->selectors($out);
+        $this->saveEncoding();
+
+        $selector = $this->selectors($out);
+
+        $this->restoreEncoding();
+
+        return $selector;
     }
 
     /**
@@ -2484,5 +2500,27 @@ class Parser
         }
 
         return array($low + 1, $pos - $this->sourcePositions[$low]);
+    }
+
+    /**
+     * Save internal encoding
+     */
+    private function saveEncoding()
+    {
+        if (ini_get('mbstring.func_overload') & 2) {
+            $this->encoding = mb_internal_encoding();
+
+            mb_internal_encoding('iso-8859-1');
+        }
+    }
+
+    /**
+     * Restore internal encoding
+     */
+    private function restoreEncoding()
+    {
+        if ($this->encoding) {
+            mb_internal_encoding($this->encoding);
+        }
     }
 }
