@@ -11,8 +11,6 @@
 
 namespace Leafo\ScssPhp\Compiler;
 
-use Leafo\ScssPhp\Block;
-
 /**
  * Compiler environment
  *
