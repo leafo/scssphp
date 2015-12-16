@@ -700,7 +700,7 @@ class Compiler
 	        continue;
             }
 
-            if ($this->isWithout($without, $e->block)) {
+            if ($e->block && $this->isWithout($without, $e->block)) {
                 continue;
             }
 
@@ -815,7 +815,7 @@ class Compiler
         $filtered = array();
 
         foreach ($envs as $e) {
-            if ($this->isWithout($without, $e->block)) {
+            if ($e->block && $this->isWithout($without, $e->block)) {
                 continue;
             }
 
@@ -828,12 +828,12 @@ class Compiler
     /**
      * Filter WITH rules
      *
-     * @param integer   $without
-     * @param \stdClass $block
+     * @param integer              $without
+     * @param \Leafo\ScssPhp\Block $block
      *
      * @return boolean
      */
-    private function isWithout($without, $block)
+    private function isWithout($without, Block $block)
     {
         if ((($without & self::WITH_RULE) && isset($block->selectors)) ||
             (($without & self::WITH_MEDIA) &&
