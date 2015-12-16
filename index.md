@@ -87,8 +87,8 @@ must have permission to write in `scss_cache`.
 
 ### Compiler Interface
 
-If you're interested in directly using the compiler, then all you need to either
-require `scss.inc.php` or use your `composer` generated auto-loader, and then
+If you're interested in directly using the compiler, then all you need to do is
+either require `scss.inc.php` or use your `composer` generated auto-loader, and then
 invoke the `Compiler` class:
 
 {% highlight php startinline=true %}
