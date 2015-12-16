@@ -1878,8 +1878,6 @@ class Parser
         $s = $this->seek();
 
         if ($this->literal('#{') && $this->valueList($value) && $this->literal('}', false)) {
-            // TODO: don't error if out of bounds
-
             if ($lookWhite) {
                 $left = preg_match('/\s/', $this->buffer[$s - 1]) ? ' ' : '';
                 $right = preg_match('/\s/', $this->buffer[$this->count]) ? ' ': '';

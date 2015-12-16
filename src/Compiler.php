@@ -4568,7 +4568,6 @@ class Compiler
         return count($list[2]);
     }
 
-    // TODO: need a way to declare this built-in as varargs
     //protected static $libListSeparator = array('list...');
     protected function libListSeparator($args)
     {
