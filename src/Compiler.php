@@ -697,23 +697,10 @@ class Compiler
             }
 
             if (isset($e->block->type) && $e->block->type === Type::T_AT_ROOT) {
-                continue;
+	        continue;
             }
 
-            if (($without & self::WITH_RULE) && isset($e->block->selectors)) {
-                continue;
-            }
-
-            if (($without & self::WITH_MEDIA) &&
-                isset($e->block->type) && $e->block->type === Type::T_MEDIA
-            ) {
-                continue;
-            }
-
-            if (($without & self::WITH_SUPPORTS) &&
-                isset($e->block->type) && $e->block->type === Type::T_DIRECTIVE &&
-                isset($e->block->name) && $e->block->name === 'supports'
-            ) {
+            if ($this->isWithout($without, $e->block)) {
                 continue;
             }
 
@@ -828,20 +815,7 @@ class Compiler
         $filtered = array();
 
         foreach ($envs as $e) {
-            if (($without & self::WITH_RULE) && isset($e->block->selectors)) {
-                continue;
-            }
-
-            if (($without & self::WITH_MEDIA) &&
-                isset($e->block->type) && $e->block->type === Type::T_MEDIA
-            ) {
-                continue;
-            }
-
-            if (($without & self::WITH_SUPPORTS) &&
-                isset($e->block->type) && $e->block->type === Type::T_DIRECTIVE &&
-                isset($e->block->name) && $e->block->name === 'supports'
-            ) {
+            if ($this->isWithout($without, $e->block)) {
                 continue;
             }
 
@@ -849,6 +823,29 @@ class Compiler
         }
 
         return $this->extractEnv($filtered);
+    }
+
+    /**
+     * Filter WITH rules
+     *
+     * @param integer   $without
+     * @param \stdClass $block
+     *
+     * @return boolean
+     */
+    private function isWithout($without, $block)
+    {
+        if ((($without & self::WITH_RULE) && isset($block->selectors)) ||
+            (($without & self::WITH_MEDIA) &&
+                isset($block->type) && $block->type === Type::T_MEDIA) ||
+            (($without & self::WITH_SUPPORTS) &&
+                isset($block->type) && $block->type === Type::T_DIRECTIVE &&
+                isset($block->name) && $block->name === 'supports')
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
