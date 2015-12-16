@@ -863,7 +863,7 @@ class Compiler
 
         $envs = $this->compactEnv($env);
 
-        $this->env = $this->extractEnv(array_filter($envs, function ($e) {
+        $this->env = $this->extractEnv(array_filter($envs, function (Environment $e) {
             return ! isset($e->block->selectors);
         }));
 
