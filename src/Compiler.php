@@ -697,7 +697,7 @@ class Compiler
             }
 
             if (isset($e->block->type) && $e->block->type === Type::T_AT_ROOT) {
-	        continue;
+                continue;
             }
 
             if ($e->block && $this->isWithout($without, $e->block)) {
