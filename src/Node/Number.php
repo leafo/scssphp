@@ -271,7 +271,6 @@ class Number extends Node implements \ArrayAccess
             return $unitSize;
         });
 
-        // @todo refactor normalize()
         if (count($units) > 1 && array_sum($units) === 0) {
             $dimension = $this->dimension;
             $units     = array();
