@@ -116,13 +116,12 @@ class Server
     /**
      * Determine whether .scss file needs to be re-compiled.
      *
-     * @param string $in   Input path
      * @param string $out  Output path
      * @param string $etag ETag
      *
      * @return boolean True if compile required.
      */
-    protected function needsCompile($in, $out, &$etag)
+    protected function needsCompile($out, &$etag)
     {
         if (! is_file($out)) {
             return true;
@@ -326,7 +325,7 @@ class Server
             $output = $this->cacheName($salt . $input);
             $etag = $noneMatch = trim($this->getIfNoneMatchHeader(), '"');
 
-            if ($this->needsCompile($input, $output, $etag)) {
+            if ($this->needsCompile($output, $etag)) {
                 try {
                     list($css, $etag) = $this->compile($input, $output);
 
@@ -408,7 +407,7 @@ class Server
             throw new ServerException('Invalid or unwritable output file specified.');
         }
 
-        if ($force || $this->needsCompile($in, $out, $etag)) {
+        if ($force || $this->needsCompile($out, $etag)) {
             list($css, $etag) = $this->compile($in, $out);
         } else {
             $css = file_get_contents($out);

@@ -479,7 +479,7 @@ class Compiler
         $found = false;
 
         foreach ($counts as $idx => $count) {
-            list($target, $origin, $block) = $this->extends[$idx];
+            list($target, $origin, /* $block */) = $this->extends[$idx];
 
             // check count
             if ($count !== count($target)) {
@@ -1766,7 +1766,7 @@ class Compiler
      */
     protected function expToString($exp)
     {
-        list(, $op, $left, $right, $inParens, $whiteLeft, $whiteRight) = $exp;
+        list(, $op, $left, $right, /* $inParens */, $whiteLeft, $whiteRight) = $exp;
 
         $content = array($this->reduce($left));
 
