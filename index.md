@@ -121,6 +121,10 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.6.2** -- December 16, 2015
+  * bin/pscss --iso8859-1
+  * add rebeccapurple (from css color draft)
+  * improve utf-8 support
 * **0.6.1** -- December 13, 2015
   * bin/pscss --continue-on-error
   * fix BEM and {% raw %}@{% endraw %}extend infinite loop
