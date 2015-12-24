@@ -285,3 +285,23 @@ $var: ".selector1, .selector2";
 a.important {
   @extend .notice !optional;
 }
+
+$color-base: white;
+
+%pagination-bullet {
+    width: 6px;
+    height: 6px;
+    margin-left: 5px;
+    &:first-child {
+        margin-left: 0;
+    }
+    &.is-active {
+        background-color: $color-base;
+    }
+}
+
+.pagination {
+    &-bullet {
+       @extend %pagination-bullet;
+    }
+}

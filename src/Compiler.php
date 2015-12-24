@@ -521,21 +521,28 @@ class Compiler
      */
     protected function combineSelectorSingle($base, $other)
     {
-        $tag = null;
+        $tag = [];
         $out = [];
+        $wasTag = true;
 
         foreach ([$base, $other] as $single) {
             foreach ($single as $part) {
-                if (preg_match('/^[^\[.#:]/', $part)) {
-                    $tag = $part;
-                } else {
+                if (preg_match('/^[\[.:#]/', $part)) {
                     $out[] = $part;
+                    $wasTag = false;
+                } elseif (preg_match('/^[^_-]/', $part)) {
+                    $tag[] = $part;
+                    $wasTag = true;
+                } elseif ($wasTag) {
+                    $tag[count($tag) - 1] .= $part;
+                } else {
+                    $out[count($out) - 1] .= $part;
                 }
             }
         }
 
-        if ($tag) {
-            array_unshift($out, $tag);
+        if (count($tag)) {
+            array_unshift($out, $tag[0]);
         }
 
         return $out;

@@ -129,3 +129,12 @@ body .to-extend, body .test {
   font-size: 14px; }
   .main .block__element--modifier {
     font-weight: bold; }
+
+.pagination-bullet {
+  width: 6px;
+  height: 6px;
+  margin-left: 5px; }
+  .pagination-bullet:first-child {
+    margin-left: 0; }
+  .pagination-bullet.is-active {
+    background-color: white; }

@@ -201,3 +201,17 @@ body .to-extend, body .test {
 .main .block__element--modifier {
   font-weight: bold; }
 /* line 285, inputs/extends.scss */
+/* line 291, inputs/extends.scss */
+
+.pagination-bullet {
+  width: 6px;
+  height: 6px;
+  margin-left: 5px; }
+/* line 295, inputs/extends.scss */
+.pagination-bullet:first-child {
+  margin-left: 0; }
+/* line 298, inputs/extends.scss */
+.pagination-bullet.is-active {
+  background-color: white; }
+/* line 303, inputs/extends.scss */
+/* line 304, inputs/extends.scss */
