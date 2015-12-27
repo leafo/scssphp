@@ -64,6 +64,8 @@ class Parser
     private $buffer;
     private $utf8;
     private $encoding;
+    private $pattern_modifiers = 'Ais';
+
 
     /**
      * Constructor
@@ -80,6 +82,10 @@ class Parser
         $this->sourceIndex = $sourceIndex;
         $this->charset     = null;
         $this->utf8        = ! $encoding || strtolower($encoding) === 'utf-8';
+
+        if ($this->utf8) {
+            $this->pattern_modifiers = 'Aisu';
+        }
 
         if (empty(self::$operatorPattern)) {
             self::$operatorPattern = '([*\/%+-]|[!=]\=|\>\=?|\<\=\>|\<\=?|and|or)';
@@ -782,7 +788,7 @@ class Parser
             $from = $this->count;
         }
 
-        $r = $this->utf8 ? '/' . $regex . '/Aisu' : '/' . $regex . '/Ais';
+        $r = '/' . $regex . '/'.$this->pattern_modifiers;
         $result = preg_match($r, $this->buffer, $out, null, $from);
 
         return $result;
@@ -862,7 +868,7 @@ class Parser
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-        $r = $this->utf8 ? '/' . $regex . '/Aisu' : '/' . $regex . '/Ais';
+        $r = '/' . $regex . '/'.$this->pattern_modifiers;
 
         if (preg_match($r, $this->buffer, $out, null, $this->count)) {
             $this->count += strlen($out[0]);
@@ -891,23 +897,19 @@ class Parser
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-        // shortcut on single letter
-        if (! isset($what[1]) && isset($this->buffer[$this->count])) {
-            if ($this->buffer[$this->count] === $what) {
-                if (! $eatWhitespace) {
-                    $this->count++;
 
-                    return true;
-                }
-
-                // goes below...
-            } else {
-                return false;
+        $len = strlen($what);
+        if( substr($this->buffer,$this->count,$len) === $what ){
+            $this->count += $len;
+            if ($eatWhitespace) {
+                $this->whitespace();
             }
+            return true;
         }
 
-        return $this->match($this->pregQuote($what), $m, $eatWhitespace);
+        return false;
     }
+
 
     /**
      * Match some whitespace
