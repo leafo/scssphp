@@ -891,18 +891,20 @@ class Parser
     protected function matchChar($char, $eatWhitespace = null)
     {
 
+        if (! isset($this->buffer[$this->count]) || $this->buffer[$this->count] !== $char) {
+            return false;
+        }
+
+        $this->count++;
+
         if (! isset($eatWhitespace)) {
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-        if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] === $char) {
-            $this->count++;
-            if ($eatWhitespace) {
-                $this->whitespace();
-            }
-            return true;
+        if ($eatWhitespace) {
+            $this->whitespace();
         }
-        return false;
+        return true;
     }
 
 
@@ -917,21 +919,21 @@ class Parser
      */
     protected function literal($what, $len, $eatWhitespace = null)
     {
+
+        if (strcasecmp(substr($this->buffer, $this->count, $len), $what) !== 0) {
+            return false;
+        }
+
+        $this->count += $len;
+
         if (! isset($eatWhitespace)) {
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-        if (strcasecmp(substr($this->buffer, $this->count, $len), $what) === 0) {
-            $this->count += $len;
-
-            if ($eatWhitespace) {
-                $this->whitespace();
-            }
-
-            return true;
+        if ($eatWhitespace) {
+            $this->whitespace();
         }
-
-        return false;
+        return true;
     }
 
 
