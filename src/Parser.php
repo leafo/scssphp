@@ -2131,21 +2131,6 @@ class Parser
                 continue;
             }
 
-            // for keyframes
-            if ($this->unit($unit)) {
-                $parts[] = $unit;
-                continue;
-            }
-
-            if ($this->keyword($name)) {
-                $parts[] = $name;
-                continue;
-            }
-
-            if ($this->interpolation($inter)) {
-                $parts[] = $inter;
-                continue;
-            }
 
             if ($char === '%') {
                 $this->count++;
@@ -2156,11 +2141,19 @@ class Parser
                 }
             }
 
+
             if ($char === '#' ) {
+
+				if ($this->interpolation($inter)) {
+					$parts[] = $inter;
+					continue;
+				}
+
                 $parts[] = '#';
                 $this->count++;
                 continue;
             }
+
 
             // a pseudo selector
             if( $char === ':' ){
@@ -2200,7 +2193,20 @@ class Parser
 				}
 			}
 
+
             $this->seek($s);
+
+
+            // for keyframes
+            if ($this->unit($unit)) {
+                $parts[] = $unit;
+                continue;
+            }
+
+            if ($this->keyword($name)) {
+                $parts[] = $name;
+                continue;
+            }
 
             // attribute selector
             if ($this->matchChar('[') &&
