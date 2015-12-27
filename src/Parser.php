@@ -286,7 +286,7 @@ class Parser
             if ($this->literal('@at-root') &&
                 ($this->selectors($selector) || true) &&
                 ($this->map($with) || true) &&
-                $this->literal('{')
+                $this->matchChar('{')
             ) {
                 $atRoot = $this->pushSpecialBlock(Type::T_AT_ROOT, $s);
                 $atRoot->selector = $selector;
@@ -297,7 +297,7 @@ class Parser
 
             $this->seek($s);
 
-            if ($this->literal('@media') && $this->mediaQueryList($mediaQueryList) && $this->literal('{')) {
+            if ($this->literal('@media') && $this->mediaQueryList($mediaQueryList) && $this->matchChar('{')) {
                 $media = $this->pushSpecialBlock(Type::T_MEDIA, $s);
                 $media->queryList = $mediaQueryList[2];
 
@@ -309,7 +309,7 @@ class Parser
             if ($this->literal('@mixin') &&
                 $this->keyword($mixinName) &&
                 ($this->argumentDef($args) || true) &&
-                $this->literal('{')
+                $this->matchChar('{')
             ) {
                 $mixin = $this->pushSpecialBlock(Type::T_MIXIN, $s);
                 $mixin->name = $mixinName;
@@ -322,11 +322,11 @@ class Parser
 
             if ($this->literal('@include') &&
                 $this->keyword($mixinName) &&
-                ($this->literal('(') &&
+                ($this->matchChar('(') &&
                     ($this->argValues($argValues) || true) &&
-                    $this->literal(')') || true) &&
+                    $this->matchChar(')') || true) &&
                 ($this->end() ||
-                    $this->literal('{') && $hasBlock = true)
+                    $this->matchChar('{') && $hasBlock = true)
             ) {
                 $child = [Type::T_INCLUDE, $mixinName, isset($argValues) ? $argValues : null, null];
 
@@ -391,7 +391,7 @@ class Parser
             if ($this->literal('@function') &&
                 $this->keyword($fnName) &&
                 $this->argumentDef($args) &&
-                $this->literal('{')
+                $this->matchChar('{')
             ) {
                 $func = $this->pushSpecialBlock(Type::T_FUNCTION, $s);
                 $func->name = $fnName;
@@ -431,7 +431,7 @@ class Parser
                 $this->genericList($varNames, 'variable', ',', false) &&
                 $this->literal('in') &&
                 $this->valueList($list) &&
-                $this->literal('{')
+                $this->matchChar('{')
             ) {
                 $each = $this->pushSpecialBlock(Type::T_EACH, $s);
 
@@ -448,7 +448,7 @@ class Parser
 
             if ($this->literal('@while') &&
                 $this->expression($cond) &&
-                $this->literal('{')
+                $this->matchChar('{')
             ) {
                 $while = $this->pushSpecialBlock(Type::T_WHILE, $s);
                 $while->cond = $cond;
@@ -465,7 +465,7 @@ class Parser
                 ($this->literal('through') ||
                     ($forUntil = true && $this->literal('to'))) &&
                 $this->expression($end) &&
-                $this->literal('{')
+                $this->matchChar('{')
             ) {
                 $for = $this->pushSpecialBlock(Type::T_FOR, $s);
                 $for->var = $varName[1];
@@ -478,7 +478,7 @@ class Parser
 
             $this->seek($s);
 
-            if ($this->literal('@if') && $this->valueList($cond) && $this->literal('{')) {
+            if ($this->literal('@if') && $this->valueList($cond) && $this->matchChar('{')) {
                 $if = $this->pushSpecialBlock(Type::T_IF, $s);
                 $if->cond = $cond;
                 $if->cases = [];
@@ -535,9 +535,9 @@ class Parser
                 list(, $if) = $last;
 
                 if ($this->literal('@else')) {
-                    if ($this->literal('{')) {
+                    if ($this->matchChar('{')) {
                         $else = $this->pushSpecialBlock(Type::T_ELSE, $s);
-                    } elseif ($this->literal('if') && $this->valueList($cond) && $this->literal('{')) {
+                    } elseif ($this->literal('if') && $this->valueList($cond) && $this->matchChar('{')) {
                         $else = $this->pushSpecialBlock(Type::T_ELSEIF, $s);
                         $else->cond = $cond;
                     }
@@ -576,10 +576,10 @@ class Parser
             $this->seek($s);
 
             // doesn't match built in directive, do generic one
-            if ($this->literal('@', false) &&
+            if ($this->matchChar('@', false) &&
                 $this->keyword($dirName) &&
                 ($this->variable($dirValue) || $this->openString('{', $dirValue) || true) &&
-                $this->literal('{')
+                $this->matchChar('{')
             ) {
                 if ($dirName === 'media') {
                     $directive = $this->pushSpecialBlock(Type::T_MEDIA, $s);
@@ -617,7 +617,7 @@ class Parser
 
         // variable assigns
         if ($this->variable($name) &&
-            $this->literal(':') &&
+            $this->matchChar(':') &&
             $this->valueList($value) &&
             $this->end()
         ) {
@@ -636,7 +636,7 @@ class Parser
         }
 
         // opening css block
-        if ($this->selectors($selectors) && $this->literal('{')) {
+        if ($this->selectors($selectors) && $this->matchChar('{')) {
             $this->pushBlock($selectors, $s);
 
             return true;
@@ -645,7 +645,7 @@ class Parser
         $this->seek($s);
 
         // property assign, or nested assign
-        if ($this->propertyName($name) && $this->literal(':')) {
+        if ($this->propertyName($name) && $this->matchChar(':')) {
             $foundSomething = false;
 
             if ($this->valueList($value)) {
@@ -653,7 +653,7 @@ class Parser
                 $foundSomething = true;
             }
 
-            if ($this->literal('{')) {
+            if ($this->matchChar('{')) {
                 $propBlock = $this->pushSpecialBlock(Type::T_NESTED_PROPERTY, $s);
                 $propBlock->prefix = $name;
                 $foundSomething = true;
@@ -669,7 +669,7 @@ class Parser
         $this->seek($s);
 
         // closing a block
-        if ($this->literal('}')) {
+        if ($this->matchChar('}')) {
             $block = $this->popBlock();
 
             if (isset($block->type) && $block->type === Type::T_INCLUDE) {
@@ -686,7 +686,7 @@ class Parser
         }
 
         // extra stuff
-        if ($this->literal(';') ||
+        if ($this->matchChar(';') ||
             $this->literal('<!--')
         ) {
             return true;
@@ -885,6 +885,33 @@ class Parser
         return false;
     }
 
+
+    /**
+     * Match a single string
+     *
+     * @param string  $char
+     * @param boolean $eatWhitespace
+     *
+     * @return boolean
+     */
+    protected function matchChar($char, $eatWhitespace = null)
+    {
+
+        if (! isset($eatWhitespace)) {
+            $eatWhitespace = $this->eatWhiteDefault;
+        }
+
+        if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] === $char) {
+            $this->count++;
+            if ($eatWhitespace) {
+                $this->whitespace();
+            }
+            return true;
+        }
+        return false;
+    }
+
+
     /**
      * Match literal string
      *
@@ -913,6 +940,7 @@ class Parser
 
         return false;
     }
+
 
     /**
      * Match some whitespace
@@ -1065,10 +1093,10 @@ class Parser
         $s = $this->seek();
         $value = null;
 
-        if ($this->literal('(') &&
+        if ($this->matchChar('(') &&
             $this->expression($feature) &&
-            ($this->literal(':') && $this->expression($value) || true) &&
-            $this->literal(')')
+            ($this->matchChar(':') && $this->expression($value) || true) &&
+            $this->matchChar(')')
         ) {
             $out = [Type::T_MEDIA_EXPRESSION, $feature];
 
@@ -1115,7 +1143,7 @@ class Parser
 
         $keyword = null;
 
-        if (! $this->variable($keyword) || ! $this->literal(':')) {
+        if (! $this->variable($keyword) || ! $this->matchChar(':')) {
             $this->seek($s);
             $keyword = null;
         }
@@ -1211,14 +1239,14 @@ class Parser
     {
         $s = $this->seek();
 
-        if ($this->literal('(')) {
-            if ($this->literal(')')) {
+        if ($this->matchChar('(')) {
+            if ($this->matchChar(')')) {
                 $out = [Type::T_LIST, '', []];
 
                 return true;
             }
 
-            if ($this->valueList($out) && $this->literal(')') && $out[0] === Type::T_LIST) {
+            if ($this->valueList($out) && $this->matchChar(')') && $out[0] === Type::T_LIST) {
                 return true;
             }
 
@@ -1333,7 +1361,7 @@ class Parser
 
         $this->seek($s);
 
-        if ($this->literal('+') && $this->value($inner)) {
+        if ($this->matchChar('+') && $this->value($inner)) {
             $out = [Type::T_UNARY, '+', $inner, $this->inParens];
 
             return true;
@@ -1342,7 +1370,7 @@ class Parser
         $this->seek($s);
 
         // negation
-        if ($this->literal('-', false) &&
+        if ($this->matchChar('-', false) &&
             ($this->variable($inner) ||
             $this->unit($inner) ||
             $this->parenValue($inner))
@@ -1392,8 +1420,8 @@ class Parser
 
         $inParens = $this->inParens;
 
-        if ($this->literal('(')) {
-            if ($this->literal(')')) {
+        if ($this->matchChar('(')) {
+            if ($this->matchChar(')')) {
                 $out = [Type::T_LIST, '', []];
 
                 return true;
@@ -1401,7 +1429,7 @@ class Parser
 
             $this->inParens = true;
 
-            if ($this->expression($exp) && $this->literal(')')) {
+            if ($this->expression($exp) && $this->matchChar(')')) {
                 $out = $exp;
                 $this->inParens = $inParens;
 
@@ -1428,11 +1456,11 @@ class Parser
 
         if ($this->literal('progid:', false) &&
             $this->openString('(', $fn) &&
-            $this->literal('(')
+            $this->matchChar('(')
         ) {
             $this->openString(')', $args, '(');
 
-            if ($this->literal(')')) {
+            if ($this->matchChar(')')) {
                 $out = [Type::T_STRING, '', [
                     'progid:', $fn, '(', $args, ')'
                 ]];
@@ -1458,7 +1486,7 @@ class Parser
         $s = $this->seek();
 
         if ($this->keyword($name, false) &&
-            $this->literal('(')
+            $this->matchChar('(')
         ) {
             if ($name === 'alpha' && $this->argumentList($args)) {
                 $func = [Type::T_FUNCTION, $name, [Type::T_STRING, '', $args]];
@@ -1469,7 +1497,7 @@ class Parser
             if ($name !== 'expression' && ! preg_match('/^(-[a-z]+-)?calc$/', $name)) {
                 $ss = $this->seek();
 
-                if ($this->argValues($args) && $this->literal(')')) {
+                if ($this->argValues($args) && $this->matchChar(')')) {
                     $func = [Type::T_FUNCTION_CALL, $name, $args];
 
                     return true;
@@ -1479,7 +1507,7 @@ class Parser
             }
 
             if (($this->openString(')', $str, '(') || true) &&
-                $this->literal(')')
+                $this->matchChar(')')
             ) {
                 $args = [];
 
@@ -1508,12 +1536,12 @@ class Parser
     protected function argumentList(&$out)
     {
         $s = $this->seek();
-        $this->literal('(');
+        $this->matchChar('(');
 
         $args = [];
 
         while ($this->keyword($var)) {
-            if ($this->literal('=') && $this->expression($exp)) {
+            if ($this->matchChar('=') && $this->expression($exp)) {
                 $args[] = [Type::T_STRING, '', [$var . '=']];
                 $arg = $exp;
             } else {
@@ -1522,14 +1550,14 @@ class Parser
 
             $args[] = $arg;
 
-            if (! $this->literal(',')) {
+            if (! $this->matchChar(',')) {
                 break;
             }
 
             $args[] = [Type::T_STRING, '', [', ']];
         }
 
-        if (! $this->literal(')') || ! count($args)) {
+        if (! $this->matchChar(')') || ! count($args)) {
             $this->seek($s);
 
             return false;
@@ -1550,7 +1578,7 @@ class Parser
     protected function argumentDef(&$out)
     {
         $s = $this->seek();
-        $this->literal('(');
+        $this->matchChar('(');
 
         $args = [];
 
@@ -1559,7 +1587,7 @@ class Parser
 
             $ss = $this->seek();
 
-            if ($this->literal(':') && $this->genericList($defaultVal, 'expression')) {
+            if ($this->matchChar(':') && $this->genericList($defaultVal, 'expression')) {
                 $arg[1] = $defaultVal;
             } else {
                 $this->seek($ss);
@@ -1570,7 +1598,7 @@ class Parser
             if ($this->literal('...')) {
                 $sss = $this->seek();
 
-                if (! $this->literal(')')) {
+                if (! $this->matchChar(')')) {
                     $this->throwParseError('... has to be after the final argument');
                 }
 
@@ -1582,12 +1610,12 @@ class Parser
 
             $args[] = $arg;
 
-            if (! $this->literal(',')) {
+            if (! $this->matchChar(',')) {
                 break;
             }
         }
 
-        if (! $this->literal(')')) {
+        if (! $this->matchChar(')')) {
             $this->seek($s);
 
             return false;
@@ -1609,25 +1637,25 @@ class Parser
     {
         $s = $this->seek();
 
-        if (! $this->literal('(')) {
+        if (! $this->matchChar('(')) {
             return false;
         }
 
         $keys = [];
         $values = [];
 
-        while ($this->genericList($key, 'expression') && $this->literal(':') &&
+        while ($this->genericList($key, 'expression') && $this->matchChar(':') &&
             $this->genericList($value, 'expression')
         ) {
             $keys[] = $key;
             $values[] = $value;
 
-            if (! $this->literal(',')) {
+            if (! $this->matchChar(',')) {
                 break;
             }
         }
 
-        if (! count($keys) || ! $this->literal(')')) {
+        if (! count($keys) || ! $this->matchChar(')')) {
             $this->seek($s);
 
             return false;
@@ -1704,9 +1732,9 @@ class Parser
     {
         $s = $this->seek();
 
-        if ($this->literal('"', false)) {
+        if ($this->matchChar('"', false)) {
             $delim = '"';
-        } elseif ($this->literal("'", false)) {
+        } elseif ($this->matchChar("'", false)) {
             $delim = "'";
         } else {
             return false;
@@ -1733,9 +1761,9 @@ class Parser
                     $content[] = '#{'; // ignore it
                 }
             } elseif ($m[2] === '\\') {
-                if ($this->literal('"', false)) {
+                if ($this->matchChar('"', false)) {
                     $content[] = $m[2] . '"';
-                } elseif ($this->literal("'", false)) {
+                } elseif ($this->matchChar("'", false)) {
                     $content[] = $m[2] . "'";
                 } elseif ($this->literal("\\", false)) {
                     $content[] = $m[2] . "\\";
@@ -1900,7 +1928,7 @@ class Parser
 
         $s = $this->seek();
 
-        if ($this->literal('#{') && $this->valueList($value) && $this->literal('}', false)) {
+        if ($this->literal('#{') && $this->valueList($value) && $this->matchChar('}', false)) {
             if ($lookWhite) {
                 $left = preg_match('/\s/', $this->buffer[$s - 1]) ? ' ' : '';
                 $right = preg_match('/\s/', $this->buffer[$this->count]) ? ' ': '';
@@ -2000,11 +2028,11 @@ class Parser
         while ($this->selector($sel)) {
             $selectors[] = $sel;
 
-            if (! $this->literal(',')) {
+            if (! $this->matchChar(',')) {
                 break;
             }
 
-            while ($this->literal(',')) {
+            while ($this->matchChar(',')) {
                 ; // ignore extra
             }
         }
@@ -2077,7 +2105,7 @@ class Parser
 
         $parts = [];
 
-        if ($this->literal('*', false)) {
+        if ($this->matchChar('*', false)) {
             $parts[] = '*';
         }
 
@@ -2091,17 +2119,17 @@ class Parser
             $s = $this->seek();
 
             // self
-            if ($this->literal('&', false)) {
+            if ($this->matchChar('&', false)) {
                 $parts[] = Compiler::$selfSelector;
                 continue;
             }
 
-            if ($this->literal('.', false)) {
+            if ($this->matchChar('.', false)) {
                 $parts[] = '.';
                 continue;
             }
 
-            if ($this->literal('|', false)) {
+            if ($this->matchChar('|', false)) {
                 $parts[] = '|';
                 continue;
             }
@@ -2127,13 +2155,13 @@ class Parser
                 continue;
             }
 
-            if ($this->literal('%', false) && $this->placeholder($placeholder)) {
+            if ($this->matchChar('%', false) && $this->placeholder($placeholder)) {
                 $parts[] = '%';
                 $parts[] = $placeholder;
                 continue;
             }
 
-            if ($this->literal('#', false)) {
+            if ($this->matchChar('#', false)) {
                 $parts[] = '#';
                 continue;
             }
@@ -2148,9 +2176,9 @@ class Parser
 
                 $ss = $this->seek();
 
-                if ($this->literal('(') &&
+                if ($this->matchChar('(') &&
                     ($this->openString(')', $str, '(') || true) &&
-                    $this->literal(')')
+                    $this->matchChar(')')
                 ) {
                     $parts[] = '(';
 
@@ -2169,9 +2197,9 @@ class Parser
             $this->seek($s);
 
             // attribute selector
-            if ($this->literal('[') &&
+            if ($this->matchChar('[') &&
                ($this->openString(']', $str, '[') || true) &&
-               $this->literal(']')
+               $this->matchChar(']')
             ) {
                 $parts[] = '[';
 
@@ -2211,7 +2239,7 @@ class Parser
     {
         $s = $this->seek();
 
-        if ($this->literal('$', false) && $this->keyword($name)) {
+        if ($this->matchChar('$', false) && $this->keyword($name)) {
             $out = [Type::T_VARIABLE, $name];
 
             return true;
@@ -2295,7 +2323,7 @@ class Parser
      */
     protected function end()
     {
-        if ($this->literal(';')) {
+        if ($this->matchChar(';')) {
             return true;
         }
 
