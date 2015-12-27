@@ -270,7 +270,7 @@ class Parser
      * the buffer position will be left at an invalid state. In order to
      * avoid this, Compiler::seek() is used to remember and set buffer positions.
      *
-     * Before parsing a chain, use $s = $this->seek() to remember the current
+     * Before parsing a chain, use $s = $this->count to remember the current
      * position into $s. Then if a chain fails, use $this->seek($s) to
      * go back where we started.
      *
@@ -278,7 +278,7 @@ class Parser
      */
     protected function parseChunk()
     {
-        $s = $this->seek();
+        $s = $this->count;
 
         // the directives
         if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] === '@') {
@@ -801,15 +801,9 @@ class Parser
      *
      * @return integer
      */
-    protected function seek($where = null)
+    protected function seek($where)
     {
-        if ($where === null) {
-            return $this->count;
-        }
-
         $this->count = $where;
-
-        return true;
     }
 
     /**
@@ -1087,7 +1081,7 @@ class Parser
      */
     protected function mediaExpression(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
         $value = null;
 
         if ($this->matchChar('(') &&
@@ -1136,7 +1130,7 @@ class Parser
      */
     protected function argValue(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
 
         $keyword = null;
 
@@ -1147,7 +1141,7 @@ class Parser
 
         if ($this->genericList($value, 'expression')) {
             $out = [$keyword, $value, false];
-            $s = $this->seek();
+            $s = $this->count;
 
             if ($this->literal('...')) {
                 $out[2] = true;
@@ -1197,7 +1191,7 @@ class Parser
      */
     protected function genericList(&$out, $parseItem, $delim = '', $flatten = true)
     {
-        $s = $this->seek();
+        $s = $this->count;
         $items = [];
 
         while ($this->$parseItem($value)) {
@@ -1234,7 +1228,7 @@ class Parser
      */
     protected function expression(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
 
         if ($this->matchChar('(')) {
             if ($this->matchChar(')')) {
@@ -1277,7 +1271,7 @@ class Parser
     {
         $operators = self::$operatorPattern;
 
-        $ss = $this->seek();
+        $ss = $this->count;
         $whiteBefore = isset($this->buffer[$this->count - 1]) &&
             ctype_space($this->buffer[$this->count - 1]);
 
@@ -1306,7 +1300,7 @@ class Parser
             }
 
             $lhs = [Type::T_EXPRESSION, $op, $lhs, $rhs, $this->inParens, $whiteBefore, $whiteAfter];
-            $ss = $this->seek();
+            $ss = $this->count;
             $whiteBefore = isset($this->buffer[$this->count - 1]) &&
                 ctype_space($this->buffer[$this->count - 1]);
         }
@@ -1325,7 +1319,7 @@ class Parser
      */
     protected function value(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
 
         if ($this->literal('not', false) && $this->whitespace() && $this->value($inner)) {
             $out = [Type::T_UNARY, 'not', $inner, $this->inParens];
@@ -1398,7 +1392,7 @@ class Parser
      */
     protected function parenValue(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
 
         $inParens = $this->inParens;
 
@@ -1434,7 +1428,7 @@ class Parser
      */
     protected function progid(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
 
         if ($this->literal('progid:', false) &&
             $this->openString('(', $fn) &&
@@ -1465,7 +1459,7 @@ class Parser
      */
     protected function func(&$func)
     {
-        $s = $this->seek();
+        $s = $this->count;
 
         if ($this->keyword($name, false) &&
             $this->matchChar('(')
@@ -1477,7 +1471,7 @@ class Parser
             }
 
             if ($name !== 'expression' && ! preg_match('/^(-[a-z]+-)?calc$/', $name)) {
-                $ss = $this->seek();
+                $ss = $this->count;
 
                 if ($this->argValues($args) && $this->matchChar(')')) {
                     $func = [Type::T_FUNCTION_CALL, $name, $args];
@@ -1517,7 +1511,7 @@ class Parser
      */
     protected function argumentList(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
         $this->matchChar('(');
 
         $args = [];
@@ -1559,7 +1553,7 @@ class Parser
      */
     protected function argumentDef(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
         $this->matchChar('(');
 
         $args = [];
@@ -1567,7 +1561,7 @@ class Parser
         while ($this->variable($var)) {
             $arg = [$var[1], null, false];
 
-            $ss = $this->seek();
+            $ss = $this->count;
 
             if ($this->matchChar(':') && $this->genericList($defaultVal, 'expression')) {
                 $arg[1] = $defaultVal;
@@ -1575,10 +1569,10 @@ class Parser
                 $this->seek($ss);
             }
 
-            $ss = $this->seek();
+            $ss = $this->count;
 
             if ($this->literal('...')) {
-                $sss = $this->seek();
+                $sss = $this->count;
 
                 if (! $this->matchChar(')')) {
                     $this->throwParseError('... has to be after the final argument');
@@ -1617,7 +1611,7 @@ class Parser
      */
     protected function map(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
 
         if (! $this->matchChar('(')) {
             return false;
@@ -1712,7 +1706,7 @@ class Parser
      */
     protected function string(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
 
         if ($this->matchChar('"', false)) {
             $delim = '"';
@@ -1904,7 +1898,7 @@ class Parser
         $oldWhite = $this->eatWhiteDefault;
         $this->eatWhiteDefault = true;
 
-        $s = $this->seek();
+        $s = $this->count;
 
         if ($this->literal('#{') && $this->valueList($value) && $this->matchChar('}', false)) {
             if ($lookWhite) {
@@ -2000,7 +1994,7 @@ class Parser
      */
     protected function selectors(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
         $selectors = [];
 
         while ($this->selector($sel)) {
@@ -2098,7 +2092,7 @@ class Parser
 				break;
 			}
 
-            $s = $this->seek();
+            $s = $this->count;
             $char = $this->buffer[$this->count];
 
             //self
@@ -2162,7 +2156,7 @@ class Parser
                     $parts[] = $sub;
                 }
 
-                $ss = $this->seek();
+                $ss = $this->count;
 
                 if ($this->matchChar('(') &&
                     ($this->openString(')', $str, '(') || true) &&
@@ -2225,7 +2219,7 @@ class Parser
      */
     protected function variable(&$out)
     {
-        $s = $this->seek();
+        $s = $this->count;
 
         if ($this->matchChar('$', false) && $this->keyword($name)) {
             $out = [Type::T_VARIABLE, $name];
