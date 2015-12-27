@@ -1413,9 +1413,8 @@ class Compiler
 
         switch ($child[0]) {
             case Type::T_SCSSPHP_IMPORT_ONCE:
-                list(, $rawPath) = $child;
 
-                $rawPath = $this->reduce($rawPath);
+                $rawPath = $this->reduce($child[1]);
 
                 if (! $this->compileImport($rawPath, $out, true)) {
                     $out->lines[] = '@import ' . $this->compileValue($rawPath) . ';';
@@ -1423,9 +1422,8 @@ class Compiler
                 break;
 
             case Type::T_IMPORT:
-                list(, $rawPath) = $child;
 
-                $rawPath = $this->reduce($rawPath);
+                $rawPath = $this->reduce($child[1]);
 
                 if (! $this->compileImport($rawPath, $out)) {
                     $out->lines[] = '@import ' . $this->compileValue($rawPath) . ';';
@@ -1529,9 +1527,8 @@ class Compiler
                 break;
 
             case Type::T_EXTEND:
-                list(, $selectors) = $child;
 
-                foreach ($selectors as $sel) {
+                foreach ($child[1] as $sel) {
                     $results = $this->evalSelectors([$sel]);
 
                     foreach ($results as $result) {
@@ -1835,9 +1832,8 @@ class Compiler
      */
     protected function reduce($value, $inExp = false)
     {
-        list($type) = $value;
 
-        switch ($type) {
+        switch ($value[0]) {
             case Type::T_EXPRESSION:
                 list(, $op, $left, $right, $inParens) = $value;
 
@@ -1970,9 +1966,7 @@ class Compiler
                 return [Type::T_STRING, '', [$op, $exp]];
 
             case Type::T_VARIABLE:
-                list(, $name) = $value;
-
-                return $this->reduce($this->get($name));
+                return $this->reduce($this->get($value[1]));
 
             case Type::T_LIST:
                 foreach ($value[2] as &$item) {
@@ -2007,9 +2001,7 @@ class Compiler
                 return $value;
 
             case Type::T_FUNCTION_CALL:
-                list(, $name, $argValues) = $value;
-
-                return $this->fncall($name, $argValues);
+                return $this->fncall($value[1], $value[2]);
 
             default:
                 return $value;
@@ -2070,9 +2062,8 @@ class Compiler
     public function normalizeValue($value)
     {
         $value = $this->coerceForExpression($this->reduce($value));
-        list($type) = $value;
 
-        switch ($type) {
+        switch ($value[0]) {
             case Type::T_LIST:
                 $value = $this->extractInterpolation($value);
 
@@ -2087,7 +2078,7 @@ class Compiler
                 return $value;
 
             case Type::T_STRING:
-                return [$type, '"', [$this->compileStringContent($value)]];
+                return [$value[0], '"', [$this->compileStringContent($value)]];
 
             case Type::T_NUMBER:
                 return $value->normalize();
@@ -2492,9 +2483,7 @@ class Compiler
     {
         $value = $this->reduce($value);
 
-        list($type) = $value;
-
-        switch ($type) {
+        switch ($value[0]) {
             case Type::T_KEYWORD:
                 return $value[1];
 
@@ -2587,11 +2576,8 @@ class Compiler
                 return $left . $this->compileValue($interpolate) . $right;
 
             case Type::T_INTERPOLATE:
-                // raw parse node
-                list(, $exp) = $value;
-
                 // strip quotes if it's a string
-                $reduced = $this->reduce($exp);
+                $reduced = $this->reduce($value[1]);
 
                 switch ($reduced[0]) {
                     case Type::T_STRING:
@@ -2608,7 +2594,7 @@ class Compiler
                 return 'null';
 
             default:
-                $this->throwError("unknown value type: $type");
+                $this->throwError("unknown value type: $value[0]");
         }
     }
 
