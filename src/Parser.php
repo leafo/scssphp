@@ -2125,7 +2125,7 @@ class Parser
             }
 
 
-            if ($this->match('\\\\\S', $m)) {
+            if ($char === '\\' && $this->match('\\\\\S', $m)) {
                 $parts[] = $m[0];
                 continue;
             }
