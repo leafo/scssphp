@@ -2104,7 +2104,7 @@ class Parser
             $char = $this->buffer[$this->count];
 
             // see if we can stop early
-            if( $char === '{' || $char === ',' ){
+            if( $char === '{' || $char === ',' || $char === ';' || $char === '}' ){
                 break;
 			}
 
@@ -2223,6 +2223,8 @@ class Parser
                 $parts[] = $name;
                 continue;
             }
+
+
 
 
             break;
