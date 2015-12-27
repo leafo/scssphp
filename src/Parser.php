@@ -2094,23 +2094,29 @@ class Parser
                 break;
             }
 
+            if( !isset($this->buffer[$this->count]) ){
+				break;
+			}
+
             $s = $this->seek();
+            $char = $this->buffer[$this->count];
 
-            // self
-            if ($this->matchChar('&', false)) {
-                $parts[] = Compiler::$selfSelector;
-                continue;
-            }
+            //self
+            switch($char){
+				case '&':
+					$parts[] = Compiler::$selfSelector;
+					$this->count++;
+				continue 2;
+				case '.':
+					$parts[] = '.';
+					$this->count++;
+				continue 2;
+				case '|':
+					$parts[] = '|';
+					$this->count++;
+				continue 2;
+			}
 
-            if ($this->matchChar('.', false)) {
-                $parts[] = '.';
-                continue;
-            }
-
-            if ($this->matchChar('|', false)) {
-                $parts[] = '|';
-                continue;
-            }
 
             if ($this->match('\\\\\S', $m)) {
                 $parts[] = $m[0];
@@ -2133,19 +2139,23 @@ class Parser
                 continue;
             }
 
-            if ($this->matchChar('%', false) && $this->placeholder($placeholder)) {
-                $parts[] = '%';
-                $parts[] = $placeholder;
-                continue;
+            if ($char === '%') {
+				$this->count++;
+				if( $this->placeholder($placeholder)) {
+					$parts[] = '%';
+					$parts[] = $placeholder;
+					continue;
+				}
             }
 
-            if ($this->matchChar('#', false)) {
+            if ($char === '#' ) {
                 $parts[] = '#';
+				$this->count++;
                 continue;
             }
 
             // a pseudo selector
-            if ($this->match('::?', $m) && $this->mixedKeyword($nameParts)) {
+            if ($char === ':' && $this->match('::?', $m) && $this->mixedKeyword($nameParts)) {
                 $parts[] = $m[0];
 
                 foreach ($nameParts as $sub) {
