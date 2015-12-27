@@ -2212,19 +2212,9 @@ class Parser
             $this->seek($s);
 
 
-            // for keyframes
-            if ($this->unit($unit)) {
-                $parts[] = $unit;
-                continue;
-            }
-
-            if ($this->keyword($name)) {
-                $parts[] = $name;
-                continue;
-            }
-
             // attribute selector
-            if ($this->matchChar('[') &&
+            if ($char === '[' &&
+              $this->matchChar('[') &&
               ($this->openString(']', $str, '[') || true) &&
               $this->matchChar(']')
             ) {
@@ -2240,6 +2230,19 @@ class Parser
             }
 
             $this->seek($s);
+
+
+            // for keyframes
+            if ($this->unit($unit)) {
+                $parts[] = $unit;
+                continue;
+            }
+
+            if ($this->keyword($name)) {
+                $parts[] = $name;
+                continue;
+            }
+
 
             break;
         }
