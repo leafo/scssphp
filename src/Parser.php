@@ -1322,9 +1322,16 @@ class Parser
      */
     protected function value(&$out)
     {
-        $s = $this->count;
 
-        if( $this->literal('not', 3, false) ){
+        if( !isset($this->buffer[$this->count]) ){
+			return false;
+		}
+
+        $s = $this->count;
+        $char = $this->buffer[$this->count];
+
+		// not
+        if( $char === 'n' && $this->literal('not', 3, false) ){
 
 			if( $this->whitespace() && $this->value($inner)) {
 				$out = [Type::T_UNARY, 'not', $inner, $this->inParens];
@@ -1338,31 +1345,30 @@ class Parser
 				return true;
 			}
 
+			$this->seek($s);
         }
 
-
-        $this->seek($s);
-
-        if ($this->matchChar('+') && $this->value($inner)) {
-            $out = [Type::T_UNARY, '+', $inner, $this->inParens];
-
-            return true;
+		// addition
+        if ( $char === '+' ){
+			$this->count++;
+			if( $this->value($inner)) {
+				$out = [Type::T_UNARY, '+', $inner, $this->inParens];
+				return true;
+			}
+			$this->count--;
         }
 
-        $this->seek($s);
 
         // negation
-        if ($this->matchChar('-', false) &&
-            ($this->variable($inner) ||
-            $this->unit($inner) ||
-            $this->parenValue($inner))
-        ) {
-            $out = [Type::T_UNARY, '-', $inner, $this->inParens];
+        if( $char === '-' ){
+			$this->count++;
+			if( $this->variable($inner) || $this->unit($inner) || $this->parenValue($inner) ){
+				$out = [Type::T_UNARY, '-', $inner, $this->inParens];
+				return true;
+			}
+			$this->count--;
+		}
 
-            return true;
-        }
-
-        $this->seek($s);
 
         if ($this->parenValue($out) ||
             $this->interpolation($out) ||
