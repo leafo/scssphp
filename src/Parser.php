@@ -2181,31 +2181,40 @@ class Parser
             }
 
             // a pseudo selector
-            if ($char === ':' && $this->match('::?', $m) && $this->mixedKeyword($nameParts)) {
-                $parts[] = $m[0];
-
-                foreach ($nameParts as $sub) {
-                    $parts[] = $sub;
+            if ($char === ':') {
+                if ($this->buffer[$this->count + 1] === ':') {
+                    $this->count += 2;
+                    $part = '::';
+                } else {
+                    $this->count++;
+                    $part = ':';
                 }
+                if ($this->mixedKeyword($nameParts)) {
+                    $parts[] = $part;
 
-                $ss = $this->count;
-
-                if ($this->matchChar('(') &&
-                  ($this->openString(')', $str, '(') || true) &&
-                  $this->matchChar(')')
-                ) {
-                    $parts[] = '(';
-
-                    if (! empty($str)) {
-                        $parts[] = $str;
+                    foreach ($nameParts as $sub) {
+                        $parts[] = $sub;
                     }
 
-                    $parts[] = ')';
-                } else {
-                    $this->seek($ss);
-                }
+                    $ss = $this->count;
 
-                continue;
+                    if ($this->matchChar('(') &&
+                      ($this->openString(')', $str, '(') || true) &&
+                      $this->matchChar(')')
+                    ) {
+                        $parts[] = '(';
+
+                        if (! empty($str)) {
+                            $parts[] = $str;
+                        }
+
+                        $parts[] = ')';
+                    } else {
+                        $this->seek($ss);
+                    }
+
+                    continue;
+                }
             }
 
             $this->seek($s);
