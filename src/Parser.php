@@ -2089,27 +2089,27 @@ class Parser
             }
 
             if( !isset($this->buffer[$this->count]) ){
-				break;
-			}
+                break;
+            }
 
             $s = $this->count;
             $char = $this->buffer[$this->count];
 
             //self
             switch($char){
-				case '&':
-					$parts[] = Compiler::$selfSelector;
-					$this->count++;
-				continue 2;
-				case '.':
-					$parts[] = '.';
-					$this->count++;
-				continue 2;
-				case '|':
-					$parts[] = '|';
-					$this->count++;
-				continue 2;
-			}
+                case '&':
+                    $parts[] = Compiler::$selfSelector;
+                    $this->count++;
+                continue 2;
+                case '.':
+                    $parts[] = '.';
+                    $this->count++;
+                continue 2;
+                case '|':
+                    $parts[] = '|';
+                    $this->count++;
+                continue 2;
+            }
 
 
             if ($this->match('\\\\\S', $m)) {
@@ -2134,17 +2134,17 @@ class Parser
             }
 
             if ($char === '%') {
-				$this->count++;
-				if( $this->placeholder($placeholder)) {
-					$parts[] = '%';
-					$parts[] = $placeholder;
-					continue;
-				}
+                $this->count++;
+                if( $this->placeholder($placeholder)) {
+                    $parts[] = '%';
+                    $parts[] = $placeholder;
+                    continue;
+                }
             }
 
             if ($char === '#' ) {
                 $parts[] = '#';
-				$this->count++;
+                $this->count++;
                 continue;
             }
 
