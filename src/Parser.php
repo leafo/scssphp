@@ -1340,19 +1340,20 @@ class Parser
 
         $this->seek($s);
 
-        if ($this->literal('not', 3, false) && $this->whitespace() && $this->value($inner)) {
-            $out = [Type::T_UNARY, 'not', $inner, $this->inParens];
+        if ($this->literal('not', 3, false)) {
+            if ($this->whitespace() && $this->value($inner)) {
+                $out = [Type::T_UNARY, 'not', $inner, $this->inParens];
+                return true;
+            }
 
-            return true;
+            $this->seek($s);
+
+            if ($this->parenValue($inner)) {
+                $out = [Type::T_UNARY, 'not', $inner, $this->inParens];
+                return true;
+            }
         }
 
-        $this->seek($s);
-
-        if ($this->literal('not', 3, false) && $this->parenValue($inner)) {
-            $out = [Type::T_UNARY, 'not', $inner, $this->inParens];
-
-            return true;
-        }
 
         $this->seek($s);
 
