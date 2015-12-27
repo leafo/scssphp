@@ -858,23 +858,24 @@ class Parser
      */
     protected function match($regex, &$out, $eatWhitespace = null)
     {
+
+        $r = '/' . $regex . '/'.$this->pattern_modifiers;
+
+        if (!preg_match($r, $this->buffer, $out, null, $this->count)) {
+			return false;
+		}
+
+		$this->count += strlen($out[0]);
+
         if (! isset($eatWhitespace)) {
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-        $r = '/' . $regex . '/'.$this->pattern_modifiers;
+		if ($eatWhitespace) {
+			$this->whitespace();
+		}
 
-        if (preg_match($r, $this->buffer, $out, null, $this->count)) {
-            $this->count += strlen($out[0]);
-
-            if ($eatWhitespace) {
-                $this->whitespace();
-            }
-
-            return true;
-        }
-
-        return false;
+		return true;
     }
 
 
