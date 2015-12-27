@@ -2114,18 +2114,18 @@ class Parser
         }
 
         for (;;) {
-            // see if we can stop early
-            if ($this->match('\s*[{,]', $m)) {
-                $this->count--;
-                break;
-            }
-
             if (! isset($this->buffer[$this->count])) {
                 break;
             }
 
             $s = $this->count;
             $char = $this->buffer[$this->count];
+
+            // see if we can stop early
+            if ($char === '{' || $char === ',') {
+                break;
+            }
+
 
             //self
             switch ($char) {
