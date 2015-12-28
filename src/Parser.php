@@ -1387,16 +1387,27 @@ class Parser
 			return true;
 		}
 
+		if( $char === 'p' && $this->progid($out) ){
+			return true;
+		}
 
-        if ( $this->unit($out) ||
-            $this->string($out) ||
-            $this->func($out) ||
-            $this->progid($out)
-        ) {
+		if( ($char === '"' || $char === "'") && $this->string($out) ){
+			return true;
+		}
+
+
+        if ( $this->unit($out) ) {
             return true;
         }
 
-        if ($this->keyword($keyword)) {
+        if ($this->keyword($keyword, false)) {
+
+			if( $this->func($keyword, $out) ){
+				return true;
+			}
+
+			$this->whitespace();
+
             if ($keyword === 'null') {
                 $out = [Type::T_NULL];
             } else {
@@ -1479,17 +1490,17 @@ class Parser
     /**
      * Parse function call
      *
+     * @param string $name
      * @param array $out
      *
      * @return boolean
      */
-    protected function func(&$func)
+    protected function func($name, &$func)
     {
         $s = $this->count;
 
-        if ($this->keyword($name, false) &&
-            $this->matchChar('(')
-        ) {
+        if ( $this->matchChar('(') ) {
+
             if ($name === 'alpha' && $this->argumentList($args)) {
                 $func = [Type::T_FUNCTION, $name, [Type::T_STRING, '', $args]];
 
