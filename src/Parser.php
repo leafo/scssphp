@@ -327,33 +327,22 @@ class Parser
             return true;
         }
 
-
-
-        // property shortcut
-        // captures most properties before having to parse a selector
-        if ($this->keyword($name, false) &&
-            $this->literal(': ',2) &&
-            $this->valueList($value) &&
-            $this->end()
-        ) {
-            $name = [Type::T_STRING, '', [$name]];
-            $this->append([Type::T_ASSIGN, $name, $value], $s);
-
+        // variable assigns
+        if ( $char === '$' && $this->variable($name) && $this->matchChar(':') && $this->valueList($value) && $this->end() ) {
+            // check for '!flag'
+            $assignmentFlag = $this->stripAssignmentFlag($value);
+            $this->append([Type::T_ASSIGN, $name, $value, $assignmentFlag], $s);
             return true;
         }
 
         $this->seek($s);
 
-        // variable assigns
-        if ($this->variable($name) &&
-            $this->matchChar(':') &&
-            $this->valueList($value) &&
-            $this->end()
-        ) {
-            // check for '!flag'
-            $assignmentFlag = $this->stripAssignmentFlag($value);
-            $this->append([Type::T_ASSIGN, $name, $value, $assignmentFlag], $s);
 
+        // property shortcut
+        // captures most properties before having to parse a selector
+        if ($this->keyword($name, false) && $this->literal(': ',2) && $this->valueList($value) && $this->end() ) {
+            $name = [Type::T_STRING, '', [$name]];
+            $this->append([Type::T_ASSIGN, $name, $value], $s);
             return true;
         }
 
@@ -362,7 +351,6 @@ class Parser
         // opening css block
         if ($this->selectors($selectors) && $this->matchChar('{')) {
             $this->pushBlock($selectors, $s);
-
             return true;
         }
 
@@ -2090,8 +2078,23 @@ class Parser
         $selector = [];
 
         for (;;) {
-            if ($this->match('[>+~]+', $m)) {
-                $selector[] = [$m[0]];
+
+			if( !isset($this->buffer[$this->count]) ){
+				break;
+			}
+
+			$char = $this->buffer[$this->count];
+            if( $char === '>' && $this->buffer[$this->count+1] === '>' ){
+                $selector[] = ['>>'];
+                $this->count += 2;
+                $this->whitespace();
+                continue;
+            }
+
+			if( $char === '>' || $char === '+' || $char === '~' ){
+                $selector[] = [$char];
+                $this->count++;
+                $this->whitespace();
                 continue;
             }
 
@@ -2101,7 +2104,7 @@ class Parser
                 continue;
             }
 
-            if ($this->match('\/[^\/]+\/', $m)) {
+            if ($char === '/' && $this->match('\/[^\/]+\/', $m)) {
                 $selector[] = [$m[0]];
                 continue;
             }
