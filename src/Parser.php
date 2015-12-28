@@ -278,11 +278,54 @@ class Parser
      */
     protected function parseChunk()
     {
-        if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] === '@') {
-			return $this->parseDirective();
+		if( !isset($this->buffer[$this->count]) ){
+			return false;
 		}
 
         $s = $this->count;
+        $char = $this->buffer[$this->count];
+
+		//directives
+        if( $char === '@') {
+			return $this->parseDirective();
+		}
+
+
+        // misc
+        if ( $char === '-' && $this->literal('-->',3)) {
+            return true;
+        }
+
+        if ( $char === '<' && $this->literal('<!--',4) ) {
+            return true;
+		}
+
+        // extra stuff
+        if ( $char === ';' ) {
+			$this->count++;
+			$this->whitespace();
+			return true;
+        }
+
+
+        // closing a block
+        if ($char === '}') {
+            $this->count++;
+            $this->whitespace();
+            $block = $this->popBlock();
+
+            if (isset($block->type) && $block->type === Type::T_INCLUDE) {
+                $include = $block->child;
+                unset($block->child);
+                $include[3] = $block;
+                $this->append($include, $s);
+            } elseif (empty($block->dontAppend)) {
+                $type = isset($block->type) ? $block->type : Type::T_BLOCK;
+                $this->append([$type, $block], $s);
+            }
+
+            return true;
+        }
 
 
 
@@ -316,11 +359,6 @@ class Parser
 
         $this->seek($s);
 
-        // misc
-        if ($this->literal('-->',3)) {
-            return true;
-        }
-
         // opening css block
         if ($this->selectors($selectors) && $this->matchChar('{')) {
             $this->pushBlock($selectors, $s);
@@ -353,30 +391,6 @@ class Parser
         }
 
         $this->seek($s);
-
-        // closing a block
-        if ($this->matchChar('}')) {
-            $block = $this->popBlock();
-
-            if (isset($block->type) && $block->type === Type::T_INCLUDE) {
-                $include = $block->child;
-                unset($block->child);
-                $include[3] = $block;
-                $this->append($include, $s);
-            } elseif (empty($block->dontAppend)) {
-                $type = isset($block->type) ? $block->type : Type::T_BLOCK;
-                $this->append([$type, $block], $s);
-            }
-
-            return true;
-        }
-
-        // extra stuff
-        if ($this->matchChar(';') ||
-            $this->literal('<!--',4)
-        ) {
-            return true;
-        }
 
         return false;
     }
