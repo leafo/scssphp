@@ -1357,6 +1357,7 @@ class Parser
 				return true;
 			}
 			$this->count--;
+			return false;
         }
 
 
@@ -1370,12 +1371,24 @@ class Parser
 			$this->count--;
 		}
 
+		// paren
+		if( $char === '(' && $this->parenValue($out) ){
+			return true;
+		}
 
-        if ($this->parenValue($out) ||
-            $this->interpolation($out) ||
-            $this->variable($out) ||
-            $this->color($out) ||
-            $this->unit($out) ||
+		if( $char === '#' ){
+
+			if( $this->interpolation($out) || $this->color($out) ){
+				return true;
+			}
+		}
+
+		if( $char === '$' && $this->variable($out) ){
+			return true;
+		}
+
+
+        if ( $this->unit($out) ||
             $this->string($out) ||
             $this->func($out) ||
             $this->progid($out)
