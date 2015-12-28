@@ -50,8 +50,8 @@ class Parser
     ];
 
     protected static $commentPattern;
+    protected static $mCommentPattern;
     protected static $operatorPattern;
-    protected static $whitePattern;
 
     private $sourceName;
     private $sourceIndex;
@@ -95,9 +95,7 @@ class Parser
             $commentMultiRight  = '\*\/';
 
             self::$commentPattern = $commentMultiLeft . '.*?' . $commentMultiRight;
-            self::$whitePattern = $this->utf8
-                ? '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentPattern . ')\s*|\s+/AisuS'
-                : '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentPattern . ')\s*|\s+/AisS';
+            self::$mCommentPattern = '/'.self::$commentPattern.'/'.$this->pattern_modifiers.'S';
         }
     }
 
@@ -974,7 +972,7 @@ class Parser
 				}
 
 
-				if( $char2 === '*' && preg_match('/'.self::$commentPattern.'/'.$this->pattern_modifiers.'S', $this->buffer, $m, null, $this->count) ){
+				if( $char2 === '*' && preg_match(self::$mCommentPattern, $this->buffer, $m, null, $this->count) ){
 					$this->appendComment($this->count,[Type::T_COMMENT, $m[0]]);
 					$this->count += strlen($m[0]);
 					$gotWhite = true;
@@ -2038,13 +2036,7 @@ class Parser
         }
 
         // match comment hack
-        if (preg_match(
-            self::$whitePattern,
-            $this->buffer,
-            $m,
-            null,
-            $this->count
-        )) {
+        if( preg_match(self::$mCommentPattern,$this->buffer, $m, null, $this->count) ){
             if (! empty($m[0])) {
                 $parts[] = $m[0];
                 $this->count += strlen($m[0]);
