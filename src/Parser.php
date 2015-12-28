@@ -278,326 +278,13 @@ class Parser
      */
     protected function parseChunk()
     {
+        if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] === '@') {
+			return $this->parseDirective();
+		}
+
         $s = $this->count;
 
-        // the directives
-        if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] === '@') {
-            if ($this->literal('@at-root',8) &&
-                ($this->selectors($selector) || true) &&
-                ($this->map($with) || true) &&
-                $this->matchChar('{')
-            ) {
-                $atRoot = $this->pushSpecialBlock(Type::T_AT_ROOT, $s);
-                $atRoot->selector = $selector;
-                $atRoot->with = $with;
 
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@media',6) && $this->mediaQueryList($mediaQueryList) && $this->matchChar('{')) {
-                $media = $this->pushSpecialBlock(Type::T_MEDIA, $s);
-                $media->queryList = $mediaQueryList[2];
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@mixin',6) &&
-                $this->keyword($mixinName) &&
-                ($this->argumentDef($args) || true) &&
-                $this->matchChar('{')
-            ) {
-                $mixin = $this->pushSpecialBlock(Type::T_MIXIN, $s);
-                $mixin->name = $mixinName;
-                $mixin->args = $args;
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@include',8) &&
-                $this->keyword($mixinName) &&
-                ($this->matchChar('(') &&
-                    ($this->argValues($argValues) || true) &&
-                    $this->matchChar(')') || true) &&
-                ($this->end() ||
-                    $this->matchChar('{') && $hasBlock = true)
-            ) {
-                $child = [Type::T_INCLUDE, $mixinName, isset($argValues) ? $argValues : null, null];
-
-                if (! empty($hasBlock)) {
-                    $include = $this->pushSpecialBlock(Type::T_INCLUDE, $s);
-                    $include->child = $child;
-                } else {
-                    $this->append($child, $s);
-                }
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@scssphp-import-once',20) &&
-                $this->valueList($importPath) &&
-                $this->end()
-            ) {
-                $this->append([Type::T_SCSSPHP_IMPORT_ONCE, $importPath], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@import',7) &&
-                $this->valueList($importPath) &&
-                $this->end()
-            ) {
-                $this->append([Type::T_IMPORT, $importPath], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@import',7) &&
-                $this->url($importPath) &&
-                $this->end()
-            ) {
-                $this->append([Type::T_IMPORT, $importPath], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@extend',7) &&
-                $this->selectors($selectors) &&
-                $this->end()
-            ) {
-                // check for '!flag'
-                $optional = $this->stripOptionalFlag($selectors);
-                $this->append([Type::T_EXTEND, $selectors, $optional], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@function',9) &&
-                $this->keyword($fnName) &&
-                $this->argumentDef($args) &&
-                $this->matchChar('{')
-            ) {
-                $func = $this->pushSpecialBlock(Type::T_FUNCTION, $s);
-                $func->name = $fnName;
-                $func->args = $args;
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@break',6) && $this->end()) {
-                $this->append([Type::T_BREAK], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@continue',9) && $this->end()) {
-                $this->append([Type::T_CONTINUE], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-
-            if ($this->literal('@return',7) && ($this->valueList($retVal) || true) && $this->end()) {
-                $this->append([Type::T_RETURN, isset($retVal) ? $retVal : [Type::T_NULL]], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@each',5) &&
-                $this->genericList($varNames, 'variable', ',', false) &&
-                $this->literal('in',2) &&
-                $this->valueList($list) &&
-                $this->matchChar('{')
-            ) {
-                $each = $this->pushSpecialBlock(Type::T_EACH, $s);
-
-                foreach ($varNames[2] as $varName) {
-                    $each->vars[] = $varName[1];
-                }
-
-                $each->list = $list;
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@while',6) &&
-                $this->expression($cond) &&
-                $this->matchChar('{')
-            ) {
-                $while = $this->pushSpecialBlock(Type::T_WHILE, $s);
-                $while->cond = $cond;
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@for',4) &&
-                $this->variable($varName) &&
-                $this->literal('from',4) &&
-                $this->expression($start) &&
-                ($this->literal('through',7) ||
-                    ($forUntil = true && $this->literal('to',2))) &&
-                $this->expression($end) &&
-                $this->matchChar('{')
-            ) {
-                $for = $this->pushSpecialBlock(Type::T_FOR, $s);
-                $for->var = $varName[1];
-                $for->start = $start;
-                $for->end = $end;
-                $for->until = isset($forUntil);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@if',3) && $this->valueList($cond) && $this->matchChar('{')) {
-                $if = $this->pushSpecialBlock(Type::T_IF, $s);
-                $if->cond = $cond;
-                $if->cases = [];
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@debug',6) &&
-                $this->valueList($value) &&
-                $this->end()
-            ) {
-                $this->append([Type::T_DEBUG, $value], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@warn',5) &&
-                $this->valueList($value) &&
-                $this->end()
-            ) {
-                $this->append([Type::T_WARN, $value], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@error',6) &&
-                $this->valueList($value) &&
-                $this->end()
-            ) {
-                $this->append([Type::T_ERROR, $value], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->literal('@content',8) && $this->end()) {
-                $this->append([Type::T_MIXIN_CONTENT], $s);
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            $last = $this->last();
-
-            if (isset($last) && $last[0] === Type::T_IF) {
-                list(, $if) = $last;
-
-                if ($this->literal('@else',5)) {
-                    if ($this->matchChar('{')) {
-                        $else = $this->pushSpecialBlock(Type::T_ELSE, $s);
-                    } elseif ($this->literal('if',2) && $this->valueList($cond) && $this->matchChar('{')) {
-                        $else = $this->pushSpecialBlock(Type::T_ELSEIF, $s);
-                        $else->cond = $cond;
-                    }
-
-                    if (isset($else)) {
-                        $else->dontAppend = true;
-                        $if->cases[] = $else;
-
-                        return true;
-                    }
-                }
-
-                $this->seek($s);
-            }
-
-            // only retain the first @charset directive encountered
-            if ($this->literal('@charset',8) &&
-                $this->valueList($charset) &&
-                $this->end()
-            ) {
-                if (! isset($this->charset)) {
-                    $statement = [Type::T_CHARSET, $charset];
-
-                    list($line, $column) = $this->getSourcePosition($s);
-
-                    $statement[self::SOURCE_LINE]   = $line;
-                    $statement[self::SOURCE_COLUMN] = $column;
-                    $statement[self::SOURCE_INDEX]  = $this->sourceIndex;
-
-                    $this->charset = $statement;
-                }
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            // doesn't match built in directive, do generic one
-            if ($this->matchChar('@', false) &&
-                $this->keyword($dirName) &&
-                ($this->variable($dirValue) || $this->openString('{', $dirValue) || true) &&
-                $this->matchChar('{')
-            ) {
-                if ($dirName === 'media') {
-                    $directive = $this->pushSpecialBlock(Type::T_MEDIA, $s);
-                } else {
-                    $directive = $this->pushSpecialBlock(Type::T_DIRECTIVE, $s);
-                    $directive->name = $dirName;
-                }
-
-                if (isset($dirValue)) {
-                    $directive->value = $dirValue;
-                }
-
-                return true;
-            }
-
-            $this->seek($s);
-
-            return false;
-        }
 
         // property shortcut
         // captures most properties before having to parse a selector
@@ -693,6 +380,326 @@ class Parser
 
         return false;
     }
+
+    /**
+     * Parse Directive
+     *
+     */
+    protected function parseDirective(){
+
+		$s = $this->count;
+
+		//get directive name
+		$pattern = '@[a-zA-Z\-]+';
+		$this->match($pattern, $directive);
+		$directive = strtolower($directive[0]);
+		$ss = $this->count;
+
+
+		// @at-root
+		if ($directive === '@at-root' && ($this->selectors($selector) || true) && ($this->map($with) || true) &&	$this->matchChar('{')) {
+			$atRoot = $this->pushSpecialBlock(Type::T_AT_ROOT, $s);
+			$atRoot->selector = $selector;
+			$atRoot->with = $with;
+
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @media
+		if ($directive === '@media' && $this->mediaQueryList($mediaQueryList) && $this->matchChar('{')) {
+			$media = $this->pushSpecialBlock(Type::T_MEDIA, $s);
+			$media->queryList = $mediaQueryList[2];
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @mixin
+		if ($directive === '@mixin' && $this->keyword($mixinName) && ($this->argumentDef($args) || true) &&	$this->matchChar('{')) {
+			$mixin = $this->pushSpecialBlock(Type::T_MIXIN, $s);
+			$mixin->name = $mixinName;
+			$mixin->args = $args;
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @include
+		if ( $directive === '@include' &&
+			$this->keyword($mixinName) &&
+			($this->matchChar('(') &&
+				($this->argValues($argValues) || true) &&
+				$this->matchChar(')') || true) &&
+			($this->end() ||
+				$this->matchChar('{') && $hasBlock = true)
+		) {
+			$child = [Type::T_INCLUDE, $mixinName, isset($argValues) ? $argValues : null, null];
+
+			if (! empty($hasBlock)) {
+				$include = $this->pushSpecialBlock(Type::T_INCLUDE, $s);
+				$include->child = $child;
+			} else {
+				$this->append($child, $s);
+			}
+
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @scssphp-import-once
+		if ($directive === '@scssphp-import-once' && $this->valueList($importPath) && $this->end()) {
+			$this->append([Type::T_SCSSPHP_IMPORT_ONCE, $importPath], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @import
+		if ($directive === '@import' && $this->valueList($importPath) && $this->end()) {
+			$this->append([Type::T_IMPORT, $importPath], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @import
+		if ($directive === '@import' && $this->url($importPath) && $this->end()) {
+			$this->append([Type::T_IMPORT, $importPath], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @extend
+		if ($directive === '@extend' && $this->selectors($selectors) && $this->end()) {
+			// check for '!flag'
+			$optional = $this->stripOptionalFlag($selectors);
+			$this->append([Type::T_EXTEND, $selectors, $optional], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @function
+		if ($directive === '@function' && $this->keyword($fnName) && $this->argumentDef($args) && $this->matchChar('{')) {
+			$func = $this->pushSpecialBlock(Type::T_FUNCTION, $s);
+			$func->name = $fnName;
+			$func->args = $args;
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @break
+		if ($directive === '@break' && $this->end()) {
+			$this->append([Type::T_BREAK], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+		// @continue
+		if ($directive === '@continue' && $this->end()) {
+			$this->append([Type::T_CONTINUE], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @return
+		if ($directive === '@return' && ($this->valueList($retVal) || true) && $this->end()) {
+			$this->append([Type::T_RETURN, isset($retVal) ? $retVal : [Type::T_NULL]], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @each
+		if ($directive === '@each' &&
+			$this->genericList($varNames, 'variable', ',', false) &&
+			$this->literal('in',2) &&
+			$this->valueList($list) &&
+			$this->matchChar('{')
+		) {
+			$each = $this->pushSpecialBlock(Type::T_EACH, $s);
+
+			foreach ($varNames[2] as $varName) {
+				$each->vars[] = $varName[1];
+			}
+
+			$each->list = $list;
+
+			return true;
+		}
+
+		$this->seek($ss);
+
+		// @while
+		if ($directive === '@while' && $this->expression($cond) && $this->matchChar('{')) {
+			$while = $this->pushSpecialBlock(Type::T_WHILE, $s);
+			$while->cond = $cond;
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @for
+		if ($directive === '@for' &&
+			$this->variable($varName) &&
+			$this->literal('from',4) &&
+			$this->expression($start) &&
+			($this->literal('through',7) ||
+				($forUntil = true && $this->literal('to',2))) &&
+			$this->expression($end) &&
+			$this->matchChar('{')
+		) {
+			$for = $this->pushSpecialBlock(Type::T_FOR, $s);
+			$for->var = $varName[1];
+			$for->start = $start;
+			$for->end = $end;
+			$for->until = isset($forUntil);
+
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+
+		// @if
+		if ($directive === '@if' && $this->valueList($cond) && $this->matchChar('{')) {
+			$if = $this->pushSpecialBlock(Type::T_IF, $s);
+			$if->cond = $cond;
+			$if->cases = [];
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @debug
+		if ($directive === '@debug' && $this->valueList($value) && $this->end() ) {
+			$this->append([Type::T_DEBUG, $value], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @warn
+		if ($directive === '@warn' && $this->valueList($value) && $this->end()) {
+			$this->append([Type::T_WARN, $value], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @error
+		if ( $directive === '@error' && $this->valueList($value) && $this->end()) {
+			$this->append([Type::T_ERROR, $value], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+		// @content
+		if ( $directive === '@content' && $this->end()) {
+			$this->append([Type::T_MIXIN_CONTENT], $s);
+			return true;
+		}
+
+		$this->seek($ss);
+
+
+
+		// @else, @elseif, @else if
+		$last = $this->last();
+		if (isset($last) && $last[0] === Type::T_IF) {
+			list(, $if) = $last;
+
+			if( $directive === '@else' && $this->matchChar('{') ){
+				$else = $this->pushSpecialBlock(Type::T_ELSE, $s);
+
+			}elseif( ($directive === '@elseif' || $this->literal('if',2))
+				&& $this->valueList($cond)
+				&& $this->matchChar('{')) {
+					$else = $this->pushSpecialBlock(Type::T_ELSEIF, $s);
+					$else->cond = $cond;
+			}
+
+			if (isset($else)) {
+				$else->dontAppend = true;
+				$if->cases[] = $else;
+
+				return true;
+			}
+
+			$this->seek($ss);
+		}
+
+
+		// only retain the first @charset directive encountered
+		if ( $directive == '@charset' && $this->valueList($charset) && $this->end()	) {
+			if (! isset($this->charset)) {
+				$statement = [Type::T_CHARSET, $charset];
+
+				list($line, $column) = $this->getSourcePosition($s);
+
+				$statement[self::SOURCE_LINE]   = $line;
+				$statement[self::SOURCE_COLUMN] = $column;
+				$statement[self::SOURCE_INDEX]  = $this->sourceIndex;
+
+				$this->charset = $statement;
+			}
+
+			return true;
+		}
+
+
+		$this->seek($s);
+
+		// doesn't match built in directive, do generic one
+		if ($this->matchChar('@', false) &&
+			$this->keyword($dirName) &&
+			($this->variable($dirValue) || $this->openString('{', $dirValue) || true) &&
+			$this->matchChar('{')
+		) {
+			if ($dirName === 'media') {
+				$directive = $this->pushSpecialBlock(Type::T_MEDIA, $s);
+			} else {
+				$directive = $this->pushSpecialBlock(Type::T_DIRECTIVE, $s);
+				$directive->name = $dirName;
+			}
+
+			if (isset($dirValue)) {
+				$directive->value = $dirValue;
+			}
+
+			return true;
+		}
+
+		$this->seek($s);
+
+		return false;
+
+	}
 
     /**
      * Push block onto parse tree
