@@ -955,16 +955,43 @@ class Parser
     {
         $gotWhite = false;
 
-        while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
-            if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
-                $this->appendComment([Type::T_COMMENT, $m[1]]);
+        for(;;){
+			if( !isset($this->buffer[$this->count]) ){
+				break;
+			}
+			$char = $this->buffer[$this->count];
 
-                $this->commentsSeen[$this->count] = true;
-            }
 
-            $this->count += strlen($m[0]);
-            $gotWhite = true;
-        }
+			//comment
+			if( $char === '/' ){
+				$char2 = $this->buffer[$this->count+1];
+
+
+				if( $char2 === '/' && preg_match('/\/\/.*/', $this->buffer, $m, null, $this->count) ){
+					$this->count += strlen($m[0]);
+					$gotWhite = true;
+					continue;
+				}
+
+
+				if( $char2 === '*' && preg_match('/'.self::$commentPattern.'/'.$this->pattern_modifiers.'S', $this->buffer, $m, null, $this->count) ){
+					$this->appendComment($this->count,[Type::T_COMMENT, $m[0]]);
+					$this->count += strlen($m[0]);
+					$gotWhite = true;
+					continue;
+				}
+
+				break;
+			}
+
+
+			if( ($char !== "\n") && ($char !== "\r") && ($char !== "\t") && ($char !== ' ') ){
+				break;
+			}
+			$this->count++;
+			$gotWhite = true;
+		}
+
 
         return $gotWhite;
     }
@@ -974,11 +1001,11 @@ class Parser
      *
      * @param array $comment
      */
-    protected function appendComment($comment)
+    protected function appendComment($position, $comment)
     {
         $comment[1] = substr(preg_replace(['/^\s+/m', '/^(.)/m'], ['', ' \1'], $comment[1]), 1);
 
-        $this->env->comments[] = $comment;
+        $this->env->comments[$position] = $comment;
     }
 
     /**
