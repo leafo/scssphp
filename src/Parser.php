@@ -767,7 +767,7 @@ class Parser
         unset($block->parent);
 
         $comments = $block->comments;
-        if (count($comments)) {
+        if ($comments) {
             $this->env->comments = $comments;
             unset($block->comments);
         }
@@ -993,7 +993,7 @@ class Parser
 
         $comments = $this->env->comments;
 
-        if (count($comments)) {
+        if ($comments) {
             $this->env->children = array_merge($this->env->children, $comments);
             $this->env->comments = [];
         }
@@ -1209,7 +1209,7 @@ class Parser
             }
         }
 
-        if (count($items) === 0) {
+        if (!$items) {
             $this->seek($s);
 
             return false;
@@ -1573,7 +1573,7 @@ class Parser
             $args[] = [Type::T_STRING, '', [', ']];
         }
 
-        if (! $this->matchChar(')') || ! count($args)) {
+        if (! $this->matchChar(')') || !$args) {
             $this->seek($s);
 
             return false;
@@ -1671,7 +1671,7 @@ class Parser
             }
         }
 
-        if (! count($keys) || ! $this->matchChar(')')) {
+        if (!$keys || ! $this->matchChar(')')) {
             $this->seek($s);
 
             return false;
@@ -1849,7 +1849,7 @@ class Parser
 
         $this->eatWhiteDefault = $oldWhite;
 
-        if (count($parts) === 0) {
+        if (!$parts) {
             return false;
         }
 
@@ -1915,7 +1915,7 @@ class Parser
 
         $this->eatWhiteDefault = $oldWhite;
 
-        if (count($content) === 0) {
+        if (!$content) {
             return false;
         }
 
@@ -1993,7 +1993,7 @@ class Parser
                 continue;
             }
 
-            if (count($parts) === 0 && $this->match('[:.#]', $m, false)) {
+            if (!$parts && $this->match('[:.#]', $m, false)) {
                 // css hacks
                 $parts[] = $m[0];
                 continue;
@@ -2004,7 +2004,7 @@ class Parser
 
         $this->eatWhiteDefault = $oldWhite;
 
-        if (count($parts) === 0) {
+        if (!$parts) {
             return false;
         }
 
@@ -2053,7 +2053,7 @@ class Parser
             }
         }
 
-        if (count($selectors) === 0) {
+        if (!$selectors) {
             $this->seek($s);
 
             return false;
@@ -2095,7 +2095,7 @@ class Parser
             break;
         }
 
-        if (count($selector) === 0) {
+        if (!$selector) {
             return false;
         }
 
@@ -2264,7 +2264,7 @@ class Parser
 
         $this->eatWhiteDefault = $oldWhite;
 
-        if (count($parts) === 0) {
+        if (!$parts) {
             return false;
         }
 
