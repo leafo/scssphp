@@ -1870,13 +1870,9 @@ class Compiler
                 // 3. op[op name]
                 $fn = "op${ucOpName}${ucLType}${ucRType}";
 
-                if (is_callable([$this, $fn]) ||
-                    (($fn = "op${ucLType}${ucRType}") &&
-                        is_callable([$this, $fn]) &&
-                        $passOp = true) ||
-                    (($fn = "op${ucOpName}") &&
-                        is_callable([$this, $fn]) &&
-                        $genOp = true)
+                if (is_callable([$this, $fn])
+                    || (($fn = "op${ucLType}${ucRType}") && is_callable([$this, $fn]) && $passOp = true)
+                    || (($fn = "op${ucOpName}") && is_callable([$this, $fn]) && $genOp = true)
                 ) {
                     $coerceUnit = false;
 
