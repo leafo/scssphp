@@ -64,8 +64,7 @@ class Parser
     private $buffer;
     private $utf8;
     private $encoding;
-    private $patternModifiers = 'Ais';
-
+    private $patternModifiers;
 
     /**
      * Constructor
@@ -78,14 +77,11 @@ class Parser
      */
     public function __construct($sourceName, $sourceIndex = 0, $encoding = 'utf-8')
     {
-        $this->sourceName  = $sourceName ?: '(stdin)';
-        $this->sourceIndex = $sourceIndex;
-        $this->charset     = null;
-        $this->utf8        = ! $encoding || strtolower($encoding) === 'utf-8';
-
-        if ($this->utf8) {
-            $this->patternModifiers = 'Aisu';
-        }
+        $this->sourceName       = $sourceName ?: '(stdin)';
+        $this->sourceIndex      = $sourceIndex;
+        $this->charset          = null;
+        $this->utf8             = ! $encoding || strtolower($encoding) === 'utf-8';
+        $this->patternModifiers = $this->utf8 ? 'Aisu' : 'Ais';
 
         if (empty(self::$operatorPattern)) {
             self::$operatorPattern = '([*\/%+-]|[!=]\=|\>\=?|\<\=\>|\<\=?|and|or)';
@@ -788,7 +784,7 @@ class Parser
             $from = $this->count;
         }
 
-        $r = '/' . $regex . '/'.$this->patternModifiers;
+        $r = '/' . $regex . '/' . $this->patternModifiers;
         $result = preg_match($r, $this->buffer, $out, null, $from);
 
         return $result;
@@ -868,7 +864,7 @@ class Parser
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-        $r = '/' . $regex . '/'.$this->patternModifiers;
+        $r = '/' . $regex . '/' . $this->patternModifiers;
 
         if (preg_match($r, $this->buffer, $out, null, $this->count)) {
             $this->count += strlen($out[0]);
