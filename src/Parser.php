@@ -64,7 +64,7 @@ class Parser
     private $buffer;
     private $utf8;
     private $encoding;
-    private $pattern_modifiers = 'Ais';
+    private $patternModifiers = 'Ais';
 
 
     /**
@@ -84,7 +84,7 @@ class Parser
         $this->utf8        = ! $encoding || strtolower($encoding) === 'utf-8';
 
         if ($this->utf8) {
-            $this->pattern_modifiers = 'Aisu';
+            $this->patternModifiers = 'Aisu';
         }
 
         if (empty(self::$operatorPattern)) {
@@ -788,7 +788,7 @@ class Parser
             $from = $this->count;
         }
 
-        $r = '/' . $regex . '/'.$this->pattern_modifiers;
+        $r = '/' . $regex . '/'.$this->patternModifiers;
         $result = preg_match($r, $this->buffer, $out, null, $from);
 
         return $result;
@@ -868,7 +868,7 @@ class Parser
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-        $r = '/' . $regex . '/'.$this->pattern_modifiers;
+        $r = '/' . $regex . '/'.$this->patternModifiers;
 
         if (preg_match($r, $this->buffer, $out, null, $this->count)) {
             $this->count += strlen($out[0]);
@@ -897,19 +897,20 @@ class Parser
             $eatWhitespace = $this->eatWhiteDefault;
         }
 
-
         $len = strlen($what);
-        if( substr($this->buffer,$this->count,$len) === $what ){
+
+        if (substr($this->buffer, $this->count, $len) === $what) {
             $this->count += $len;
+
             if ($eatWhitespace) {
                 $this->whitespace();
             }
+
             return true;
         }
 
         return false;
     }
-
 
     /**
      * Match some whitespace
