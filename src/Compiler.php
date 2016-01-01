@@ -1698,7 +1698,7 @@ class Compiler
                 if (isset($content)) {
                     $content->scope = $callingScope;
 
-                    $this->setRaw(self::$namespaces['special'] . 'content', $content, $this->getStoreEnv());
+                    $this->setRaw(self::$namespaces['special'] . 'content', $content, $this->env);
                 }
 
                 if (isset($mixin->args)) {
@@ -1713,7 +1713,8 @@ class Compiler
                 break;
 
             case Type::T_MIXIN_CONTENT:
-                $content = $this->get(self::$namespaces['special'] . 'content', false, $this->getStoreEnv());
+                $content = $this->get(self::$namespaces['special'] . 'content', false, $this->getStoreEnv())
+                         ?: $this->get(self::$namespaces['special'] . 'content', false, $this->env);
 
                 if (! $content) {
                     $this->throwError('Expected @content inside of mixin');

@@ -60,7 +60,7 @@ $color: white;
   }
 }
 
-@mixin nested {
+@mixin nested($args) {
   * body {
     @content;
   }
