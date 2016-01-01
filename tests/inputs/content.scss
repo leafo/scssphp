@@ -97,3 +97,22 @@ A {
         }
     }
 }
+
+@mixin two() {
+  @content;
+}
+@mixin three() {
+  @content;
+}
+@mixin one() {
+  @include two() {
+    @include three() {
+      @content;
+    }
+  }
+}
+.test {
+  @include one() {
+    display: none;
+  }
+}
