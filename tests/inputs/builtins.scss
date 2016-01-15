@@ -104,6 +104,7 @@
 
 #number {
     color: percentage(100/40);
+    $test: 50%; $test: 0 + ($test / 100%); color: percentage($test);
     color: round(3.4);
     color: floor(3.4);
     color: ceil(3.4);

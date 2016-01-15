@@ -3752,7 +3752,7 @@ class Compiler
     protected function coercePercent($value)
     {
         if ($value[0] === Type::T_NUMBER) {
-            if (isset($value[2]['%'])) {
+            if (!empty($value[2]['%'])) {
                 return $value[1] / 100;
             }
 
