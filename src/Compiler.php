@@ -164,6 +164,10 @@ class Compiler
      */
     public function compile($code, $path = null)
     {
+        if(is_file($code)){
+            $this->setImportPaths(basename($code));
+            $code=file_get_contents($code);
+        }
         $locale = setlocale(LC_NUMERIC, 0);
         setlocale(LC_NUMERIC, 'C');
 
