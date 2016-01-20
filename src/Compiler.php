@@ -125,20 +125,21 @@ class Compiler
     protected $rootEnv;
     protected $rootBlock;
 
+    protected $env;
+    protected $scope;
+    protected $storeEnv;
+    protected $charsetSeen;
+    protected $sourceNames;
+
     private $indentLevel;
     private $commentsSeen;
     private $extends;
     private $extendsMap;
     private $parsedFiles;
-    private $env;
-    private $scope;
     private $parser;
-    private $sourceNames;
     private $sourceIndex;
     private $sourceLine;
     private $sourceColumn;
-    private $storeEnv;
-    private $charsetSeen;
     private $stderr;
     private $shouldEvaluate;
     private $ignoreErrors;
@@ -207,7 +208,7 @@ class Compiler
      *
      * @return \Leafo\ScssPhp\Parser
      */
-    private function parserFactory($path)
+    protected function parserFactory($path)
     {
         $parser = new Parser($path, count($this->sourceNames), $this->encoding);
 
@@ -2944,7 +2945,6 @@ class Compiler
         }
 
         $hasNamespace = $name[0] === '^' || $name[0] === '@' || $name[0] === '%';
-
         for (;;) {
             if (array_key_exists($name, $env->store)) {
                 return $env->store[$name];
@@ -3303,7 +3303,7 @@ class Compiler
      *
      * @throws \Exception
      */
-    private function handleImportLoop($name)
+    protected function handleImportLoop($name)
     {
         for ($env = $this->env; $env; $env = $env->parent) {
             $file = $this->sourceNames[$env->block->sourceIndex];
