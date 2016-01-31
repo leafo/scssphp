@@ -121,7 +121,7 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
-* **0.6.3** -- January 14, 2015
+* **0.6.3** -- January 14, 2016
   * extend + parent + placeholder fix (atna)
   * nested content infinite loop (Lusito)
   * only divide by 100 if percent (jkrehm)
