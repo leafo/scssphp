@@ -895,7 +895,7 @@ class Parser
 
         $len = strlen($what);
 
-        if (substr($this->buffer, $this->count, $len) === $what) {
+        if (strcasecmp(substr($this->buffer, $this->count, $len), $what) === 0) {
             $this->count += $len;
 
             if ($eatWhitespace) {
