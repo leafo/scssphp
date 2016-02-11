@@ -1460,9 +1460,9 @@ class Compiler
                 list(, $name, $value) = $child;
 
                 if ($name[0] === Type::T_VARIABLE) {
-                    $flag = isset($child[3]) ? $child[3] : null;
-                    $isDefault = $flag === '!default';
-                    $isGlobal = $flag === '!global';
+                    $flags = isset($child[3]) ? $child[3] : [];
+                    $isDefault = in_array('!default', $flags);
+                    $isGlobal = in_array('!global', $flags);
 
                     if ($isGlobal) {
                         $this->set($name[1], $this->reduce($value), false, $this->rootEnv);

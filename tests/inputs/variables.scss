@@ -80,3 +80,10 @@ body
 {
 	color: $цвет;
 }
+
+$test: 12 !default !global;
+
+*   {
+    // Expected: 12
+    data: $test;
+}

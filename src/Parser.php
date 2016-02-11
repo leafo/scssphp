@@ -617,8 +617,8 @@ class Parser
             $this->end()
         ) {
             // check for '!flag'
-            $assignmentFlag = $this->stripAssignmentFlag($value);
-            $this->append([Type::T_ASSIGN, $name, $value, $assignmentFlag], $s);
+            $assignmentFlags = $this->stripAssignmentFlags($value);
+            $this->append([Type::T_ASSIGN, $name, $value, $assignmentFlags], $s);
 
             return true;
         }
@@ -2287,25 +2287,28 @@ class Parser
      *
      * @param array $value
      *
-     * @return string
+     * @return array
      */
-    protected function stripAssignmentFlag(&$value)
+    protected function stripAssignmentFlags(&$value)
     {
-        $token = &$value;
+        $flags = [];
 
         for ($token = &$value; $token[0] === Type::T_LIST && ($s = count($token[2])); $token = &$lastNode) {
-            $lastNode = &$token[2][$s - 1];
-
-            if ($lastNode[0] === Type::T_KEYWORD && in_array($lastNode[1], ['!default', '!global'])) {
+            for ($lastNode = &$token[2][$s - 1];
+                $lastNode[0] === Type::T_KEYWORD && in_array($lastNode[1], ['!default', '!global']);
+                $lastNode = $node
+            ) {
                 array_pop($token[2]);
+
+                $node = end($token[2]);
 
                 $token = $this->flattenList($token);
 
-                return $lastNode[1];
+                $flags[] = $lastNode[1];
             }
         }
 
-        return false;
+        return $flags;
     }
 
     /**
