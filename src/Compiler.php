@@ -1742,7 +1742,7 @@ class Compiler
 
                 $line = $this->sourceLine;
                 $value = $this->compileValue($this->reduce($value, true));
-                echo "Line $line WARN: $value\n";
+                fwrite($this->stderr, "Line $line WARN: $value\n");
                 break;
 
             case Type::T_ERROR:
