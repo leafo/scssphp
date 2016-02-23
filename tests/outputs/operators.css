@@ -77,7 +77,8 @@ div {
   and: false;
   or: two;
   or: one;
-  or: one; }
+  or: one;
+  or: two; }
 
 #nots-fail {
   not: false2;
