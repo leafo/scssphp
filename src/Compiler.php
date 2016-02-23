@@ -2216,7 +2216,7 @@ class Compiler
             return;
         }
 
-        if ($left !== self::$false) {
+        if ($left !== self::$false and $left !== self::$null) {
             return $this->reduce($right, true);
         }
 
@@ -2238,7 +2238,7 @@ class Compiler
             return;
         }
 
-        if ($left !== self::$false) {
+        if ($left !== self::$false and $left !== self::$null) {
             return $left;
         }
 
