@@ -2294,10 +2294,9 @@ class Parser
         $flags = [];
 
         for ($token = &$value; $token[0] === Type::T_LIST && ($s = count($token[2])); $token = &$lastNode) {
-            for ($lastNode = &$token[2][$s - 1];
-                $lastNode[0] === Type::T_KEYWORD && in_array($lastNode[1], ['!default', '!global']);
-                $lastNode = $node
-            ) {
+            $lastNode = &$token[2][$s - 1];
+
+            while ($lastNode[0] === Type::T_KEYWORD && in_array($lastNode[1], ['!default', '!global'])) {
                 array_pop($token[2]);
 
                 $node = end($token[2]);
@@ -2305,6 +2304,8 @@ class Parser
                 $token = $this->flattenList($token);
 
                 $flags[] = $lastNode[1];
+
+                $lastNode = $node;
             }
         }
 
