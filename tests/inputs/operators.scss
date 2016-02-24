@@ -99,10 +99,12 @@ div {
     and: (false and two);
     and: (one and two);
     and: (one and false);
+    and: (null and two);
 
     or: (false or two);
     or: (one or two);
     or: (one or false);
+    or: (null or two);
 }
 
 
