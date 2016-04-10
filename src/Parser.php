@@ -622,7 +622,7 @@ class Parser
         ) {
             // check for '!flag'
             $assignmentFlags = $this->stripAssignmentFlags($value);
-            $this->append([Type::T_ASSIGN, $name, $value, $assignmentFlags, $annotations], $s);
+            $this->append([Type::T_ASSIGN, $name, $value, $assignmentFlags], $s);
 
             return true;
         }
