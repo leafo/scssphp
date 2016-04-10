@@ -725,8 +725,6 @@ class Parser
             $this->env->comments = [];
         }
 
-        $b->annotations  = $this->parseAnnotation();
-
         $this->env = $b;
 
         return $b;
