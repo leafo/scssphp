@@ -27,6 +27,7 @@ class Parser
     const SOURCE_INDEX  = -1;
     const SOURCE_LINE   = -2;
     const SOURCE_COLUMN = -3;
+    const SOURCE_ANNOTATION = -4;
 
     /**
      * @var array
@@ -52,6 +53,7 @@ class Parser
     protected static $commentPattern;
     protected static $operatorPattern;
     protected static $whitePattern;
+    protected static $annotationPattern;
 
     private $sourceName;
     private $sourceIndex;
@@ -94,6 +96,8 @@ class Parser
             self::$whitePattern = $this->utf8
                 ? '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentPattern . ')\s*|\s+/AisuS'
                 : '/' . $commentSingle . '[^\n]*\s*|(' . self::$commentPattern . ')\s*|\s+/AisS';
+
+            self:: $annotationPattern = '/@(?<type>[^\W]+)\W*(?<value>.*[^\W])/';
         }
     }
 
@@ -618,7 +622,7 @@ class Parser
         ) {
             // check for '!flag'
             $assignmentFlags = $this->stripAssignmentFlags($value);
-            $this->append([Type::T_ASSIGN, $name, $value, $assignmentFlags], $s);
+            $this->append([Type::T_ASSIGN, $name, $value, $assignmentFlags, $annotations], $s);
 
             return true;
         }
@@ -720,6 +724,8 @@ class Parser
             $b->children = $this->env->comments;
             $this->env->comments = [];
         }
+
+        $b->annotations  = $this->parseAnnotation();
 
         $this->env = $b;
 
@@ -957,6 +963,7 @@ class Parser
             $statement[self::SOURCE_LINE]   = $line;
             $statement[self::SOURCE_COLUMN] = $column;
             $statement[self::SOURCE_INDEX]  = $this->sourceIndex;
+            $statement[self::SOURCE_ANNOTATION] = $this->parseAnnotation();
         }
 
         $this->env->children[] = $statement;
@@ -2479,4 +2486,34 @@ class Parser
             mb_internal_encoding($this->encoding);
         }
     }
+
+    /**
+     * Parse current block annotation.
+     *
+     * Retrieves the last block from the tree and checks for the comment type.
+     * Annotations are matched against the comment lines and then returned.
+     *
+     * @return array
+     */
+    private function parseAnnotation() {
+        $annotations = [];
+        if (isset($this->env->children)) {
+            $last = $this->last();
+            if ($last[0] == Type::T_COMMENT) {
+                $lines = explode("\n", $last[1]);
+                foreach($lines as $line) {
+                    preg_match(self::$annotationPattern, $line, $matches);
+                    if (isset($matches['type']) && isset($matches['value'])) {
+                        $annotations[] = array(
+                          'type' => $matches['type'],
+                          'value' => $matches['value']
+                        );
+                    }
+                }
+            }
+        }
+        return $annotations;
+    }
+
 }
+

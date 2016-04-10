@@ -57,4 +57,9 @@ class Block
      * @var array
      */
     public $children;
+
+    /**
+     * @var array
+     */
+    public $annotations;
 }
