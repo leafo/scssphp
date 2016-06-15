@@ -121,6 +121,12 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.6.4** -- June 15, 2016
+  * parsing multiple assignment flags (Limych)
+  * {% raw %}@{% endraw %}warn should not write to stdout (atomicalnet)
+  * evaluating null and/or 'foo' (micranet)
+  * case insensitive directives regression (Limych)
+  * Compiler: scope change to some properties and methods to facilitate subclassing (jo)
 * **0.6.3** -- January 14, 2016
   * extend + parent + placeholder fix (atna)
   * nested content infinite loop (Lusito)
