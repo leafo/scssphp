@@ -2938,16 +2938,16 @@ class Compiler
      */
     public function get($name, $shouldThrow = true, Environment $env = null)
     {
-        $name = $this->normalizeName($name);
+        $normalizedName = $this->normalizeName($name);
 
         if (! isset($env)) {
             $env = $this->getStoreEnv();
         }
 
-        $hasNamespace = $name[0] === '^' || $name[0] === '@' || $name[0] === '%';
+        $hasNamespace = $normalizedName[0] === '^' || $normalizedName[0] === '@' || $normalizedName[0] === '%';
         for (;;) {
-            if (array_key_exists($name, $env->store)) {
-                return $env->store[$name];
+            if (array_key_exists($normalizedName, $env->store)) {
+                return $env->store[$normalizedName];
             }
 
             if (! $hasNamespace && isset($env->marker)) {
