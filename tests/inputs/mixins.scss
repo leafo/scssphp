@@ -190,3 +190,21 @@ div.parameter-name-scope {
 .test{
   @include test-mixin();
 }
+
+@mixin inner($value) {}
+
+@mixin outer($value) {
+  #{$value} {
+    content: "#{$value}";
+    @content;
+    content: "#{$value}";
+  }
+}
+
+@include outer(div) {
+  @include inner('break');
+  @include outer(p) {
+    @include inner('break');
+  }
+}
+

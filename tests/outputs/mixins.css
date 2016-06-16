@@ -95,3 +95,10 @@ div.parameter-name-scope {
 @media screen and (min-width:0\0) {
     .test {
       color: #000; } }
+
+div {
+  content: "div";
+  content: "div"; }
+  div p {
+    content: "p";
+    content: "p"; }

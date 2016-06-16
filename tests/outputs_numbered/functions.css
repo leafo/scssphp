@@ -47,3 +47,7 @@ p {
   l3: 5, 6;
   l4: (a: 1, b: 2);
   l5: (a: 1, b: 2); }
+/* line 165, inputs/functions.scss */
+div {
+  margin: 1px 1px 2px 2px;
+  padding: 1px 1px 2px 2px; }

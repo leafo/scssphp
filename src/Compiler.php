@@ -1696,6 +1696,9 @@ class Compiler
                 $this->pushEnv();
                 $this->env->depth--;
 
+                $storeEnv = $this->storeEnv;
+                $this->storeEnv = $this->env;
+
                 if (isset($content)) {
                     $content->scope = $callingScope;
 
@@ -1709,6 +1712,8 @@ class Compiler
                 $this->env->marker = 'mixin';
 
                 $this->compileChildrenNoReturn($mixin->children, $out);
+
+                $this->storeEnv = $storeEnv;
 
                 $this->popEnv();
                 break;
@@ -3346,6 +3351,9 @@ class Compiler
 
         $this->pushEnv();
 
+        $storeEnv = $this->storeEnv;
+        $this->storeEnv = $this->env;
+
         // set the args
         if (isset($func->args)) {
             $this->applyArguments($func->args, $argValues);
@@ -3359,6 +3367,8 @@ class Compiler
         $this->env->marker = 'function';
 
         $ret = $this->compileChildren($func->children, $tmp);
+
+        $this->storeEnv = $storeEnv;
 
         $this->popEnv();
 
