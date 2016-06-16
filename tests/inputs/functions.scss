@@ -128,3 +128,41 @@ $str: 'global';
   l4: inspect((a: 1, b: 2));
   l5: inspect($value: (a: 1, b: 2));
 }
+
+@function contains($list, $values...) {
+  @each $value in $values {
+    @if type-of(index($list, $value)) != "number" {
+      @return false;
+    }
+  }
+
+  @return true;
+}
+
+@function mapping($items) {
+  $src: ();
+  $map: (
+          one:   1px 1px,
+          two:   2px 2px,
+  );
+
+  @each $key, $values in $map {
+    @if contains($items, $key) {
+      $value1: nth($values, 1);
+      $value2: nth($values, 2);
+
+      $src: append($src, $value1 $value2, space);
+    }
+  }
+
+  @return $src;
+}
+
+@mixin test() {
+  padding: mapping(one two);
+}
+
+div {
+  margin: mapping(one two);
+  @include test();
+}
