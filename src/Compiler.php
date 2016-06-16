@@ -3622,6 +3622,29 @@ class Compiler
             return self::$emptyString;
         }
 
+        if (preg_match('/^(#([0-9a-f]{6})|#([0-9a-f]{3}))$/i', $value, $m)) {
+            $color = [Type::T_COLOR];
+
+            if (isset($m[3])) {
+                $num = hexdec($m[3]);
+
+                foreach ([3, 2, 1] as $i) {
+                    $t = $num & 0xf;
+                    $color[$i] = $t << 4 | $t;
+                    $num >>= 4;
+                }
+            } else {
+                $num = hexdec($m[2]);
+
+                foreach ([3, 2, 1] as $i) {
+                    $color[$i] = $num & 0xff;
+                    $num >>= 8;
+                }
+            }
+
+            return $color;
+        }
+
         return [Type::T_KEYWORD, $value];
     }
 
