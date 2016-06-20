@@ -105,6 +105,15 @@ class ApiTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testCompileByteOrderMarker()
+    {
+        // test that BOM is stripped/ignored
+        $this->assertEquals(
+            '@import "main";',
+            $this->compile("\xEF\xBB\xBF@import \"main\";")
+        );
+    }
+
     public function compile($str)
     {
         return trim($this->scss->compile($str));
