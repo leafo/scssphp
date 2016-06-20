@@ -142,11 +142,16 @@ class Parser
      */
     public function parse($buffer)
     {
+        // strip BOM (byte order marker)
+        if (substr($buffer, 0, 3) === "\xef\xbb\xbf") {
+            $buffer = substr($buffer, 3);
+        }
+
+        $this->buffer          = rtrim($buffer, "\x00..\x1f");
         $this->count           = 0;
         $this->env             = null;
         $this->inParens        = false;
         $this->eatWhiteDefault = true;
-        $this->buffer          = rtrim($buffer, "\x00..\x1f");
 
         $this->saveEncoding();
         $this->extractLineNumbers($buffer);
