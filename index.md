@@ -121,6 +121,11 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.6.5** -- June 20, 2016
+  * ignore BOM (nwiborg)
+  * fix another mixin and variable scope issue (mahagr)
+  * Compiler: coerceValue support for #rgb values (thesjg)
+  * preserve un-normalized variable name for error message (kissifrot)
 * **0.6.4** -- June 15, 2016
   * parsing multiple assignment flags (Limych)
   * {% raw %}@{% endraw %}warn should not write to stdout (atomicalnet)
