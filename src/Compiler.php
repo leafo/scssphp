@@ -3621,7 +3621,7 @@ class Compiler
         }
 
         if ($value === null) {
-            $value = self::$null;
+            return self::$null;
         }
 
         if (is_numeric($value)) {
