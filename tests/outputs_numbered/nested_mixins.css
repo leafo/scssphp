@@ -1,0 +1,14 @@
+/* line 13, inputs/nested_mixins.scss */
+/* line 2, inputs/nested_mixins.scss */
+  div .container {
+    width: 10px; }
+/* line 2, inputs/nested_mixins.scss */
+div .container .container {
+  width: 10px;
+  max-width: 12px; }
+/* line 21, inputs/nested_mixins.scss */
+div .container .foo {
+  width: 10px; }
+/* line 24, inputs/nested_mixins.scss */
+div .container .bar {
+  width: 12px; }

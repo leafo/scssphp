@@ -1,0 +1,9 @@
+div .container {
+  width: 10px; }
+  div .container .container {
+    width: 10px;
+    max-width: 12px; }
+  div .container .foo {
+    width: 10px; }
+  div .container .bar {
+    width: 12px; }

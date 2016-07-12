@@ -1,0 +1,28 @@
+@mixin container() {
+    .container {
+        @content;
+    }
+}
+@mixin add-size($size) {
+    width: $size;
+}
+@function add($a, $b) {
+    @return $a + $b;
+}
+
+div {
+    @include container() {
+        $i: 10px;
+        @include container() {
+            width: $i;
+            max-width: add($i, 2px);
+        }
+        @include add-size($i);
+        .foo {
+            @include add-size($i);
+        }
+        .bar {
+            @include add-size(add($i, 2px));
+        }
+    }
+}
