@@ -2944,11 +2944,13 @@ class Compiler
     public function get($name, $shouldThrow = true, Environment $env = null)
     {
         $normalizedName = $this->normalizeName($name);
+        $specialContentKey = self::$namespaces['special'] . 'content';
 
         if (! isset($env)) {
             $env = $this->getStoreEnv();
         }
 
+        $nextIsRoot = false;
         $hasNamespace = $normalizedName[0] === '^' || $normalizedName[0] === '@' || $normalizedName[0] === '%';
         for (;;) {
             if (array_key_exists($normalizedName, $env->store)) {
@@ -2956,6 +2958,12 @@ class Compiler
             }
 
             if (! $hasNamespace && isset($env->marker)) {
+                if (! $nextIsRoot && !empty($env->store[$specialContentKey])) {
+                    $env = $env->store[$specialContentKey]->scope;
+                    $nextIsRoot = true;
+                    continue;
+                }
+
                 $env = $this->rootEnv;
                 continue;
             }
