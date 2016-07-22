@@ -215,3 +215,13 @@ body .to-extend, body .test {
   background-color: white; }
 /* line 303, inputs/extends.scss */
 /* line 304, inputs/extends.scss */
+
+/* line 315, inputs/extends.scss */
+
+/* line 310, inputs/extends.scss */
+
+/* line 317, inputs/extends.scss */
+
+.parent-nested-foo-include .in-nested-foo .child-nested-foo-include, .parent-nested-foo-include .in-nested-foo .beard + .mustache {
+  color: green; }
+/* line 323, inputs/extends.scss */

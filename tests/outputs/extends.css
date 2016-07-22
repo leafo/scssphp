@@ -138,3 +138,6 @@ body .to-extend, body .test {
     margin-left: 0; }
   .pagination-bullet.is-active {
     background-color: white; }
+
+.parent-nested-foo-include .in-nested-foo .child-nested-foo-include, .parent-nested-foo-include .in-nested-foo .beard + .mustache {
+  color: green; }

@@ -305,3 +305,21 @@ $color-base: white;
        @extend %pagination-bullet;
     }
 }
+
+@mixin nested-foo() {
+    .in-nested-foo {
+        @content;
+    }
+}
+
+.parent-nested-foo-include {
+    @include nested-foo() {
+        .child-nested-foo-include {
+            color: green;
+        }
+    }
+}
+
+.beard + .mustache {
+    @extend .child-nested-foo-include;
+}

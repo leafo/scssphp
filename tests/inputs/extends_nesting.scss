@@ -1,0 +1,44 @@
+.btn {
+    padding: 1px;
+}
+.btn-lg {
+    font-size: 10px;
+}
+.dropup .btn-lg .caret {
+    border-width: 100px;
+}
+
+.dropup .btn {
+    content: "dropup btn";
+    .caret {
+        content: "dropup btn caret";
+    }
+}
+.dropup > .btn {
+    content: "dropup > btn";
+    > .caret {
+        content: "dropup > btn > caret";
+    }
+}
+.dropup + .btn {
+    content: "dropup + btn";
+    + .caret {
+        content: "dropup + btn + caret";
+    }
+}
+.dropup.btn {
+    content: "dropupbtn";
+    &.caret {
+        content: "dropupbtncaret";
+    }
+}
+
+.btn-group-lg > .btn {
+    @extend .btn-lg;
+}
+
+.extend {
+    .the-button {
+        @extend .btn;
+    }
+}

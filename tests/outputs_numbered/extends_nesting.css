@@ -1,0 +1,37 @@
+/* line 1, inputs/extends_nesting.scss */
+.btn, .extend .the-button {
+  padding: 1px; }
+/* line 4, inputs/extends_nesting.scss */
+.btn-lg, .btn-group-lg > .btn, .extend .btn-group-lg > .the-button {
+  font-size: 10px; }
+/* line 7, inputs/extends_nesting.scss */
+.dropup .btn-lg .caret, .dropup .btn-group-lg > .btn .caret, .dropup .extend .btn-group-lg > .the-button .caret, .extend .dropup .btn-group-lg > .the-button .caret {
+  border-width: 100px; }
+/* line 11, inputs/extends_nesting.scss */
+.dropup .btn, .dropup .extend .the-button, .extend .dropup .the-button {
+  content: "dropup btn"; }
+/* line 13, inputs/extends_nesting.scss */
+.dropup .btn .caret, .dropup .extend .the-button .caret, .extend .dropup .the-button .caret {
+  content: "dropup btn caret"; }
+/* line 17, inputs/extends_nesting.scss */
+.dropup > .btn, .extend .dropup > .the-button {
+  content: "dropup > btn"; }
+/* line 19, inputs/extends_nesting.scss */
+.dropup > .btn > .caret, .extend .dropup > .the-button > .caret {
+  content: "dropup > btn > caret"; }
+/* line 23, inputs/extends_nesting.scss */
+.dropup + .btn, .extend .dropup + .the-button {
+  content: "dropup + btn"; }
+/* line 25, inputs/extends_nesting.scss */
+.dropup + .btn + .caret, .extend .dropup + .the-button + .caret {
+  content: "dropup + btn + caret"; }
+/* line 29, inputs/extends_nesting.scss */
+.dropup.btn, .extend .the-button.dropup {
+  content: "dropupbtn"; }
+/* line 31, inputs/extends_nesting.scss */
+.dropup.btn.caret, .extend .the-button.dropup.caret {
+  content: "dropupbtncaret"; }
+/* line 36, inputs/extends_nesting.scss */
+/* line 40, inputs/extends_nesting.scss */
+
+/* line 41, inputs/extends_nesting.scss */

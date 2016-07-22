@@ -397,23 +397,46 @@ class Compiler
             }
 
             if ($this->matchExtendsSingle($part, $origin)) {
-                $before = array_slice($selector, 0, $i);
+
                 $after = array_slice($selector, $i + 1);
-                $s = count($before);
+                $j = $i;
+                $s = $i;
+                do {
+                    $nonBreakableBefore = $j != $i ? array_slice($selector, $j, $i - $j) : [];
+                    $before = array_slice($selector, 0, $j);
+                    $slice = end($before);
+                    $hasImmediateRelationshipCombinator = !empty($slice) && $this->isImmediateRelationshipCombinator($slice[0]);
+                    if ($hasImmediateRelationshipCombinator) {
+                        $j -= 2;
+                    }
+                } while ($hasImmediateRelationshipCombinator);
 
                 foreach ($origin as $new) {
                     $k = 0;
 
                     // remove shared parts
                     if ($initial) {
-                        while ($k < $s && isset($new[$k]) && $before[$k] === $new[$k]) {
+                        while ($k < $s && isset($new[$k]) && $selector[$k] === $new[$k]) {
                             $k++;
                         }
                     }
 
+                    $replacement = [];
+                    $tempReplacement = $k > 0 ? array_slice($new, $k) : $new;
+                    for ($l = count($tempReplacement) - 1; $l >= 0 ; $l--) {
+                        $slice = $tempReplacement[$l];
+                        array_unshift($replacement, $slice);
+                        if (!$this->isImmediateRelationshipCombinator(end($slice))) {
+                            break;
+                        }
+                    }
+                    $afterBefore = $l != 0 ? array_slice($tempReplacement, 0, $l) : [];
+
                     $result = array_merge(
                         $before,
-                        $k > 0 ? array_slice($new, $k) : $new,
+                        $afterBefore,
+                        $nonBreakableBefore,
+                        $replacement,
                         $after
                     );
 
@@ -424,14 +447,22 @@ class Compiler
                     $out[] = $result;
 
                     // recursively check for more matches
-                    $this->matchExtends($result, $out, $i, false);
+                    $this->matchExtends($result, $out, count($before) + count($afterBefore) + count($nonBreakableBefore), false);
 
                     // selector sequence merging
                     if (! empty($before) && count($new) > 1) {
+                        $slice = !empty($afterBefore) ? end($afterBefore) : null;
+
+                        if ($slice && $this->isImmediateRelationshipCombinator(end($slice))) {
+                            continue;
+                        }
+
                         $result2 = array_merge(
-                            array_slice($new, 0, -1),
+                            $k > 0 ? array_slice($before, 0, $k) : [],
+                            $afterBefore,
                             $k > 0 ? array_slice($before, $k) : $before,
-                            array_slice($new, -1),
+                            $nonBreakableBefore,
+                            $replacement,
                             $after
                         );
 
@@ -1806,6 +1837,18 @@ class Compiler
     protected function isTruthy($value)
     {
         return $value !== self::$false && $value !== self::$null;
+    }
+
+    /**
+     * Is the value a direct relationship combinator?
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    protected function isImmediateRelationshipCombinator($value)
+    {
+        return $value === '>' || $value === '+' || $value === '~';
     }
 
     /**
