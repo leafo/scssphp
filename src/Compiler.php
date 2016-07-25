@@ -399,24 +399,15 @@ class Compiler
             if ($this->matchExtendsSingle($part, $origin)) {
 
                 $after = array_slice($selector, $i + 1);
-                $j = $i;
-                $s = $i;
-                do {
-                    $nonBreakableBefore = $j != $i ? array_slice($selector, $j, $i - $j) : [];
-                    $before = array_slice($selector, 0, $j);
-                    $slice = end($before);
-                    $hasImmediateRelationshipCombinator = !empty($slice) && $this->isImmediateRelationshipCombinator($slice[0]);
-                    if ($hasImmediateRelationshipCombinator) {
-                        $j -= 2;
-                    }
-                } while ($hasImmediateRelationshipCombinator);
+                $before = array_slice($selector, 0, $i);
+                list($before, $nonBreakableBefore) = $this->extractRelationshipFromFragment($before);
 
                 foreach ($origin as $new) {
                     $k = 0;
 
                     // remove shared parts
                     if ($initial) {
-                        while ($k < $s && isset($new[$k]) && $selector[$k] === $new[$k]) {
+                        while ($k < $i && isset($new[$k]) && $selector[$k] === $new[$k]) {
                             $k++;
                         }
                     }
@@ -432,10 +423,12 @@ class Compiler
                     }
                     $afterBefore = $l != 0 ? array_slice($tempReplacement, 0, $l) : [];
 
+                    // Merge shared direct relationships.
+                    $mergedBefore = $this->mergeDirectRelationships($afterBefore, $nonBreakableBefore);
+
                     $result = array_merge(
                         $before,
-                        $afterBefore,
-                        $nonBreakableBefore,
+                        $mergedBefore,
                         $replacement,
                         $after
                     );
@@ -447,20 +440,20 @@ class Compiler
                     $out[] = $result;
 
                     // recursively check for more matches
-                    $this->matchExtends($result, $out, count($before) + count($afterBefore) + count($nonBreakableBefore), false);
+                    $this->matchExtends($result, $out, count($before) + count($mergedBefore), false);
 
                     // selector sequence merging
                     if (! empty($before) && count($new) > 1) {
-                        $slice = !empty($afterBefore) ? end($afterBefore) : null;
 
-                        if ($slice && $this->isImmediateRelationshipCombinator(end($slice))) {
-                            continue;
-                        }
+                        $sharedParts = $k > 0 ? array_slice($before, 0, $k) : [];
+                        $postSharedParts = $k > 0 ? array_slice($before, $k) : $before;
+                        list($injectBetweenSharedParts, $nonBreakable2) = $this->extractRelationshipFromFragment($afterBefore);
 
                         $result2 = array_merge(
-                            $k > 0 ? array_slice($before, 0, $k) : [],
-                            $afterBefore,
-                            $k > 0 ? array_slice($before, $k) : $before,
+                            $sharedParts,
+                            $injectBetweenSharedParts,
+                            $postSharedParts,
+                            $nonBreakable2,
                             $nonBreakableBefore,
                             $replacement,
                             $after
@@ -541,6 +534,37 @@ class Compiler
         }
 
         return $found;
+    }
+
+
+    /**
+     * Extract a relationship from the fragment.
+     *
+     * When extracting the last portion of a selector we will be left with a
+     * fragment which may end with a direction relationship combinator. This
+     * method will extract the relationship fragment and return it along side
+     * the rest.
+     *
+     * @param array $fragment The selector fragment maybe ending with a direction relationship combinator.
+     * @return array The selector without the relationship fragment if any, the relationship fragment.
+     */
+    protected function extractRelationshipFromFragment(array $fragment)
+    {
+        $parents = [];
+        $children = [];
+        $j = $i = count($fragment);
+
+        do {
+            $children = $j != $i ? array_slice($fragment, $j, $i - $j) : [];
+            $parents = array_slice($fragment, 0, $j);
+            $slice = end($parents);
+            $hasImmediateRelationshipCombinator = !empty($slice) && $this->isImmediateRelationshipCombinator($slice[0]);
+            if ($hasImmediateRelationshipCombinator) {
+                $j -= 2;
+            }
+        } while ($hasImmediateRelationshipCombinator);
+
+        return [$parents, $children];
     }
 
     /**
@@ -1313,6 +1337,34 @@ class Compiler
         }
 
         return $out;
+    }
+
+    protected function mergeDirectRelationships($selectors1, $selectors2) {
+        if (empty($selectors1) || empty($selectors2)) {
+            return array_merge($selectors1, $selectors2);
+        }
+
+        $part1 = end($selectors1);
+        $part2 = end($selectors2);
+        if (!$this->isImmediateRelationshipCombinator($part1[0]) || $part1 !== $part2) {
+            return array_merge($selectors1, $selectors2);
+        }
+
+        $merged = [];
+        do {
+            $part1 = array_pop($selectors1);
+            $part2 = array_pop($selectors2);
+
+            if ($this->isImmediateRelationshipCombinator($part1[0]) && $part1 === $part2) {
+                array_unshift($merged, $part1);
+                array_unshift($merged, [array_pop($selectors1)[0] . array_pop($selectors2)[0]]);
+            } else {
+                $merged = array_merge($selectors1, [$part1], $selectors2, [$part2], $merged);
+                break;
+            }
+        } while (!empty($selectors1) && !empty($selectors2));
+
+        return $merged;
     }
 
     /**

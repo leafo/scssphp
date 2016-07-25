@@ -323,3 +323,23 @@ $color-base: white;
 .beard + .mustache {
     @extend .child-nested-foo-include;
 }
+
+// Shared direct relationship combinator.
+.btn-group-lg > .btn {
+  @extend .btn-lg;
+}
+.btn-group > .btn-lg {
+  padding-right: 12px;
+  padding-left: 12px;
+}
+
+// Reverse rules with direct relationship combinators.
+.fp-content-center form + div {
+    @extend .form-group;
+    padding-left: 0;
+}
+.form-inline + .a {
+    .form-group > b {
+      margin-bottom: 0;
+    }
+}

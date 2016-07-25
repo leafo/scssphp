@@ -225,3 +225,18 @@ body .to-extend, body .test {
 .parent-nested-foo-include .in-nested-foo .child-nested-foo-include, .parent-nested-foo-include .in-nested-foo .beard + .mustache {
   color: green; }
 /* line 323, inputs/extends.scss */
+/* line 328, inputs/extends.scss */
+
+/* line 331, inputs/extends.scss */
+
+.btn-group > .btn-lg, .btn-group-lg.btn-group > .btn, .edit .actions .btn-group-lg.btn-group > button, .edit .new .actions .btn-group-lg.btn-group > button {
+  padding-right: 12px;
+  padding-left: 12px; }
+/* line 337, inputs/extends.scss */
+.fp-content-center form + div {
+  padding-left: 0; }
+/* line 341, inputs/extends.scss */
+/* line 342, inputs/extends.scss */
+
+.form-inline + .a .form-group > b, .form-inline + .a .fp-content-center form + div > b, .fp-content-center .form-inline + .a form + div > b {
+  margin-bottom: 0; }
