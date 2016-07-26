@@ -343,3 +343,35 @@ $color-base: white;
       margin-bottom: 0;
     }
 }
+
+// Decorated tags cannot be extended by tags of another type.
+canvas {
+    color: yellow;
+}
+.popup {
+    color: red;
+}
+div.popup {
+    color: blue;
+}
+.before span.popup .after {
+    color: green;
+}
+input {
+    @extend .popup;
+}
+img.bar {
+    @extend .popup;
+}
+object {
+    @extend canvas;
+}
+embed.bar {
+    @extend canvas;
+}
+.prepend {
+    input.foo,
+    div.foo {
+        @extend .popup
+    }
+}

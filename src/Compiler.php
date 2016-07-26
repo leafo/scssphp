@@ -395,7 +395,6 @@ class Compiler
             if ($i < $from) {
                 continue;
             }
-
             if ($this->matchExtendsSingle($part, $origin)) {
 
                 $after = array_slice($selector, $i + 1);
@@ -492,6 +491,12 @@ class Compiler
             }
         }
 
+        $extendingDecoratedTag = false;
+        if (count($single) > 1) {
+            $matches = null;
+            $extendingDecoratedTag = preg_match('/^[a-z0-9]+$/i', $single[0], $matches) ? $matches[0] : false;
+        }
+
         foreach ($single as $part) {
             if (isset($this->extendsMap[$part])) {
                 foreach ($this->extendsMap[$part] as $idx) {
@@ -521,7 +526,16 @@ class Compiler
                     return false;
                 }
 
-                $combined = $this->combineSelectorSingle(end($new), $rem);
+                $replacement = end($new);
+
+                // Extending a decorated tag with another tag is not possible.
+                if ($extendingDecoratedTag && $replacement[0] != $extendingDecoratedTag
+                        && preg_match('/^[a-z0-9]+$/i', $replacement[0])) {
+                    unset($origin[$j]);
+                    continue;
+                }
+
+                $combined = $this->combineSelectorSingle($replacement, $rem);
 
                 if (count(array_diff($combined, $origin[$j][count($origin[$j]) - 1]))) {
                     $origin[$j][count($origin[$j]) - 1] = $combined;

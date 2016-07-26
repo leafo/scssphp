@@ -151,3 +151,15 @@ body .to-extend, body .test {
 
 .form-inline + .a .form-group > b, .form-inline + .a .fp-content-center form + div > b, .fp-content-center .form-inline + .a form + div > b {
   margin-bottom: 0; }
+
+canvas, object, embed.bar {
+  color: yellow; }
+
+.popup, input, img.bar, .prepend input.foo, .prepend div.foo {
+  color: red; }
+
+div.popup, .prepend div.foo {
+  color: blue; }
+
+.before span.popup .after {
+  color: green; }

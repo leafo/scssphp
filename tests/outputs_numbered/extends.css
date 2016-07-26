@@ -240,3 +240,25 @@ body .to-extend, body .test {
 
 .form-inline + .a .form-group > b, .form-inline + .a .fp-content-center form + div > b, .fp-content-center .form-inline + .a form + div > b {
   margin-bottom: 0; }
+/* line 348, inputs/extends.scss */
+canvas, object, embed.bar {
+  color: yellow; }
+/* line 351, inputs/extends.scss */
+.popup, input, img.bar, .prepend input.foo, .prepend div.foo {
+  color: red; }
+/* line 354, inputs/extends.scss */
+div.popup, .prepend div.foo {
+  color: blue; }
+/* line 357, inputs/extends.scss */
+.before span.popup .after {
+  color: green; }
+/* line 360, inputs/extends.scss */
+/* line 363, inputs/extends.scss */
+
+/* line 366, inputs/extends.scss */
+
+/* line 369, inputs/extends.scss */
+
+/* line 372, inputs/extends.scss */
+
+/* line 373, inputs/extends.scss */
