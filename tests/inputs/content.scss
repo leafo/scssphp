@@ -116,3 +116,12 @@ A {
     display: none;
   }
 }
+
+@mixin empty_content() {
+  @content;
+}
+.test_empty_content {
+  display: inline;
+  font-weight: bold;
+  @include empty_content()
+}

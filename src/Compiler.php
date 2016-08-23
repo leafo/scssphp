@@ -1723,7 +1723,9 @@ class Compiler
                          ?: $this->get(self::$namespaces['special'] . 'content', false, $this->env);
 
                 if (! $content) {
-                    $this->throwError('Expected @content inside of mixin');
+                    $content = new \stdClass();
+                    $content->scope = new \stdClass();
+                    $content->children = $this->storeEnv->parent->block->children;
                     break;
                 }
 

@@ -45,3 +45,7 @@ A {
 /* line 114, inputs/content.scss */
 .test {
   display: none; }
+/* line 123, inputs/content.scss */
+.test_empty_content {
+  display: inline;
+  font-weight: bold; }
