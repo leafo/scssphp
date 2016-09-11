@@ -395,10 +395,11 @@ class Compiler
             if ($i < $from) {
                 continue;
             }
-            if ($this->matchExtendsSingle($part, $origin)) {
 
+            if ($this->matchExtendsSingle($part, $origin)) {
                 $after = array_slice($selector, $i + 1);
                 $before = array_slice($selector, 0, $i);
+
                 list($before, $nonBreakableBefore) = $this->extractRelationshipFromFragment($before);
 
                 foreach ($origin as $new) {
@@ -413,13 +414,16 @@ class Compiler
 
                     $replacement = [];
                     $tempReplacement = $k > 0 ? array_slice($new, $k) : $new;
-                    for ($l = count($tempReplacement) - 1; $l >= 0 ; $l--) {
+
+                    for ($l = count($tempReplacement) - 1; $l >= 0; $l--) {
                         $slice = $tempReplacement[$l];
                         array_unshift($replacement, $slice);
-                        if (!$this->isImmediateRelationshipCombinator(end($slice))) {
+
+                        if (! $this->isImmediateRelationshipCombinator(end($slice))) {
                             break;
                         }
                     }
+
                     $afterBefore = $l != 0 ? array_slice($tempReplacement, 0, $l) : [];
 
                     // Merge shared direct relationships.
@@ -443,9 +447,9 @@ class Compiler
 
                     // selector sequence merging
                     if (! empty($before) && count($new) > 1) {
-
                         $sharedParts = $k > 0 ? array_slice($before, 0, $k) : [];
                         $postSharedParts = $k > 0 ? array_slice($before, $k) : $before;
+
                         list($injectBetweenSharedParts, $nonBreakable2) = $this->extractRelationshipFromFragment($afterBefore);
 
                         $result2 = array_merge(
@@ -492,6 +496,7 @@ class Compiler
         }
 
         $extendingDecoratedTag = false;
+
         if (count($single) > 1) {
             $matches = null;
             $extendingDecoratedTag = preg_match('/^[a-z0-9]+$/i', $single[0], $matches) ? $matches[0] : false;
@@ -529,8 +534,9 @@ class Compiler
                 $replacement = end($new);
 
                 // Extending a decorated tag with another tag is not possible.
-                if ($extendingDecoratedTag && $replacement[0] != $extendingDecoratedTag
-                        && preg_match('/^[a-z0-9]+$/i', $replacement[0])) {
+                if ($extendingDecoratedTag && $replacement[0] != $extendingDecoratedTag &&
+                    preg_match('/^[a-z0-9]+$/i', $replacement[0])
+                ) {
                     unset($origin[$j]);
                     continue;
                 }
@@ -568,15 +574,17 @@ class Compiler
         $children = [];
         $j = $i = count($fragment);
 
-        do {
+        for (;;) {
             $children = $j != $i ? array_slice($fragment, $j, $i - $j) : [];
             $parents = array_slice($fragment, 0, $j);
             $slice = end($parents);
-            $hasImmediateRelationshipCombinator = !empty($slice) && $this->isImmediateRelationshipCombinator($slice[0]);
-            if ($hasImmediateRelationshipCombinator) {
-                $j -= 2;
+
+            if (empty($slice) || ! $this->isImmediateRelationshipCombinator($slice[0])) {
+                break;
             }
-        } while ($hasImmediateRelationshipCombinator);
+
+            $j -= 2;
+        }
 
         return [$parents, $children];
     }
@@ -1353,30 +1361,33 @@ class Compiler
         return $out;
     }
 
-    protected function mergeDirectRelationships($selectors1, $selectors2) {
+    protected function mergeDirectRelationships($selectors1, $selectors2)
+    {
         if (empty($selectors1) || empty($selectors2)) {
             return array_merge($selectors1, $selectors2);
         }
 
         $part1 = end($selectors1);
         $part2 = end($selectors2);
-        if (!$this->isImmediateRelationshipCombinator($part1[0]) || $part1 !== $part2) {
+
+        if (! $this->isImmediateRelationshipCombinator($part1[0]) || $part1 !== $part2) {
             return array_merge($selectors1, $selectors2);
         }
 
         $merged = [];
+
         do {
             $part1 = array_pop($selectors1);
             $part2 = array_pop($selectors2);
 
-            if ($this->isImmediateRelationshipCombinator($part1[0]) && $part1 === $part2) {
-                array_unshift($merged, $part1);
-                array_unshift($merged, [array_pop($selectors1)[0] . array_pop($selectors2)[0]]);
-            } else {
+            if ($this->isImmediateRelationshipCombinator($part1[0]) && $part1 !== $part2) {
                 $merged = array_merge($selectors1, [$part1], $selectors2, [$part2], $merged);
                 break;
             }
-        } while (!empty($selectors1) && !empty($selectors2));
+
+            array_unshift($merged, $part1);
+            array_unshift($merged, [array_pop($selectors1)[0] . array_pop($selectors2)[0]]);
+        } while (! empty($selectors1) && ! empty($selectors2));
 
         return $merged;
     }
@@ -1720,7 +1731,7 @@ class Compiler
                 $end = $end[1];
                 $d = $start < $end ? 1 : -1;
 
-                while (true) {
+                for (;;) {
                     if ((! $for->until && $start - $d == $end) ||
                         ($for->until && $start == $end)
                     ) {
@@ -3063,13 +3074,14 @@ class Compiler
 
         $nextIsRoot = false;
         $hasNamespace = $normalizedName[0] === '^' || $normalizedName[0] === '@' || $normalizedName[0] === '%';
+
         for (;;) {
             if (array_key_exists($normalizedName, $env->store)) {
                 return $env->store[$normalizedName];
             }
 
             if (! $hasNamespace && isset($env->marker)) {
-                if (! $nextIsRoot && !empty($env->store[$specialContentKey])) {
+                if (! $nextIsRoot && ! empty($env->store[$specialContentKey])) {
                     $env = $env->store[$specialContentKey]->scope;
                     $nextIsRoot = true;
                     continue;
