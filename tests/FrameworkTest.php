@@ -23,7 +23,7 @@ class FrameworkTest extends \PHPUnit_Framework_TestCase
         ],
         [
             "frameworkVerion" => "zurb/foundation6.2",
-            "inputdirectory" => "../vendor/zurb/foundation/scss/",
+            "inputdirectory" => "../vendor/zurb/foundation/assets/",
             "inputfiles" => "foundation.scss",
         ]
     ];
