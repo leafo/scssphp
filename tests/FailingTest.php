@@ -87,32 +87,6 @@ END_OF_SCSS
 END_OF_EXPECTED
             ),
             array(
-                '#199 - issue with selectors', <<<'END_OF_SCSS'
-.abc {
-  color: #ddd;
-}
-
-a.abc:hover {
-  text-decoration: underline; 
-}
-
-small {
-  @extend .abc;
-  font-weight: italic;
-}
-END_OF_SCSS
-                , <<<END_OF_EXPECTED
-.abc, small {
-  color: #ddd; }
-
-a.abc:hover {
-  text-decoration: underline; }
-
-small {
-  font-weight: italic; }
-END_OF_EXPECTED
-            ),
-            array(
                 '#368 - self in selector', <<<'END_OF_SCSS'
 .test {
     &:last-child:not(+ &:first-child) {
