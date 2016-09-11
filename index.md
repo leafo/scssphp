@@ -121,6 +121,12 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.6.6** -- September 10, 2016
+  * Do not extend decorated tags with another tag (FMCorz)
+  * Merge shared direct relationship when extending (FMCorz)
+  * Extend resolution was generating invalid selectors (FMCorz)
+  * Resolve function arguments using mixin content scope (FMCorz)
+  * Let {% raw %}@{% endraw %}content work when a block isn’t passed in. (diemer)
 * **0.6.5** -- June 20, 2016
   * ignore BOM (nwiborg)
   * fix another mixin and variable scope issue (mahagr)
