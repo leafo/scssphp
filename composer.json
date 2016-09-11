@@ -26,7 +26,9 @@
     "require-dev": {
         "squizlabs/php_codesniffer": "~2.5",
         "phpunit/phpunit": "~3.7",
-        "kherge/box": "~2.5"
+        "kherge/box": "~2.5",
+        "twbs/bootstrap": "4.0.0-alpha.4",
+        "zurb/foundation": "~6.2"
     },
     "bin": ["bin/pscss"],
     "archive": {
