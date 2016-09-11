@@ -36,3 +36,7 @@ A {
 
 .test {
   display: none; }
+
+.test_empty_content {
+  display: inline;
+  font-weight: bold; }
