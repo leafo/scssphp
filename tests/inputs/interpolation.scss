@@ -91,3 +91,9 @@ body{
 foo, #{x, y} {
     color: #abc;
 }
+
+// interpolate lists
+$foo: ('a', 'b');
+div {
+    prop: #{$foo};
+}

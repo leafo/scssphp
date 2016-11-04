@@ -2723,6 +2723,39 @@ class Compiler
                 $reduced = $this->reduce($exp);
 
                 switch ($reduced[0]) {
+                    case Type::T_LIST:
+                        $reduced = $this->extractInterpolation($reduced);
+
+                        if ($reduced[0] !== Type::T_LIST) {
+                            break;
+                        }
+
+                        list(, $delim, $items) = $reduced;
+
+                        if ($delim !== ' ') {
+                            $delim .= ' ';
+                        }
+
+                        $filtered = [];
+
+                        foreach ($items as $item) {
+                            if ($item[0] === Type::T_NULL) {
+                                continue;
+                            }
+
+                            $temp = $this->compileValue([Type::T_KEYWORD, $item]);
+                            if ($temp[0] === Type::T_STRING) {
+                                $filtered[] = $this->compileStringContent($temp);
+                            } elseif ($temp[0] === Type::T_KEYWORD) {
+                                $filtered[] = $temp[1];
+                            } else {
+                                $filtered[] = $this->compileValue($temp);
+                            }
+                        }
+
+                        $reduced = [Type::T_KEYWORD, implode("$delim", $filtered)];
+                        break;
+
                     case Type::T_STRING:
                         $reduced = [Type::T_KEYWORD, $this->compileStringContent($reduced)];
                         break;

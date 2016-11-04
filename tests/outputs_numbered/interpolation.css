@@ -68,3 +68,6 @@ body {
 /* line 91, inputs/interpolation.scss */
 foo, x, y {
   color: #abc; }
+/* line 97, inputs/interpolation.scss */
+div {
+  prop: a, b; }

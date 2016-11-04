@@ -58,3 +58,6 @@ body {
 
 foo, x, y {
   color: #abc; }
+
+div {
+  prop: a, b; }
