@@ -1015,12 +1015,15 @@ class Compiler
 
             switch ($this->lineNumberStyle) {
                 case self::LINE_COMMENTS:
-                    $annotation->lines[] = '/* line ' . $line . ', ' . $file . ' */';
+                    $annotation->lines[] = '/* line ' . $line
+                                         . ($file ? ', ' . $file : '')
+                                         . ' */';
                     break;
 
                 case self::DEBUG_INFO:
-                    $annotation->lines[] = '@media -sass-debug-info{filename{font-family:"' . $file
-                                         . '"}line{font-family:' . $line . '}}';
+                    $annotation->lines[] = '@media -sass-debug-info{'
+                                         . ($file ? 'filename{font-family:"' . $file . '"}' : '')
+                                         . 'line{font-family:' . $line . '}}';
                     break;
             }
 

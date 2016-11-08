@@ -169,11 +169,11 @@ if ($dumpTree) {
 
 $scss = new Compiler();
 
-if ($debugInfo && $inputFile) {
+if ($debugInfo) {
     $scss->setLineNumberStyle(Compiler::DEBUG_INFO);
 }
 
-if ($lineNumbers && $inputFile) {
+if ($lineNumbers) {
     $scss->setLineNumberStyle(Compiler::LINE_COMMENTS);
 }
 
