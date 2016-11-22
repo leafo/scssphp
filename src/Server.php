@@ -457,7 +457,7 @@ class Server
      */
     public static function serveFrom($path)
     {
-        $server = new self($path);
+        $server = new static($path);
         $server->serve();
     }
 }
