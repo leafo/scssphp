@@ -3496,7 +3496,7 @@ class Compiler
      */
     protected function fileExists($name)
     {
-        return is_file($name);
+        return file_exists($name) && is_file($name);
     }
 
     /**
