@@ -3390,6 +3390,8 @@ class Compiler
             $urls = [$url, preg_replace('/[^\/]+$/', '_\0', $url)];
         }
 
+        $hasExtension = preg_match('/[.]s?css$/', $url);
+
         foreach ($this->importPaths as $dir) {
             if (is_string($dir)) {
                 // check urls for normal import paths
@@ -3399,7 +3401,7 @@ class Compiler
                         . $full;
 
                     if ($this->fileExists($file = $full . '.scss') ||
-                        $this->fileExists($file = $full)
+                        ($hasExtension && $this->fileExists($file = $full))
                     ) {
                         return $file;
                     }
