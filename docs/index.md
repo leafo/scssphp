@@ -331,7 +331,7 @@ your custom feature using the `addFeature` method:
 
 * `addFeature($name)` registers the `$name`.
 
-### Exception Handling
+### Security Considerations
 
 If your web appilcation compiles SCSS on-the-fly, you need to handle any potential
 exceptions thrown by the Compiler. This is especially important in a production
@@ -350,6 +350,10 @@ try {
     syslog(LOG_ERR, 'scssphp: Unable to compile content');
 }
 {% endhighlight %}
+
+If your web application allows for arbitrary `@import` paths, you should
+tighten the `open_basedir` setting at run-time to mitigate vulnerability to
+local file inclusion (LFI) attack.
 
 ## SCSS Server
 
