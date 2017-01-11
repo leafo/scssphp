@@ -331,6 +331,26 @@ your custom feature using the `addFeature` method:
 
 * `addFeature($name)` registers the `$name`.
 
+### Exception Handling
+
+If your web appilcation compiles SCSS on-the-fly, you need to handle any potential
+exceptions thrown by the Compiler. This is especially important in a production
+environment where the content may be untrusted (e.g., user uploaded) because
+the exception stack trace may contain sensitive data.
+
+{% highlight php startinline=true %}
+use Leafo\ScssPhp\Compiler;
+
+try {
+    $scss = new Compiler();
+
+    echo $scss->compile($content);
+} catch (\Exception $e) {
+    echo '';
+    syslog(LOG_ERR, 'scssphp: Unable to compile content');
+}
+{% endhighlight %}
+
 ## SCSS Server
 
 The SCSS server is a small class that helps with automatically compiling SCSS.
