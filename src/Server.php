@@ -455,7 +455,7 @@ class Server
      *
      * @param string $path Root path
      */
-    public static function serveFrom($path)
+    public static function serveFrom($path, $cacheDir = null)
     {
         $server = new static($path);
         $server->serve();
