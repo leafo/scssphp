@@ -3580,7 +3580,7 @@ class Compiler
 
         $returnValue = call_user_func($f, $sorted, $kwargs);
 
-        if (! isset($returnValue)) {
+        if (!isset($returnValue) && !is_null($returnValue)) {
             return false;
         }
 
