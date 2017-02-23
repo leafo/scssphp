@@ -121,6 +121,10 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.6.7** -- February 23, 2017
+  * fix list interpolation
+  * pscss: enable --line-numbers and --debug-info for stdin
+  * checkRange() throws RangeException
 * **0.6.6** -- September 10, 2016
   * Do not extend decorated tags with another tag (FMCorz)
   * Merge shared direct relationship when extending (FMCorz)
