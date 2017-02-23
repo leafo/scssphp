@@ -68,7 +68,8 @@ use Leafo\ScssPhp\Server;
 
 $directory = "stylesheets";
 
-Server::serveFrom($directory);
+$server = new Server($directory);
+$server->serve();
 {% endhighlight %}
 
 Create the directory set in the script alongside the script, then add your
@@ -121,6 +122,8 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
+* **0.7.0** -- ???
+  * Server::serveFrom() helper removed
 * **0.6.7** -- February 23, 2017
   * fix list interpolation
   * pscss: enable --line-numbers and --debug-info for stdin

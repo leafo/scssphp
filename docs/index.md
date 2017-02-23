@@ -357,15 +357,11 @@ local file inclusion (LFI) attack.
 
 ## SCSS Server
 
-The SCSS server is a small class that helps with automatically compiling SCSS.
-
-It's an endpoint for your web application that searches for SCSS files in a
-directory then compiles and serves them as CSS. It will only compile
-files if they've been modified (or one of the imports has been modified).
-
-### Using `serveFrom`
-
-`Server::serveFrom` is a simple to use function that should handle most cases.
+The SCSS server is a small class that demonstrates the ability to automatically
+compile SCSS on the fly. The example provides an endpoint for your web application
+that searches for SCSS files in a directory then compiles and serves them as CSS.
+It will only compile files if they've been modified (or one of the imports has
+been modified).
 
 For example, create a file `style.php`:
 
@@ -374,15 +370,12 @@ use Leafo\ScssPhp\Server;
 
 $directory = 'stylesheets';
 
-Server::serveFrom($directory);
+$server = new Server($directory);
+$server->serve();
 {% endhighlight %}
 
 Going to the URL `example.com/style.php/style.scss` will attempt to compile
 `style.scss` from the `stylesheets` directory, and serve it as CSS.
-
-* `Server::serveFrom($directory)` will serve SCSS files out of
-  `$directory`. It will attempt to get the path to the file out of
-  `$_SERVER['PATH_INFO']`. (It also looks at the GET parameter `p`)
 
 If it can not find the file it will return an HTTP 404 page:
 
@@ -405,9 +398,9 @@ it runs.
 
 ### Using `Leafo\ScssPhp\Server`
 
-Creating an instance of `Server` is just another way of accomplishing what
-`serveFrom` does. It lets us customize the cache directory and the instance
-of the `Compiler` that is used to compile
+Creating an instance of `Server` provides the highest level of customization.
+We can specify the cache directory and even the instance of the `Compiler`
+that is used to compile SCSS.
 
 * `new Server($sourceDir, $cacheDir, $scss)` creates a new server that
   serves files from `$sourceDir`. The cache dir is where the cached compiled
