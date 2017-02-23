@@ -449,15 +449,4 @@ class Server
             date_default_timezone_set('UTC');
         }
     }
-
-    /**
-     * Helper method to serve compiled scss
-     *
-     * @param string $path Root path
-     */
-    public static function serveFrom($path)
-    {
-        $server = new static($path);
-        $server->serve();
-    }
 }
