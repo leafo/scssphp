@@ -38,6 +38,18 @@ class ApiTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testUserFunctionNull()
+    {
+        $this->scss->registerFunction('get-null', function ($args) {
+            return Compiler::$null;
+        });
+
+        $this->assertEquals(
+            '',
+            $this->compile('result: get-null();')
+        );
+    }
+
     public function testUserFunctionKwargs()
     {
         $this->scss->registerFunction(
