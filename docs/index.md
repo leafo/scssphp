@@ -5,7 +5,7 @@ title: Documentation
 
 # scssphp {{ site.current_version }} Documentation
 
-## PHP Interface
+## SCSSPHP Library
 
 ### Including
 
@@ -220,23 +220,9 @@ This works well in combination with frontend debugging tools such as https://add
 To activate this feature, call the `setLineNumberStyle` method after creating a new instance of class `Compiler`.
 
 {% highlight php startinline=true %}
-use Leafo\ScssPhp\Server;
 use Leafo\ScssPhp\Compiler;
 
 $directory = 'css';
-
-$scss = new Compiler();
-$scss->setLineNumberStyle(Compiler::LINE_COMMENTS);
-
-$server = new Server($directory, null, $scss);
-$server->serve();
-{% endhighlight %}
-
-You can also call the `compile` method directly (without using an instance of `Server` like above)
-
-{% highlight php startinline=true %}
-use Leafo\ScssPhp\Server;
-use Leafo\ScssPhp\Compiler;
 
 $scss = new Compiler();
 $scss->setLineNumberStyle(Compiler::LINE_COMMENTS);
@@ -355,100 +341,6 @@ If your web application allows for arbitrary `@import` paths, you should
 tighten the `open_basedir` setting at run-time to mitigate vulnerability to
 local file inclusion (LFI) attack.
 
-## SCSS Server
+### Server Example
 
-The SCSS server is a small class that demonstrates the ability to automatically
-compile SCSS on the fly. The example provides an endpoint for your web application
-that searches for SCSS files in a directory then compiles and serves them as CSS.
-It will only compile files if they've been modified (or one of the imports has
-been modified).
-
-For example, create a file `style.php`:
-
-{% highlight php startinline=true %}
-use Leafo\ScssPhp\Server;
-
-$directory = 'stylesheets';
-
-$server = new Server($directory);
-$server->serve();
-{% endhighlight %}
-
-Going to the URL `example.com/style.php/style.scss` will attempt to compile
-`style.scss` from the `stylesheets` directory, and serve it as CSS.
-
-If it can not find the file it will return an HTTP 404 page:
-
-{% highlight text %}
-/* INPUT NOT FOUND scss v0.0.1 */
-{% endhighlight %}
-
-If the file can't be compiled due to an error, then an HTTP 500 page is
-returned. Similar to the following:
-
-{% highlight text %}
-Parse error: failed at 'height: ;' stylesheets/test.scss on line 8
-{% endhighlight %}
-
-By default , the SCSS server must have write access to the style sheet
-directory. It writes its cache in a special directory called `scss_cache`.
-
-Also, because SCSS server writes headers, make sure no output is written before
-it runs.
-
-### Using `Leafo\ScssPhp\Server`
-
-Creating an instance of `Server` provides the highest level of customization.
-We can specify the cache directory and even the instance of the `Compiler`
-that is used to compile SCSS.
-
-* `new Server($sourceDir, $cacheDir, $scss)` creates a new server that
-  serves files from `$sourceDir`. The cache dir is where the cached compiled
-  files are placed. When `null`, `$sourceDir . '/scss_cache'` is used. `$scss`
-  is the instance of `scss` that is used to compile.
-
-Just call the `serve` method to let it render its output.
-
-Here's an example of creating a SCSS server that outputs compressed CSS:
-
-{% highlight php startinline=true %}
-use Leafo\ScssPhp\Compiler;
-use Leafo\ScssPhp\Server;
-
-$scss = new Compiler();
-$scss->setFormatter('Leafo\ScssPhp\Formatter\Compressed');
-
-$server = new Server('stylesheets', null, $scss);
-$server->serve();
-{% endhighlight %}
-
-## Command Line Tool
-
-A really basic command line tool is included for integration with scripts. It
-is called `pscss`. It reads SCSS from either a named input file or standard in,
-and returns the CSS to standard out.
-
-Usage: bin/pscss [options] [input-file]
-
-### Options
-
-If passed the flag `-h` (or `--help`), input is ignored and a summary of the command's usage is returned.
-
-If passed the flag `-v` (or `--version`), input is ignored and the current version is returned.
-
-If passed the flag `-T`, a formatted parse tree is returned instead of the compiled CSS.
-
-The flag `-f` (or `--style`) can be used to set the [formatter](#output-formatting):
-
-{% highlight bash %}
-$ bin/pscss -f compressed < styles.scss
-{% endhighlight %}
-
-The flag `-i` (or `--load_paths`) can be used to set import paths for the loader. On Unix/Linux systems,
-the paths are colon separated.
-
-The flag `-p` (or `--precision`) can be used to set the decimal number precision. The default is 5.
-
-The flag `--debug-info` can be used to annotate the selectors with CSS {% raw %}@{% endraw %}media queries that identify the source file and line number.
-
-The flag `--line-comments` (or `--line-numbers`) can be used to annotate the selectors with comments that identify the source file and line number.
+An example `Server` class is described here: <a href="{{ site.baseurl }}docs/example.html">{{ site.baseurl }}docs/example.html</a>.

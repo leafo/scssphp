@@ -4,7 +4,7 @@ current_version: 0.6.7
 description: >
   SCSS compiler written in PHP
 url: http://leafo.github.io
-baseurl: /scssphp/
+baseurl: /scssphp
 repo_url: https://github.com/leafo/scssphp
 
 # Build settings
