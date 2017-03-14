@@ -25,8 +25,7 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "~2.5",
-        "phpunit/phpunit": "~3.7",
-        "kherge/box": "~2.5"
+        "phpunit/phpunit": "~4.6"
     },
     "bin": ["bin/pscss"],
     "archive": {
@@ -35,7 +34,6 @@
             "/.gitattributes",
             "/.gitignore",
             "/.travis.yml",
-            "/box.json.dist",
             "/phpunit.xml.dist",
             "/tests"
         ]
