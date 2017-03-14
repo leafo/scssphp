@@ -8,8 +8,9 @@
  *
  * @link http://leafo.github.io/scssphp
  */
-
 namespace Leafo\ScssPhp\Tests;
+
+require_once __DIR__ . '/../example/Server.php';
 
 use Leafo\ScssPhp\Server;
 
