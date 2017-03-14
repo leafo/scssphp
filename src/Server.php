@@ -434,7 +434,7 @@ class Server
         $this->cacheDir = $cacheDir;
 
         if (! is_dir($this->cacheDir)) {
-            mkdir($this->cacheDir, 0755, true);
+            mkdir($this->cacheDir, 0777, true);
         }
 
         if (! isset($scss)) {
