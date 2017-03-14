@@ -7,10 +7,10 @@ php:
   - 5.6
   - 7.0
   - 7.1
-# - nightly
+  - nightly
 
 script:
-  - phpunit tests
+  - vendor/bin/phpunit tests
 
 branches:
   only:
