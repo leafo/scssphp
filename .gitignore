@@ -1,3 +1,4 @@
+# Project
 .sass-cache
 scss_cache
 composer.lock
@@ -8,3 +9,11 @@ composer.lock
 /compass/
 /vendor/
 /frameworks/
+
+# IDE
+.idea/
+nbproject/
+.project
+
+# Filesystem
+.DS_Store
