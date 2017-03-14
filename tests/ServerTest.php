@@ -23,6 +23,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCheckedCachedCompile()
     {
+        if (! file_exists(__DIR__ . '/inputs/scss_cache')) {
+            mkdir(__DIR__ . '/inputs/scss_cache', 0755);
+        }
+
         $server = new Server(__DIR__ . '/inputs/');
         $css = $server->checkedCachedCompile(__DIR__ . '/inputs/import.scss', '/tmp/scss.css');
 
