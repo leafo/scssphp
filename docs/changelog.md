@@ -221,5 +221,5 @@ title: Changelog
   * SCSS server is aware of imports
   * added custom function interface
   * compressed formatter
-  * wrote <a href="{{ site.baseurl }}docs/">documentation</a>
+  * wrote <a href="{{ site.baseurl }}/docs/">documentation</a>
 * **0.0.1** -- July 29th, 2012 -- Initial Release

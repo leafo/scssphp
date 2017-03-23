@@ -78,7 +78,7 @@ The flag `--line-comments` (or `--line-numbers`) can be used to annotate the sel
 
 ## SCSSPHP Library Reference
 
-Complete documentation for **scssphp** is located at <a href="{{ site.baseurl }}docs/">{{ site.baseurl }}docs/</a>.
+Complete documentation for **scssphp** is located at <a href="{{ site.baseurl }}/docs/">{{ site.baseurl }}/docs/</a>.
 
 To use the scssphp library either require `scss.inc.php` or use your `composer` generated auto-loader, and then
 invoke the `Compiler` class:
@@ -100,7 +100,7 @@ The `compile` method takes `SCSS` as a string, and returns the `CSS`. If there
 is an error when compiling then an exception is thrown with an appropriate
 message.
 
-For a more detailed guide, consult <a href="{{ site.baseurl }}docs/">{{ site.baseurl }}docs/</a>.
+For a more detailed guide, consult <a href="{{ site.baseurl }}/docs/">{{ site.baseurl }}/docs/</a>.
 
 <a name="issues"></a>
 
@@ -110,7 +110,7 @@ Please submit bug reports and feature requests to the [the issue tracker][3]. Pu
 
 ## Changelog
 
-For a list of **scssphp** changes, refer to <a href="{{ site.baseurl }}docs/changelog.html">{{ site.baseurl }}docs/changelog.html</a>.
+For a list of **scssphp** changes, refer to <a href="{{ site.baseurl }}/docs/changelog.html">{{ site.baseurl }}/docs/changelog.html</a>.
 
   [0]: http://sass-lang.com/
   [1]: http://sass-lang.com/documentation/file.SASS_REFERENCE.html
