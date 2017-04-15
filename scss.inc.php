@@ -27,3 +27,4 @@ if (! class_exists('scssc', false)) {
     include_once __DIR__ . '/src/Util.php';
     include_once __DIR__ . '/src/Version.php';
 }
+?>
