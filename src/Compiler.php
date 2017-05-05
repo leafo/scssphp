@@ -12,15 +12,9 @@
 namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Base\Range;
-use Leafo\ScssPhp\Block;
-use Leafo\ScssPhp\Colors;
 use Leafo\ScssPhp\Compiler\Environment;
 use Leafo\ScssPhp\Exception\CompilerException;
 use Leafo\ScssPhp\Formatter\OutputBlock;
-use Leafo\ScssPhp\Node;
-use Leafo\ScssPhp\Type;
-use Leafo\ScssPhp\Parser;
-use Leafo\ScssPhp\Util;
 
 /**
  * The scss compiler and parser.
@@ -1181,7 +1175,7 @@ class Compiler
     /**
      * Compile selector to string; self(&) should have been replaced by now
      *
-     * @param array $selector
+     * @param string|array $selector
      *
      * @return string
      */
@@ -1203,7 +1197,7 @@ class Compiler
     /**
      * Compile selector part
      *
-     * @param arary $piece
+     * @param array $piece
      *
      * @return string
      */
@@ -1947,11 +1941,12 @@ class Compiler
                 if ($value[1] === '/') {
                     return $this->shouldEval($value[2], $value[3]);
                 }
-
+                break;
                 // fall-thru
             case Type::T_VARIABLE:
             case Type::T_FUNCTION_CALL:
                 return true;
+                break;
         }
 
         return false;
@@ -2238,7 +2233,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return Node\Number
      */
     protected function opAddNumberNumber($left, $right)
     {
@@ -2251,7 +2246,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return Node\Number
      */
     protected function opMulNumberNumber($left, $right)
     {
@@ -2264,7 +2259,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return Node\Number
      */
     protected function opSubNumberNumber($left, $right)
     {
@@ -2277,7 +2272,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return array|Node\Number
      */
     protected function opDivNumberNumber($left, $right)
     {
@@ -2294,7 +2289,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return Node\Number
      */
     protected function opModNumberNumber($left, $right)
     {
@@ -2580,7 +2575,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return Node\Number
      */
     protected function opCmpNumberNumber($left, $right)
     {
@@ -3505,7 +3500,7 @@ class Compiler
      * Call SCSS @function
      *
      * @param string $name
-     * @param array  $args
+     * @param array  $argValues
      * @param array  $returnValue
      *
      * @return boolean Returns true if returnValue is set; otherwise, false
@@ -3777,7 +3772,7 @@ class Compiler
      *
      * @param mixed $value
      *
-     * @return array
+     * @return array|Node\Number
      */
     private function coerceValue($value)
     {
@@ -3851,6 +3846,7 @@ class Compiler
      * Coerce something to list
      *
      * @param array $item
+     * @param string $delim
      *
      * @return array
      */
@@ -4168,9 +4164,7 @@ class Compiler
         $g = $this->hueToRGB($m1, $m2, $h) * 255;
         $b = $this->hueToRGB($m1, $m2, $h - 1/3) * 255;
 
-        $out = [Type::T_COLOR, $r, $g, $b];
-
-        return $out;
+        return [Type::T_COLOR, $r, $g, $b];
     }
 
     // Built in functions
@@ -4352,7 +4346,7 @@ class Compiler
                     $max = 100;
             }
 
-            $scale = $scale / 100;
+            $scale /= 100;
 
             if ($scale < 0) {
                 return $base * $scale + $base;
@@ -5003,19 +4997,20 @@ class Compiler
                 if ($this->coerceColor($value)) {
                     return 'color';
                 }
-
+                break;
                 // fall-thru
             case Type::T_FUNCTION:
                 return 'string';
-
+                break;
             case Type::T_LIST:
                 if (isset($value[3]) && $value[3]) {
                     return 'arglist';
                 }
-
+                break;
                 // fall-thru
             default:
                 return $value[0];
+                break;
         }
     }
 
@@ -5210,6 +5205,8 @@ class Compiler
      * Workaround IE7's content counter bug.
      *
      * @param array $args
+     *
+     * @return array
      */
     protected function libCounter($args)
     {
