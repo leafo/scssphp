@@ -1941,7 +1941,7 @@ class Compiler
                 if ($value[1] === '/') {
                     return $this->shouldEval($value[2], $value[3]);
                 }
-                break;
+
                 // fall-thru
             case Type::T_VARIABLE:
             case Type::T_FUNCTION_CALL:
@@ -4997,16 +4997,16 @@ class Compiler
                 if ($this->coerceColor($value)) {
                     return 'color';
                 }
-                break;
+
                 // fall-thru
             case Type::T_FUNCTION:
                 return 'string';
-                break;
+
             case Type::T_LIST:
                 if (isset($value[3]) && $value[3]) {
                     return 'arglist';
                 }
-                break;
+
                 // fall-thru
             default:
                 return $value[0];
