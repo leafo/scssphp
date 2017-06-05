@@ -3104,6 +3104,7 @@ class Compiler
         $normalizedName = $this->normalizeName($name);
         $specialContentKey = static::$namespaces['special'] . 'content';
 
+
         if (! isset($env)) {
             $env = $this->getStoreEnv();
         }
@@ -3117,7 +3118,7 @@ class Compiler
             }
 
             if (! $hasNamespace && isset($env->marker)) {
-                if (! $nextIsRoot && ! empty($env->store[$specialContentKey])) {
+                if (! $nextIsRoot && !empty($env->store[$specialContentKey])) {
                     $env = $env->store[$specialContentKey]->scope;
                     $nextIsRoot = true;
                     continue;
