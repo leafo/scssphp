@@ -2468,7 +2468,13 @@ class Parser
      */
     private function saveEncoding()
     {
-        if (ini_get('mbstring.func_overload') & 2) {
+        if (version_compare(PHP_VERSION, '7.2.0') >= 0) {
+            return;
+        }
+
+        $iniDirective = 'mbstring' . '.func_overload'; // deprecated in PHP 7.2
+
+        if (ini_get($iniDirective) & 2) {
             $this->encoding = mb_internal_encoding();
 
             mb_internal_encoding('iso-8859-1');
