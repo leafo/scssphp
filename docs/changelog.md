@@ -5,9 +5,11 @@ title: Changelog
 
 ## Changelog
 
-* **0.7.0** -- ???
+* **0.7.1** -- October 13, 2017
   * Server moved to example/ folder
   * Server::serveFrom() helper removed
+  * Removed .phar build
+  * Workaround {% raw %}each(){% endraw %} deprecated in PHP 7.2RC (marinaglancy)
 * **0.6.7** -- February 23, 2017
   * fix list interpolation
   * pscss: enable --line-numbers and --debug-info for stdin
