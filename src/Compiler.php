@@ -1181,7 +1181,7 @@ class Compiler
     /**
      * Compile selector to string; self(&) should have been replaced by now
      *
-     * @param array $selector
+     * @param string|array $selector
      *
      * @return string
      */
@@ -1203,7 +1203,7 @@ class Compiler
     /**
      * Compile selector part
      *
-     * @param arary $piece
+     * @param array $piece
      *
      * @return string
      */
@@ -1963,7 +1963,7 @@ class Compiler
      * @param array   $value
      * @param boolean $inExp
      *
-     * @return array
+     * @return array|\Leafo\ScssPhp\Node\Number
      */
     protected function reduce($value, $inExp = false)
     {
@@ -2238,7 +2238,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return \Leafo\ScssPhp\Node\Number
      */
     protected function opAddNumberNumber($left, $right)
     {
@@ -2251,7 +2251,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return \Leafo\ScssPhp\Node\Number
      */
     protected function opMulNumberNumber($left, $right)
     {
@@ -2264,7 +2264,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return \Leafo\ScssPhp\Node\Number
      */
     protected function opSubNumberNumber($left, $right)
     {
@@ -2277,7 +2277,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return array|\Leafo\ScssPhp\Node\Number
      */
     protected function opDivNumberNumber($left, $right)
     {
@@ -2294,7 +2294,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return \Leafo\ScssPhp\Node\Number
      */
     protected function opModNumberNumber($left, $right)
     {
@@ -2580,7 +2580,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return \Leafo\ScssPhp\Node\Number
      */
     protected function opCmpNumberNumber($left, $right)
     {
@@ -3505,7 +3505,7 @@ class Compiler
      * Call SCSS @function
      *
      * @param string $name
-     * @param array  $args
+     * @param array  $argValues
      * @param array  $returnValue
      *
      * @return boolean Returns true if returnValue is set; otherwise, false
@@ -3777,7 +3777,7 @@ class Compiler
      *
      * @param mixed $value
      *
-     * @return array
+     * @return array|\Leafo\ScssPhp\Node\Number
      */
     private function coerceValue($value)
     {
@@ -3850,7 +3850,8 @@ class Compiler
     /**
      * Coerce something to list
      *
-     * @param array $item
+     * @param array  $item
+     * @param string $delim
      *
      * @return array
      */
@@ -5210,6 +5211,8 @@ class Compiler
      * Workaround IE7's content counter bug.
      *
      * @param array $args
+     *
+     * @return array
      */
     protected function libCounter($args)
     {
