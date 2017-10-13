@@ -31,7 +31,7 @@ class Number extends Node implements \ArrayAccess
     /**
      * @var integer
      */
-    static public $precision = 5;
+    static public $precision = 10;
 
     /**
      * @see http://www.w3.org/TR/2012/WD-css3-values-20120308/
