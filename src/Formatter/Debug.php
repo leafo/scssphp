@@ -12,7 +12,6 @@
 namespace Leafo\ScssPhp\Formatter;
 
 use Leafo\ScssPhp\Formatter;
-use Leafo\ScssPhp\Formatter\OutputBlock;
 
 /**
  * Debug formatter
@@ -95,7 +94,7 @@ class Debug extends Formatter
 
         $this->indentLevel++;
 
-        foreach ($block->children as $i => $child) {
+        foreach ($block->children as $child) {
             $this->block($child);
         }
 

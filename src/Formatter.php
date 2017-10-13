@@ -209,8 +209,6 @@ abstract class Formatter
 
         $this->block($block);
 
-        $out = ob_get_clean();
-
-        return $out;
+        return ob_get_clean();
     }
 }

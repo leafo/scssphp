@@ -11,11 +11,7 @@
 
 namespace Leafo\ScssPhp;
 
-use Leafo\ScssPhp\Block;
-use Leafo\ScssPhp\Compiler;
 use Leafo\ScssPhp\Exception\ParserException;
-use Leafo\ScssPhp\Node;
-use Leafo\ScssPhp\Type;
 
 /**
  * Parser

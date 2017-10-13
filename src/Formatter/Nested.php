@@ -12,7 +12,6 @@
 namespace Leafo\ScssPhp\Formatter;
 
 use Leafo\ScssPhp\Formatter;
-use Leafo\ScssPhp\Formatter\OutputBlock;
 
 /**
  * Nested formatter
@@ -71,18 +70,6 @@ class Nested extends Formatter
         if (! empty($block->children)) {
             echo $this->break;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function blockSelectors(OutputBlock $block)
-    {
-        $inner = $this->indentStr();
-
-        echo $inner
-            . implode($this->tagSeparator, $block->selectors)
-            . $this->open . $this->break;
     }
 
     /**
@@ -192,7 +179,7 @@ class Nested extends Formatter
         foreach ($block->children as $child) {
             $this->adjustAllChildren($child);
 
-            $child->depth = $child->depth - $block->depth;
+            $child->depth -= $block->depth;
         }
     }
 }
