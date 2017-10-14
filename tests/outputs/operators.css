@@ -6,7 +6,7 @@ body {
   color: 5px;
   top: 1.5em;
   left: -1cm;
-  top: 6.29921; }
+  top: 6.2992125984; }
 
 div {
   color: false;
@@ -19,7 +19,7 @@ div {
   color: 1; }
 
 #units {
-  test: 2.5748in;
+  test: 2.5748031496in;
   test: 13mm;
   test: 4em;
   test: 11mm;
@@ -169,7 +169,7 @@ div {
   margin: 0 -2em; }
 
 div {
-  *margin-left: 2.07447%; }
+  *margin-left: 2.0744680851%; }
 
 .foo {
   width: 12.5%; }
