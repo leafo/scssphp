@@ -165,9 +165,6 @@ class Compiler
      */
     public function compile($code, $path = null)
     {
-        $locale = setlocale(LC_NUMERIC, 0);
-        setlocale(LC_NUMERIC, 'C');
-
         $this->indentLevel    = -1;
         $this->commentsSeen   = [];
         $this->extends        = [];
@@ -195,8 +192,6 @@ class Compiler
         $this->popEnv();
 
         $out = $this->formatter->format($this->scope);
-
-        setlocale(LC_NUMERIC, $locale);
 
         return $out;
     }
