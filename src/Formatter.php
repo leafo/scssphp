@@ -12,6 +12,7 @@
 namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Formatter\OutputBlock;
+use Leafo\ScssPhp\SourceMap\SourceMapGenerator;
 
 /**
  * Base formatter
@@ -56,9 +57,30 @@ abstract class Formatter
     public $assignSeparator;
 
     /**
-     * @var boolea
+     * @var boolean
      */
     public $keepSemicolons;
+
+    /**
+     * @var OutputBlock;
+     */
+    protected $currentBlock;
+
+
+    /**
+     * @var int
+     */
+    protected $currentLine;
+
+    /**
+     * @var int;
+     */
+    protected $currentColumn;
+
+    /**
+     * @var SourceMapGenerator
+     */
+    protected $sourceMapGenerator;
 
     /**
      * Initialize formatter
@@ -123,10 +145,10 @@ abstract class Formatter
 
         $glue = $this->break . $inner;
 
-        echo $inner . implode($glue, $block->lines);
+        $this->write($inner . implode($glue, $block->lines));
 
         if (! empty($block->children)) {
-            echo $this->break;
+            $this->write($this->break);
         }
     }
 
@@ -139,9 +161,9 @@ abstract class Formatter
     {
         $inner = $this->indentStr();
 
-        echo $inner
+        $this->write($inner
             . implode($this->tagSeparator, $block->selectors)
-            . $this->open . $this->break;
+            . $this->open . $this->break);
     }
 
     /**
@@ -167,6 +189,8 @@ abstract class Formatter
             return;
         }
 
+        $this->currentBlock = $block;
+
         $pre = $this->indentStr();
 
         if (! empty($block->selectors)) {
@@ -187,10 +211,10 @@ abstract class Formatter
             $this->indentLevel--;
 
             if (empty($block->children)) {
-                echo $this->break;
+                $this->write($this->break);
             }
 
-            echo $pre . $this->close . $this->break;
+            $this->write($pre . $this->close . $this->break);
         }
     }
 
@@ -201,10 +225,19 @@ abstract class Formatter
      *
      * @param \Leafo\ScssPhp\Formatter\OutputBlock $block An abstract syntax tree
      *
+     * @param SourceMapGenerator|null $sourceMapGenerator
      * @return string
+     * @internal param bool $collectSourceMap
      */
-    public function format(OutputBlock $block)
+    public function format(OutputBlock $block, SourceMapGenerator $sourceMapGenerator = null)
     {
+        if($sourceMapGenerator) {
+            $this->currentLine = 1;
+            $this->currentColumn = 0;
+            $this->sourceMapGenerator = $sourceMapGenerator;
+        } else {
+            $this->sourceMapGenerator = null;
+        }
         ob_start();
 
         $this->block($block);
@@ -212,5 +245,33 @@ abstract class Formatter
         $out = ob_get_clean();
 
         return $out;
+    }
+
+    /**
+     * @param $str
+     */
+    protected function write($str) {
+        if($this->sourceMapGenerator) {
+            $this->sourceMapGenerator->addMapping(
+                $this->currentLine,
+                $this->currentColumn,
+                $this->currentBlock->sourceLine,
+                $this->currentBlock->sourceColumn,
+                $this->currentBlock->sourceName
+            );
+
+            $lines = explode("\n", $str);
+            $lineCount = count($lines);
+            $this->currentLine += $lineCount-1;
+
+            $lastLine = array_pop($lines);
+            if($lineCount == 1) {
+                $this->currentColumn += mb_strlen($lastLine);
+            } else {
+                $this->currentColumn = mb_strlen($lastLine);
+            }
+        }
+
+        echo $str;
     }
 }
