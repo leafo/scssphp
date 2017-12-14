@@ -29,6 +29,11 @@ class Block
     public $parent;
 
     /**
+     * @var string;
+     */
+    public $sourceName;
+
+    /**
      * @var integer
      */
     public $sourceIndex;

@@ -47,4 +47,19 @@ class OutputBlock
      * @var \Leafo\ScssPhp\Formatter\OutputBlock
      */
     public $parent;
+
+    /**
+     * @var string
+     */
+    public $sourceName;
+
+    /**
+     * @var int
+     */
+    public $sourceLine;
+
+    /**
+     * @var int
+     */
+    public $sourceColumn;
 }
