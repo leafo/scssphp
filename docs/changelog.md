@@ -5,10 +5,13 @@ title: Changelog
 
 ## Changelog
 
+* **0.7.2** -- December 14, 2017
+  * Change default precision to 10 to match scss 3.5.0
+  * Use number_format instead of locale (Arlisaha)
 * **0.7.1** -- October 13, 2017
-  * Server moved to example/ folder
+  * Server moved to exoample/ folder
   * Server::serveFrom() helper removed
-  * Removed .phar build
+  * Removed .phar build 
   * Workaround {% raw %}each(){% endraw %} deprecated in PHP 7.2RC (marinaglancy)
 * **0.6.7** -- February 23, 2017
   * fix list interpolation

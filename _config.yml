@@ -1,6 +1,6 @@
 # Site settings
 title: SCSS Compiler in PHP
-current_version: 0.7.1
+current_version: 0.7.2
 description: >
   SCSS compiler written in PHP
 url: http://leafo.github.io
