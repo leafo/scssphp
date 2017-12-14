@@ -292,7 +292,7 @@ class Number extends Node implements \ArrayAccess
         reset($units);
         $unit = key($units);
         $dimension = number_format($dimension, static::$precision, '.', '');
-        
+
         return (static::$precision ? rtrim(rtrim($dimension, '0'), '.') : $dimension) . $unit;
     }
 
