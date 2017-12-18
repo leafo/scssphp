@@ -67,6 +67,7 @@ class Compiler
 
     const SOURCE_MAP_NONE = 0;
     const SOURCE_MAP_INLINE = 1;
+    const SOURCE_MAP_FILE = 2;
 
     /**
      * @var array
@@ -205,12 +206,14 @@ class Compiler
             $sourceMapGenerator = new SourceMapGenerator($this->sourceMapOptions);
         }
         $out = $this->formatter->format($this->scope, $sourceMapGenerator);
-        if($this->sourceMap &&  $this->sourceMap !== self::SOURCE_MAP_NONE) {
+        if(!empty($out) && $this->sourceMap &&  $this->sourceMap !== self::SOURCE_MAP_NONE) {
             $sourceMap = $sourceMapGenerator->generateJson();
 
             $sourceMapUrl = null;
             if($this->sourceMap == self::SOURCE_MAP_INLINE) {
                 $sourceMapUrl = sprintf('data:application/json,%s', self::encodeURIComponent($sourceMap));
+            } elseif ($this->sourceMap == self::SOURCE_MAP_FILE) {
+                $sourceMapUrl = $sourceMapGenerator->saveMap($sourceMap);
             }
 
             $out .= sprintf('/*# sourceMappingURL=%s */', $sourceMapUrl);

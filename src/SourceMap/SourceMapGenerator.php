@@ -8,6 +8,8 @@
 
 namespace Leafo\ScssPhp\SourceMap;
 
+use Leafo\ScssPhp\Exception\CompilerException;
+
 class SourceMapGenerator {
     /**
      * What version of source map does the generator generate?
@@ -93,6 +95,28 @@ class SourceMapGenerator {
 
         $this->sources[$sourceFile] = $sourceFile;
     }
+
+    /**
+   	 * Saves the source map to a file
+   	 *
+   	 * @param string $file The absolute path to a file
+   	 * @param string $content The content to write
+   	 * @throws Exception If the file could not be saved
+   	 */
+   	public function saveMap($content){
+   	    $file = $this->options['sourceMapWriteTo'];
+   		$dir = dirname($file);
+   		// directory does not exist
+   		if( !is_dir($dir) ){
+   			// FIXME: create the dir automatically?
+   			throw new CompilerException(sprintf('The directory "%s" does not exist. Cannot save the source map.', $dir));
+   		}
+   		// FIXME: proper saving, with dir write check!
+   		if(file_put_contents($file, $content) === false){
+   			throw new CompilerException(sprintf('Cannot save the source map to "%s"', $file));
+   		}
+   		return $this->options['sourceMapURL'];
+   	}
 
     /**
      * Generates the JSON source map
