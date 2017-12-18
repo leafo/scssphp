@@ -128,13 +128,17 @@ class Compiler
     protected $sourceMap = self::SOURCE_MAP_NONE;
     protected $sourceMapOptions = [];
 
-    /** @var string|Formatter */
+    /**
+     * @var string|\Leafo\ScssPhp\Formatter
+     */
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
 
     protected $rootEnv;
     protected $rootBlock;
 
-    /** @var  Environment */
+    /**
+     * @var \Leafo\ScssPhp\Compiler\Environment
+     */
     protected $env;
     protected $scope;
     protected $storeEnv;
@@ -202,22 +206,30 @@ class Compiler
         $this->popEnv();
 
         $sourceMapGenerator = null;
-        if($this->sourceMap &&  $this->sourceMap !== self::SOURCE_MAP_NONE) {
+
+        if ($this->sourceMap && $this->sourceMap !== self::SOURCE_MAP_NONE) {
             $sourceMapGenerator = new SourceMapGenerator($this->sourceMapOptions);
         }
-        $out = $this->formatter->format($this->scope, $sourceMapGenerator);
-        if(!empty($out) && $this->sourceMap &&  $this->sourceMap !== self::SOURCE_MAP_NONE) {
-            $sourceMap = $sourceMapGenerator->generateJson();
 
+        $out = $this->formatter->format($this->scope, $sourceMapGenerator);
+
+        if (! empty($out) && $this->sourceMap && $this->sourceMap !== self::SOURCE_MAP_NONE) {
+            $sourceMap    = $sourceMapGenerator->generateJson();
             $sourceMapUrl = null;
-            if($this->sourceMap == self::SOURCE_MAP_INLINE) {
-                $sourceMapUrl = sprintf('data:application/json,%s', self::encodeURIComponent($sourceMap));
-            } elseif ($this->sourceMap == self::SOURCE_MAP_FILE) {
-                $sourceMapUrl = $sourceMapGenerator->saveMap($sourceMap);
+
+            switch ($this->sourceMap) {
+                case self::SOURCE_MAP_INLINE:
+                    $sourceMapUrl = sprintf('data:application/json,%s', self::encodeURIComponent($sourceMap));
+                    break;
+
+                case self::SOURCE_MAP_FILE:
+                    $sourceMapUrl = $sourceMapGenerator->saveMap($sourceMap);
+                    break;
             }
 
             $out .= sprintf('/*# sourceMappingURL=%s */', $sourceMapUrl);
         }
+
         return $out;
     }
 
@@ -1110,7 +1122,8 @@ class Compiler
     /**
      * @param array $sourceMapOptions
      */
-    public function setSourceMapOptions($sourceMapOptions) {
+    public function setSourceMapOptions($sourceMapOptions)
+    {
         $this->sourceMapOptions = $sourceMapOptions;
     }
 
@@ -1959,7 +1972,7 @@ class Compiler
      *
      * @param string $value
      *
-     * @return bool
+     * @return boolean
      */
     protected function isImmediateRelationshipCombinator($value)
     {
@@ -3338,9 +3351,14 @@ class Compiler
     }
 
     /**
-     * @param int $sourceMap
+     * Set source map option
+     *
+     * @api
+     *
+     * @param integer $sourceMap
      */
-    public function setSourceMap($sourceMap) {
+    public function setSourceMap($sourceMap)
+    {
         $this->sourceMap = $sourceMap;
     }
 
@@ -5302,8 +5320,10 @@ class Compiler
         return $args[0];
     }
 
-    public static function encodeURIComponent($string){
+    public static function encodeURIComponent($string)
+    {
         $revert = array('%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')');
+
         return strtr(rawurlencode($string), $revert);
     }
 }

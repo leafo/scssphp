@@ -65,10 +65,10 @@ class Nested extends Formatter
             }
         }
 
-        $this->write( $inner . implode($glue, $block->lines));
+        $this->write($inner . implode($glue, $block->lines));
 
         if (! empty($block->children)) {
-            $this->write( $this->break);
+            $this->write($this->break);
         }
     }
 
@@ -79,7 +79,7 @@ class Nested extends Formatter
     {
         $inner = $this->indentStr();
 
-        $this->write( $inner
+        $this->write($inner
             . implode($this->tagSeparator, $block->selectors)
             . $this->open . $this->break);
     }
@@ -93,13 +93,13 @@ class Nested extends Formatter
             $this->block($child);
 
             if ($i < count($block->children) - 1) {
-                $this->write( $this->break);
+                $this->write($this->break);
 
                 if (isset($block->children[$i + 1])) {
                     $next = $block->children[$i + 1];
 
                     if ($next->depth === max($block->depth, 1) && $child->depth >= $next->depth) {
-                        $this->write( $this->break);
+                        $this->write($this->break);
                     }
                 }
             }
@@ -141,11 +141,11 @@ class Nested extends Formatter
         if (! empty($block->selectors)) {
             $this->indentLevel--;
 
-            $this->write( $this->close);
+            $this->write($this->close);
         }
 
         if ($block->type === 'root') {
-            $this->write( $this->break);
+            $this->write($this->break);
         }
     }
 

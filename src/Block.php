@@ -29,7 +29,7 @@ class Block
     public $parent;
 
     /**
-     * @var string;
+     * @var string
      */
     public $sourceName;
 

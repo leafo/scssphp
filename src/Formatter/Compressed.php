@@ -53,10 +53,10 @@ class Compressed extends Formatter
             }
         }
 
-        $this->write( $inner . implode($glue, $block->lines));
+        $this->write($inner . implode($glue, $block->lines));
 
         if (! empty($block->children)) {
-            $this->write( $this->break);
+            $this->write($this->break);
         }
     }
 }

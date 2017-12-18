@@ -58,7 +58,7 @@ class Debug extends Formatter
         }
 
         foreach ($block->lines as $index => $line) {
-            $this->write( "{$indent}block->lines[{$index}]: $line\n");
+            $this->write("{$indent}block->lines[{$index}]: $line\n");
         }
     }
 
@@ -70,13 +70,13 @@ class Debug extends Formatter
         $indent = $this->indentStr();
 
         if (empty($block->selectors)) {
-            $this->write( "{$indent}block->selectors: []\n");
+            $this->write("{$indent}block->selectors: []\n");
 
             return;
         }
 
         foreach ($block->selectors as $index => $selector) {
-            $this->write( "{$indent}block->selectors[{$index}]: $selector\n");
+            $this->write("{$indent}block->selectors[{$index}]: $selector\n");
         }
     }
 
@@ -88,7 +88,7 @@ class Debug extends Formatter
         $indent = $this->indentStr();
 
         if (empty($block->children)) {
-            $this->write( "{$indent}block->children: []\n");
+            $this->write("{$indent}block->children: []\n");
 
             return;
         }
@@ -109,7 +109,7 @@ class Debug extends Formatter
     {
         $indent = $this->indentStr();
 
-        $this->write( "{$indent}block->type: {$block->type}\n" .
+        $this->write("{$indent}block->type: {$block->type}\n" .
              "{$indent}block->depth: {$block->depth}\n");
 
         $this->currentBlock = $block;

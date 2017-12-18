@@ -54,12 +54,12 @@ class OutputBlock
     public $sourceName;
 
     /**
-     * @var int
+     * @var integer
      */
     public $sourceLine;
 
     /**
-     * @var int
+     * @var integer
      */
     public $sourceColumn;
 }
