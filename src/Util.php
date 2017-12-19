@@ -15,7 +15,7 @@ use Leafo\ScssPhp\Base\Range;
 use Leafo\ScssPhp\Exception\RangeException;
 
 /**
- * Utilties
+ * Utilty functions
  *
  * @author Anthon Pang <anthon.pang@gmail.com>
  */
@@ -52,5 +52,19 @@ class Util
         }
 
         throw new RangeException("$name {$val} must be between {$range->first} and {$range->last}$unit");
+    }
+
+    /**
+     * Encode URI component
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function encodeURIComponent($string)
+    {
+        $revert = array('%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')');
+
+        return strtr(rawurlencode($string), $revert);
     }
 }

@@ -101,11 +101,11 @@ class SourceMapGenerator
     /**
      * Adds a mapping
      *
-     * @param integer $generatedLine The line number in generated file
+     * @param integer $generatedLine   The line number in generated file
      * @param integer $generatedColumn The column number in generated file
-     * @param integer $originalLine The line number in original file
-     * @param integer $originalColumn The column number in original file
-     * @param string $sourceFile The original source file
+     * @param integer $originalLine    The line number in original file
+     * @param integer $originalColumn  The column number in original file
+     * @param string  $sourceFile      The original source file
      */
     public function addMapping($generatedLine, $generatedColumn, $originalLine, $originalColumn, $sourceFile)
     {
@@ -123,9 +123,10 @@ class SourceMapGenerator
     /**
      * Saves the source map to a file
      *
-     * @param string $file The absolute path to a file
+     * @param string $file    The absolute path to a file
      * @param string $content The content to write
-     * @throws Exception If the file could not be saved
+     *
+     * @throws \Leafo\ScssPhp\Exception\CompilerException If the file could not be saved
      */
     public function saveMap($content)
     {
@@ -150,6 +151,7 @@ class SourceMapGenerator
      * Generates the JSON source map
      *
      * @return string
+     *
      * @see https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit#
      */
     public function generateJson()

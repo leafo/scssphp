@@ -66,7 +66,6 @@ abstract class Formatter
      */
     protected $currentBlock;
 
-
     /**
      * @var integer
      */
@@ -78,7 +77,7 @@ abstract class Formatter
     protected $currentColumn;
 
     /**
-     * @var SourceMapGenerator
+     * @var \Leafo\ScssPhp\SourceMap\SourceMapGenerator
      */
     protected $sourceMapGenerator;
 
@@ -223,11 +222,10 @@ abstract class Formatter
      *
      * @api
      *
-     * @param \Leafo\ScssPhp\Formatter\OutputBlock $block An abstract syntax tree
+     * @param \Leafo\ScssPhp\Formatter\OutputBlock             $block              An abstract syntax tree
+     * @param \Leafo\ScssPhp\SourceMap\SourceMapGenerator|null $sourceMapGenerator Optional source map generator
      *
-     * @param SourceMapGenerator|null $sourceMapGenerator
      * @return string
-     * @internal param bool $collectSourceMap
      */
     public function format(OutputBlock $block, SourceMapGenerator $sourceMapGenerator = null)
     {

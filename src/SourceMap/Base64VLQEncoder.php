@@ -94,6 +94,7 @@ class Base64VLQEncoder
      *   2 becomes 4 (100 binary), -2 becomes 5 (101 binary)
      * We generate the value for 32 bit machines, hence -2147483648 becomes 1, not 4294967297,
      * even on a 64 bit machine.
+     *
      * @param string $aValue
      */
     public function toVLQSigned($aValue)
@@ -110,6 +111,7 @@ class Base64VLQEncoder
      * Hence
      *   1 becomes -2147483648
      * even on a 64 bit machine.
+     *
      * @param integer $aValue
      */
     public function fromVLQSigned($aValue)
@@ -121,6 +123,7 @@ class Base64VLQEncoder
      * Return the base 64 VLQ encoded value.
      *
      * @param string $aValue The value to encode
+     *
      * @return string The encoded value
      */
     public function encode($aValue)
@@ -146,6 +149,7 @@ class Base64VLQEncoder
      * Return the value decoded from base 64 VLQ.
      *
      * @param string $encoded The encoded value to decode
+     *
      * @return integer The decoded value
      */
     public function decode($encoded)
@@ -167,6 +171,7 @@ class Base64VLQEncoder
      *
      * @param integer $a number to shift
      * @param integer $b number of bits to shift
+     *
      * @return integer
      */
     public function zeroFill($a, $b)
@@ -178,13 +183,15 @@ class Base64VLQEncoder
      * Encode single 6-bit digit as base64.
      *
      * @param integer $number
+     *
      * @return string
-     * @throws Exception If the number is invalid
+     *
+     * @throws \Exception If the number is invalid
      */
     public function base64Encode($number)
     {
         if ($number < 0 || $number > 63) {
-            throw new Exception(sprintf('Invalid number "%s" given. Must be between 0 and 63.', $number));
+            throw new \Exception(sprintf('Invalid number "%s" given. Must be between 0 and 63.', $number));
         }
 
         return $this->intToCharMap[$number];
@@ -194,13 +201,15 @@ class Base64VLQEncoder
      * Decode single 6-bit digit from base64
      *
      * @param string $char
-     * @return number
-     * @throws Exception If the number is invalid
+     *
+     * @return integer
+     *
+     * @throws \Exception If the number is invalid
      */
     public function base64Decode($char)
     {
         if (! array_key_exists($char, $this->charToIntMap)) {
-            throw new Exception(sprintf('Invalid base 64 digit "%s" given.', $char));
+            throw new \Exception(sprintf('Invalid base 64 digit "%s" given.', $char));
         }
 
         return $this->charToIntMap[$char];
