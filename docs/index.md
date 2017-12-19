@@ -233,6 +233,19 @@ echo $scss->compile('
 ');
 {% endhighlight %}
 
+### Source Maps
+
+To enable source maps, use the `setSourceMap()' method.
+
+{% highlight php startinline=true %}
+use Leafo\ScssPhp\Compiler;
+
+$scss = new Compiler();
+$scss->setSourceMap(Compiler::SOURCE_MAP_INLINE);
+
+// use Compiler::SOURCE_MAP_FILE for file-based source maps
+{% endhighlight %}
+
 ### Custom Functions
 
 It's possible to register custom functions written in PHP that can be called

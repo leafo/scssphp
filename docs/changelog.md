@@ -5,6 +5,9 @@ title: Changelog
 
 ## Changelog
 
+* **0.7.3** -- December 19, 2017
+  * Add inline sourcemaps (oyejorge, NicolaF)
+  * Add file-based sourcemaps (dleffler)
 * **0.7.2** -- December 14, 2017
   * Change default precision to 10 to match scss 3.5.0
   * Use number_format instead of locale (Arlisaha)
