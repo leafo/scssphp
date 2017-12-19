@@ -32,6 +32,7 @@ $debugInfo = false;
 $lineNumbers = false;
 $ignoreErrors = false;
 $encoding = false;
+$sourceMap = false;
 
 /**
  * Parse argument
@@ -77,6 +78,7 @@ Options include:
     --iso8859-1         Use iso8859-1 encoding instead of utf-8 (default utf-8)
     --line-numbers      Annotate selectors with comments referring to the source file and line number
     -p=precision        Set decimal number precision (default 10)
+    --sourcemap         Create source map file
     -T                  Dump formatted parse tree
     -v, --version       Print the version
 
@@ -105,6 +107,11 @@ EOT;
 
     if ($argv[$i] === '--line-numbers' || $argv[$i] === '--line-comments') {
         $lineNumbers = true;
+        continue;
+    }
+
+    if ($argv[$i] === '--sourcemap') {
+        $sourceMap = true;
         continue;
     }
 
@@ -191,6 +198,10 @@ if ($precision) {
 
 if ($style) {
     $scss->setFormatter('Leafo\\ScssPhp\\Formatter\\' . ucfirst($style));
+}
+
+if ($sourceMap) {
+    $scss->setSourceMap(Compiler::SOURCE_MAP_FILE);
 }
 
 if ($encoding) {
