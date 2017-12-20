@@ -172,11 +172,9 @@ class SourceMapGenerator
         // An optional source root, useful for relocating source files on a server or removing repeated values in the
         // 'sources' entry. This value is prepended to the individual entries in the 'source' field.
         $root = $this->options['sourceRoot'];
-
         if ($root) {
-//            $sourceMap['sourceRoot'] = $root;
+            $sourceMap['sourceRoot'] = $root;
             // A list of symbol names used by the 'mappings' entry.
-            $sourceMap['names'] = array();
         }
 
         // A list of original sources used by the 'mappings' entry.
@@ -184,6 +182,7 @@ class SourceMapGenerator
         foreach($this->sources as $source_uri => $source_filename) {
             $sourceMap['sources'][] = $this->normalizeFilename($source_filename);
         }
+        $sourceMap['names'] = array();
 
         // A string with the encoded mapping data.
         $sourceMap['mappings'] = $mappings;
