@@ -174,7 +174,15 @@ class SourceMapGenerator
         $root = $this->options['sourceRoot'];
 
         if ($root) {
+//            $sourceMap['sourceRoot'] = $root;
+            // A list of symbol names used by the 'mappings' entry.
             $sourceMap['names'] = array();
+        }
+
+        // A list of original sources used by the 'mappings' entry.
+        $sourceMap['sources'] = array();
+        foreach($this->sources as $source_uri => $source_filename) {
+            $sourceMap['sources'][] = $this->normalizeFilename($source_filename);
         }
 
         // A string with the encoded mapping data.
