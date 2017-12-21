@@ -5,6 +5,8 @@ title: Changelog
 
 ## Changelog
 
+* **0.7.4** -- December 21, 2017
+  * Fat fingered cleanup; broke source maps (dleffler)
 * **0.7.3** -- December 19, 2017
   * Add inline sourcemaps (oyejorge, NicolaF)
   * Add file-based sourcemaps (dleffler)
