@@ -2,7 +2,7 @@
 /**
  * SCSSPHP
  *
- * @copyright 2012-2017 Leaf Corcoran
+ * @copyright 2012-2018 Leaf Corcoran
  *
  * @license http://opensource.org/licenses/MIT MIT
  *
@@ -1774,7 +1774,7 @@ class Compiler
                 $start = $this->reduce($for->start, true);
                 $end   = $this->reduce($for->end, true);
 
-                if ( ! ($start[2] == $end[2] || $end->unitless())) {
+                if (! ($start[2] == $end[2] || $end->unitless())) {
                     $this->throwError('Incompatible units: "%s" and "%s".', $start->unitStr(), $end->unitStr());
 
                     break;
