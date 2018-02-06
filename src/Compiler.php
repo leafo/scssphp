@@ -207,8 +207,13 @@ class Compiler
 
         $sourceMapGenerator = null;
 
-        if ($this->sourceMap && $this->sourceMap !== self::SOURCE_MAP_NONE) {
-            $sourceMapGenerator = new SourceMapGenerator($this->sourceMapOptions);
+        if ($this->sourceMap) {
+            if (is_object($this->sourceMap) && is_a($this->sourceMap, 'SourceMapGenerator')) {
+                $sourceMapGenerator = $this->sourceMap;
+                $this->sourceMap = self::SOURCE_MAP_FILE;
+            } elseif ($this->sourceMap !== self::SOURCE_MAP_NONE) {
+                $sourceMapGenerator = new SourceMapGenerator($this->sourceMapOptions);
+            }
         }
 
         $out = $this->formatter->format($this->scope, $sourceMapGenerator);
