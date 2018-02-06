@@ -1772,9 +1772,18 @@ class Compiler
                 list(, $for) = $child;
 
                 $start = $this->reduce($for->start, true);
+                $end   = $this->reduce($for->end, true);
+
+                if ( ! ($start[2] == $end[2] || $end->unitless())) {
+                    $this->throwError('Incompatible units: "%s" and "%s".', $start->unitStr(), $end->unitStr());
+
+                    break;
+                }
+
+                $unit  = $start[2];
                 $start = $start[1];
-                $end = $this->reduce($for->end, true);
-                $end = $end[1];
+                $end   = $end[1];
+
                 $d = $start < $end ? 1 : -1;
 
                 for (;;) {
@@ -1784,7 +1793,7 @@ class Compiler
                         break;
                     }
 
-                    $this->set($for->var, new Node\Number($start, ''));
+                    $this->set($for->var, new Node\Number($start, $unit));
                     $start += $d;
 
                     $ret = $this->compileChildren($for->children, $out);
