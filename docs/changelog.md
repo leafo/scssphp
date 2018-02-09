@@ -5,6 +5,10 @@ title: Changelog
 
 ## Changelog
 
+* **0.7.5** -- February 8, 2018
+  * Fix `for` loop with units (of2607)
+  * Fix side-effects in abs(), ceil(), floor(), and round() (jugyhead)
+  * Add option for custom SourceMapGenerator (dleffler)
 * **0.7.4** -- December 21, 2017
   * Fat fingered cleanup; broke source maps (dleffler)
 * **0.7.3** -- December 19, 2017
