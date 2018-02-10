@@ -11,6 +11,7 @@ php:
 
 script:
   - composer install
+  - vendor/bin/phpcs --standard=PSR2 bin src example tests *.php
   - vendor/bin/phpunit tests
 
 branches:
