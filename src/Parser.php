@@ -280,7 +280,7 @@ class Parser
     protected function parseChunk()
     {
         $s = $this->seek();
-
+        
         // the directives
         if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] === '@') {
             if ($this->literal('@at-root') &&
@@ -621,11 +621,14 @@ class Parser
             $this->valueList($value) &&
             $this->end()
         ) {
+
+        
+            
             // check for '!flag'
             $assignmentFlags = $this->stripAssignmentFlags($value);
             $this->append([Type::T_ASSIGN, $name, $value, $assignmentFlags], $s);
 
-            return true;
+            return true; 
         }
 
         $this->seek($s);
@@ -708,6 +711,7 @@ class Parser
         list($line, $column) = $this->getSourcePosition($pos);
 
         $b = new Block;
+        $b->sourceName = $this->sourceName;
         $b->sourceLine   = $line;
         $b->sourceColumn = $column;
         $b->sourceIndex  = $this->sourceIndex;
@@ -1350,6 +1354,11 @@ class Parser
             return true;
         }
 
+        if ($this->selfCache($out)) {
+            return true;
+        }
+
+
         if ($this->keyword($keyword)) {
             if ($keyword === 'null') {
                 $out = [Type::T_NULL];
@@ -1362,6 +1371,27 @@ class Parser
 
         return false;
     }
+
+    /**
+     * Parse variable value of "&"
+     *
+     * @param array $out
+     *
+     * @return boolean
+     */
+     protected function selfCache(&$out) {
+
+        $s = $this->seek();
+
+        if ($this->literal('&')) {
+
+            $out = [Type::T_SELF, '', [Type::T_SELF]];
+            
+            return true;
+        }
+
+        return false;
+     }
 
     /**
      * Parse parenthesized value
@@ -2468,7 +2498,13 @@ class Parser
      */
     private function saveEncoding()
     {
-        if (ini_get('mbstring.func_overload') & 2) {
+        if (version_compare(PHP_VERSION, '7.2.0') >= 0) {
+            return;
+        }
+
+        $iniDirective = 'mbstring' . '.func_overload'; // deprecated in PHP 7.2
+
+        if (ini_get($iniDirective) & 2) {
             $this->encoding = mb_internal_encoding();
 
             mb_internal_encoding('iso-8859-1');
