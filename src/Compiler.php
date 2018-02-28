@@ -18,6 +18,7 @@ use Leafo\ScssPhp\Compiler\Environment;
 use Leafo\ScssPhp\Exception\CompilerException;
 use Leafo\ScssPhp\Formatter\OutputBlock;
 use Leafo\ScssPhp\Node;
+use Leafo\ScssPhp\SourceMap\SourceMapGenerator;
 use Leafo\ScssPhp\Type;
 use Leafo\ScssPhp\Parser;
 use Leafo\ScssPhp\Util;
@@ -63,6 +64,10 @@ class Compiler
     const WITH_MEDIA    = 2;
     const WITH_SUPPORTS = 4;
     const WITH_ALL      = 7;
+
+    const SOURCE_MAP_NONE = 0;
+    const SOURCE_MAP_INLINE = 1;
+    const SOURCE_MAP_FILE = 2;
 
     /**
      * @var array
@@ -120,11 +125,16 @@ class Compiler
     protected $encoding = null;
     protected $lineNumberStyle = null;
 
+    protected $sourceMap = self::SOURCE_MAP_NONE;
+    protected $sourceMapOptions = [];
+
+    /** @var string|Formatter */
     protected $formatter = 'Leafo\ScssPhp\Formatter\Nested';
 
     protected $rootEnv;
     protected $rootBlock;
 
+    /** @var  Environment */
     protected $env;
     protected $scope;
     protected $storeEnv;
@@ -165,9 +175,6 @@ class Compiler
      */
     public function compile($code, $path = null)
     {
-        $locale = setlocale(LC_NUMERIC, 0);
-        setlocale(LC_NUMERIC, 'C');
-
         $this->indentLevel    = -1;
         $this->commentsSeen   = [];
         $this->extends        = [];
@@ -194,10 +201,23 @@ class Compiler
         $this->compileRoot($tree);
         $this->popEnv();
 
-        $out = $this->formatter->format($this->scope);
+        $sourceMapGenerator = null;
+        if($this->sourceMap &&  $this->sourceMap !== self::SOURCE_MAP_NONE) {
+            $sourceMapGenerator = new SourceMapGenerator($this->sourceMapOptions);
+        }
+        $out = $this->formatter->format($this->scope, $sourceMapGenerator);
+        if(!empty($out) && $this->sourceMap &&  $this->sourceMap !== self::SOURCE_MAP_NONE) {
+            $sourceMap = $sourceMapGenerator->generateJson();
 
-        setlocale(LC_NUMERIC, $locale);
+            $sourceMapUrl = null;
+            if($this->sourceMap == self::SOURCE_MAP_INLINE) {
+                $sourceMapUrl = sprintf('data:application/json,%s', self::encodeURIComponent($sourceMap));
+            } elseif ($this->sourceMap == self::SOURCE_MAP_FILE) {
+                $sourceMapUrl = $sourceMapGenerator->saveMap($sourceMap);
+            }
 
+            $out .= sprintf('/*# sourceMappingURL=%s */', $sourceMapUrl);
+        }
         return $out;
     }
 
@@ -279,6 +299,9 @@ class Compiler
         $out->parent    = $this->scope;
         $out->selectors = $selectors;
         $out->depth     = $this->env->depth;
+        $out->sourceName = $this->env->block->sourceName;
+        $out->sourceLine = $this->env->block->sourceLine;
+        $out->sourceColumn = $this->env->block->sourceColumn;
 
         return $out;
     }
@@ -661,6 +684,7 @@ class Compiler
 
             if ($needsWrap) {
                 $wrapped = new Block;
+                $wrapped->sourceName = $media->sourceName;
                 $wrapped->sourceIndex  = $media->sourceIndex;
                 $wrapped->sourceLine   = $media->sourceLine;
                 $wrapped->sourceColumn = $media->sourceColumn;
@@ -734,6 +758,7 @@ class Compiler
         // wrap inline selector
         if ($block->selector) {
             $wrapped = new Block;
+            $wrapped->sourceName   = $block->sourceName;
             $wrapped->sourceIndex  = $block->sourceIndex;
             $wrapped->sourceLine   = $block->sourceLine;
             $wrapped->sourceColumn = $block->sourceColumn;
@@ -790,6 +815,7 @@ class Compiler
             }
 
             $b = new Block;
+            $b->sourceName   = $e->block->sourceName;
             $b->sourceIndex  = $e->block->sourceIndex;
             $b->sourceLine   = $e->block->sourceLine;
             $b->sourceColumn = $e->block->sourceColumn;
@@ -1075,10 +1101,18 @@ class Compiler
 
             if ($parser->parseSelector($buffer, $newSelectors)) {
                 $selectors = array_map([$this, 'evalSelector'], $newSelectors);
+
             }
         }
 
         return $selectors;
+    }
+
+    /**
+     * @param array $sourceMapOptions
+     */
+    public function setSourceMapOptions($sourceMapOptions) {
+        $this->sourceMapOptions = $sourceMapOptions;
     }
 
     /**
@@ -1181,7 +1215,7 @@ class Compiler
     /**
      * Compile selector to string; self(&) should have been replaced by now
      *
-     * @param array $selector
+     * @param string|array $selector
      *
      * @return string
      */
@@ -1203,7 +1237,7 @@ class Compiler
     /**
      * Compile selector part
      *
-     * @param arary $piece
+     * @param array $piece
      *
      * @return string
      */
@@ -1572,9 +1606,18 @@ class Compiler
                 list(, $name, $value) = $child;
 
                 if ($name[0] === Type::T_VARIABLE) {
+
                     $flags = isset($child[3]) ? $child[3] : [];
                     $isDefault = in_array('!default', $flags);
                     $isGlobal = in_array('!global', $flags);
+
+                    if($value[0] === Type::T_SELF):
+                    
+                        if (!empty($out->selectors)) {
+                            $value[2][0] = implode($out->selectors[0][0]);
+                            $value[0] = Type::T_STRING;
+                        }
+                    endif;
 
                     if ($isGlobal) {
                         $this->set($name[1], $this->reduce($value), false, $this->rootEnv);
@@ -1963,7 +2006,7 @@ class Compiler
      * @param array   $value
      * @param boolean $inExp
      *
-     * @return array
+     * @return array|\Leafo\ScssPhp\Node\Number
      */
     protected function reduce($value, $inExp = false)
     {
@@ -2238,7 +2281,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return \Leafo\ScssPhp\Node\Number
      */
     protected function opAddNumberNumber($left, $right)
     {
@@ -2251,7 +2294,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return \Leafo\ScssPhp\Node\Number
      */
     protected function opMulNumberNumber($left, $right)
     {
@@ -2264,7 +2307,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return \Leafo\ScssPhp\Node\Number
      */
     protected function opSubNumberNumber($left, $right)
     {
@@ -2277,7 +2320,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return array|\Leafo\ScssPhp\Node\Number
      */
     protected function opDivNumberNumber($left, $right)
     {
@@ -2294,7 +2337,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return \Leafo\ScssPhp\Node\Number
      */
     protected function opModNumberNumber($left, $right)
     {
@@ -2580,7 +2623,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return \Leafo\ScssPhp\Node\Number
      */
     protected function opCmpNumberNumber($left, $right)
     {
@@ -2772,6 +2815,10 @@ class Compiler
             case Type::T_NULL:
                 return 'null';
 
+            case Type::T_SELF:
+
+                return Type::T_SELF;
+
             default:
                 $this->throwError("unknown value type: $type");
         }
@@ -2857,6 +2904,7 @@ class Compiler
             foreach ($env->selectors as $selector) {
                 foreach ($parentSelectors as $parent) {
                     $selectors[] = $this->joinSelectors($parent, $selector);
+
                 }
             }
 
@@ -3031,9 +3079,13 @@ class Compiler
     {
         $name = $this->normalizeName($name);
 
+
+
         if (! isset($env)) {
             $env = $this->getStoreEnv();
         }
+
+        //if($name == "parent") var_dump($env);
 
         if ($shadow) {
             $this->setRaw($name, $value, $env);
@@ -3305,6 +3357,13 @@ class Compiler
     }
 
     /**
+     * @param int $sourceMap
+     */
+    public function setSourceMap($sourceMap) {
+        $this->sourceMap = $sourceMap;
+    }
+
+    /**
      * Register function
      *
      * @api
@@ -3505,7 +3564,7 @@ class Compiler
      * Call SCSS @function
      *
      * @param string $name
-     * @param array  $args
+     * @param array  $argValues
      * @param array  $returnValue
      *
      * @return boolean Returns true if returnValue is set; otherwise, false
@@ -3777,7 +3836,7 @@ class Compiler
      *
      * @param mixed $value
      *
-     * @return array
+     * @return array|\Leafo\ScssPhp\Node\Number
      */
     private function coerceValue($value)
     {
@@ -3850,7 +3909,8 @@ class Compiler
     /**
      * Coerce something to list
      *
-     * @param array $item
+     * @param array  $item
+     * @param string $delim
      *
      * @return array
      */
@@ -5210,6 +5270,8 @@ class Compiler
      * Workaround IE7's content counter bug.
      *
      * @param array $args
+     *
+     * @return array
      */
     protected function libCounter($args)
     {
@@ -5257,5 +5319,10 @@ class Compiler
         }
 
         return $args[0];
+    }
+
+    public static function encodeURIComponent($string){
+        $revert = array('%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')');
+        return strtr(rawurlencode($string), $revert);
     }
 }
