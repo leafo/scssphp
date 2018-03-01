@@ -4526,7 +4526,7 @@ class Compiler
         ];
 
         if ($firstAlpha != 1.0 || $secondAlpha != 1.0) {
-            $new[] = $firstAlpha * $weight + $secondAlpha * ($weight - 1);
+            $new[] = $firstAlpha * $weight + $secondAlpha * (1 - $weight);
         }
 
         return $this->fixColor($new);

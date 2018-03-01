@@ -51,3 +51,6 @@ p {
 div {
   margin: 1px 1px 2px 2px;
   padding: 1px 1px 2px 2px; }
+/* line 173, inputs/functions.scss */
+.test {
+  color: rgba(159, 159, 159, 0.625); }
