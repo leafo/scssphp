@@ -2699,7 +2699,7 @@ class Compiler
                 $b = round($b);
 
                 if (count($value) === 5 && $value[4] !== 1) { // rgba
-                    $a = new Node\Number($value[4],'');
+                    $a = new Node\Number($value[4], '');
 
                     return 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $a . ')';
                 }
