@@ -316,14 +316,14 @@ class Compiler
         $out->parent       = $this->scope;
         $out->selectors    = $selectors;
         $out->depth        = $this->env->depth;
-        if($this->env->block instanceof Block) {
+        if ($this->env->block instanceof Block) {
             $out->sourceName   = $this->env->block->sourceName;
             $out->sourceLine   = $this->env->block->sourceLine;
             $out->sourceColumn = $this->env->block->sourceColumn;
         } else {
             $out->sourceName   = null;
             $out->sourceLine   = null;
-            $out->sourceColum  = null;   
+            $out->sourceColum  = null;
         }
         return $out;
     }
