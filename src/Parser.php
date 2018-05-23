@@ -1302,7 +1302,7 @@ class Parser
     {
         $s = $this->seek();
 
-        if ($this->literal('url(') && $this->match('data:image\/([a-z0-9+-]+);base64,', $m, false)) {
+        if ($this->literal('url(') && $this->match('data:([a-z]+)\/([a-z0-9.+-]+);base64,', $m, false)) {
             $len = strspn($this->buffer, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwyxz0123456789+/=', $this->count);
 
             $this->count += $len;
