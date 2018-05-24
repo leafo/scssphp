@@ -5,6 +5,11 @@ title: Changelog
 
 ## Changelog
 
+* **0.7.5** -- May 23, 2018
+  * `mix()` alpha fix (Uriziel01)
+  * `transparentize()` alpha sensitive to locale (leonardfischer, timelsass)
+  * notices when compiling UIKit (azjezz)
+  * faster parsing for base64 data: url()s (wout)
 * **0.7.5** -- February 8, 2018
   * Fix `for` loop with units (of2607)
   * Fix side-effects in abs(), ceil(), floor(), and round() (jugyhead)
