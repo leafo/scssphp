@@ -3472,7 +3472,7 @@ class Compiler
         // for "normal" scss imports (ignore vanilla css and external requests)
         if (! preg_match('/\.css$|^https?:\/\//', $url)) {
             // try both normal and the _partial filename
-            $urls = [$url, preg_replace('/[^\/]+$/', '_\0', $url)];
+            $urls = [$url, preg_replace('/[^\/]+$/', '_\0', $url), $url.'.css'];
         }
 
         $hasExtension = preg_match('/[.]s?css$/', $url);
