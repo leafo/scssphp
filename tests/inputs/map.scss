@@ -25,9 +25,10 @@ div {
     bar: nth(nth($map, 1), 1);
 }
 
-$color: ("black" : #000000);
+$color: ("black" : #000000, "grey" : #777777);
+$color2: ("grey" : #888888, "white" : #ffffff);
 
-@each $color_name, $color_value in $color {
+@each $color_name, $color_value in map_merge( $color, $color2 ) {
     .#{$color_name} {
         background-color: $color_value !important;
     }
