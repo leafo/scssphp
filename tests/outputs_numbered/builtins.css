@@ -160,3 +160,15 @@ div.call-tests {
 /* line 216, inputs/builtins.scss */
 div.unquote-test {
   a: [type='text']; }
+/* line 220, inputs/builtins.scss */
+.does-compile-1 {
+  color: #666; }
+/* line 224, inputs/builtins.scss */
+.does-compile-2 {
+  color: #666; }
+/* line 230, inputs/builtins.scss */
+.does-compile-3 {
+  color: #666; }
+/* line 235, inputs/builtins.scss */
+.does-compile-4 {
+  color: #666; }

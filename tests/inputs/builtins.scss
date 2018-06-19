@@ -216,3 +216,23 @@ $type: text;
 div.unquote-test {
   a: unquote('[type=\'#{$type}\']');
 }
+
+.does-compile-1 {
+  color: call(lighten, #000, 40%);
+}
+
+.does-compile-2 {
+  $color: #000;
+  $percent: 40%;
+  color: call(lighten, $color, $percent);
+}
+
+.does-compile-3 {
+  $args: (#000, 40%);
+  color: call(lighten, nth($args, 1), nth($args, 2));
+}
+
+.does-compile-4 {
+  $args: (#000, 40%);
+  color: call(lighten, $args...);
+}

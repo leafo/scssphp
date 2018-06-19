@@ -3655,7 +3655,7 @@ class Compiler
             return false;
         }
 
-        list($sorted, $kwargs) = $this->sortArgs($prototype, $args);
+        @list($sorted, $kwargs) = $this->sortArgs($prototype, $args);
 
         if ($name !== 'if' && $name !== 'call') {
             foreach ($sorted as &$val) {
@@ -3714,7 +3714,7 @@ class Compiler
             $key = $key[1];
 
             if (empty($key)) {
-                $posArgs[] = $value;
+                $posArgs[] = empty($arg[2]) ? $value : $arg;
             } else {
                 $keyArgs[$key] = $value;
             }
@@ -4266,20 +4266,38 @@ class Compiler
     {
         $name = $this->compileStringContent($this->coerceString($this->reduce(array_shift($args), true)));
 
-        $args = array_map(
-            function ($a) {
-                return [null, $a, false];
-            },
-            $args
-        );
+        $posArgs = [];
+
+        foreach ($args as $arg) {
+            if (empty($arg[0])) {
+                if ($arg[2] === true) {
+                    $tmp = $this->reduce($arg[1]);
+
+                    if ($tmp[0] === Type::T_LIST) {
+                        foreach ($tmp[2] as $item) {
+                            $posArgs[] = [null, $item, false];
+                        }
+                    } else {
+                        $posArgs[] = [null, $tmp, true];
+                    }
+
+                    continue;
+                }
+
+                $posArgs[] = [null, $this->reduce($arg), false];
+                continue;
+            }
+
+            $posArgs[] = [null, $arg, false];
+        }
 
         if (count($kwargs)) {
             foreach ($kwargs as $key => $value) {
-                $args[] = [[Type::T_VARIABLE, $key], $value, false];
+                $posArgs[] = [[Type::T_VARIABLE, $key], $value, false];
             }
         }
 
-        return $this->reduce([Type::T_FUNCTION_CALL, $name, $args]);
+        return $this->reduce([Type::T_FUNCTION_CALL, $name, $posArgs]);
     }
 
     protected static $libIf = ['condition', 'if-true', 'if-false'];
