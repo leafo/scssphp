@@ -4856,7 +4856,7 @@ class Compiler
             if (null === $unit) {
                 $unit = $number[2];
                 $originalUnit = $item->unitStr();
-            } elseif ($unit !== $number[2]) {
+            } elseif ($number[1] && $unit !== $number[2]) {
                 $this->throwError('Incompatible units: "%s" and "%s".', $originalUnit, $item->unitStr());
                 break;
             }
