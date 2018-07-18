@@ -1211,24 +1211,34 @@ class Parser
     {
         $s = $this->seek();
 
+        if ($this->literal('&',false)) {
+            if ($this->literal('&',false)) {
+                $this->throwParseError('"&" may only be used at the beginning of a compound selector.');
+                return false;
+            }
+            //Assign parent selectors here
+            $out = Compiler::$selfSelector;
+            return true;
+        }
+
+        $this->seek($s);
+
         if ($this->literal('(')) {
-            if ($this->literal(')')) {
-                $out = [Type::T_LIST, '', []];
 
+            if ($this->parenExpression($out,$s)) {
                 return true;
             }
 
-            if ($this->valueList($out) && $this->literal(')') && $out[0] === Type::T_LIST) {
+        }
+
+        $this->seek($s);
+
+        if ($this->literal('[')) {
+
+            if ($this->parenExpression($out,$s, "]")) {
                 return true;
             }
 
-            $this->seek($s);
-
-            if ($this->map($out)) {
-                return true;
-            }
-
-            $this->seek($s);
         }
 
         if ($this->value($lhs)) {
@@ -1239,6 +1249,44 @@ class Parser
 
         return false;
     }
+
+
+    /**
+     * Parse expression specifically checking for lists in parenthesis or brackets
+     *
+     * @param array $out
+     * @param integer $s
+     * @param string $closingParen
+     *
+     * @return boolean
+     */
+    protected function parenExpression(&$out, $s, $closingParen = ")") 
+    {
+        
+        if ($this->literal($closingParen)) {
+            $out = [Type::T_LIST, '', []];
+
+            return true;
+        }
+
+        if ($this->valueList($out) && $this->literal($closingParen) && $out[0] === Type::T_LIST) {
+            return true;
+        }
+
+        $this->seek($s);
+
+        if ($this->map($out)) {
+            return true;
+        }
+
+        $this->seek($s);
+
+        return false;
+
+    }
+
+
+
 
     /**
      * Parse left-hand side of subexpression
@@ -1301,21 +1349,6 @@ class Parser
     protected function value(&$out)
     {
         $s = $this->seek();
-
-        if ($this->literal('url(') && $this->match('data:([a-z]+)\/([a-z0-9.+-]+);base64,', $m, false)) {
-            $len = strspn($this->buffer, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwyxz0123456789+/=', $this->count);
-
-            $this->count += $len;
-
-            if ($this->literal(')')) {
-                $content = substr($this->buffer, $s, $this->count - $s);
-                $out = [Type::T_KEYWORD, $content];
-
-                return true;
-            }
-        }
-
-        $this->seek($s);
 
         if ($this->literal('not', false) && $this->whitespace() && $this->value($inner)) {
             $out = [Type::T_UNARY, 'not', $inner, $this->inParens];
@@ -1897,12 +1930,15 @@ class Parser
         $s = $this->seek();
 
         if ($this->literal('#{') && $this->valueList($value) && $this->literal('}', false)) {
+
             if ($lookWhite) {
                 $left = preg_match('/\s/', $this->buffer[$s - 1]) ? ' ' : '';
                 $right = preg_match('/\s/', $this->buffer[$this->count]) ? ' ': '';
             } else {
                 $left = $right = false;
             }
+
+            
 
             $out = [Type::T_INTERPOLATE, $value, $left, $right];
             $this->eatWhiteDefault = $oldWhite;
@@ -2088,6 +2124,10 @@ class Parser
 
             // self
             if ($this->literal('&', false)) {
+                if ($this->literal('&',false)) {
+                    $this->throwParseError('"&" may only be used at the beginning of a compound selector.');
+                    return false;
+                }
                 $parts[] = Compiler::$selfSelector;
                 continue;
             }
