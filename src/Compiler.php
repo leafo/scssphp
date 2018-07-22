@@ -5004,15 +5004,19 @@ class Compiler
         $map2 = $this->assertMap($args[1]);
 
         foreach ($map2[1] as $i2 => $key2) {
+            $key = $this->compileStringContent($this->coerceString($key2));
+
             foreach ($map1[1] as $i1 => $key1) {
-                if ($this->compileStringContent($this->coerceString($key1)) === $this->compileStringContent($this->coerceString($key2))) {
+                if ($key === $this->compileStringContent($this->coerceString($key1))) {
                     $map1[2][$i1] = $map2[2][$i2];
                     continue 2;
                 }
             }
+
             $map1[1][] = $map2[1][$i2];
             $map1[2][] = $map2[2][$i2];
         }
+
         return $map1;
     }
 
