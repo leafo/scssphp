@@ -27,6 +27,7 @@ class Parser
     const SOURCE_INDEX  = -1;
     const SOURCE_LINE   = -2;
     const SOURCE_COLUMN = -3;
+    const SOURCE_NAME  = -4;
 
     /**
      * @var array
@@ -566,6 +567,7 @@ class Parser
                     $statement[static::SOURCE_LINE]   = $line;
                     $statement[static::SOURCE_COLUMN] = $column;
                     $statement[static::SOURCE_INDEX]  = $this->sourceIndex;
+                    $statement[static::SOURCE_NAME]   = $this->sourceName;
 
                     $this->charset = $statement;
                 }
@@ -963,6 +965,7 @@ class Parser
             $statement[static::SOURCE_LINE]   = $line;
             $statement[static::SOURCE_COLUMN] = $column;
             $statement[static::SOURCE_INDEX]  = $this->sourceIndex;
+            $statement[static::SOURCE_NAME]   = $this->sourceName;
         }
 
         $this->env->children[] = $statement;

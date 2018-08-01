@@ -1569,6 +1569,7 @@ class Compiler
      */
     protected function compileChild($child, OutputBlock $out)
     {
+        $this->sourceName   = isset($child[Parser::SOURCE_NAME]) ? $child[Parser::SOURCE_NAME] : null;
         $this->sourceIndex  = isset($child[Parser::SOURCE_INDEX]) ? $child[Parser::SOURCE_INDEX] : null;
         $this->sourceLine   = isset($child[Parser::SOURCE_LINE]) ? $child[Parser::SOURCE_LINE] : -1;
         $this->sourceColumn = isset($child[Parser::SOURCE_COLUMN]) ? $child[Parser::SOURCE_COLUMN] : -1;
@@ -1910,25 +1911,28 @@ class Compiler
             case Type::T_DEBUG:
                 list(, $value) = $child;
 
+                $fname = $this->sourceName;
                 $line = $this->sourceLine;
                 $value = $this->compileValue($this->reduce($value, true));
-                fwrite($this->stderr, "Line $line DEBUG: $value\n");
+                fwrite($this->stderr, "File $fname on line $line DEBUG: $value\n");
                 break;
 
             case Type::T_WARN:
                 list(, $value) = $child;
 
+                $fname = $this->sourceName;
                 $line = $this->sourceLine;
                 $value = $this->compileValue($this->reduce($value, true));
-                fwrite($this->stderr, "Line $line WARN: $value\n");
+                fwrite($this->stderr, "File $fname on line $line WARN: $value\n");
                 break;
 
             case Type::T_ERROR:
                 list(, $value) = $child;
 
+                $fname = $this->sourceName;
                 $line = $this->sourceLine;
                 $value = $this->compileValue($this->reduce($value, true));
-                $this->throwError("Line $line ERROR: $value\n");
+                $this->throwError("File $fname on line $line ERROR: $value\n");
                 break;
 
             case Type::T_CONTROL:
@@ -3550,7 +3554,8 @@ class Compiler
         }
 
         $line = $this->sourceLine;
-        $msg = "$msg: line: $line";
+        $loc = empty($this->sourceName) ? "line: $line" : "$this->sourceName on line $line";
+        $msg = "$msg: $loc";
 
         throw new CompilerException($msg);
     }
@@ -4066,7 +4071,7 @@ class Compiler
         $value = $this->coerceMap($value);
 
         if ($value[0] !== Type::T_MAP) {
-            $this->throwError('expecting map');
+            $this->throwError('expecting map, %s received', $value[0]);
         }
 
         return $value;
@@ -4086,7 +4091,7 @@ class Compiler
     public function assertList($value)
     {
         if ($value[0] !== Type::T_LIST) {
-            $this->throwError('expecting list');
+            $this->throwError('expecting list, %s received', $value[0]);
         }
 
         return $value;
@@ -4109,7 +4114,7 @@ class Compiler
             return $color;
         }
 
-        $this->throwError('expecting color');
+        $this->throwError('expecting color, %s received', $value[0]);
     }
 
     /**
@@ -4126,7 +4131,7 @@ class Compiler
     public function assertNumber($value)
     {
         if ($value[0] !== Type::T_NUMBER) {
-            $this->throwError('expecting number');
+            $this->throwError('expecting number, %s received', $value[0]);
         }
 
         return $value[1];
