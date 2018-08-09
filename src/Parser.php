@@ -105,7 +105,7 @@ class Parser
      * @return string
      */
     public function getSourceName() 
-    { 
+    {
         return $this->sourceName;
     }
 
@@ -367,7 +367,7 @@ class Parser
             if ($this->literal('@import') &&
                 $this->url($importPath) &&
                 $this->end()
-               ) {
+            ) {
                 $this->append([Type::T_IMPORT, $importPath], $s);
 
                 return true;
@@ -1069,7 +1069,7 @@ class Parser
             $this->expression($feature) &&
             ($this->literal(':') && $this->expression($value) || true) &&
             $this->literal(')')
-           ) {
+        ) {
             $out = [Type::T_MEDIA_EXPRESSION, $feature];
 
             if ($value) {
@@ -1381,8 +1381,8 @@ class Parser
         // negation
         if ($this->literal('-', false) &&
             ($this->variable($inner) ||
-             $this->unit($inner) ||
-             $this->parenValue($inner))
+            $this->unit($inner) ||
+            $this->parenValue($inner))
         ) {
             $out = [Type::T_UNARY, '-', $inner, $this->inParens];
 
@@ -1516,7 +1516,7 @@ class Parser
 
         if ($this->keyword($name, false) &&
             $this->literal('(')
-           ) {
+        ) {
             if ($name === 'alpha' && $this->argumentList($args)) {
                 $func = [Type::T_FUNCTION, $name, [Type::T_STRING, '', $args]];
 
