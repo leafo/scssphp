@@ -779,7 +779,7 @@ class Compiler
         if (!$block->selector) {
             $storeEnv = $this->getStoreEnv();
         }
-
+    
         $env     = $this->pushEnv($block);
         $envs    = $this->compactEnv($env);
         $without = isset($block->with) ? $this->compileWith($block->with) : static::WITH_RULE;
@@ -791,59 +791,17 @@ class Compiler
             $wrapped->sourceIndex  = $block->sourceIndex;
             $wrapped->sourceLine   = $block->sourceLine;
             $wrapped->sourceColumn = $block->sourceColumn;
-            $wrapped->selectors    = $this->evalSelectors($block->selector);
+            $wrapped->selectors    = $this->preParseSelectors($this->evalSelectors($block->selector), $env);
             $wrapped->comments     = [];
             $wrapped->parent       = $block;
             $wrapped->children     = $block->children;
-
-            $newSelectors = [];
-            $injectIteration = 0;
-
-            foreach($wrapped->selectors as $key1 => $branch) {
-                if ($this->checkForSelf($branch)) {
-                    foreach ($this->multiplySelectors($env) as $selectorPart) {
-                        $newSelectors[$injectIteration] = $branch;
-                        foreach($branch as $key2 => $leaf) {
-                            if ($leaf === [static::$selfSelector]) {
-                                $newSelectors[$injectIteration][$key2] = [$this->collapseSelectors([$selectorPart])];
-                                continue;
-                            } 
-                        }
-                        ++$injectIteration;
-                    }
-                } else {
-                    $newSelectors[$injectIteration] = $branch;
-                    ++$injectIteration;
-                }
-            }
-
-            $wrapped->selectors = $newSelectors;
-            $block->children = [[Type::T_BLOCK, $wrapped]];
+            $block->children       = [[Type::T_BLOCK, $wrapped]];
         } else {
 
             foreach($block->children as $childIndex => $child) {
-
-                $newSelectors = [];
-                $injectIteration = 0;
-
-                foreach($child[1]->selectors as $key1 => $branch) {
-                    if ($this->checkForSelf($branch)) {
-                        foreach ($this->multiplySelectors($env) as $selectorPart) {
-                            $newSelectors[$injectIteration] = $branch;
-                            foreach($branch as $key2 => $leaf) {
-                                if ($leaf === [static::$selfSelector]) {
-                                    $newSelectors[$injectIteration][$key2] = [$this->collapseSelectors([$selectorPart])];
-                                    continue;
-                                }
-                            }
-                            ++$injectIteration;
-                        }
-                    } else {
-                        $newSelectors[$injectIteration] = $branch;
-                        ++$injectIteration;
-                    }
+                if ($child[0] === Type::T_BLOCK) {
+                    $block->children[$childIndex][1]->selectors = $this->preParseSelectors($child[1]->selectors, $env);
                 }
-                $block->children[$childIndex][1]->selectors =  $newSelectors;
             }
 
         }
@@ -863,6 +821,39 @@ class Compiler
     }
 
     /**
+     * Reconstitute selectors 
+     *
+     * @param array $selectors
+     *
+     * @return array
+     */
+    private function preParseSelectors($selectors, $env) 
+    {
+        $newSelectors = [];
+        $injectIteration = 0;
+
+        foreach($selectors as $key1 => $branch) {
+            if ($this->checkForSelf($branch)) {
+                foreach ($this->multiplySelectors($env) as $selectorPart) {
+                    $newSelectors[$injectIteration] = $branch;
+                    foreach($branch as $key2 => $leaf) {
+                        if ($leaf === [static::$selfSelector]) {
+                            $newSelectors[$injectIteration][$key2] = [$this->collapseSelectors([$selectorPart])];
+                            continue;
+                        } 
+                    }
+                    ++$injectIteration;
+                }
+            } else {
+                $newSelectors[$injectIteration] = $branch;
+                ++$injectIteration;
+            }
+        }
+
+        return $newSelectors;
+    }
+
+    /**
      * Determine if a self(&) declaration is part of the selector part
      *
      * @param array $branch
@@ -875,13 +866,13 @@ class Compiler
         array_walk_recursive(
             $branch,
             function ($value, $key) use (&$hasSelf) {
-            if ($value === Type::T_SELF) {
-                $hasSelf = true;
-                return;
+                if ($value === Type::T_SELF) {
+                    $hasSelf = true;
+                    return;
+                }
             }
-        }
         );
-        return $hasSelf;
+         return $hasSelf;
     }
 
     /**
@@ -1142,14 +1133,14 @@ class Compiler
             switch ($this->lineNumberStyle) {
                 case static::LINE_COMMENTS:
                     $annotation->lines[] = '/* line ' . $line
-                        . ($file ? ', ' . $file : '')
-                        . ' */';
+                                         . ($file ? ', ' . $file : '')
+                                         . ' */';
                     break;
 
                 case static::DEBUG_INFO:
                     $annotation->lines[] = '@media -sass-debug-info{'
-                        . ($file ? 'filename{font-family:"' . $file . '"}' : '')
-                        . 'line{font-family:' . $line . '}}';
+                                         . ($file ? 'filename{font-family:"' . $file . '"}' : '')
+                                         . 'line{font-family:' . $line . '}}';
                     break;
             }
 
@@ -1226,12 +1217,13 @@ class Compiler
      *
      * @return array
      */
+
     protected function evalSelectorPart($part)
     {
         foreach ($part as &$p) {
             if (is_array($p) && ($p[0] === Type::T_INTERPOLATE || $p[0] === Type::T_STRING)) {
                 $p = $this->compileValue($p);
-
+                
                 // force re-evaluation
                 if (strpos($p, '&') !== false || strpos($p, ',') !== false) {
                     $this->shouldEvaluate = true;
@@ -1306,14 +1298,14 @@ class Compiler
         array_walk_recursive(
             $part,
             function ($value, $key) use (&$output) {
-            if ($value === Type::T_SELF) {
-
-                $output .= "&";
-
-            } else {
-                $output .= $value;
-            }
-        }
+                if ($value === Type::T_SELF) {
+                 
+                    $output .= "&";
+                    
+                } else {
+                    $output .= $value;
+                }
+             }
         );
 
         return $output;
@@ -1380,6 +1372,7 @@ class Compiler
      */
     protected function compileSelectorPart($piece)
     {
+        
         foreach ($piece as &$p) {
             if (! is_array($p)) {
                 continue;
@@ -1414,7 +1407,7 @@ class Compiler
 
         foreach ($selector as $parts) {
             foreach ($parts as $part) {
-                if (strlen($part) && '%' === $part[0]) {
+                if (is_string($part) && strlen($part) && '%' === $part[0]) {
                     return true;
                 }
             }
@@ -2928,19 +2921,19 @@ class Compiler
 
                 if ($value[1][0] == Type::T_SELF) {
                     $env = $this->env;
-
+                                   
                     if ($env === null) return false;
                     $selfSelectors = array();
                     foreach ($this->multiplySelectors($env) as $selectorPart) {
                         $selfSelectors[] = $this->collapseSelectors([$selectorPart]);
                     }
-
+     
                     $temp = array();
                     foreach($selfSelectors as $singleSelector) {
                         $temp[] = array(Type::T_STRING,"'",[trim($singleSelector)]);
                     }
                     $exp = [Type::T_LIST,",",$temp]; 
-
+                   
                 }
 
                 // strip quotes if it's a string
@@ -3648,7 +3641,7 @@ class Compiler
 
                     if ($this->fileExists($file = $full . '.scss') ||
                         ($hasExtension && $this->fileExists($file = $full))
-                       ) {
+                    ) {
                         return $file;
                     }
                 }
