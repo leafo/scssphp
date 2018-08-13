@@ -166,3 +166,10 @@ div {
   margin: mapping(one two);
   @include test();
 }
+
+$a: rgba(#000, 0.5);
+$b: rgba(#fff, 0.75);
+
+.test {
+    color: mix($a, $b);
+}

@@ -159,3 +159,15 @@ div.call-tests {
 
 div.unquote-test {
   a: [type='text']; }
+
+.does-compile-1 {
+  color: #666; }
+
+.does-compile-2 {
+  color: #666; }
+
+.does-compile-3 {
+  color: #666; }
+
+.does-compile-4 {
+  color: #666; }
