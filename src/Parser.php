@@ -1737,6 +1737,8 @@ class Parser
                     $content[] = $m[2] . '"';
                 } elseif ($this->literal("'", false)) {
                     $content[] = $m[2] . "'";
+                } elseif ($this->literal("\\", false)) {
+                    $content[] = $m[2] . "\\";
                 } else {
                     $content[] = $m[2];
                 }
@@ -1753,7 +1755,9 @@ class Parser
                 $delim = '"';
 
                 foreach ($content as &$string) {
-                    if ($string === "\\'") {
+                    if ($string === "\\\\") {
+                        $string = "\\";
+                    } elseif ($string === "\\'") {
                         $string = "'";
                     } elseif ($string === '\\"') {
                         $string = '"';
