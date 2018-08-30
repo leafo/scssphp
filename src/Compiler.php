@@ -775,6 +775,11 @@ class Compiler
      */
     protected function compileAtRoot(Block $block)
     {
+
+        if (!$block->selector) {
+            $storeEnv = $this->getStoreEnv();
+        }
+    
         $env     = $this->pushEnv($block);
         $envs    = $this->compactEnv($env);
         $without = isset($block->with) ? $this->compileWith($block->with) : static::WITH_RULE;
@@ -786,12 +791,19 @@ class Compiler
             $wrapped->sourceIndex  = $block->sourceIndex;
             $wrapped->sourceLine   = $block->sourceLine;
             $wrapped->sourceColumn = $block->sourceColumn;
-            $wrapped->selectors    = $block->selector;
+            $wrapped->selectors    = $this->preParseSelectors($this->evalSelectors($block->selector), $env);
             $wrapped->comments     = [];
             $wrapped->parent       = $block;
             $wrapped->children     = $block->children;
+            $block->children       = [[Type::T_BLOCK, $wrapped]];
+        } else {
 
-            $block->children = [[Type::T_BLOCK, $wrapped]];
+            foreach($block->children as $childIndex => $child) {
+                if ($child[0] === Type::T_BLOCK) {
+                    $block->children[$childIndex][1]->selectors = $this->preParseSelectors($child[1]->selectors, $env);
+                }
+            }
+
         }
 
         $this->env = $this->filterWithout($envs, $without);
@@ -806,6 +818,61 @@ class Compiler
         $this->env   = $this->extractEnv($envs);
 
         $this->popEnv();
+    }
+
+    /**
+     * Reconstitute selectors 
+     *
+     * @param array $selectors
+     *
+     * @return array
+     */
+    private function preParseSelectors($selectors, $env) 
+    {
+        $newSelectors = [];
+        $injectIteration = 0;
+
+        foreach($selectors as $key1 => $branch) {
+            if ($this->checkForSelf($branch)) {
+                foreach ($this->multiplySelectors($env) as $selectorPart) {
+                    $newSelectors[$injectIteration] = $branch;
+                    foreach($branch as $key2 => $leaf) {
+                        if ($leaf === [static::$selfSelector]) {
+                            $newSelectors[$injectIteration][$key2] = [$this->collapseSelectors([$selectorPart])];
+                            continue;
+                        } 
+                    }
+                    ++$injectIteration;
+                }
+            } else {
+                $newSelectors[$injectIteration] = $branch;
+                ++$injectIteration;
+            }
+        }
+
+        return $newSelectors;
+    }
+
+    /**
+     * Determine if a self(&) declaration is part of the selector part
+     *
+     * @param array $branch
+     *
+     * @return boolean
+     */
+    private function checkForSelf($branch) 
+    {
+        $hasSelf = false;        
+        array_walk_recursive(
+            $branch,
+            function ($value, $key) use (&$hasSelf) {
+                if ($value === Type::T_SELF) {
+                    $hasSelf = true;
+                    return;
+                }
+            }
+        );
+         return $hasSelf;
     }
 
     /**
@@ -1150,12 +1217,13 @@ class Compiler
      *
      * @return array
      */
+
     protected function evalSelectorPart($part)
     {
         foreach ($part as &$p) {
             if (is_array($p) && ($p[0] === Type::T_INTERPOLATE || $p[0] === Type::T_STRING)) {
                 $p = $this->compileValue($p);
-
+                
                 // force re-evaluation
                 if (strpos($p, '&') !== false || strpos($p, ',') !== false) {
                     $this->shouldEvaluate = true;
@@ -1182,6 +1250,22 @@ class Compiler
     {
         $parts = [];
 
+        foreach ($selectors as $selectorColumn) {
+            $output = '';
+            $rows = [];
+
+            foreach($selectorColumn as $selectorRow) {
+                $rows[] = $this->collapseSelectorPart($selectorRow);
+            }
+
+            $output .= implode(" ", $rows);
+            $parts[] = $output;
+        }
+
+        return implode(', ', $parts);
+
+        /* NOTE: Retaining for potential reversion
+
         foreach ($selectors as $selector) {
             $output = '';
 
@@ -1196,6 +1280,35 @@ class Compiler
         }
 
         return implode(', ', $parts);
+
+        */
+    }
+
+    /**
+     * Collapse a part of a selector
+     *
+     * @param array $part
+     *
+     * @return array
+     */
+    protected function collapseSelectorPart($part) 
+    {
+        $output = "";
+
+        array_walk_recursive(
+            $part,
+            function ($value, $key) use (&$output) {
+                if ($value === Type::T_SELF) {
+                 
+                    $output .= "&";
+                    
+                } else {
+                    $output .= $value;
+                }
+             }
+        );
+
+        return $output;
     }
 
     /**
@@ -1259,6 +1372,7 @@ class Compiler
      */
     protected function compileSelectorPart($piece)
     {
+        
         foreach ($piece as &$p) {
             if (! is_array($p)) {
                 continue;
@@ -1293,7 +1407,7 @@ class Compiler
 
         foreach ($selector as $parts) {
             foreach ($parts as $part) {
-                if (strlen($part) && '%' === $part[0]) {
+                if (is_string($part) && strlen($part) && '%' === $part[0]) {
                     return true;
                 }
             }
@@ -1626,6 +1740,28 @@ class Compiler
                     $isDefault = in_array('!default', $flags);
                     $isGlobal = in_array('!global', $flags);
 
+                    if ($value[0] === Type::T_SELF) {
+                        $env = $this->env;
+
+                        if ($env !== null) {
+                            $selfSelectors = array();
+                            foreach ($this->multiplySelectors($env) as $selectorPart) {
+                                $selfSelectors[] = $this->collapseSelectors([$selectorPart]);
+                            }
+                        }
+
+                        $child[2][0] = $value[0] = Type::T_LIST;
+                        $child[2][1] = $value[1] = ",";
+                        $temp = array();
+
+                        foreach($selfSelectors as $singleSelector) {
+                            $temp[] = array(Type::T_KEYWORD,trim($singleSelector));
+                        }
+
+                        $child[2][2] = $value[2] = $temp;
+                    }
+
+
                     if ($isGlobal) {
                         $this->set($name[1], $this->reduce($value), false, $this->rootEnv);
                         break;
@@ -1890,7 +2026,7 @@ class Compiler
 
             case Type::T_MIXIN_CONTENT:
                 $content = $this->get(static::$namespaces['special'] . 'content', false, $this->getStoreEnv())
-                         ?: $this->get(static::$namespaces['special'] . 'content', false, $this->env);
+                        ?: $this->get(static::$namespaces['special'] . 'content', false, $this->env);
 
                 if (! $content) {
                     $content = new \stdClass();
@@ -2783,6 +2919,23 @@ class Compiler
                 // raw parse node
                 list(, $exp) = $value;
 
+                if ($value[1][0] == Type::T_SELF) {
+                    $env = $this->env;
+                                   
+                    if ($env === null) return false;
+                    $selfSelectors = array();
+                    foreach ($this->multiplySelectors($env) as $selectorPart) {
+                        $selfSelectors[] = $this->collapseSelectors([$selectorPart]);
+                    }
+     
+                    $temp = array();
+                    foreach($selfSelectors as $singleSelector) {
+                        $temp[] = array(Type::T_STRING,"'",[trim($singleSelector)]);
+                    }
+                    $exp = [Type::T_LIST,",",$temp]; 
+                   
+                }
+
                 // strip quotes if it's a string
                 $reduced = $this->reduce($exp);
 
@@ -2928,7 +3081,7 @@ class Compiler
     }
 
     /**
-     * Join selectors; looks for & to replace, or append parent before child
+     * Join selectors; looks for self(&) to replace, or append parent before child
      *
      * @param array $parent
      * @param array $child
@@ -3184,7 +3337,8 @@ class Compiler
                     continue;
                 }
 
-                $env = $this->rootEnv;
+                //$env = $this->rootEnv;
+                $env = $env->parent;
                 continue;
             }
 
