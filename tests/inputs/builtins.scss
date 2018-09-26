@@ -78,6 +78,7 @@
     color: quote("I do?");
     color: str_index(abc, b);
     color: str_insert(string, insert, 2);
+    color: str_insert(string, "\\", 2);
     color: str_length(string);
     color: str_slice(string, 2, 4);
     color: str-slice(string, 2, 0);
