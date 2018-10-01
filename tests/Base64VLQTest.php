@@ -11,7 +11,7 @@
 
 namespace Leafo\ScssPhp\Tests;
 
-use Leafo\ScssPhp\SourceMap\Base64VLQEncoder;
+use Leafo\ScssPhp\SourceMap\Base64VLQ;
 
 /**
  * Base64VLQ encoder test
@@ -30,7 +30,7 @@ class Base64VLQTest extends \PHPUnit_Framework_TestCase
      */
     public function testEncode($expected, $value)
     {
-        $encoder = new Base64VLQEncoder;
+        $encoder = new Base64VLQ;
 
         $this->assertEquals($expected, $encoder->encode($value));
     }

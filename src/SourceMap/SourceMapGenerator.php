@@ -61,7 +61,7 @@ class SourceMapGenerator
     /**
      * The base64 VLQ encoder
      *
-     * @var \Leafo\ScssPhp\SourceMap\Base64VLQEncoder
+     * @var \Leafo\ScssPhp\SourceMap\Base64VLQ
      */
     protected $encoder;
 
@@ -95,7 +95,7 @@ class SourceMapGenerator
     public function __construct(array $options = [])
     {
         $this->options = array_merge($this->defaultOptions, $options);
-        $this->encoder = new Base64VLQEncoder();
+        $this->encoder = new Base64VLQ();
     }
 
     /**
