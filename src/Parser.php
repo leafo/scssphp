@@ -60,6 +60,7 @@ class Parser
     private $count;
     private $env;
     private $inParens;
+    private $inNot;
     private $eatWhiteDefault;
     private $buffer;
     private $utf8;
@@ -607,6 +608,12 @@ class Parser
             $this->valueList($value) &&
             $this->end()
         ) {
+            
+            if ($this->env->parent == NULL || ($this->env->type == Type::T_AT_ROOT)) {     
+                $this->seek($s);
+                $this->throwParseError('property declarations must be inside a block');
+            }
+    
             $name = [Type::T_STRING, '', [$name]];
             $this->append([Type::T_ASSIGN, $name, $value], $s);
 
@@ -1211,25 +1218,25 @@ class Parser
     {
         $s = $this->seek();
 
-        if ($this->literal('(')) {
-            if ($this->literal(')')) {
-                $out = [Type::T_LIST, '', []];
-
-                return true;
+        if ($this->literal('&',false)) {
+            if ($this->literal('&',false)) {
+                $this->throwParseError('"&" may only be used at the beginning of a compound selector.');
+                return false;
             }
-
-            if ($this->valueList($out) && $this->literal(')') && $out[0] === Type::T_LIST) {
-                return true;
-            }
-
-            $this->seek($s);
-
-            if ($this->map($out)) {
-                return true;
-            }
-
-            $this->seek($s);
+            //Assign parent selectors here
+            $out = Compiler::$selfSelector;
+            return true;
         }
+        
+        $this->seek($s);
+
+        if ($this->literal('(')) {
+            if ($this->parenExpression($out, $s)) {
+         
+                return true;
+            }
+            $this->seek($s);
+        }        
 
         if ($this->value($lhs)) {
             $out = $this->expHelper($lhs, 0);
@@ -1237,6 +1244,37 @@ class Parser
             return true;
         }
 
+        return false;
+    }
+
+    /**
+     * Parse expression specifically checking for lists in parenthesis or brackets
+     *
+     * @param array $out
+     * @param integer $s
+     * @param string $closingParen
+     *
+     * @return boolean
+     */
+    protected function parenExpression(&$out, $s, $closingParen = ")") 
+    {
+        
+        if ($this->literal($closingParen)) {
+            $out = [Type::T_LIST, '', []];
+             return true;
+        }
+
+        if ($this->valueList($out) && $this->literal($closingParen) && $out[0] === Type::T_LIST) {
+            return true;
+        }
+
+        $this->seek($s);
+
+        if ($this->map($out)) {
+            return true;
+        }
+
+        
         return false;
     }
 
@@ -1354,7 +1392,7 @@ class Parser
 
         $this->seek($s);
 
-        if ($this->parenValue($out) ||
+        if ($this->parenOrBracketValue($out) ||
             $this->interpolation($out) ||
             $this->variable($out) ||
             $this->color($out) ||
@@ -1402,6 +1440,42 @@ class Parser
             $this->inParens = true;
 
             if ($this->expression($exp) && $this->literal(')')) {
+                $out = $exp;
+                $this->inParens = $inParens;
+
+                return true;
+            }
+        }
+
+        $this->inParens = $inParens;
+        $this->seek($s);
+
+        return false;
+
+    }
+
+    /**
+     * Parse parenthesized value
+     *
+     * @param array $out
+     *
+     * @return boolean
+     */
+    protected function parenOrBracketValue(&$out)
+    {
+        
+        if ($this->parenValue($out)) return true;
+
+        if ($this->literal('[')) {
+            if ($this->literal(']')) {
+                $out = [Type::T_LIST, '', []];
+
+                return true;
+            }
+
+            $this->inParens = true;
+
+            if ($this->expression($exp) && $this->literal(']')) {
                 $out = $exp;
                 $this->inParens = $inParens;
 
@@ -2007,6 +2081,7 @@ class Parser
             while ($this->literal(',')) {
                 ; // ignore extra
             }
+            $this->match('\s+', $m);
         }
 
         if (count($selectors) === 0) {
@@ -2034,6 +2109,7 @@ class Parser
         for (;;) {
             if ($this->match('[>+~]+', $m)) {
                 $selector[] = [$m[0]];
+                $this->match('\s+', $m);
                 continue;
             }
 
@@ -2092,6 +2168,10 @@ class Parser
 
             // self
             if ($this->literal('&', false)) {
+                if ($this->literal('&',false)) {
+                    $this->throwParseError('"&" may only be used at the beginning of a compound selector.');
+                    return false;
+                }
                 $parts[] = Compiler::$selfSelector;
                 continue;
             }
@@ -2147,6 +2227,44 @@ class Parser
                 }
 
                 $ss = $this->seek();
+
+
+                // negation selector
+                if (in_array('not',$nameParts)) {
+
+                    if ($this->inNot === true) {
+                        $this->inNot = false;
+                        $this->throwParseError('psuedo-selector :not() may not contain another :not() psuedo-selector');
+                    } 
+
+                    $this->inNot = true;
+
+                    if ($this->literal('(') &&
+                        //$this->selectors($selectors) &&
+                        $this->openString(')', $str, '(') &&
+                        $this->literal(')')
+                    ) {     
+
+                        $parts[] = '(';
+
+                        $strParts = explode("&",$str[2][0]);
+                        $strPartsLength = count($strParts);
+                        foreach($strParts as $index => $strTok) {
+                            $parts[] = $strTok;
+                            if ($index + 1 < $strPartsLength) {
+                                $parts[] = Compiler::$selfSelector;
+                            }
+                        }
+
+                        $parts[] = ')';
+                        $this->inNot = false;
+                        continue;
+                    }
+
+                    $this->seek($ss);
+                }
+
+                
 
                 if ($this->literal('(') &&
                     ($this->openString(')', $str, '(') || true) &&
