@@ -1174,7 +1174,7 @@ class Parser
     {
         $s = $this->seek();
         $items = [];
-
+        $value = null;
         while ($this->$parseItem($value)) {
             $items[] = $value;
 
