@@ -12,16 +12,10 @@
 namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Base\Range;
-use Leafo\ScssPhp\Block;
-use Leafo\ScssPhp\Colors;
 use Leafo\ScssPhp\Compiler\Environment;
 use Leafo\ScssPhp\Exception\CompilerException;
 use Leafo\ScssPhp\Formatter\OutputBlock;
-use Leafo\ScssPhp\Node;
 use Leafo\ScssPhp\SourceMap\SourceMapGenerator;
-use Leafo\ScssPhp\Type;
-use Leafo\ScssPhp\Parser;
-use Leafo\ScssPhp\Util;
 
 /**
  * The scss compiler and parser.
