@@ -33,7 +33,7 @@ class SourceMapGenerator
      *
      * @var array
      */
-    protected $defaultOptions = array(
+    protected $defaultOptions = [
         // an optional source root, useful for relocating source files
         // on a server or removing repeated values in the 'sources' entry.
         // This value is prepended to the individual entries in the 'source' field.
@@ -56,7 +56,7 @@ class SourceMapGenerator
 
         // base path for filename normalization
         'sourceMapBasepath' => ''
-    );
+    ];
 
     /**
      * The base64 VLQ encoder
@@ -70,22 +70,22 @@ class SourceMapGenerator
      *
      * @var array
      */
-    protected $mappings = array();
+    protected $mappings = [];
 
     /**
      * Array of contents map
      *
      * @var array
      */
-    protected $contentsMap = array();
+    protected $contentsMap = [];
 
     /**
      * File to content map
      *
      * @var array
      */
-    protected $sources = array();
-    protected $source_keys = array();
+    protected $sources = [];
+    protected $source_keys = [];
 
     /**
      * @var array
@@ -109,13 +109,13 @@ class SourceMapGenerator
      */
     public function addMapping($generatedLine, $generatedColumn, $originalLine, $originalColumn, $sourceFile)
     {
-        $this->mappings[] = array(
+        $this->mappings[] = [
             'generated_line' => $generatedLine,
             'generated_column' => $generatedColumn,
             'original_line' => $originalLine,
             'original_column' => $originalColumn,
             'source_file' => $sourceFile
-        );
+        ];
 
         $this->sources[$sourceFile] = $sourceFile;
     }
@@ -156,7 +156,7 @@ class SourceMapGenerator
      */
     public function generateJson()
     {
-        $sourceMap = array();
+        $sourceMap = [];
         $mappings  = $this->generateMappings();
 
         // File version (always the first entry in the object) and must be a positive integer.
@@ -178,14 +178,14 @@ class SourceMapGenerator
         }
 
         // A list of original sources used by the 'mappings' entry.
-        $sourceMap['sources'] = array();
+        $sourceMap['sources'] = [];
 
         foreach ($this->sources as $source_uri => $source_filename) {
             $sourceMap['sources'][] = $this->normalizeFilename($source_filename);
         }
 
         // A list of symbol names used by the 'mappings' entry.
-        $sourceMap['names'] = array();
+        $sourceMap['names'] = [];
 
         // A string with the encoded mapping data.
         $sourceMap['mappings'] = $mappings;
@@ -216,7 +216,7 @@ class SourceMapGenerator
             return null;
         }
 
-        $content = array();
+        $content = [];
 
         foreach ($this->sources as $sourceFile) {
             $content[] = file_get_contents($sourceFile);
@@ -239,7 +239,7 @@ class SourceMapGenerator
         $this->source_keys = array_flip(array_keys($this->sources));
 
         // group mappings by generated line number.
-        $groupedMap = $groupedMapEncoded = array();
+        $groupedMap = $groupedMapEncoded = [];
 
         foreach ($this->mappings as $m) {
             $groupedMap[$m['generated_line']][] = $m;
@@ -253,7 +253,7 @@ class SourceMapGenerator
                 $groupedMapEncoded[] = ';';
             }
 
-            $lineMapEncoded = array();
+            $lineMapEncoded = [];
             $lastGeneratedColumn = 0;
 
             foreach ($line_map as $m) {

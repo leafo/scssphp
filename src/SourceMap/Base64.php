@@ -21,7 +21,7 @@ class Base64
     /**
      * @var array
      */
-    private static $encodingMap = array (
+    private static $encodingMap = [
         0 => 'A',
         1 => 'B',
         2 => 'C',
@@ -86,12 +86,12 @@ class Base64
         61 => '9',
         62 => '+',
         63 => '/',
-    );
+    ];
 
     /**
      * @var array
      */
-    private static $decodingMap = array(
+    private static $decodingMap = [
         'A' => 0,
         'B' => 1,
         'C' => 2,
@@ -156,7 +156,7 @@ class Base64
         9 => 61,
         '+' => 62,
         '/' => 63,
-    );
+    ];
 
     /**
      * Convert to base64
