@@ -1310,7 +1310,7 @@ class Compiler
      * @param array                                $stms
      * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
      *
-     * @return array
+     * @return array|null
      */
     protected function compileChildren($stms, OutputBlock $out)
     {
@@ -1321,6 +1321,7 @@ class Compiler
                 return $ret;
             }
         }
+        return null;
     }
 
     /**
@@ -2016,7 +2017,7 @@ class Compiler
         switch ($value[0]) {
             case Type::T_EXPRESSION:
                 if ($value[1] === '/') {
-                    return $this->shouldEval($value[2], $value[3]);
+                    return $this->shouldEval($value[2]);
                 }
 
                 // fall-thru
@@ -2372,7 +2373,7 @@ class Compiler
      * @param array $left
      * @param array $right
      *
-     * @return array
+     * @return array|null
      */
     protected function opAdd($left, $right)
     {
@@ -2395,6 +2396,7 @@ class Compiler
 
             return $strRight;
         }
+        return null;
     }
 
     /**
@@ -2404,12 +2406,12 @@ class Compiler
      * @param array   $right
      * @param boolean $shouldEval
      *
-     * @return array
+     * @return array|null
      */
     protected function opAnd($left, $right, $shouldEval)
     {
         if (! $shouldEval) {
-            return;
+            return null;
         }
 
         if ($left !== static::$false and $left !== static::$null) {
@@ -2426,12 +2428,12 @@ class Compiler
      * @param array   $right
      * @param boolean $shouldEval
      *
-     * @return array
+     * @return array|null
      */
     protected function opOr($left, $right, $shouldEval)
     {
         if (! $shouldEval) {
-            return;
+            return null;
         }
 
         if ($left !== static::$false and $left !== static::$null) {
@@ -3177,7 +3179,7 @@ class Compiler
      * @param \Leafo\ScssPhp\Compiler\Environment $env
      * @param boolean                             $unreduced
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function get($name, $shouldThrow = true, Environment $env = null, $unreduced = false)
     {
@@ -3222,6 +3224,7 @@ class Compiler
         }
 
         // found nothing
+        return null;
     }
 
     /**
@@ -3550,6 +3553,7 @@ class Compiler
     public function setIgnoreErrors($ignoreErrors)
     {
         $this->ignoreErrors = $ignoreErrors;
+        return $this;
     }
 
     /**
@@ -4948,7 +4952,7 @@ class Compiler
         if (! isset($list[2][$n])) {
             $this->throwError('Invalid argument for "n"');
 
-            return;
+            return null;
         }
 
         $list[2][$n] = $args[2];
@@ -5186,7 +5190,7 @@ class Compiler
         ) {
             $this->throwError('Invalid argument(s) for "comparable"');
 
-            return;
+            return null;
         }
 
         $number1 = $number1->normalize();
@@ -5366,7 +5370,7 @@ class Compiler
             if ($n < 1) {
                 $this->throwError("limit must be greater than or equal to 1");
 
-                return;
+                return null;
             }
 
             return new Node\Number(mt_rand(1, $n), '');
