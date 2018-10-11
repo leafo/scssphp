@@ -3308,7 +3308,7 @@ class Compiler
      *
      * @api
      *
-     * @param string $path
+     * @param string|callable $path
      */
     public function addImportPath($path)
     {
