@@ -3481,9 +3481,12 @@ class Compiler
             if (is_string($dir)) {
                 // check urls for normal import paths
                 foreach ($urls as $full) {
-                    $full = $dir
-                        . (! empty($dir) && substr($dir, -1) !== '/' ? '/' : '')
-                        . $full;
+                    $separator = (
+                        !empty($dir) &&
+                        substr($dir, -1) !== '/' &&
+                        substr($full, 0, 1) !== '/'
+                    ) ? '/' : '';
+                    $full = $dir . $separator . $full;
 
                     if ($this->fileExists($file = $full . '.scss') ||
                         ($hasExtension && $this->fileExists($file = $full))
