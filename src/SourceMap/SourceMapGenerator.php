@@ -303,7 +303,7 @@ class SourceMapGenerator
         $basePath = $this->options['sourceMapBasepath'];
 
         // "Trim" the 'sourceMapBasepath' from the output filename.
-        if (strpos($filename, $basePath) === 0) {
+        if (strlen($basePath) && strpos($filename, $basePath) === 0) {
             $filename = substr($filename, strlen($basePath));
         }
 
