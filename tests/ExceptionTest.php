@@ -18,7 +18,7 @@ use Leafo\ScssPhp\Compiler;
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */
-class ExceptionTest extends \PHPUnit_Framework_TestCase
+class ExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

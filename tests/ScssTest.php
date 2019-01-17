@@ -18,7 +18,7 @@ use Leafo\ScssPhp\Compiler;
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */
-class ScssTest extends \PHPUnit_Framework_TestCase
+class ScssTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $name

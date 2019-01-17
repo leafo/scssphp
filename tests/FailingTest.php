@@ -22,7 +22,7 @@ use Leafo\ScssPhp\Compiler;
  *
  * @author Anthon Pang <anthon.pang@gmail.com>
  */
-class FailingTest extends \PHPUnit_Framework_TestCase
+class FailingTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

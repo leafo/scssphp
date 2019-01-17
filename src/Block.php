@@ -62,4 +62,12 @@ class Block
      * @var array
      */
     public $children;
+    /**
+     * @var \Leafo\ScssPhp\Block
+     */
+    public $atrootParent;
+    /**
+     * @var array
+     */
+    public $atrootParentSelectors;
 }

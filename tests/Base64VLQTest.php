@@ -18,7 +18,7 @@ use Leafo\ScssPhp\SourceMap\Base64VLQ;
  *
  * @author Anthon Pang <anthon.pang@gmail.com>
  */
-class Base64VLQTest extends \PHPUnit_Framework_TestCase
+class Base64VLQTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test encode

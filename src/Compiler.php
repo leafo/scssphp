@@ -796,6 +796,8 @@ class Compiler
 
         $this->env = $this->filterWithout($envs, $without);
         $newBlock  = $this->spliceTree($envs, $block, $without);
+        if (isset($block->atrootParent))
+            $newBlock[1]->atrootParent = $block->atrootParent;
 
         $saveScope   = $this->scope;
         $this->scope = $this->rootBlock;
@@ -1293,6 +1295,9 @@ class Compiler
 
         foreach ($selector as $parts) {
             foreach ($parts as $part) {
+                if (is_array($part)) {
+                    return false;
+                }
                 if (strlen($part) && '%' === $part[0]) {
                     return true;
                 }
@@ -1878,7 +1883,11 @@ class Compiler
                 if (isset($mixin->args)) {
                     $this->applyArguments($mixin->args, $argValues);
                 }
-
+                foreach ($mixin->children as $stm) {
+                    if ($stm[0] == Type::T_AT_ROOT) {
+                        $stm[1]->atrootParentSelectors = $callingScope->selectors;
+                    }
+                }
                 $this->env->marker = 'mixin';
 
                 $this->compileChildrenNoReturn($mixin->children, $out);
@@ -2912,8 +2921,16 @@ class Compiler
             if (empty($env->selectors)) {
                 continue;
             }
-
+            if ($env->block->type == Type::T_AT_ROOT) {
+                break;
+            }
             $selectors = [];
+            if (!empty($env->block->parent->atrootParent) && !empty($env->block->parent->atrootParent->selectors)) {
+                $parentSelectors = $env->block->parent->atrootParent->selectors;
+            }
+            if (!empty($env->parent->parent->block->atrootParentSelectors)) {
+                $parentSelectors = $env->parent->parent->block->atrootParentSelectors;
+            }
 
             foreach ($env->selectors as $selector) {
                 foreach ($parentSelectors as $parent) {

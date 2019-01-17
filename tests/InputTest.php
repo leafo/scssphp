@@ -29,7 +29,7 @@ function _quote($str)
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */
-class InputTest extends \PHPUnit_Framework_TestCase
+class InputTest extends \PHPUnit\Framework\TestCase
 {
     protected static $inputDir = 'inputs';
     protected static $outputDir = 'outputs';

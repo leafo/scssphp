@@ -18,7 +18,7 @@ use Leafo\ScssPhp\Compiler;
  *
  * @author Leaf Corcoran <leafot@gmail.com>
  */
-class ApiTest extends \PHPUnit_Framework_TestCase
+class ApiTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

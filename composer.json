@@ -18,14 +18,17 @@
         "psr-4": { "Leafo\\ScssPhp\\": "src/" }
     },
     "autoload-dev": {
-        "psr-4": { "Leafo\\ScssPhp\\Test\\": "tests/" }
+        "psr-4": { "Leafo\\ScssPhp\\Test\\": "tests/" },
+        "classmap": [
+            "src/"
+        ]
     },
     "require": {
         "php": ">=5.4.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "~2.5",
-        "phpunit/phpunit": "~4.6"
+        "phpunit/phpunit": "^7"
     },
     "bin": ["bin/pscss"],
     "archive": {
