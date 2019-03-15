@@ -75,7 +75,7 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                     if (preg_match('/^\s*def test_([a-z_]+)/', $line, $matches)) {
                         $state = 1; // enter function
                         $name = $matches[1];
-                        continue;
+                        continue 2;
                     }
 
                     break;
@@ -83,7 +83,7 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                 case 1:
                     // inside function
                     if ($line === '' || $line[0] === '#') {
-                        continue;
+                        continue 2;
                     }
 
                     if (preg_match('/= <<([A-Z_]+)\s*$/', $line, $matches)
@@ -95,14 +95,14 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                             ;
                         }
 
-                        continue;
+                        continue 2;
                     }
 
                     if (preg_match('/^\s*assert_equal\(<<CSS, render\(<<SASS\)\)\s*$/', $line, $matches)
                         || preg_match('/^\s*assert_equal <<CSS, render\(<<SASS\)\s*$/', $line, $matches)
                     ) {
                         $state = 6; // sass parameter list
-                        continue;
+                        continue 2;
                     }
 
                     if (preg_match('/^\s*assert_equal\(<<CSS, render\(<<SCSS\)\)\s*$/', $line, $matches)
@@ -114,12 +114,12 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                     ) {
                         $state = 2; // get css
                         $style = isset($matches[1]) ? $matches[1] : null;
-                        continue;
+                        continue 2;
                     }
 
                     if (preg_match('/^\s*assert_warning .* do$/', $line)) {
                         $state = 4; // skip block
-                        continue;
+                        continue 2;
                     }
 
                     if (preg_match('/^\s*assert_raise_message.*render\(<<SCSS\)}\s*$/', $line)
@@ -135,7 +135,7 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                         || preg_match('/^\s*render <<SCSS\s*$/', $line)
                     ) {
                         $state = 6; // begin parameter list
-                        continue;
+                        continue 2;
                     }
 
                     if (preg_match('/^\s*assert_equal\(<<CSS,/', $line)) {
@@ -143,13 +143,13 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                             ;
                         }
 
-                        continue;
+                        continue 2;
                     }
 
                     if (preg_match('/^\s*assert_equal[ (].*,$/', $line)
                     ) {
                         $i++; // throw-away the next line too
-                        continue;
+                        continue 2;
                     }
 
                     if (preg_match('/^\s*assert_equal[ (]/', $line)
@@ -158,7 +158,7 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                         || preg_match('/^\s*render[ (]"/', $line)
                         || $line === 'rescue Sass::SyntaxError => e'
                     ) {
-                        continue;
+                        continue 2;
                     }
 
                     if (preg_match('/^\s*end\s*$/', $line)) {
@@ -168,7 +168,7 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                         $scss = array();
                         $css = array();
                         $style = null;
-                        continue;
+                        continue 2;
                     }
 
                     $skipped[] = $line;
@@ -179,9 +179,9 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                     // get css
                     if (preg_match('/^CSS\s*$/', $line)) {
                         $state = 3; // get scss
-                        continue;
+                        continue 2;
                     }
-   
+
                     $css[] = $lines[$i];
 
                     break;
@@ -190,9 +190,9 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                     // get scss
                     if (preg_match('/^SCSS\s*$/', $line)) {
                         $state = 1; // end of parameter list
-                        continue;
+                        continue 2;
                     }
-   
+
                     $scss[] = $lines[$i];
 
                     break;
@@ -201,12 +201,12 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                     // inside block
                     if (preg_match('/^\s*end\s*$/', $line)) {
                         $state = 1; // end block
-                        continue;
+                        continue 2;
                     }
 
                     if (preg_match('/^\s*assert_equal <<CSS, render\(<<SCSS\)\s*$/', $line)) {
                         $state = 5; // begin parameter list
-                        continue;
+                        continue 2;
                     }
 
                     break;
@@ -215,18 +215,18 @@ class ScssTest extends \PHPUnit_Framework_TestCase
                     // consume parameters
                     if (preg_match('/^SCSS\s*$/', $line)) {
                         $state = 4; // end of parameter list
-                        continue;
+                        continue 2;
                     }
-   
+
                     break;
 
                 case 6:
                     // consume parameters
                     if (preg_match('/^S[AC]SS\s*$/', $line)) {
                         $state = 1; // end of parameter list
-                        continue;
+                        continue 2;
                     }
-   
+
                     break;
             }
         }
