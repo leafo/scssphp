@@ -1,0 +1,19 @@
+.foo {
+  &:after {
+    color: red;
+  }
+  &:hover:after {
+    color: blue;
+  }
+}
+
+.bar {
+  @extend .foo;
+  &:before {
+    @extend .bar:after;
+  }
+}
+
+.baz.bar:before {
+  @extend .bar:before;
+}
