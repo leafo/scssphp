@@ -3550,7 +3550,9 @@ class Compiler
         }
 
         $line = $this->sourceLine;
-        $msg = "$msg: line: $line";
+        $file = $this->sourceNames[$this->sourceIndex];
+
+        $msg = "$msg: line: $line file: $file";
 
         throw new CompilerException($msg);
     }
