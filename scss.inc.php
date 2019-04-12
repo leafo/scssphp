@@ -6,6 +6,7 @@ if (version_compare(PHP_VERSION, '5.4') < 0) {
 if (! class_exists('Leafo\ScssPhp\Version', false)) {
     include_once __DIR__ . '/src/Base/Range.php';
     include_once __DIR__ . '/src/Block.php';
+    include_once __DIR__ . '/src/Cache.php';
     include_once __DIR__ . '/src/Colors.php';
     include_once __DIR__ . '/src/Compiler.php';
     include_once __DIR__ . '/src/Compiler/Environment.php';
