@@ -175,6 +175,20 @@ class Compiler
         }
     }
 
+    public function getCompileOptions()
+    {
+        $options = array(
+            'importPaths' => $this->importPaths,
+            'registeredVars' => $this->registeredVars,
+            'registeredFeatures' => $this->registeredFeatures,
+            'encoding' => $this->encoding,
+            'sourceMap' => serialize($this->sourceMap),
+            'sourceMapOptions' => $this->sourceMapOptions,
+            'formater' => $this->formatter,
+        );
+        return $options;
+    }
+
     /**
      * Compile scss
      *
@@ -187,6 +201,29 @@ class Compiler
      */
     public function compile($code, $path = null)
     {
+
+        if ($this->cache) {
+            $cache_key = ($path ? $path : "(stdin)") . ":" . md5($code);
+            $compile_options = $this->getCompileOptions();
+            $cache = $this->cache->getCache("compile", $cache_key, $compile_options);
+            if (is_array($cache)
+                and isset($cache['dependencies'])
+                and isset($cache['out']) ) {
+                // check if any dependency file changed before accepting the cache
+                foreach ($cache['dependencies'] as $file => $mtime) {
+                    if (!file_exists($file)
+                        or filemtime($file) !== $mtime) {
+                        unset($cache);
+                        break;
+                    }
+                }
+                if (isset($cache)) {
+                    return $cache['out'];
+                }
+            }
+        }
+
+
         $this->indentLevel    = -1;
         $this->extends        = [];
         $this->extendsMap     = [];
@@ -240,6 +277,14 @@ class Compiler
             }
 
             $out .= sprintf('/*# sourceMappingURL=%s */', $sourceMapUrl);
+        }
+
+        if ($this->cache and isset($cache_key) and isset($compile_options)) {
+            $v = array(
+                'dependencies' => $this->getParsedFiles(),
+                'out' => &$out,
+            );
+            $this->cache->setCache("compile", $cache_key, $v, $compile_options);
         }
 
         return $out;
