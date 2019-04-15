@@ -83,22 +83,29 @@ class Cache {
 	 *  content key (filename to be treated?)
 	 * @param array $options
 	 *  any option that affect the operation result on the content
+	 * @param int $last_modified
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function getCache( $operation, $what, $options = array()){
+	public function getCache( $operation, $what, $options = array(), $last_modified = null){
 		
 		$fileCache = self::$cache_dir . self::cacheName( $operation, $what, $options);
 		
 		if (!self::$force_refresh
-		  and file_exists($fileCache)
-		  and filemtime($fileCache) + self::$gc_lifetime > time() ) {
+		  and file_exists($fileCache)) {
 
-			$c = file_get_contents($fileCache);
-			$c = unserialize($c);
-			if (is_array($c) and isset($c['value'])) {
-				return $c['value'];
+			$cache_time = filemtime($fileCache);
+			if (
+				(is_null($last_modified) or $cache_time > $last_modified)
+				and $cache_time + self::$gc_lifetime > time() ) {
+
+				$c = file_get_contents($fileCache);
+				$c = unserialize($c);
+				if (is_array($c) and isset($c['value'])) {
+					return $c['value'];
+				}
 			}
+
 		}
 
 		return null;
