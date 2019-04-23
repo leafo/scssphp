@@ -763,6 +763,11 @@ class Parser
             $this->throwParseError('unexpected }');
         }
 
+        if ($block->type == Type::T_AT_ROOT) {
+            // keeps the parent in case of self selector &
+            $block->selfParent = $block->parent;
+        }
+
         $this->env = $block->parent;
         unset($block->parent);
 
