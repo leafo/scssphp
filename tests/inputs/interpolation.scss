@@ -97,3 +97,9 @@ $foo: ('a', 'b');
 div {
     prop: #{$foo};
 }
+
+.badge {
+  a#{&} {
+    text-decoration: none;
+  }
+}

@@ -71,3 +71,8 @@ foo, x, y {
 /* line 97, inputs/interpolation.scss */
 div {
   prop: a, b; }
+/* line 101, inputs/interpolation.scss */
+/* line 102, inputs/interpolation.scss */
+
+a.badge {
+  text-decoration: none; }
