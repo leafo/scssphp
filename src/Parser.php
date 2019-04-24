@@ -1919,6 +1919,20 @@ class Parser
         }
 
         $this->seek($s);
+
+        if ($this->literal('#{') && $this->selectorSingle($sel) && $this->literal('}', false)) {
+            $out = $sel[0];
+
+            $this->eatWhiteDefault = $oldWhite;
+
+            if ($this->eatWhiteDefault) {
+                $this->whitespace();
+            }
+
+            return true;
+        }
+
+        $this->seek($s);
         $this->eatWhiteDefault = $oldWhite;
 
         return false;
