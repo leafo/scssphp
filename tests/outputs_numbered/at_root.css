@@ -107,3 +107,8 @@ margin: 0; } }
 /* line 139, inputs/at_root.scss */
   tbody {
     padding: 10px; }
+/* line 151, inputs/at_root.scss */
+/* line 152, inputs/at_root.scss */
+
+a.badge {
+  text-decoration: none; }

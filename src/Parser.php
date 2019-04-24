@@ -763,6 +763,11 @@ class Parser
             $this->throwParseError('unexpected }');
         }
 
+        if ($block->type == Type::T_AT_ROOT) {
+            // keeps the parent in case of self selector &
+            $block->selfParent = $block->parent;
+        }
+
         $this->env = $block->parent;
         unset($block->parent);
 
@@ -1962,6 +1967,20 @@ class Parser
             }
 
             $out = [Type::T_INTERPOLATE, $value, $left, $right];
+            $this->eatWhiteDefault = $oldWhite;
+
+            if ($this->eatWhiteDefault) {
+                $this->whitespace();
+            }
+
+            return true;
+        }
+
+        $this->seek($s);
+
+        if ($this->literal('#{') && $this->selectorSingle($sel) && $this->literal('}', false)) {
+            $out = $sel[0];
+
             $this->eatWhiteDefault = $oldWhite;
 
             if ($this->eatWhiteDefault) {

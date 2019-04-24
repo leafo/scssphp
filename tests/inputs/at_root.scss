@@ -147,3 +147,9 @@ $table-padding: 10px !default;
     @include table;
   }
 }
+
+.badge {
+  @at-root a#{&} {
+    text-decoration: none;
+  }
+}
