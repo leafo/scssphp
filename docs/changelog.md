@@ -5,7 +5,28 @@ title: Changelog
 
 ## Changelog
 
-* **0.7.5** -- May 23, 2018
+* **0.7.8** -- April 24, 2019
+  * Partial support for #rrggbbaa CSS Level 4 colors with alpha (charlymz)
+  * Avoid infinitely duplicating parts when extending selector (cyberalien)
+  * Fix rooted SCSS URIs normalized incorrectly with double slashes (evanceit)
+  * Coding style updates (BrainFooLong)
+  * Interpolation support selector (jakejohns, Cerdic)
+  * Improve error messages (gabor-udvari, Cerdic)
+  * Fix font shorthand syntax (JanST123, Cerdic)
+  * Peephole optimizations (oyejorge, Cerdic)
+  * Compiler: change some private properties/methods to protected (cyberalien)
+  * Fix for "continue" causing PHP 7.3 warning (darkain)
+  * Fix error thrown from strpos if needle (basePath) is empty (evanceit)
+  * Fix doc for addImportPath, should also accept callable as input (nguyenk)
+  * Change Base64 VLQ encoder/decoder implementation
+  * Generate inline sourcemap in command-line (dexxa)
+  * Fix backslash escape (bastianjoel)
+* **0.7.7** -- July 21, 2018
+  * Actually merge maps instead of concatenating (s7eph4n)
+  * Treat 0 as special unitless number (of2607)
+  * Partial fix for call() with ellipsis (gabor-udvari)
+  * Misc peephole optimization
+* **0.7.6** -- May 23, 2018
   * `mix()` alpha fix (Uriziel01)
   * `transparentize()` alpha sensitive to locale (leonardfischer, timelsass)
   * notices when compiling UIKit (azjezz)
