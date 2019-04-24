@@ -790,6 +790,7 @@ class Compiler
             $wrapped->comments     = [];
             $wrapped->parent       = $block;
             $wrapped->children     = $block->children;
+            $wrapped->selfParent   = $block->selfParent;
 
             $block->children = [[Type::T_BLOCK, $wrapped]];
         }
@@ -882,6 +883,7 @@ class Compiler
             $newBlock = $b;
         }
 
+        $newBlock->selfParent   = $block->selfParent;
         $type = isset($newBlock->type) ? $newBlock->type : Type::T_BLOCK;
 
         return [$type, $newBlock];
@@ -1083,7 +1085,7 @@ class Compiler
         $this->scope->children[] = $out;
 
         if (count($block->children)) {
-            $out->selectors = $this->multiplySelectors($env);
+            $out->selectors = $this->multiplySelectors($env, $block->selfParent);
 
             $this->compileChildrenNoReturn($block->children, $out);
         }
@@ -2899,14 +2901,20 @@ class Compiler
      * Find the final set of selectors
      *
      * @param \Leafo\ScssPhp\Compiler\Environment $env
+     * @param Leafo\ScssPhp\Block $selfParent
      *
      * @return array
      */
-    protected function multiplySelectors(Environment $env)
+    protected function multiplySelectors(Environment $env, $selfParent = null)
     {
         $envs            = $this->compactEnv($env);
         $selectors       = [];
         $parentSelectors = [[]];
+
+        $selfParentSelectors = null;
+        if (!is_null($selfParent) and $selfParent->selectors) {
+            $selfParentSelectors = $this->evalSelectors($selfParent->selectors);
+        }
 
         while ($env = array_pop($envs)) {
             if (empty($env->selectors)) {
@@ -2917,7 +2925,7 @@ class Compiler
 
             foreach ($env->selectors as $selector) {
                 foreach ($parentSelectors as $parent) {
-                    $selectors[] = $this->joinSelectors($parent, $selector);
+                    $selectors[] = $this->joinSelectors($parent, $selector, $selfParentSelectors);
                 }
             }
 
@@ -2932,10 +2940,10 @@ class Compiler
      *
      * @param array $parent
      * @param array $child
-     *
+     * @param array $selfParentSelectors
      * @return array
      */
-    protected function joinSelectors($parent, $child)
+    protected function joinSelectors($parent, $child, $selfParentSelectors = null)
     {
         $setSelf = false;
         $out = [];
@@ -2946,15 +2954,17 @@ class Compiler
             foreach ($part as $p) {
                 if ($p === static::$selfSelector) {
                     $setSelf = true;
-
-                    foreach ($parent as $i => $parentPart) {
+                    if (is_null($selfParentSelectors)) {
+                        $selfParentSelectors = $parent;
+                    }
+                    foreach ($selfParentSelectors as $i => $parentPart) {
                         if ($i > 0) {
                             $out[] = $newPart;
                             $newPart = [];
                         }
 
                         foreach ($parentPart as $pp) {
-                            $newPart[] = $pp;
+                            $newPart[] = (is_array($pp) ? implode($pp) : $pp);
                         }
                     }
                 } else {
