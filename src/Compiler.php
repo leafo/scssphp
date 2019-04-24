@@ -2017,7 +2017,7 @@ class Compiler
         switch ($value[0]) {
             case Type::T_EXPRESSION:
                 if ($value[1] === '/') {
-                    return $this->shouldEval($value[2]);
+                    return $this->shouldEval($value[2]) || $this->shouldEval($value[3]);
                 }
 
                 // fall-thru
