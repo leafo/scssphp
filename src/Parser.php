@@ -1342,7 +1342,7 @@ class Parser
 
             $this->count += $len;
 
-            if ($this->literal(')')) {
+            if ($this->matchChar(')')) {
                 $content = substr($this->buffer, $s, $this->count - $s);
                 $out = [Type::T_KEYWORD, $content];
 
@@ -1978,7 +1978,7 @@ class Parser
 
         $this->seek($s);
 
-        if ($this->literal('#{') && $this->selectorSingle($sel) && $this->literal('}', false)) {
+        if ($this->literal('#{', 2) && $this->selectorSingle($sel) && $this->matchChar('}', false)) {
             $out = $sel[0];
 
             $this->eatWhiteDefault = $oldWhite;
