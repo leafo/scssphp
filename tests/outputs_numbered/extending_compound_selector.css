@@ -1,0 +1,11 @@
+/* line 1, inputs/extending_compound_selector.scss */
+/* line 2, inputs/extending_compound_selector.scss */
+  .foo:after, .bar:after, .bar:before, .baz.bar:before {
+    color: red; }
+/* line 5, inputs/extending_compound_selector.scss */
+.foo:hover:after, .bar:hover:after, .bar:before:hover, .baz.bar:before:hover {
+  color: blue; }
+/* line 10, inputs/extending_compound_selector.scss */
+/* line 12, inputs/extending_compound_selector.scss */
+
+/* line 17, inputs/extending_compound_selector.scss */

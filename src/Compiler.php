@@ -463,7 +463,12 @@ class Compiler
                     $tempReplacement = $k > 0 ? array_slice($new, $k) : $new;
 
                     for ($l = count($tempReplacement) - 1; $l >= 0; $l--) {
-                        $slice = $tempReplacement[$l];
+                        $slice = [];
+                        foreach ($tempReplacement[$l] as $chunk) {
+                            if (!in_array($chunk, $slice)) {
+                                $slice[] = $chunk;
+                            }
+                        }
                         array_unshift($replacement, $slice);
 
                         if (! $this->isImmediateRelationshipCombinator(end($slice))) {
