@@ -1706,22 +1706,46 @@ class Parser
     protected function color(&$out)
     {
         $color = [Type::T_COLOR];
+        $s     = $this->count;
 
-        if ($this->match('(#([0-9a-f]{6})|#([0-9a-f]{3}))', $m)) {
-            if (isset($m[3])) {
-                $num = hexdec($m[3]);
+        if ($this->match('(#([0-9a-f]+))', $m)) {
+            $nofValues = strlen($m[2]);
+            $hasAlpha  = $nofValues === 4 || $nofValues === 8;
+            $channels  = $hasAlpha ? [4, 3, 2, 1] : [3, 2, 1];
 
-                foreach ([3, 2, 1] as $i) {
-                    $t = $num & 0xf;
-                    $color[$i] = $t << 4 | $t;
-                    $num >>= 4;
-                }
-            } else {
-                $num = hexdec($m[2]);
+            switch ($nofValues) {
+                case 3:
+                case 4:
+                    $num = hexdec($m[2]);
 
-                foreach ([3, 2, 1] as $i) {
-                    $color[$i] = $num & 0xff;
-                    $num >>= 8;
+                    foreach ($channels as $i) {
+                        $t = $num & 0xf;
+                        $color[$i] = $t << 4 | $t;
+                        $num >>= 4;
+                    }
+                    break;
+
+                case 6:
+                case 8:
+                    $num = hexdec($m[2]);
+
+                    foreach ($channels as $i) {
+                        $color[$i] = $num & 0xff;
+                        $num >>= 8;
+                    }
+                    break;
+
+                default:
+                    $this->seek($s);
+
+                    return false;
+            }
+
+            if ($hasAlpha) {
+                if ($color[4] === 255) {
+                    $color[4] = 1; // fully opaque
+                } else {
+                    $color[4] = round($color[4] / 255, 3);
                 }
             }
 

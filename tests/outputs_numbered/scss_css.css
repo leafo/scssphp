@@ -786,3 +786,7 @@ foo {
 foo {
   a: foo();
   b: bar baz-bang() bip; }
+/* line 985, inputs/scss_css.scss */
+.alpha {
+  color: rgba(31, 37, 38, 0.749);
+  background-color: #1f2526; }
