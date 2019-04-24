@@ -1623,7 +1623,7 @@ class Compiler
                     $isGlobal = in_array('!global', $flags);
 
                     if ($isGlobal) {
-                        $this->set($name[1], $this->reduce($value), false, $this->rootEnv);
+                        $this->set($name[1], $this->reduce($value), false, $this->rootEnv, $value);
                         break;
                     }
 
@@ -1632,7 +1632,7 @@ class Compiler
                         || $result === static::$null);
 
                     if (! $isDefault || $shouldSet) {
-                        $this->set($name[1], $this->reduce($value));
+                        $this->set($name[1], $this->reduce($value), false, null, $value);
                     }
                     break;
                 }
@@ -1641,10 +1641,23 @@ class Compiler
 
                 // handle shorthand syntax: size / line-height
                 if ($compiledName === 'font') {
-                    if ($value[0] === Type::T_EXPRESSION && $value[1] === '/') {
-                        $value = $this->expToString($value);
-                    } elseif ($value[0] === Type::T_LIST) {
-                        foreach ($value[2] as &$item) {
+                    if ($value[0] === Type::T_VARIABLE) {
+                        // if the font value comes from variable, the content is already reduced (which means formulars where already calculated)
+                        // so we need the original unreduced value
+                        $value = $this->get($value[1], true, null, true);
+                    }
+
+                    $fontValue=&$value;
+                    if ($value[0] === Type::T_LIST && $value[1]==',') {
+                        // this is the case if more than one font is given: example: "font: 400 1em/1.3 arial,helvetica"
+                        // we need to handle the first list element
+                        $fontValue=&$value[2][0];
+                    }
+
+                    if ($fontValue[0] === Type::T_EXPRESSION && $fontValue[1] === '/') {
+                        $fontValue = $this->expToString($fontValue);
+                    } elseif ($fontValue[0] === Type::T_LIST) {
+                        foreach ($fontValue[2] as &$item) {
                             if ($item[0] === Type::T_EXPRESSION && $item[1] === '/') {
                                 $item = $this->expToString($item);
                             }
@@ -3070,8 +3083,9 @@ class Compiler
      * @param mixed                               $value
      * @param boolean                             $shadow
      * @param \Leafo\ScssPhp\Compiler\Environment $env
+     * @param mixed                               $valueUnreduced
      */
-    protected function set($name, $value, $shadow = false, Environment $env = null)
+    protected function set($name, $value, $shadow = false, Environment $env = null, $valueUnreduced = null)
     {
         $name = $this->normalizeName($name);
 
@@ -3080,9 +3094,9 @@ class Compiler
         }
 
         if ($shadow) {
-            $this->setRaw($name, $value, $env);
+            $this->setRaw($name, $value, $env, $valueUnreduced);
         } else {
-            $this->setExisting($name, $value, $env);
+            $this->setExisting($name, $value, $env, $valueUnreduced);
         }
     }
 
@@ -3092,8 +3106,9 @@ class Compiler
      * @param string                              $name
      * @param mixed                               $value
      * @param \Leafo\ScssPhp\Compiler\Environment $env
+     * @param mixed                               $valueUnreduced
      */
-    protected function setExisting($name, $value, Environment $env)
+    protected function setExisting($name, $value, Environment $env, $valueUnreduced = null)
     {
         $storeEnv = $env;
 
@@ -3118,6 +3133,9 @@ class Compiler
         }
 
         $env->store[$name] = $value;
+        if ($valueUnreduced) {
+            $env->storeUnreduced[$name] = $valueUnreduced;
+        }
     }
 
     /**
@@ -3126,10 +3144,14 @@ class Compiler
      * @param string                              $name
      * @param mixed                               $value
      * @param \Leafo\ScssPhp\Compiler\Environment $env
+     * @param mixed                               $valueUnreduced
      */
-    protected function setRaw($name, $value, Environment $env)
+    protected function setRaw($name, $value, Environment $env, $valueUnreduced = null)
     {
         $env->store[$name] = $value;
+        if ($valueUnreduced) {
+            $env->storeUnreduced[$name] = $valueUnreduced;
+        }
     }
 
     /**
@@ -3140,10 +3162,11 @@ class Compiler
      * @param string                              $name
      * @param boolean                             $shouldThrow
      * @param \Leafo\ScssPhp\Compiler\Environment $env
+     * @param boolean                             $unreduced
      *
      * @return mixed
      */
-    public function get($name, $shouldThrow = true, Environment $env = null)
+    public function get($name, $shouldThrow = true, Environment $env = null, $unreduced = false)
     {
         $normalizedName = $this->normalizeName($name);
         $specialContentKey = static::$namespaces['special'] . 'content';
@@ -3157,6 +3180,9 @@ class Compiler
 
         for (;;) {
             if (array_key_exists($normalizedName, $env->store)) {
+                if ($unreduced && isset($env->storeUnreduced[$normalizedName])) {
+                    return $env->storeUnreduced[$normalizedName];
+                }
                 return $env->store[$normalizedName];
             }
 
