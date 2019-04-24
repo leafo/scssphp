@@ -202,7 +202,7 @@ class SourceMapGenerator
             unset($sourceMap['sourceRoot']);
         }
 
-        return json_encode($sourceMap);
+        return json_encode($sourceMap, JSON_UNESCAPED_SLASHES);
     }
 
     /**
