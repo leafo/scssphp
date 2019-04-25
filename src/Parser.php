@@ -1766,11 +1766,26 @@ class Parser
      */
     protected function unit(&$unit)
     {
-        if ($this->match('([0-9]*(\.)?[0-9]+)([%a-zA-Z]+)?', $m)) {
-            $unit = new Node\Number($m[1], empty($m[3]) ? '' : $m[3]);
+        $s = $this->count;
+
+        if ($this->match('([0-9]*(\.)?[0-9]+)([%a-zA-Z]+)?', $m, false)) {
+            if ( ! ctype_digit($this->buffer[$this->count])) {
+                $this->whitespace();
+
+                $unit = new Node\Number($m[1], empty($m[3]) ? '' : $m[3]);
+
+                return true;
+            }
+
+            $this->seek($s);
+        }
+/*
+        if ($this->match('([0-9][0-9a-fA-F]+)', $m)) {
+            $unit = new Node\Number($m[1], '');
 
             return true;
         }
+*/
 
         return false;
     }

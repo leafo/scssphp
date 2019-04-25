@@ -985,3 +985,9 @@ foo {
 .alpha {
   color: #1f2526bf;
   background-color: #1f2526ff; }
+
+$id: 4c29f540779d8549daf934275faea11;
+$selector: '.shortcode-' + $id;
+#{$selector} {
+  color: red;
+}
