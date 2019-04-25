@@ -3209,7 +3209,6 @@ class Compiler
             if (! $hasNamespace && isset($env->marker)) {
                 if (! $nextIsRoot && ! empty($env->store[$specialContentKey])) {
                     $env = $env->store[$specialContentKey]->scope;
-                    $nextIsRoot = true;
                     continue;
                 }
 
