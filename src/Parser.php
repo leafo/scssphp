@@ -1769,7 +1769,7 @@ class Parser
         $s = $this->count;
 
         if ($this->match('([0-9]*(\.)?[0-9]+)([%a-zA-Z]+)?', $m, false)) {
-            if (strlen($this->buffer) == $this->count || ! ctype_digit($this->buffer[$this->count])) {
+            if (strlen($this->buffer) === $this->count || ! ctype_digit($this->buffer[$this->count])) {
                 $this->whitespace();
 
                 $unit = new Node\Number($m[1], empty($m[3]) ? '' : $m[3]);
@@ -1779,13 +1779,6 @@ class Parser
 
             $this->seek($s);
         }
-/*
-        if ($this->match('([0-9][0-9a-fA-F]+)', $m)) {
-            $unit = new Node\Number($m[1], '');
-
-            return true;
-        }
-*/
 
         return false;
     }
