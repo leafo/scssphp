@@ -26,3 +26,30 @@ div {
         }
     }
 }
+
+@mixin at-rooting($position: left, $content: 'element') {
+
+    @at-root .#{$content} {
+        float: $position;
+    }
+}
+
+@mixin breakpoint-with-var($value) {
+    $screen: 'screen';
+    @media print, #{$screen} and #{$value} {
+        @content;
+    }
+}
+
+@mixin caller-nested {
+
+    $width: '(min-width:640px)';
+
+    @include breakpoint-with-var($width) {
+        .position-left {
+          @include at-rooting(left, 'element');
+        }
+    }
+}
+
+@include caller-nested;
