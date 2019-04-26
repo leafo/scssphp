@@ -1311,7 +1311,8 @@ class Compiler
         return false;
     }
 
-    protected function pushCallStack($name = '') {
+    protected function pushCallStack($name = '')
+    {
         $this->callStack[] = [
           'n' => $name,
           Parser::SOURCE_INDEX => $this->sourceIndex,
@@ -1320,7 +1321,8 @@ class Compiler
         ];
     }
 
-    protected function popCallStack() {
+    protected function popCallStack()
+    {
         array_pop($this->callStack);
     }
 
@@ -1592,19 +1594,15 @@ class Compiler
      */
     protected function compileChild($child, OutputBlock $out)
     {
-        if (isset($child[Parser::SOURCE_LINE]))
-        {
-            $this->sourceIndex  = isset($child[Parser::SOURCE_INDEX]) ? $child[Parser::SOURCE_INDEX] : null;
-            $this->sourceLine   = isset($child[Parser::SOURCE_LINE]) ? $child[Parser::SOURCE_LINE] : -1;
+        if (isset($child[Parser::SOURCE_LINE])) {
+            $this->sourceIndex = isset($child[Parser::SOURCE_INDEX]) ? $child[Parser::SOURCE_INDEX] : null;
+            $this->sourceLine = isset($child[Parser::SOURCE_LINE]) ? $child[Parser::SOURCE_LINE] : -1;
             $this->sourceColumn = isset($child[Parser::SOURCE_COLUMN]) ? $child[Parser::SOURCE_COLUMN] : -1;
-        }
-        elseif(is_array($child) and isset($child[1]->sourceLine))
-        {
+        } elseif (is_array($child) and isset($child[1]->sourceLine)) {
             $this->sourceIndex = $child[1]->sourceIndex;
             $this->sourceLine = $child[1]->sourceLine;
             $this->sourceColumn = $child[1]->sourceColumn;
-        }
-        elseif (! empty($out->sourceLine) and ! empty($out->sourceName)) {
+        } elseif (! empty($out->sourceLine) and ! empty($out->sourceName)) {
             $this->sourceLine = $out->sourceLine;
             $this->sourceIndex = array_search($out->sourceName, $this->sourceNames);
             if ($this->sourceIndex === false) {
