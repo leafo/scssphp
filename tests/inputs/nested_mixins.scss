@@ -27,12 +27,6 @@ div {
     }
 }
 
-@mixin at-rooting($position: left, $content: 'element') {
-
-    @at-root .#{$content} {
-        float: $position;
-    }
-}
 
 @mixin breakpoint-with-var($value) {
     $screen: 'screen';
@@ -47,7 +41,10 @@ div {
 
     @include breakpoint-with-var($width) {
         .position-left {
-          @include at-rooting(left, 'element');
+            @at-root .element {
+                float: $position;
+            }
+
         }
     }
 }
