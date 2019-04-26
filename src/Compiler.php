@@ -158,6 +158,8 @@ class Compiler
     protected $shouldEvaluate;
     protected $ignoreErrors;
 
+    protected $callStack = [];
+
     /**
      * Constructor
      */
@@ -1309,6 +1311,19 @@ class Compiler
         return false;
     }
 
+    protected function pushCallStack($name = '') {
+        $this->callStack[] = [
+          'n' => $name,
+          Parser::SOURCE_INDEX => $this->sourceIndex,
+          Parser::SOURCE_LINE => $this->sourceLine,
+          Parser::SOURCE_COLUMN => $this->sourceColumn
+        ];
+    }
+
+    protected function popCallStack() {
+        array_pop($this->callStack);
+    }
+
     /**
      * Compile children and return result
      *
@@ -1912,7 +1927,9 @@ class Compiler
 
                 $this->env->marker = 'mixin';
 
+                $this->pushCallStack($this->env->marker . " " . $name);
                 $this->compileChildrenNoReturn($mixin->children, $out);
+                $this->popCallStack();
 
                 $this->storeEnv = $storeEnv;
 
@@ -3601,6 +3618,15 @@ class Compiler
         $line = $this->sourceLine;
         $loc = isset($this->sourceNames[$this->sourceIndex]) ? $this->sourceNames[$this->sourceIndex] . " on line $line" : "line: $line";
         $msg = "$msg: $loc";
+        if ($this->callStack) {
+            $msg .= "\nCall Stack:\n";
+            $ncall = 0;
+            foreach (array_reverse($this->callStack) as $call) {
+                $msg .= "#" . $ncall++ . " " . $call['n'] . " ";
+                $msg .= (isset($this->sourceNames[$call[Parser::SOURCE_INDEX]]) ? $this->sourceNames[$call[Parser::SOURCE_INDEX]] : '(unknown file)');
+                $msg .= " on line " . $call[Parser::SOURCE_LINE] . "\n";
+            }
+        }
 
         throw new CompilerException($msg);
     }
@@ -3669,8 +3695,11 @@ class Compiler
         $tmp->children = [];
 
         $this->env->marker = 'function';
+        $this->pushCallStack($this->env->marker . " " . $name);
 
         $ret = $this->compileChildren($func->children, $tmp);
+
+        $this->popCallStack();
 
         $this->storeEnv = $storeEnv;
 
