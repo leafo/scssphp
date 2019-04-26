@@ -979,13 +979,15 @@ class Compiler
      */
     protected function isWithout($without, Block $block)
     {
-        if ((($without & static::WITH_RULE) && isset($block->selectors)) ||
-            (($without & static::WITH_MEDIA) &&
-                isset($block->type) && $block->type === Type::T_MEDIA) ||
-            (($without & static::WITH_SUPPORTS) &&
-                isset($block->type) && $block->type === Type::T_DIRECTIVE &&
-                isset($block->name) && $block->name === 'supports')
-        ) {
+        if (isset($block->type)) {
+            if ($block->type === Type::T_MEDIA) {
+                return ($without & static::WITH_MEDIA) ? true : false;
+            }
+            if ($block->type === Type::T_DIRECTIVE and isset($block->name) && $block->name === 'supports') {
+                return ($without & static::WITH_SUPPORTS) ? true : false;
+            }
+        }
+        if ((($without & static::WITH_RULE) && isset($block->selectors))) {
             return true;
         }
 
