@@ -1,18 +1,20 @@
 /* line 1, inputs/at_root.scss */
 .parent-inline-selector {
   color: white; }
-  /* line 3, inputs/at_root.scss */
-    .child {
-      color: black; }
+/* line 3, inputs/at_root.scss */
+.child {
+  color: black; }
+
 /* line 6, inputs/at_root.scss */
 .parent-block {
   color: white; }
-  /* line 9, inputs/at_root.scss */
-    .child1 {
-      color: green; }
+/* line 9, inputs/at_root.scss */
+.child1 {
+  color: green; }
 /* line 10, inputs/at_root.scss */
 .child2 {
   color: blue; }
+
 /* line 12, inputs/at_root.scss */
 .parent-block .step-child {
   color: black; }
@@ -25,14 +27,14 @@
 body .second {
   color: white;
   color: black; }
-
 /* line 23, inputs/at_root.scss */
-  .nested1 {
-    color: blue;
-    color: orange; }
-    /* line 26, inputs/at_root.scss */
-      .nested2 {
-        color: yellow; }
+.nested1 {
+  color: blue;
+  color: orange; }
+
+/* line 26, inputs/at_root.scss */
+.nested2 {
+  color: yellow; }
 /* line 36, inputs/at_root.scss */
 .third {
   color: green; }
@@ -49,16 +51,18 @@ body .second {
     /* line 51, inputs/at_root.scss */
       .my-widget .inside-mq {
         inside-style: mq; } }
-  /* line 56, inputs/at_root.scss */
-    .my-widget .outside-mq {
-      outside-style: mq; }
-  /* line 63, inputs/at_root.scss */
-    .outside-class {
-      color: blue; }
-  @media (min-width: 300px) {
+
+/* line 56, inputs/at_root.scss */
+.my-widget .outside-mq {
+outside-style: mq; }
+/* line 63, inputs/at_root.scss */
+.outside-class {
+  color: blue; }
+
+@media (min-width: 300px) {
 /* line 71, inputs/at_root.scss */
 .with-only {
-color: pink; } }
+  color: pink; } }
 
 @media screen and (max-width: 320px) {
 /* line 81, inputs/at_root.scss */
@@ -69,46 +73,48 @@ color: pink; } }
 /* line 85, inputs/at_root.scss */
 .bar {
   padding: 0; } }
-
 /* line 90, inputs/at_root.scss */
-  .baar {
-    padding: 0; }
+.baar {
+  padding: 0; }
 
 /* line 95, inputs/at_root.scss */
-  .foo .barr {
-    padding: 0; }
+.foo .barr {
+padding: 0; }
 
 @media screen and (max-width: 640px) {
 /* line 104, inputs/at_root.scss */ }
-  /* line 107, inputs/at_root.scss */
-  .foo .bar {
-    width: 0; }
-  @supports ( display: flex ) {
+/* line 107, inputs/at_root.scss */
+.foo .bar {
+  width: 0; }
+
+@supports ( display: flex ) {
 /* line 112, inputs/at_root.scss */
 .baz {
-height: 0; } }
-  @media screen and (max-width: 640px) {
+  height: 0; } }
+
+@media screen and (max-width: 640px) {
 /* line 117, inputs/at_root.scss */
 .qux {
-margin: 0; } }
-  @media screen and (max-width: 640px) {
-          /* line 122, inputs/at_root.scss */
-            .foo .quux {
-              padding: 0; } }
-  /* line 127, inputs/at_root.scss */
-  .foo .quix {
-    padding: 0; }
+  margin: 0; } }
+
+@media screen and (max-width: 640px) {
+/* line 122, inputs/at_root.scss */
+.foo .quux {
+  padding: 0; } }
+/* line 127, inputs/at_root.scss */
+.foo .quix {
+  padding: 0; }
 /* line 144, inputs/at_root.scss */
 /* line 145, inputs/at_root.scss */
 
 .test .test2 {
   padding: 0px; }
-
 /* line 139, inputs/at_root.scss */
-  tbody {
-    padding: 10px; }
+tbody {
+  padding: 10px; }
+
 /* line 151, inputs/at_root.scss */
 /* line 152, inputs/at_root.scss */
-
 a.badge {
-  text-decoration: none; }
+text-decoration: none; }
+
