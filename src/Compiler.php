@@ -822,7 +822,8 @@ class Compiler
      * @param $without
      * @return mixed
      */
-    protected function filterScopeWithout($scope, $without) {
+    protected function filterScopeWithout($scope, $without)
+    {
         $filteredScopes = [];
 
         // start from the root
@@ -830,7 +831,7 @@ class Compiler
             $scope = $scope->parent;
         }
 
-        for (; ;) {
+        for (;;) {
             if (! $scope) {
                 break;
             }
@@ -847,8 +848,7 @@ class Compiler
 
             if ($scope->children) {
                 $scope = end($scope->children);
-            }
-            else {
+            } else {
                 $scope = null;
             }
         }
@@ -878,13 +878,13 @@ class Compiler
      * @param $previousScope
      * @return mixed
      */
-    protected function completeScope($scope, $previousScope) {
-
+    protected function completeScope($scope, $previousScope)
+    {
         if (! $scope->type && ! count($scope->selectors) && count($scope->lines)) {
             $scope->selectors = $this->findScopeSelectors($previousScope, $scope->depth);
         }
         if ($scope->children) {
-            foreach ($scope->children as $k=>$c) {
+            foreach ($scope->children as $k => $c) {
                 $scope->children[$k] = $this->completeScope($c, $previousScope);
             }
         }
@@ -898,7 +898,8 @@ class Compiler
      * @param $depth
      * @return array
      */
-    protected function findScopeSelectors($scope, $depth) {
+    protected function findScopeSelectors($scope, $depth)
+    {
         if ($scope->depth === $depth && $scope->selectors) {
             return $scope->selectors;
         }
@@ -1004,7 +1005,7 @@ class Compiler
                 if (isset($block->name) && $block->name === 'supports') {
                     return ($without & static::WITH_SUPPORTS) ? true : false;
                 }
-                if (isset($block->selectors) && strpos(serialize($block->selectors),'@supports') !== false) {
+                if (isset($block->selectors) && strpos(serialize($block->selectors), '@supports') !== false) {
                     return ($without & static::WITH_SUPPORTS) ? true : false;
                 }
             }
