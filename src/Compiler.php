@@ -803,12 +803,11 @@ class Compiler
         }
 
         $this->env = $this->filterWithout($envs, $without);
-        $newBlock  = $this->spliceTree($envs, $block, $without);
 
         $saveScope   = $this->scope;
-        $this->scope = $this->rootBlock;
-
-        $this->compileChild($newBlock, $this->scope);
+        $this->scope = $this->filterScopeWithout($saveScope, $without);
+        
+        $this->compileChildrenNoReturn($block->children, $this->scope);
 
         $this->scope = $saveScope;
         $this->env   = $this->extractEnv($envs);
@@ -817,84 +816,60 @@ class Compiler
     }
 
     /**
-     * Splice parse tree
-     *
-     * @param array                $envs
-     * @param \Leafo\ScssPhp\Block $block
-     * @param integer              $without
-     *
-     * @return array
+     * Filter at-root scope depending of with/without option
+     * @param $scope
+     * @param $without
+     * @return mixed
      */
-    protected function spliceTree($envs, Block $block, $without)
-    {
-        $newBlock = null;
+    protected function filterScopeWithout($scope, $without) {
+        $filteredScopes = [];
 
-        foreach ($envs as $e) {
-            if (! isset($e->block)) {
-                continue;
-            }
-
-            if ($e->block === $block) {
-                continue;
-            }
-
-            if (isset($e->block->type) && $e->block->type === Type::T_AT_ROOT) {
-                continue;
-            }
-
-            if ($e->block && $this->isWithout($without, $e->block)) {
-                continue;
-            }
-
-            $b = new Block;
-            $b->sourceName   = $e->block->sourceName;
-            $b->sourceIndex  = $e->block->sourceIndex;
-            $b->sourceLine   = $e->block->sourceLine;
-            $b->sourceColumn = $e->block->sourceColumn;
-            $b->selectors    = [];
-            $b->comments     = $e->block->comments;
-            $b->parent       = null;
-
-            if ($newBlock) {
-                $type = isset($newBlock->type) ? $newBlock->type : Type::T_BLOCK;
-
-                $b->children = [[$type, $newBlock]];
-
-                $newBlock->parent = $b;
-            } elseif (count($block->children)) {
-                foreach ($block->children as $child) {
-                    if ($child[0] === Type::T_BLOCK) {
-                        $child[1]->parent = $b;
-                    }
-                }
-
-                $b->children = $block->children;
-            }
-
-            if (isset($e->block->type)) {
-                $b->type = $e->block->type;
-            }
-
-            if (isset($e->block->name)) {
-                $b->name = $e->block->name;
-            }
-
-            if (isset($e->block->queryList)) {
-                $b->queryList = $e->block->queryList;
-            }
-
-            if (isset($e->block->value)) {
-                $b->value = $e->block->value;
-            }
-
-            $newBlock = $b;
+        // start from the root
+        while ($scope->parent && $scope->parent->type !== TYPE::T_ROOT) {
+            $scope = $scope->parent;
         }
 
-        $newBlock->selfParent   = $block->selfParent;
-        $type = isset($newBlock->type) ? $newBlock->type : Type::T_BLOCK;
+        for (; ;) {
+            if (! $scope) {
+                break;
+            }
+            if (! $this->isWithout($without, $scope)) {
+                $s = clone $scope;
+                $s->children = [];
+                $s->lines = [];
+                $s->parent = null;
+                if ($s->type !== Type::T_MEDIA && $s->type !== Type::T_DIRECTIVE) {
+                    $s->selectors = [];
+                }
+                $filteredScopes[] = $s;
+            }
 
-        return [$type, $newBlock];
+            if ($scope->children) {
+                $scope = end($scope->children);
+            }
+            else {
+                $scope = null;
+            }
+        }
+        if (!count($filteredScopes)) {
+            return $this->rootBlock;
+        }
+
+        $newScope = array_shift($filteredScopes);
+        $newScope->parent = $this->rootBlock;
+        $this->rootBlock->children[] = $newScope;
+
+        $p = &$newScope;
+        while (count($filteredScopes)) {
+            $s = array_shift($filteredScopes);
+            $s->parent = $p;
+            $p->children[] = &$s;
+            $p = $s;
+        }
+
+        return $newScope;
     }
+
 
     /**
      * Compile @at-root's with: inclusion / without: exclusion into filter flags
@@ -973,18 +948,24 @@ class Compiler
      * Filter WITH rules
      *
      * @param integer              $without
-     * @param \Leafo\ScssPhp\Block $block
+     * @param \Leafo\ScssPhp\Block|\Leafo\ScssPhp\Formatter\OutputBlock $block
      *
      * @return boolean
      */
-    protected function isWithout($without, Block $block)
+    protected function isWithout($without, $block)
     {
         if (isset($block->type)) {
             if ($block->type === Type::T_MEDIA) {
                 return ($without & static::WITH_MEDIA) ? true : false;
             }
-            if ($block->type === Type::T_DIRECTIVE and isset($block->name) && $block->name === 'supports') {
-                return ($without & static::WITH_SUPPORTS) ? true : false;
+
+            if ($block->type === Type::T_DIRECTIVE) {
+                if (isset($block->name) && $block->name === 'supports') {
+                    return ($without & static::WITH_SUPPORTS) ? true : false;
+                }
+                if (isset($block->selectors) && strpos(serialize($block->selectors),'@supports') !== false) {
+                    return ($without & static::WITH_SUPPORTS) ? true : false;
+                }
             }
         }
         if ((($without & static::WITH_RULE) && isset($block->selectors))) {
