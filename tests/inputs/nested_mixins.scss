@@ -41,10 +41,12 @@ div {
 
     @include breakpoint-with-var($width) {
         .position-left {
+            color:red;
             @at-root .element {
+                $position: left;
                 float: $position;
             }
-
+            background:yellow;
         }
     }
 }
