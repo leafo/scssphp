@@ -806,9 +806,10 @@ class Compiler
 
         $saveScope   = $this->scope;
         $this->scope = $this->filterScopeWithout($saveScope, $without);
-        
+
         $this->compileChildrenNoReturn($block->children, $this->scope);
 
+        $this->scope = $this->completeScope($this->scope, $saveScope);
         $this->scope = $saveScope;
         $this->env   = $this->extractEnv($envs);
 
@@ -870,6 +871,46 @@ class Compiler
         return $newScope;
     }
 
+    /**
+     * found missing selector from a at-root compilation in the previous scope
+     * (if at-root is just enclosing a property, the selector is in the parent tree)
+     * @param $scope
+     * @param $previousScope
+     * @return mixed
+     */
+    protected function completeScope($scope, $previousScope) {
+
+        if (! $scope->type && ! count($scope->selectors) && count($scope->lines)) {
+            $scope->selectors = $this->findScopeSelectors($previousScope, $scope->depth);
+        }
+        if ($scope->children) {
+            foreach ($scope->children as $k=>$c) {
+                $scope->children[$k] = $this->completeScope($c, $previousScope);
+            }
+        }
+
+        return $scope;
+    }
+
+    /**
+     * Find a selector by the depth node in the scope
+     * @param $scope
+     * @param $depth
+     * @return array
+     */
+    protected function findScopeSelectors($scope, $depth) {
+        if ($scope->depth === $depth && $scope->selectors) {
+            return $scope->selectors;
+        }
+        if ($scope->children) {
+            foreach (array_reverse($scope->children) as $c) {
+                if ($s = $this->findScopeSelectors($c, $depth)) {
+                    return $s;
+                }
+            }
+        }
+        return [];
+    }
 
     /**
      * Compile @at-root's with: inclusion / without: exclusion into filter flags
