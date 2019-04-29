@@ -2271,6 +2271,11 @@ class Compiler
             case Type::T_FUNCTION_CALL:
                 return $this->fncall($value[1], $value[2]);
 
+            case Type::T_SELF:
+                $selfSelector = $this->multiplySelectors($this->env);
+                $selfSelector = $this->collapseSelectors($selfSelector);
+                return [Type::T_STRING, '', [$selfSelector]];
+
             default:
                 return $value;
         }

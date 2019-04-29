@@ -41,3 +41,8 @@ multiline string.";
     d: +foo(12px);
 }
 
+#self {
+    $self1: #{&};
+    $self2: &;
+    content:'#{$self2}';
+}
