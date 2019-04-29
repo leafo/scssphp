@@ -1031,6 +1031,24 @@ class Compiler
         $this->scope = $this->makeOutputBlock($block->type, $selectors);
         $this->scope->parent->children[] = $this->scope;
 
+        // wrap assign children in a block
+        foreach ($block->children as $k => $child) {
+            if ($child[0] === Type::T_ASSIGN) {
+                $wrapped = new Block;
+                $wrapped->sourceName   = $block->sourceName;
+                $wrapped->sourceIndex  = $block->sourceIndex;
+                $wrapped->sourceLine   = $block->sourceLine;
+                $wrapped->sourceColumn = $block->sourceColumn;
+                $wrapped->selectors    = [];
+                $wrapped->comments     = [];
+                $wrapped->parent       = $block;
+                $wrapped->children     = [$child];
+                $wrapped->selfParent   = $block->selfParent;
+
+                $block->children[$k] = [Type::T_BLOCK, $wrapped];
+            }
+        }
+
         $this->compileChildrenNoReturn($block->children, $this->scope);
 
         $this->scope = $this->scope->parent;
