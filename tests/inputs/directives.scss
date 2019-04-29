@@ -153,3 +153,22 @@ div {
 }
 
 }
+
+.sticky-top {
+  @supports (position: sticky) {
+    .top2 {
+      position: sticky;
+    }
+  }
+}
+.sticky-top {
+  @supports (position: sticky) {
+    position: sticky;
+  }
+}
+
+@supports (position: sticky) {
+  .sticky-top2 {
+    position: sticky;
+  }
+}
