@@ -1402,6 +1402,11 @@ class Parser
             }
         }
 
+        if ($this->matchChar('&', true)) {
+            $out = [Type::T_SELF];
+            return true;
+        }
+
         if ($char === '$' && $this->variable($out)) {
             return true;
         }
@@ -1991,14 +1996,18 @@ class Parser
         $s = $this->count;
 
         if ($this->literal('#{', 2) && $this->valueList($value) && $this->matchChar('}', false)) {
-            if ($lookWhite) {
-                $left = preg_match('/\s/', $this->buffer[$s - 1]) ? ' ' : '';
-                $right = preg_match('/\s/', $this->buffer[$this->count]) ? ' ': '';
+            if ($value === [Type::T_SELF]) {
+                $out = $value;
             } else {
-                $left = $right = false;
-            }
+                if ($lookWhite) {
+                    $left = preg_match('/\s/', $this->buffer[$s - 1]) ? ' ' : '';
+                    $right = preg_match('/\s/', $this->buffer[$this->count]) ? ' ': '';
+                } else {
+                    $left = $right = false;
+                }
 
-            $out = [Type::T_INTERPOLATE, $value, $left, $right];
+                $out = [Type::T_INTERPOLATE, $value, $left, $right];
+            }
             $this->eatWhiteDefault = $oldWhite;
 
             if ($this->eatWhiteDefault) {
@@ -2010,19 +2019,6 @@ class Parser
 
         $this->seek($s);
 
-        if ($this->literal('#{', 2) && $this->selectorSingle($sel) && $this->matchChar('}', false)) {
-            $out = $sel[0];
-
-            $this->eatWhiteDefault = $oldWhite;
-
-            if ($this->eatWhiteDefault) {
-                $this->whitespace();
-            }
-
-            return true;
-        }
-
-        $this->seek($s);
         $this->eatWhiteDefault = $oldWhite;
 
         return false;
