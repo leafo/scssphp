@@ -103,3 +103,9 @@ a.badge {
     a.badge-secondary:focus, a.badge-secondary.focus {
       outline: 0; }
 
+.table-hover tbody tr:hover, .table2#id tbody tr:hover {
+  color: #ddd;
+  background-color: #eee; }
+      .table-hover tbody tr.foo, .table2#id tbody tr.foo {
+        color: red; }
+
