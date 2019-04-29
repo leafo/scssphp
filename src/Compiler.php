@@ -808,7 +808,8 @@ class Compiler
         $saveScope   = $this->scope;
         $this->scope = $this->filterScopeWithout($saveScope, $without);
 
-        $this->compileChildrenNoReturn($block->children, $this->scope);
+        // propagate selfParent to the children where they still can be useful
+        $this->compileChildrenNoReturn($block->children, $this->scope, $block->selfParent);
 
         $this->scope = $this->completeScope($this->scope, $saveScope);
         $this->scope = $saveScope;
@@ -1137,8 +1138,8 @@ class Compiler
 
         if (count($block->children)) {
             $out->selectors = $this->multiplySelectors($env, $block->selfParent);
-
-            $this->compileChildrenNoReturn($block->children, $out);
+            // propagate selfParent to the children where they still can be useful
+            $this->compileChildrenNoReturn($block->children, $out, $block->selfParent);
         }
 
         $this->formatter->stripSemicolon($out->lines);
@@ -1395,12 +1396,17 @@ class Compiler
      *
      * @param array                                $stms
      * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
+     * @param \Leafo\ScssPhp\Block $selfParent
      *
      * @throws \Exception
      */
-    protected function compileChildrenNoReturn($stms, OutputBlock $out)
+    protected function compileChildrenNoReturn($stms, OutputBlock $out, $selfParent = null)
     {
+
         foreach ($stms as $stm) {
+            if ($selfParent && isset($stm[1]) && is_object($stm[1]) && get_class($stm[1]) == 'Leafo\ScssPhp\Block') {
+                $stm[1]->selfParent = $selfParent;
+            }
             $ret = $this->compileChild($stm, $out);
 
             if (isset($ret)) {
@@ -1957,6 +1963,25 @@ class Compiler
                 $storeEnv = $this->storeEnv;
                 $this->storeEnv = $this->env;
 
+                // Find the parent selectors in the env to be able to know what '&' refers to in the mixin
+                $selfParent = null;
+                $selfParentSelectors = null;
+                $e = $this->env;
+                for (;;) {
+                    if (isset($e->selectors) && $e->selectors) {
+                        $selfParentSelectors = $e->selectors;
+                        break;
+                    }
+                    if (! $e->parent) {
+                        break;
+                    }
+                    $e = $e->parent;
+                }
+                if ($selfParentSelectors) {
+                    $selfParent = new Block();
+                    $selfParent->selectors = $selfParentSelectors;
+                }
+
                 if (isset($content)) {
                     $content->scope = $callingScope;
 
@@ -1970,7 +1995,7 @@ class Compiler
                 $this->env->marker = 'mixin';
 
                 $this->pushCallStack($this->env->marker . " " . $name);
-                $this->compileChildrenNoReturn($mixin->children, $out);
+                $this->compileChildrenNoReturn($mixin->children, $out, $selfParent);
                 $this->popCallStack();
 
                 $this->storeEnv = $storeEnv;
@@ -3050,7 +3075,14 @@ class Compiler
                         }
 
                         foreach ($parentPart as $pp) {
-                            $newPart[] = (is_array($pp) ? implode($pp) : $pp);
+                            if (is_array($pp)) {
+                                $flatten = [];
+                                array_walk_recursive($pp, function ($a) use (&$flatten) {
+                                    $flatten[] = $a;
+                                });
+                                $pp = implode($flatten);
+                            }
+                            $newPart[] = $pp;
                         }
                     }
                 } else {
