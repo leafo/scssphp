@@ -3053,7 +3053,9 @@ class Compiler
                         foreach ($parentPart as $pp) {
                             if (is_array($pp)) {
                                 $flatten = [];
-                                array_walk_recursive($pp, function($a) use (&$flatten) { $flatten[] = $a; });
+                                array_walk_recursive($pp, function ($a) use (&$flatten) {
+                                    $flatten[] = $a;
+                                });
                                 $pp = implode($flatten);
                             }
                             $newPart[] = $pp;
