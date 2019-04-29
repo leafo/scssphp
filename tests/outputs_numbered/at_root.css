@@ -135,3 +135,15 @@ text-decoration: none; }
     .badge-secondary:focus, .badge-secondary.focus {
       outline: 0; }
 
+/* line 183, inputs/at_root.scss */
+/* line 184, inputs/at_root.scss */
+
+/* line 177, inputs/at_root.scss */
+
+.table-hover tbody tr:hover, .table2#id tbody tr:hover {
+  color: #ddd;
+  background-color: #eee; }
+/* line 178, inputs/at_root.scss */
+.table-hover tbody tr.foo, .table2#id tbody tr.foo {
+  color: red; }
+

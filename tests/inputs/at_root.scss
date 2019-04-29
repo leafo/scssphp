@@ -171,3 +171,20 @@ $table-padding: 10px !default;
 .badge-secondary {
 	@include badge-variant(yellow);
 }
+
+// combine everything in one: several levels of selecors, mixin, at-root and self
+@mixin mixin-hover {
+  &:hover { @content; }
+  @at-root #{&}.foo {
+	color:red;
+  }
+}
+
+.table-hover, .table2#id {
+  tbody tr {
+    @include mixin-hover {
+      color: #ddd;
+      background-color: #eee;
+    }
+  }
+}
