@@ -118,3 +118,20 @@ tbody {
 a.badge {
 text-decoration: none; }
 
+/* line 168, inputs/at_root.scss */
+.badge-primary {
+  background-color: blue; }
+/* line 160, inputs/at_root.scss */
+/* line 161, inputs/at_root.scss */
+  .badge-primary:focus, .badge-primary.focus {
+    outline: 0; }
+
+/* line 171, inputs/at_root.scss */
+.badge-secondary {
+  background-color: yellow; }
+/* line 160, inputs/at_root.scss */
+/* line 160, inputs/at_root.scss */
+  /* line 161, inputs/at_root.scss */
+    .badge-secondary:focus, .badge-secondary.focus {
+      outline: 0; }
+

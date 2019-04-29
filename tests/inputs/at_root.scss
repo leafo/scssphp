@@ -153,3 +153,21 @@ $table-padding: 10px !default;
     text-decoration: none;
   }
 }
+
+@mixin badge-variant($bg) {
+  background-color: $bg;
+
+  @at-root a#{&} {
+    &:focus,
+    &.focus {
+      outline: 0;
+    }
+  }
+}
+
+.badge-primary {
+	@include badge-variant(blue);
+}
+.badge-secondary {
+	@include badge-variant(yellow);
+}
