@@ -26,6 +26,7 @@ height: 20px; } }
 
 @font-face {
   color: red;
+
   height: 20px; }
 
 @keyframes 'bounce' {
@@ -116,3 +117,17 @@ from {
 /* line 150, inputs/directives.scss */
 to {
   transform: scale(1); } }
+/* line 157, inputs/directives.scss */
+@supports (position: sticky) {
+/* line 159, inputs/directives.scss */
+.sticky-top .top2 {
+  position: sticky; } }
+/* line 164, inputs/directives.scss */
+@supports (position: sticky) {
+    .sticky-top {
+      position: sticky; } }
+
+@supports (position: sticky) {
+/* line 171, inputs/directives.scss */
+.sticky-top2 {
+  position: sticky; } }

@@ -22,6 +22,7 @@ div {
 
 @font-face {
   color: red;
+
   height: 20px; }
 
 @keyframes 'bounce' {
@@ -100,3 +101,15 @@ div {
       transform: scale(0.5); }
     to {
       transform: scale(1); } }
+
+@supports (position: sticky) {
+    .sticky-top .top2 {
+      position: sticky; } }
+
+@supports (position: sticky) {
+    .sticky-top {
+      position: sticky; } }
+
+@supports (position: sticky) {
+  .sticky-top2 {
+    position: sticky; } }
