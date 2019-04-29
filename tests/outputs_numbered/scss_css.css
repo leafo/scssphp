@@ -64,10 +64,10 @@ sel {
   a: b; }
 
 @foo {
-  a: b;
 /* line 65, inputs/scss_css.scss */
 rule {
-  a: b; } }
+  a: b; }
+a: b; }
 
 @foo {
   a: b; }
@@ -79,8 +79,11 @@ rule {
 
 foo {
   a: 12px calc(100%/3 - 2*1em - 2*1px);
+
   b: 12px -moz-calc(100%/3 - 2*1em - 2*1px);
+
   b: 12px -webkit-calc(100%/3 - 2*1em - 2*1px);
+
   b: 12px -foobar-calc(100%/3 - 2*1em - 2*1px); }
 /* line 84, inputs/scss_css.scss */
 foo {
@@ -163,7 +166,9 @@ foo {
 
 foo {
   a: -moz-element(#foo);
+
   b: -webkit-element(#foo);
+
   b: -foobar-element(#foo); }
 
 @foo ;
@@ -543,18 +548,22 @@ foo {
 
 @page {
   prop1: val;
+
   prop2: val; }
 
 @page flap {
   prop1: val;
+
   prop2: val; }
 
 @page :first {
   prop1: val;
+
   prop2: val; }
 
 @page flap:first {
   prop1: val;
+
   prop2: val; }
 /* line 688, inputs/scss_css.scss */
 .foo {
