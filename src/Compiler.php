@@ -1946,18 +1946,7 @@ class Compiler
 
                 // Find the parent selectors in the env to be able to know what '&' refers to in the mixin
                 $selfParent = null;
-                $selfParentSelectors = null;
-                $e = $this->env;
-                for (;;) {
-                    if (isset($e->selectors) && $e->selectors) {
-                        $selfParentSelectors = $e->selectors;
-                        break;
-                    }
-                    if (! $e->parent) {
-                        break;
-                    }
-                    $e = $e->parent;
-                }
+                $selfParentSelectors = $this->multiplySelectors($this->env);
                 if ($selfParentSelectors) {
                     $selfParent = new Block();
                     $selfParent->selectors = $selfParentSelectors;
@@ -3012,13 +3001,27 @@ class Compiler
 
             foreach ($env->selectors as $selector) {
                 foreach ($parentSelectors as $parent) {
-                    $selectors[] = $this->joinSelectors($parent, $selector, $selfParentSelectors);
+                    if ($selfParentSelectors) {
+                        $previous = null;
+                        foreach ($selfParentSelectors as $selfParent) {
+                            // if no '&' in the selector, each call will give same result, only add once
+                            $s = $this->joinSelectors($parent, $selector, $selfParent);
+                            if ($s !== $previous) {
+                                $selectors[serialize($s)] = $s;
+                            }
+                            $previous = $s;
+                        }
+                    } else {
+                        $s = $this->joinSelectors($parent, $selector);
+                        $selectors[serialize($s)] = $s;
+                    }
                 }
             }
 
             $parentSelectors = $selectors;
         }
 
+        $selectors = array_values($selectors);
         return $selectors;
     }
 
