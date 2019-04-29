@@ -1,16 +1,17 @@
 .parent-inline-selector {
   color: white; }
-  .child {
-    color: black; }
+    .child {
+      color: black; }
 
 .parent-block {
   color: white; }
-  .child1 {
-    color: green; }
+    .child1 {
+      color: green; }
     .child2 {
       color: blue; }
-  .parent-block .step-child {
-    color: black; }
+
+.parent-block .step-child {
+  color: black; }
 
 .first {
   color: red; }
@@ -18,11 +19,12 @@
 body .second {
   color: white;
   color: black; }
-  .nested1 {
-    color: blue;
-    color: orange; }
-    .nested2 {
-      color: yellow; }
+      .nested1 {
+        color: blue;
+        color: orange; }
+
+.nested2 {
+  color: yellow; }
 
 .third {
   color: green; }
@@ -30,50 +32,63 @@ body .second {
 @media print {
   .page {
     width: 8in; } }
-  .page {
-    color: red; }
+
+.page {
+  color: red; }
 
 @media (min-width: 300px) {
     .my-widget .inside-mq {
       inside-style: mq; } }
-  .my-widget .outside-mq {
-    outside-style: mq; }
-  .outside-class {
-    color: blue; }
-  @media (min-width: 300px) {
-          .with-only {
-            color: pink; } }
+
+      .my-widget .outside-mq {
+        outside-style: mq; }
+
+.outside-class {
+  color: blue; }
+
+@media (min-width: 300px) {
+        .with-only {
+          color: pink; } }
 
 @media screen and (max-width: 320px) {
   .foo {
     margin: 0; } }
-  @media screen and (max-width: 320px) {
-        .bar {
+
+@media screen and (max-width: 320px) {
+      .bar {
+        padding: 0; } }
+
+.baar {
+  padding: 0; }
+
+    .foo .barr {
+      padding: 0; }
+
+
+
+.foo .bar {
+  width: 0; }
+
+@supports ( display: flex ) {
+        .baz {
+          height: 0; } }
+
+@media screen and (max-width: 640px) {
+        .qux {
+          margin: 0; } }
+
+@media screen and (max-width: 640px) {
+        .foo .quux {
           padding: 0; } }
-  .baar {
-    padding: 0; }
-  .foo .barr {
-    padding: 0; }
 
-
-  .foo .bar {
-    width: 0; }
-  @supports ( display: flex ) {
-          .baz {
-            height: 0; } }
-  @media screen and (max-width: 640px) {
-          .qux {
-            margin: 0; } }
-  @media screen and (max-width: 640px) {
-          .foo .quux {
-            padding: 0; } }
-  .foo .quix {
-    padding: 0; }
+.foo .quix {
+  padding: 0; }
 
 .test .test2 {
   padding: 0px; }
-  tbody {
-    padding: 10px; }
+      tbody {
+        padding: 10px; }
 
 a.badge {
   text-decoration: none; }
+

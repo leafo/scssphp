@@ -12,3 +12,14 @@ div .container .foo {
 /* line 24, inputs/nested_mixins.scss */
 div .container .bar {
   width: 12px; }
+
+@media print, screen and (min-width:640px) {
+  /* line 43, inputs/nested_mixins.scss */
+    .position-left {
+      color: red;
+      background: yellow; } }
+
+@media print, screen and (min-width:640px) {
+/* line 45, inputs/nested_mixins.scss */
+.element {
+  float: left; } }

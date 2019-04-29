@@ -7,3 +7,12 @@ div .container {
     width: 10px; }
   div .container .bar {
     width: 12px; }
+
+@media print, screen and (min-width:640px) {
+  .position-left {
+    color: red;
+    background: yellow; } }
+
+@media print, screen and (min-width:640px) {
+        .element {
+          float: left; } }

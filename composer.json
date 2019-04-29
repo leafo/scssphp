@@ -25,7 +25,9 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "~2.5",
-        "phpunit/phpunit": "~4.6"
+        "phpunit/phpunit": "~4.6",
+        "twbs/bootstrap": "~4.3",
+        "zurb/foundation": "~6.5"
     },
     "bin": ["bin/pscss"],
     "archive": {

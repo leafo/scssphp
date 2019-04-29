@@ -26,3 +26,29 @@ div {
         }
     }
 }
+
+
+@mixin breakpoint-with-var($value) {
+    $screen: 'screen';
+    @media print, #{$screen} and #{$value} {
+        @content;
+    }
+}
+
+@mixin caller-nested {
+
+    $width: '(min-width:640px)';
+
+    @include breakpoint-with-var($width) {
+        .position-left {
+            color:red;
+            @at-root .element {
+                $position: left;
+                float: $position;
+            }
+            background:yellow;
+        }
+    }
+}
+
+@include caller-nested;
