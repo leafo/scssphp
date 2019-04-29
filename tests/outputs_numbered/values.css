@@ -33,3 +33,6 @@ multiline string.";
   b: 0.5em;
   c: -foo(12px);
   d: +foo(12px); }
+/* line 44, inputs/values.scss */
+#self {
+  content: "#self"; }
