@@ -92,3 +92,14 @@ body .second {
 a.badge {
   text-decoration: none; }
 
+
+.badge-primary {
+  background-color: blue; }
+    a.badge-primary:focus, a.badge-primary.focus {
+      outline: 0; }
+
+.badge-secondary {
+  background-color: yellow; }
+    a.badge-secondary:focus, a.badge-secondary.focus {
+      outline: 0; }
+
