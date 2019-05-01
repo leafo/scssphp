@@ -1424,11 +1424,16 @@ class Compiler
         foreach ($stms as $stm) {
             if ($selfParent && isset($stm[1]) && is_object($stm[1]) && get_class($stm[1]) == 'Leafo\ScssPhp\Block') {
                 $stm[1]->selfParent = $selfParent;
+                $ret = $this->compileChild($stm, $out);
+                $stm[1]->selfParent = null;
             }
-            if ($selfParent && $stm[0] === TYPE::T_INCLUDE) {
+            elseif ($selfParent && $stm[0] === TYPE::T_INCLUDE) {
                 $stm['selfParent'] = $selfParent;
+                $ret = $this->compileChild($stm, $out);
+                unset($stm['selfParent']);
+            } else {
+                $ret = $this->compileChild($stm, $out);
             }
-            $ret = $this->compileChild($stm, $out);
 
             if (isset($ret)) {
                 $this->throwError('@return may only be used within a function');
