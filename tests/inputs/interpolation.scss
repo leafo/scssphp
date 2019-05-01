@@ -103,3 +103,19 @@ div {
     text-decoration: none;
   }
 }
+
+@mixin button-variant($background) {
+  background: $background;
+
+  &:not(.disabled) {
+    border-color: red;
+
+    &:focus {
+	border-width: 3px;
+    }
+  }
+}
+
+.btn-primary {
+    @include button-variant(yellow);
+}
