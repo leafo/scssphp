@@ -1421,6 +1421,9 @@ class Compiler
             if ($selfParent && isset($stm[1]) && is_object($stm[1]) && get_class($stm[1]) == 'Leafo\ScssPhp\Block') {
                 $stm[1]->selfParent = $selfParent;
             }
+            if ($selfParent && $stm[0] === TYPE::T_INCLUDE) {
+                $stm['selfParent'] = $selfParent;
+            }
             $ret = $this->compileChild($stm, $out);
 
             if (isset($ret)) {
@@ -1979,13 +1982,19 @@ class Compiler
 
                 // Find the parent selectors in the env to be able to know what '&' refers to in the mixin
                 // and assign this fake parent to childs
-                $parentSelectors = $this->multiplySelectors($this->env);
-                if ($parentSelectors) {
-                    $parent = new Block();
-                    $parent->selectors = $parentSelectors;
-                    foreach ($mixin->children as $k=>$child) {
-                        if (isset($child[1]) && is_object($child[1]) && get_class($child[1]) == 'Leafo\ScssPhp\Block') {
-                            $mixin->children[$k][1]->parent = $parent;
+                $selfParent = null;
+                if (isset($child['selfParent']) && isset($child['selfParent']->selectors)) {
+                    $selfParent = $child['selfParent'];
+                }
+                else {
+                    $parentSelectors = $this->multiplySelectors($this->env);
+                    if ($parentSelectors) {
+                        $parent = new Block();
+                        $parent->selectors = $parentSelectors;
+                        foreach ($mixin->children as $k => $child) {
+                            if (isset($child[1]) && is_object($child[1]) && get_class($child[1]) == 'Leafo\ScssPhp\Block') {
+                                $mixin->children[$k][1]->parent = $parent;
+                            }
                         }
                     }
                 }
@@ -2003,7 +2012,7 @@ class Compiler
                 $this->env->marker = 'mixin';
 
                 $this->pushCallStack($this->env->marker . " " . $name);
-                $this->compileChildrenNoReturn($mixin->children, $out);
+                $this->compileChildrenNoReturn($mixin->children, $out, $selfParent);
                 $this->popCallStack();
 
                 $this->storeEnv = $storeEnv;
