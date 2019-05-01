@@ -4,7 +4,6 @@
 /* line 3, inputs/at_root.scss */
 .child {
   color: black; }
-
 /* line 6, inputs/at_root.scss */
 .parent-block {
   color: white; }
@@ -14,7 +13,6 @@
 /* line 10, inputs/at_root.scss */
 .child2 {
   color: blue; }
-
 /* line 12, inputs/at_root.scss */
 .parent-block .step-child {
   color: black; }
@@ -31,7 +29,6 @@ body .second {
 .nested1 {
   color: blue;
   color: orange; }
-
 /* line 26, inputs/at_root.scss */
 .nested2 {
   color: yellow; }
@@ -112,9 +109,52 @@ padding: 0; }
 /* line 139, inputs/at_root.scss */
 tbody {
   padding: 10px; }
-
 /* line 151, inputs/at_root.scss */
 /* line 152, inputs/at_root.scss */
-a.badge {
-text-decoration: none; }
 
+a.badge {
+  text-decoration: none; }
+/* line 168, inputs/at_root.scss */
+.badge-primary {
+  background-color: blue; }
+/* line 160, inputs/at_root.scss */
+/* line 161, inputs/at_root.scss */
+
+a.badge-primary:focus, a.badge-primary.focus {
+  outline: 0; }
+/* line 171, inputs/at_root.scss */
+.badge-secondary {
+  background-color: yellow; }
+/* line 160, inputs/at_root.scss */
+/* line 161, inputs/at_root.scss */
+
+a.badge-secondary:focus, a.badge-secondary.focus {
+  outline: 0; }
+/* line 183, inputs/at_root.scss */
+/* line 184, inputs/at_root.scss */
+
+/* line 177, inputs/at_root.scss */
+
+.table-hover tbody tr:hover, .table2#id tbody tr:hover {
+  color: #ddd;
+  background-color: #eee; }
+/* line 178, inputs/at_root.scss */
+.table-hover tbody tr.foo, .table2#id tbody tr.foo {
+  color: red; }
+/* line 206, inputs/at_root.scss */
+.badge {
+  display: inline-block; }
+
+@media (prefers-reduced-motion: reduce) {
+    .badge {
+      transition: none; } }
+/* line 210, inputs/at_root.scss */
+/* line 200, inputs/at_root.scss */
+
+a.badge:hover, a.badge:focus {
+  text-decoration: none; }
+/* line 218, inputs/at_root.scss */
+/* line 200, inputs/at_root.scss */
+
+.btn:hover, .btn:focus {
+  text-decoration: none; }

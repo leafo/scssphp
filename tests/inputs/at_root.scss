@@ -153,3 +153,70 @@ $table-padding: 10px !default;
     text-decoration: none;
   }
 }
+
+@mixin badge-variant($bg) {
+  background-color: $bg;
+
+  @at-root a#{&} {
+    &:focus,
+    &.focus {
+      outline: 0;
+    }
+  }
+}
+
+.badge-primary {
+	@include badge-variant(blue);
+}
+.badge-secondary {
+	@include badge-variant(yellow);
+}
+
+// combine everything in one: several levels of selecors, mixin, at-root and self
+@mixin mixin-hover {
+  &:hover { @content; }
+  @at-root #{&}.foo {
+	color:red;
+  }
+}
+
+.table-hover, .table2#id {
+  tbody tr {
+    @include mixin-hover {
+      color: #ddd;
+      background-color: #eee;
+    }
+  }
+}
+
+// self propagation to @include and previous media poisoning in @at-root
+@mixin transition($transition...) {
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+}
+
+@mixin hover-focus {
+  &:hover,
+  &:focus {
+    @content;
+  }
+}
+
+.badge {
+  display: inline-block;
+  @include transition(none);
+
+  @at-root a#{&} {
+    @include hover-focus {
+      text-decoration: none;
+    }
+  }
+
+}
+// check that the hover-focus has not been spoiled by previous @at-root call
+.btn {
+  @include hover-focus {
+    text-decoration: none;
+  }
+}
