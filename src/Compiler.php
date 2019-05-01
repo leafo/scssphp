@@ -1139,7 +1139,16 @@ class Compiler
         if (count($block->children)) {
             $out->selectors = $this->multiplySelectors($env, $block->selfParent);
             // propagate selfParent to the children where they still can be useful
+            $selfParentSelectors = null;
+            if (isset($block->selfParent->selectors)) {
+                $selfParentSelectors = $block->selfParent->selectors;
+                $block->selfParent->selectors = $out->selectors;
+            }
             $this->compileChildrenNoReturn($block->children, $out, $block->selfParent);
+            // and revert for the following childs of the same block
+            if ($selfParentSelectors) {
+                $block->selfParent->selectors = $selfParentSelectors;
+            }
         }
 
         $this->formatter->stripSemicolon($out->lines);
