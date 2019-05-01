@@ -188,3 +188,29 @@ $table-padding: 10px !default;
     }
   }
 }
+
+// self propagation to @include and previous media poisoning in @at-root
+@mixin transition($transition...) {
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+}
+
+@mixin hover-focus {
+  &:hover,
+  &:focus {
+    @content;
+  }
+}
+
+.badge {
+  display: inline-block;
+  @include transition(none);
+
+  @at-root a#{&} {
+    @include hover-focus {
+      text-decoration: none;
+    }
+  }
+
+}

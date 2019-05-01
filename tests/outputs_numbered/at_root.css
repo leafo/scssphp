@@ -141,3 +141,15 @@ a.badge-secondary:focus, a.badge-secondary.focus {
 /* line 178, inputs/at_root.scss */
 .table-hover tbody tr.foo, .table2#id tbody tr.foo {
   color: red; }
+/* line 206, inputs/at_root.scss */
+.badge {
+  display: inline-block; }
+
+@media (prefers-reduced-motion: reduce) {
+    .badge {
+      transition: none; } }
+/* line 210, inputs/at_root.scss */
+/* line 200, inputs/at_root.scss */
+
+a.badge:hover, a.badge:focus {
+  text-decoration: none; }
