@@ -833,6 +833,10 @@ class Compiler
     {
         $filteredScopes = [];
 
+        if ($scope->type === TYPE::T_ROOT) {
+            return $scope;
+        }
+
         // start from the root
         while ($scope->parent && $scope->parent->type !== TYPE::T_ROOT) {
             $scope = $scope->parent;
