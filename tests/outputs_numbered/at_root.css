@@ -153,3 +153,8 @@ a.badge-secondary:focus, a.badge-secondary.focus {
 
 a.badge:hover, a.badge:focus {
   text-decoration: none; }
+/* line 218, inputs/at_root.scss */
+/* line 200, inputs/at_root.scss */
+
+.btn:hover, .btn:focus {
+  text-decoration: none; }

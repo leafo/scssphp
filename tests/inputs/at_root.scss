@@ -214,3 +214,9 @@ $table-padding: 10px !default;
   }
 
 }
+// check that the hover-focus has not been spoiled by previous @at-root call
+.btn {
+  @include hover-focus {
+    text-decoration: none;
+  }
+}

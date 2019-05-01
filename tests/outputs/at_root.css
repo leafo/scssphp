@@ -104,3 +104,6 @@ a.badge {
     transition: none; } }
   a.badge:hover, a.badge:focus {
     text-decoration: none; }
+
+.btn:hover, .btn:focus {
+  text-decoration: none; }
