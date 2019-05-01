@@ -891,7 +891,7 @@ class Compiler
      */
     protected function completeScope($scope, $previousScope)
     {
-        if (! $scope->type && ! count($scope->selectors) && count($scope->lines)) {
+        if (! $scope->type && (! $scope->selectors || ! count($scope->selectors)) && count($scope->lines)) {
             $scope->selectors = $this->findScopeSelectors($previousScope, $scope->depth);
         }
         if ($scope->children) {
