@@ -800,6 +800,7 @@ class Compiler
             $wrapped->selfParent   = $block->selfParent;
 
             $block->children = [[Type::T_BLOCK, $wrapped]];
+            $block->selector = null;
         }
 
         $this->env = $this->filterWithout($envs, $without);
