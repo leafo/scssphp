@@ -71,3 +71,6 @@ a.badge {
     border-color: red; }
     .btn-primary:not(.disabled):focus {
       border-width: 3px; }
+
+.pagination .page-item:first-child .page-link {
+  border-radius: 5px; }

@@ -119,3 +119,17 @@ div {
 .btn-primary {
     @include button-variant(yellow);
 }
+
+@mixin pagination-mixin($border-radius) {
+  .page-item {
+    &:first-child {
+      .page-link {
+        border-radius: $border-radius;
+      }
+    }
+  }
+}
+
+.pagination {
+  @include pagination-mixin(5px);
+}
