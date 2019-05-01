@@ -1745,7 +1745,7 @@ class Compiler
                         || $result === static::$null);
 
                     if (! $isDefault || $shouldSet) {
-                        $this->set($name[1], $this->reduce($value), false, null, $value);
+                        $this->set($name[1], $this->reduce($value), true, null, $value);
                     }
                     break;
                 }
