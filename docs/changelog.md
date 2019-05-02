@@ -5,6 +5,14 @@ title: Changelog
 
 ## Changelog
 
+* **0.8.0** -- May 2, 2019
+  * Variables from inner override variables in parents (Daijobou, Cerdic)
+  * Bootstrap issues with {raw}@a{endraw}t-root`, self (l2a, Cerdic)
+  * `@supports` inside rule (Marat-Tanalin, Cerdic)
+  * SourceMapGenerator Former: invalid offset (fabsn182)
+  * Number parsing (ange007, robocoder)
+  * Travis test updates (Cerdic)
+  * Add Bootstrap and Foundation framework tests (Cerdic)
 * **0.7.8** -- April 24, 2019
   * Partial support for #rrggbbaa CSS Level 4 colors with alpha (charlymz)
   * Avoid infinitely duplicating parts when extending selector (cyberalien)
