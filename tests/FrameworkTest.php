@@ -56,10 +56,11 @@ class FrameworkTest extends \PHPUnit_Framework_TestCase
     {
         $this->scss->addImportPath($inputdirectory);
 
-        $input = file_get_contents($inputdirectory.$inputfiles);
+        $input = file_get_contents($inputdirectory . $inputfiles);
         
         //Test if no exeption are raised for the given framwork
         $e = null;
+
         try {
             $this->scss->compile($input, $inputfiles);
         } catch (Exception $e) {
@@ -69,7 +70,8 @@ class FrameworkTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($e);
     }
 
-    public function frameworkProvider(){
+    public function frameworkProvider()
+    {
         return self::$frameworks;
     }
 }

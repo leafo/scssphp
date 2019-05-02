@@ -11,8 +11,6 @@
 
 namespace Leafo\ScssPhp\Tests;
 
-require_once __DIR__ . '/../example/Server.php';
-
 use Leafo\ScssPhp\Server;
 
 /**
@@ -24,6 +22,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCheckedCachedCompile()
     {
+        require_once __DIR__ . '/../example/Server.php';
+
         if (! file_exists(__DIR__ . '/inputs/scss_cache')) {
             mkdir(__DIR__ . '/inputs/scss_cache', 0755);
         }
