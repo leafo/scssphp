@@ -163,3 +163,6 @@ div.popup, .prepend div.foo {
 
 .before span.popup .after {
   color: green; }
+
+.class1:not(:last-child), .class2:not(.foo):not(:last-child), .class3:not(:last-child) {
+  color: red; }
