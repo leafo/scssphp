@@ -26,7 +26,6 @@ height: 20px; } }
 
 @font-face {
   color: red;
-
   height: 20px; }
 
 @keyframes 'bounce' {
@@ -125,9 +124,10 @@ to {
 /* line 164, inputs/directives.scss */
 @supports (position: sticky) {
     .sticky-top {
-      position: sticky; } }
+      position: sticky;
+      top: 0; } }
 
 @supports (position: sticky) {
-/* line 171, inputs/directives.scss */
+/* line 172, inputs/directives.scss */
 .sticky-top2 {
   position: sticky; } }
