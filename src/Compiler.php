@@ -2183,7 +2183,7 @@ class Compiler
      *
      * @param array $value
      *
-     * @return array
+     * @return boolean
      */
     protected function isTruthy($value)
     {
