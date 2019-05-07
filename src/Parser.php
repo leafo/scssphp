@@ -2579,7 +2579,7 @@ class Parser
      *
      * @param integer $pos
      *
-     * @return integer[]
+     * @return array
      */
     private function getSourcePosition($pos)
     {
