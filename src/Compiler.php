@@ -3428,7 +3428,11 @@ class Compiler
         $nextIsRoot = false;
         $hasNamespace = $normalizedName[0] === '^' || $normalizedName[0] === '@' || $normalizedName[0] === '%';
 
+        $max_depth = 10000;
         for (;;) {
+            if ($max_depth-- <= 0) {
+                break;
+            }
             if (array_key_exists($normalizedName, $env->store)) {
                 if ($unreduced && isset($env->storeUnreduced[$normalizedName])) {
                     return $env->storeUnreduced[$normalizedName];
