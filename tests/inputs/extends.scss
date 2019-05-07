@@ -375,3 +375,16 @@ embed.bar {
         @extend .popup
     }
 }
+
+.class1:not(:last-child) {
+	color:red;
+}
+
+.class2:not(.foo) {
+	@extend .class1;
+}
+
+.class3:not(:last-child) {
+	@extend .class1;
+}
+
