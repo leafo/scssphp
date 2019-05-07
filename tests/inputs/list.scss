@@ -14,6 +14,13 @@ p {
   background: linear-gradient($list);
 }
 
+$list: [];
+$list: join($list, [red, blue], comma);
+
+.bracket-list {
+  background: linear-gradient($list);
+}
+
 div {
 x: index(1px solid red, solid);
 y: index(1px solid red, dashed);

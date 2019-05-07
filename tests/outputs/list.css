@@ -6,6 +6,9 @@ div {
 p {
   background: linear-gradient(red, blue); }
 
+.bracket-list {
+  background: linear-gradient(red, blue); }
+
 div {
   x: 2;
   z: 2; }
