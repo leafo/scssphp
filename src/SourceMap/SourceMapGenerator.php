@@ -123,7 +123,6 @@ class SourceMapGenerator
     /**
      * Saves the source map to a file
      *
-     * @param string $file    The absolute path to a file
      * @param string $content The content to write
      *
      * @throws \Leafo\ScssPhp\Exception\CompilerException If the file could not be saved

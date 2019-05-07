@@ -808,8 +808,6 @@ class Parser
      * Seek to position in input stream (or return current position in input stream)
      *
      * @param integer $where
-     *
-     * @return integer
      */
     protected function seek($where)
     {
@@ -1542,7 +1540,7 @@ class Parser
      * Parse function call
      *
      * @param string $name
-     * @param array $out
+     * @param array $func
      *
      * @return boolean
      */
@@ -1793,7 +1791,7 @@ class Parser
     /**
      * Parse number with unit
      *
-     * @param array $out
+     * @param array $unit
      *
      * @return boolean
      */
