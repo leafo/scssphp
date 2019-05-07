@@ -262,3 +262,10 @@ div.popup, .prepend div.foo {
 /* line 372, inputs/extends.scss */
 
 /* line 373, inputs/extends.scss */
+
+/* line 379, inputs/extends.scss */
+
+.class1:not(:last-child), .class2:not(.foo):not(:last-child), .class3:not(:last-child) {
+  color: red; }
+/* line 383, inputs/extends.scss */
+/* line 387, inputs/extends.scss */
