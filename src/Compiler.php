@@ -2074,10 +2074,13 @@ class Compiler
                     }
                 }
 
+                // the content stored need to be cloned to not have its scope spoiled by a further call to the same mixin
+                // ie recursive @include of the same mixin
                 if (isset($content)) {
-                    $content->scope = $callingScope;
+                    $copy_content = clone $content;
+                    $copy_content->scope = $callingScope;
 
-                    $this->setRaw(static::$namespaces['special'] . 'content', $content, $this->env);
+                    $this->setRaw(static::$namespaces['special'] . 'content', $copy_content, $this->env);
                 }
 
                 if (isset($mixin->args)) {
