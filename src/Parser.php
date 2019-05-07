@@ -1164,7 +1164,7 @@ class Parser
     /**
      * Parse comma separated value list
      *
-     * @param string $out
+     * @param array $out
      *
      * @return boolean
      */
@@ -2579,7 +2579,7 @@ class Parser
      *
      * @param integer $pos
      *
-     * @return integer
+     * @return array
      */
     private function getSourcePosition($pos)
     {
