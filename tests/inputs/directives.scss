@@ -164,6 +164,7 @@ div {
 .sticky-top {
   @supports (position: sticky) {
     position: sticky;
+    top: 0;
   }
 }
 

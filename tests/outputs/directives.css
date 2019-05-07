@@ -108,7 +108,8 @@ div {
 
 @supports (position: sticky) {
     .sticky-top {
-      position: sticky; } }
+      position: sticky;
+      top: 0; } }
 
 @supports (position: sticky) {
   .sticky-top2 {
