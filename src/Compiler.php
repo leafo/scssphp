@@ -1677,13 +1677,13 @@ class Compiler
     /**
      * Compile import; returns true if the value was something that could be imported
      *
-     * @param array   $rawPath
-     * @param array   $out
-     * @param boolean $once
+     * @param array         $rawPath
+     * @param OutputBlock   $out
+     * @param boolean       $once
      *
      * @return boolean
      */
-    protected function compileImport($rawPath, $out, $once = false)
+    protected function compileImport($rawPath, OutputBlock $out, $once = false)
     {
         if ($rawPath[0] === Type::T_STRING) {
             $path = $this->compileStringContent($rawPath);
@@ -3690,10 +3690,10 @@ class Compiler
     /**
      * Import file
      *
-     * @param string $path
-     * @param array  $out
+     * @param OutputBlock $path
+     * @param array       $out
      */
-    protected function importFile($path, $out)
+    protected function importFile($path, OutputBlock $out)
     {
         // see if tree is cached
         $realPath = realpath($path);
