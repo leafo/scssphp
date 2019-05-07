@@ -1505,6 +1505,39 @@ class Compiler
         }
     }
 
+
+    /**
+     * evaluate media query : compile internal value keeping the structure inchanged
+     *
+     * @param array $queryList
+     *
+     * @return array
+     */
+    protected function evaluateMediaQuery($queryList)
+    {
+        foreach ($queryList as $kql => $query) {
+            foreach ($query as $kq => $q) {
+                for ($i = 1; $i < count($q); $i++) {
+                    $value = $this->compileValue($q[$i]);
+
+                    // the parser had no mean to know if media type or expression if it was an interpolation
+                    if ($q[0] == Type::T_MEDIA_TYPE &&
+                      (strpos($value, '(') !== false ||
+                        strpos($value, ')') !== false ||
+                        strpos($value, ':') !== false)) {
+                        $queryList[$kql][$kq][0] = Type::T_MEDIA_EXPRESSION;
+
+                        $value = ltrim($value, '(');
+                        $value = rtrim($value, ')');
+                    }
+                    $queryList[$kql][$kq][$i] = [Type::T_KEYWORD, $value];
+                }
+            }
+        }
+
+        return $queryList;
+    }
+
     /**
      * Compile media query
      *
@@ -2111,7 +2144,6 @@ class Compiler
 
                 $storeEnv = $this->storeEnv;
                 $this->storeEnv = $content->scope;
-
                 $this->compileChildrenNoReturn($content->children, $out);
 
                 $this->storeEnv = $storeEnv;
@@ -3239,6 +3271,11 @@ class Compiler
         $parentQueries = isset($env->block->queryList)
             ? $env->block->queryList
             : [[[Type::T_MEDIA_VALUE, $env->block->value]]];
+
+        $storeEnv = $this->env;
+        $this->env = $env;
+        $parentQueries = $this->evaluateMediaQuery($parentQueries);
+        $this->env = $storeEnv;
 
         if ($childQueries === null) {
             $childQueries = $parentQueries;
