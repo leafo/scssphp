@@ -431,6 +431,32 @@ class Compiler
     }
 
     /**
+     * glue parts of :not( or :nth-child( ... that are in general splitted in selectors parts
+     * @param array $parts
+     * @return array
+     */
+    protected function glueFunctionSelectors($parts)
+    {
+        $new = [];
+        foreach ($parts as $part) {
+            if (is_array($part)) {
+                $part = $this->glueFunctionSelectors($part);
+                $new[] = $part;
+            } else {
+                // a selector part finishing with a ) is the last part of a :not( or :nth-child(
+                // and need to be joined to this
+                if (count($new) && is_string($new[count($new) - 1])
+                  && strlen($part) && substr($part, -1) === ')' && strpos($part, '(') === false) {
+                    $new[count($new) - 1] .= $part;
+                } else {
+                    $new[] = $part;
+                }
+            }
+        }
+        return $new;
+    }
+
+    /**
      * Match extends
      *
      * @param array   $selector
@@ -440,6 +466,8 @@ class Compiler
      */
     protected function matchExtends($selector, &$out, $from = 0, $initial = true)
     {
+
+        $selector = $this->glueFunctionSelectors($selector);
         foreach ($selector as $i => $part) {
             if ($i < $from) {
                 continue;
@@ -570,6 +598,7 @@ class Compiler
 
         foreach ($counts as $idx => $count) {
             list($target, $origin, /* $block */) = $this->extends[$idx];
+            $origin = $this->glueFunctionSelectors($origin);
 
             // check count
             if ($count !== count($target)) {
