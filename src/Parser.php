@@ -65,7 +65,7 @@ class Parser
     private $utf8;
     private $encoding;
     private $patternModifiers;
-    protected $commentsSeen;
+    private $commentsSeen;
 
     /**
      * Constructor
