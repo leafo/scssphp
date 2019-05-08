@@ -206,3 +206,10 @@ dt {
     }
 }
 
+@media screen and (max-width: 749px) {
+  @media screen and (max-width: 600px) and (min-width: 361px) {
+    .item {
+      color:red;
+    }
+  }
+}

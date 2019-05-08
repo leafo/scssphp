@@ -126,3 +126,8 @@ code pre {
 /* line 202, inputs/media.scss */
 .only-screen {
   height: 15px; } }
+
+@media screen and (max-width: 749px) and (max-width: 600px) and (min-width: 361px) {
+/* line 211, inputs/media.scss */
+.item {
+  color: red; } }

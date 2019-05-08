@@ -101,3 +101,7 @@ code {
 @media only screen and (color: blue) and (width: 13) {
       .only-screen {
         height: 15px; } }
+
+@media screen and (max-width: 749px) and (max-width: 600px) and (min-width: 361px) {
+    .item {
+      color: red; } }
