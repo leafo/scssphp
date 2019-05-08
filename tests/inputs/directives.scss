@@ -173,3 +173,19 @@ div {
     position: sticky;
   }
 }
+
+@media print {
+.table-bordered {
+    th,
+    td {
+      border: 1px solid #ddd !important;
+    }
+  }
+}
+
+@at-root {
+  // Import the fonts
+  @font-face {
+    font-family: "Glyphicons Halflings";
+  }
+}

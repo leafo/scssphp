@@ -131,3 +131,11 @@ to {
 /* line 172, inputs/directives.scss */
 .sticky-top2 {
   position: sticky; } }
+
+@media print {
+/* line 178, inputs/directives.scss */
+/* line 179, inputs/directives.scss */
+  .table-bordered th, .table-bordered td {
+    border: 1px solid #ddd !important; } }
+  @font-face {
+    font-family: "Glyphicons Halflings"; }
