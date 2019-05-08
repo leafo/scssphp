@@ -446,7 +446,8 @@ class Compiler
                 // a selector part finishing with a ) is the last part of a :not( or :nth-child(
                 // and need to be joined to this
                 if (count($new) && is_string($new[count($new) - 1])
-                  && strlen($part) && substr($part, -1) === ')' && strpos($part, '(') === false) {
+                    && strlen($part) && substr($part, -1) === ')' && strpos($part, '(') === false
+                ) {
                     $new[count($new) - 1] .= $part;
                 } else {
                     $new[] = $part;
@@ -835,7 +836,9 @@ class Compiler
 
         $selfParent = $block->selfParent;
 
-        if (! $block->selfParent->selectors && isset($block->parent) && $block->parent && isset($block->parent->selectors) && $block->parent->selectors) {
+        if (! $block->selfParent->selectors && isset($block->parent) && $block->parent &&
+            isset($block->parent->selectors) && $block->parent->selectors
+        ) {
             $selfParent = $block->parent;
         }
 
@@ -1488,7 +1491,7 @@ class Compiler
     protected function compileChildrenNoReturn($stms, OutputBlock $out, $selfParent = null)
     {
         foreach ($stms as $stm) {
-            if ($selfParent && isset($stm[1]) && is_object($stm[1]) && get_class($stm[1]) == 'Leafo\ScssPhp\Block') {
+            if ($selfParent && isset($stm[1]) && is_object($stm[1]) && get_class($stm[1]) === Block::class) {
                 $stm[1]->selfParent = $selfParent;
                 $ret = $this->compileChild($stm, $out);
                 $stm[1]->selfParent = null;
@@ -1525,31 +1528,39 @@ class Compiler
 
                     // the parser had no mean to know if media type or expression if it was an interpolation
                     if ($q[0] == Type::T_MEDIA_TYPE &&
-                      (strpos($value, '(') !== false ||
+                        (strpos($value, '(') !== false ||
                         strpos($value, ')') !== false ||
-                        strpos($value, ':') !== false)) {
+                        strpos($value, ':') !== false)
+                    ) {
                         $queryList[$kql][$kq][0] = Type::T_MEDIA_EXPRESSION;
 
                         if (strpos($value, 'and') !== false) {
                             $values = explode('and', $value);
                             $value = trim(array_pop($values));
+
                             while ($v = trim(array_pop($values))) {
                                 $type = Type::T_MEDIA_EXPRESSION;
+
                                 if (strpos($v, '(') === false &&
-                                  strpos($v, ')') === false &&
-                                  strpos($v, ':') === false) {
+                                    strpos($v, ')') === false &&
+                                    strpos($v, ':') === false
+                                ) {
                                     $type = Type::T_MEDIA_TYPE;
                                 }
+
                                 if (substr($v, 0, 1) === '(' && substr($v, -1) === ')') {
                                     $v = substr($v, 1, -1);
                                 }
+
                                 $queryList[$kql][] = [$type,[Type::T_KEYWORD, $v]];
                             }
                         }
+
                         if (substr($value, 0, 1) === '(' && substr($value, -1) === ')') {
                             $value = substr($value, 1, -1);
                         }
                     }
+
                     $queryList[$kql][$kq][$i] = [Type::T_KEYWORD, $value];
                 }
             }
@@ -1878,8 +1889,8 @@ class Compiler
                 // handle shorthand syntax: size / line-height
                 if ($compiledName === 'font') {
                     if ($value[0] === Type::T_VARIABLE) {
-                        // if the font value comes from variable, the content is already reduced (which means formulars where already calculated)
-                        // so we need the original unreduced value
+                        // if the font value comes from variable, the content is already reduced
+                        // (i.e., formulas were already calculated), so we need the original unreduced value
                         $value = $this->get($value[1], true, null, true);
                     }
 
@@ -2127,15 +2138,15 @@ class Compiler
                         $parent->selectors = $parentSelectors;
 
                         foreach ($mixin->children as $k => $child) {
-                            if (isset($child[1]) && is_object($child[1]) && get_class($child[1]) == 'Leafo\ScssPhp\Block') {
+                            if (isset($child[1]) && is_object($child[1]) && get_class($child[1]) === Block::class) {
                                 $mixin->children[$k][1]->parent = $parent;
                             }
                         }
                     }
                 }
 
-                // the content stored need to be cloned to not have its scope spoiled by a further call to the same mixin
-                // ie recursive @include of the same mixin
+                // clone the stored content to not have its scope spoiled by a further call to the same mixin
+                // i.e., recursive @include of the same mixin
                 if (isset($content)) {
                     $copy_content = clone $content;
                     $copy_content->scope = $callingScope;
@@ -3887,7 +3898,9 @@ class Compiler
         }
 
         $line = $this->sourceLine;
-        $loc = isset($this->sourceNames[$this->sourceIndex]) ? $this->sourceNames[$this->sourceIndex] . " on line $line" : "line: $line";
+        $loc = isset($this->sourceNames[$this->sourceIndex])
+             ? $this->sourceNames[$this->sourceIndex] . " on line $line"
+             : "line: $line";
         $msg = "$msg: $loc";
 
         if ($this->callStack) {
@@ -3896,7 +3909,9 @@ class Compiler
 
             foreach (array_reverse($this->callStack) as $call) {
                 $msg .= "#" . $ncall++ . " " . $call['n'] . " ";
-                $msg .= (isset($this->sourceNames[$call[Parser::SOURCE_INDEX]]) ? $this->sourceNames[$call[Parser::SOURCE_INDEX]] : '(unknown file)');
+                $msg .= (isset($this->sourceNames[$call[Parser::SOURCE_INDEX]])
+                      ? $this->sourceNames[$call[Parser::SOURCE_INDEX]]
+                      : '(unknown file)');
                 $msg .= " on line " . $call[Parser::SOURCE_LINE] . "\n";
             }
         }
