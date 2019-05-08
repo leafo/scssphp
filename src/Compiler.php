@@ -3275,10 +3275,11 @@ class Compiler
             ? $env->block->queryList
             : [[[Type::T_MEDIA_VALUE, $env->block->value]]];
 
-        $storeEnv = $this->env;
+        $store = [$this->env, $this->storeEnv];
         $this->env = $env;
+        $this->storeEnv = null;
         $parentQueries = $this->evaluateMediaQuery($parentQueries);
-        $this->env = $storeEnv;
+        list($this->env, $this->storeEnv) = $store;
 
         if ($childQueries === null) {
             $childQueries = $parentQueries;
