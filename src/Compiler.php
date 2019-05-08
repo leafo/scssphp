@@ -1530,14 +1530,30 @@ class Compiler
                         strpos($value, ':') !== false)) {
                         $queryList[$kql][$kq][0] = Type::T_MEDIA_EXPRESSION;
 
-                        $value = ltrim($value, '(');
-                        $value = rtrim($value, ')');
+                        if (strpos($value, 'and') !== false) {
+                            $values = explode('and', $value);
+                            $value = trim(array_pop($values));
+                            while ($v = trim(array_pop($values))) {
+                                $type = Type::T_MEDIA_EXPRESSION;
+                                if (strpos($v, '(') === false &&
+                                  strpos($v, ')') === false &&
+                                  strpos($v, ':') === false) {
+                                    $type = Type::T_MEDIA_TYPE;
+                                }
+                                if (substr($v, 0, 1) === '(' && substr($v, -1) === ')') {
+                                    $v = substr($v, 1, -1);
+                                }
+                                $queryList[$kql][] = [$type,[Type::T_KEYWORD, $v]];
+                            }
+                        }
+                        if (substr($value, 0, 1) === '(' && substr($value, -1) === ')') {
+                            $value = substr($value, 1, -1);
+                        }
                     }
                     $queryList[$kql][$kq][$i] = [Type::T_KEYWORD, $value];
                 }
             }
         }
-
         return $queryList;
     }
 
