@@ -3502,7 +3502,7 @@ class Compiler
         }
 
         if ($shouldThrow) {
-            $this->throwError("Undefined variable \$$name");
+            $this->throwError("Undefined variable \$$name" . ($max_depth<=0 ? " (infinite recursion)" : ""));
         }
 
         // found nothing
