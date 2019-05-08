@@ -65,6 +65,7 @@ class Parser
     private $utf8;
     private $encoding;
     private $patternModifiers;
+    private $commentsSeen;
 
     /**
      * Constructor
@@ -82,6 +83,7 @@ class Parser
         $this->charset          = null;
         $this->utf8             = ! $encoding || strtolower($encoding) === 'utf-8';
         $this->patternModifiers = $this->utf8 ? 'Aisu' : 'Ais';
+        $this->commentsSeen   = [];
 
         if (empty(static::$operatorPattern)) {
             static::$operatorPattern = '([*\/%+-]|[!=]\=|\>\=?|\<\=\>|\<\=?|and|or)';

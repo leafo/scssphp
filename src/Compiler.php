@@ -146,7 +146,6 @@ class Compiler
     protected $sourceNames;
 
     protected $indentLevel;
-    protected $commentsSeen;
     protected $extends;
     protected $extendsMap;
     protected $parsedFiles;
@@ -182,7 +181,6 @@ class Compiler
     public function compile($code, $path = null)
     {
         $this->indentLevel    = -1;
-        $this->commentsSeen   = [];
         $this->extends        = [];
         $this->extendsMap     = [];
         $this->sourceIndex    = null;
