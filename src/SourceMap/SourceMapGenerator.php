@@ -110,11 +110,11 @@ class SourceMapGenerator
     public function addMapping($generatedLine, $generatedColumn, $originalLine, $originalColumn, $sourceFile)
     {
         $this->mappings[] = [
-            'generated_line' => $generatedLine,
+            'generated_line'   => $generatedLine,
             'generated_column' => $generatedColumn,
-            'original_line' => $originalLine,
-            'original_column' => $originalColumn,
-            'source_file' => $sourceFile
+            'original_line'    => $originalLine,
+            'original_column'  => $originalColumn,
+            'source_file'      => $sourceFile
         ];
 
         $this->sources[$sourceFile] = $sourceFile;
@@ -124,6 +124,8 @@ class SourceMapGenerator
      * Saves the source map to a file
      *
      * @param string $content The content to write
+     *
+     * @return string
      *
      * @throws \Leafo\ScssPhp\Exception\CompilerException If the file could not be saved
      */
@@ -295,6 +297,13 @@ class SourceMapGenerator
         return $this->source_keys[$filename];
     }
 
+    /**
+     * Normalize filename
+     *
+     * @param string $filename
+     *
+     * @return string
+     */
     protected function normalizeFilename($filename)
     {
         $filename = $this->fixWindowsPath($filename);

@@ -429,8 +429,10 @@ class Compiler
     }
 
     /**
-     * glue parts of :not( or :nth-child( ... that are in general splitted in selectors parts
+     * Glue parts of :not( or :nth-child( ... that are in general splitted in selectors parts
+     *
      * @param array $parts
+     *
      * @return array
      */
     protected function glueFunctionSelectors($parts)
@@ -1044,7 +1046,7 @@ class Compiler
     /**
      * Filter WITH rules
      *
-     * @param integer              $without
+     * @param integer                                                   $without
      * @param \Leafo\ScssPhp\Block|\Leafo\ScssPhp\Formatter\OutputBlock $block
      *
      * @return boolean
@@ -1479,7 +1481,7 @@ class Compiler
      *
      * @param array                                $stms
      * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
-     * @param \Leafo\ScssPhp\Block $selfParent
+     * @param \Leafo\ScssPhp\Block                 $selfParent
      *
      * @throws \Exception
      */
@@ -1611,6 +1613,14 @@ class Compiler
         return $out;
     }
 
+    /**
+     * Merge direct relationships between selectors
+     *
+     * @param array $selectors1
+     * @param array $selectors2
+     *
+     * @return array
+     */
     protected function mergeDirectRelationships($selectors1, $selectors2)
     {
         if (empty($selectors1) || empty($selectors2)) {
@@ -1711,9 +1721,9 @@ class Compiler
     /**
      * Compile import; returns true if the value was something that could be imported
      *
-     * @param array         $rawPath
-     * @param OutputBlock   $out
-     * @param boolean       $once
+     * @param array                                $rawPath
+     * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
+     * @param boolean                              $once
      *
      * @return boolean
      */
@@ -3142,7 +3152,7 @@ class Compiler
      * Find the final set of selectors
      *
      * @param \Leafo\ScssPhp\Compiler\Environment $env
-     * @param Leafo\ScssPhp\Block $selfParent
+     * @param \Leafo\ScssPhp\Block                $selfParent
      *
      * @return array
      */
@@ -3736,8 +3746,8 @@ class Compiler
     /**
      * Import file
      *
-     * @param OutputBlock $path
-     * @param array       $out
+     * @param string                               $path
+     * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
      */
     protected function importFile($path, OutputBlock $out)
     {

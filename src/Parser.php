@@ -1265,9 +1265,9 @@ class Parser
     /**
      * Parse expression specifically checking for lists in parenthesis or brackets
      *
-     * @param array $out
+     * @param array   $out
      * @param integer $s
-     * @param string $closingParen
+     * @param string  $closingParen
      *
      * @return boolean
      */
@@ -1540,7 +1540,7 @@ class Parser
      * Parse function call
      *
      * @param string $name
-     * @param array $func
+     * @param array  $func
      *
      * @return boolean
      */
