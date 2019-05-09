@@ -1490,7 +1490,7 @@ class Compiler
     protected function compileChildrenNoReturn($stms, OutputBlock $out, $selfParent = null)
     {
         foreach ($stms as $stm) {
-            if ($selfParent && isset($stm[1]) && is_object($stm[1]) && get_class($stm[1]) === Block::class) {
+            if ($selfParent && isset($stm[1]) && is_object($stm[1]) && $stm[1] instanceof Block) {
                 $stm[1]->selfParent = $selfParent;
                 $ret = $this->compileChild($stm, $out);
                 $stm[1]->selfParent = null;
@@ -2138,7 +2138,7 @@ class Compiler
                         $parent->selectors = $parentSelectors;
 
                         foreach ($mixin->children as $k => $child) {
-                            if (isset($child[1]) && is_object($child[1]) && get_class($child[1]) === Block::class) {
+                            if (isset($child[1]) && is_object($child[1]) && $child[1] instanceof Block) {
                                 $mixin->children[$k][1]->parent = $parent;
                             }
                         }
