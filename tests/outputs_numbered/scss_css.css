@@ -64,10 +64,10 @@ sel {
   a: b; }
 
 @foo {
+  a: b;
 /* line 65, inputs/scss_css.scss */
 rule {
-  a: b; }
-a: b; }
+  a: b; } }
 
 @foo {
   a: b; }

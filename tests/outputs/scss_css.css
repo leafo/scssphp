@@ -63,10 +63,9 @@ sel {
   a: b; }
 
 @foo {
-  rule {
-    a: b; }
-
-  a: b; }
+  a: b;
+    rule {
+      a: b; } }
 
 @foo {
   a: b; }
