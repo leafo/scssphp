@@ -467,8 +467,8 @@ class Compiler
      */
     protected function matchExtends($selector, &$out, $from = 0, $initial = true)
     {
-
         $selector = $this->glueFunctionSelectors($selector);
+
         foreach ($selector as $i => $part) {
             if ($i < $from) {
                 continue;
@@ -501,6 +501,7 @@ class Compiler
                                 $slice[] = $chunk;
                             }
                         }
+
                         array_unshift($replacement, $slice);
 
                         if (! $this->isImmediateRelationshipCombinator(end($slice))) {
@@ -1123,14 +1124,16 @@ class Compiler
         // wrap assign children in a block
         // except for @font-face
         if ($block->type !== Type::T_DIRECTIVE || $block->name !== "font-face") {
-            // need wraping?
+            // need wrapping?
             $needWrapping = false;
+
             foreach ($block->children as $child) {
                 if ($child[0] === Type::T_ASSIGN) {
                     $needWrapping = true;
                     break;
                 }
             }
+
             if ($needWrapping) {
                 $wrapped = new Block;
                 $wrapped->sourceName = $block->sourceName;
@@ -1561,6 +1564,7 @@ class Compiler
                 }
             }
         }
+
         return $queryList;
     }
 
@@ -2144,10 +2148,10 @@ class Compiler
                 // clone the stored content to not have its scope spoiled by a further call to the same mixin
                 // i.e., recursive @include of the same mixin
                 if (isset($content)) {
-                    $copy_content = clone $content;
-                    $copy_content->scope = $callingScope;
+                    $copyContent = clone $content;
+                    $copyContent->scope = $callingScope;
 
-                    $this->setRaw(static::$namespaces['special'] . 'content', $copy_content, $this->env);
+                    $this->setRaw(static::$namespaces['special'] . 'content', $copyContent, $this->env);
                 }
 
                 if (isset($mixin->args)) {
@@ -3503,9 +3507,10 @@ class Compiler
         $nextIsRoot = false;
         $hasNamespace = $normalizedName[0] === '^' || $normalizedName[0] === '@' || $normalizedName[0] === '%';
 
-        $max_depth = 10000;
+        $maxDepth = 10000;
+
         for (;;) {
-            if ($max_depth-- <= 0) {
+            if ($maxDepth-- <= 0) {
                 break;
             }
             if (array_key_exists($normalizedName, $env->store)) {
@@ -3534,7 +3539,7 @@ class Compiler
         }
 
         if ($shouldThrow) {
-            $this->throwError("Undefined variable \$$name" . ($max_depth<=0 ? " (infinite recursion)" : ""));
+            $this->throwError("Undefined variable \$$name" . ($maxDepth<=0 ? " (infinite recursion)" : ""));
         }
 
         // found nothing

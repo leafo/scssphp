@@ -85,7 +85,7 @@ class SourceMapGenerator
      * @var array
      */
     protected $sources = [];
-    protected $source_keys = [];
+    protected $sourceKeys = [];
 
     /**
      * @var array
@@ -181,8 +181,8 @@ class SourceMapGenerator
         // A list of original sources used by the 'mappings' entry.
         $sourceMap['sources'] = [];
 
-        foreach ($this->sources as $source_uri => $source_filename) {
-            $sourceMap['sources'][] = $this->normalizeFilename($source_filename);
+        foreach ($this->sources as $sourceUri => $sourceFilename) {
+            $sourceMap['sources'][] = $this->normalizeFilename($sourceFilename);
         }
 
         // A list of symbol names used by the 'mappings' entry.
@@ -237,7 +237,7 @@ class SourceMapGenerator
             return '';
         }
 
-        $this->source_keys = array_flip(array_keys($this->sources));
+        $this->sourceKeys = array_flip(array_keys($this->sources));
 
         // group mappings by generated line number.
         $groupedMap = $groupedMapEncoded = [];
@@ -249,7 +249,7 @@ class SourceMapGenerator
         ksort($groupedMap);
         $lastGeneratedLine = $lastOriginalIndex = $lastOriginalLine = $lastOriginalColumn = 0;
 
-        foreach ($groupedMap as $lineNumber => $line_map) {
+        foreach ($groupedMap as $lineNumber => $lineMap) {
             while (++$lastGeneratedLine < $lineNumber) {
                 $groupedMapEncoded[] = ';';
             }
@@ -257,7 +257,7 @@ class SourceMapGenerator
             $lineMapEncoded = [];
             $lastGeneratedColumn = 0;
 
-            foreach ($line_map as $m) {
+            foreach ($lineMap as $m) {
                 $mapEncoded = $this->encoder->encode($m['generated_column'] - $lastGeneratedColumn);
                 $lastGeneratedColumn = $m['generated_column'];
 
@@ -294,7 +294,7 @@ class SourceMapGenerator
      */
     protected function findFileIndex($filename)
     {
-        return $this->source_keys[$filename];
+        return $this->sourceKeys[$filename];
     }
 
     /**

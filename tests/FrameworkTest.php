@@ -57,8 +57,8 @@ class FrameworkTest extends \PHPUnit_Framework_TestCase
         $this->scss->addImportPath($inputdirectory);
 
         $input = file_get_contents($inputdirectory . $inputfiles);
-        
-        //Test if no exeption are raised for the given framwork
+
+        // Test if no exceptions are raised for the given framework
         $e = null;
 
         try {
