@@ -5,10 +5,20 @@ title: Changelog
 
 ## Changelog
 
+* **0.8.1** -- May 9, 2019
+  * grid-row & grid-column shorthand (claytron5000, Cerdic)
+  * {% raw %}@{% endraw %}mixin {% raw %}@{% endraw %}supports {% raw %}@{% endraw %}include compilation error (geoidesic, Cerdic)
+  * {% raw %}@{% endraw %}media expression slicing (tdutrion, Cerdic)
+  * {% raw %}@{% endraw %}font-face fix (bloep, Cerdic)
+  * mixin crash fix (LucasSbBrands, Cerdic)
+  * bracketed lists don't compile (pkerling, Cerdic)
+  * wrap successive inline assign into one block (Cerdic)
+  * :not(), :nth-child() and other selectors before {% raw %}@{% endraw %}extend (STV11C, Cerdic)
+  * commentsSeen and phpdoc update (nextend)
 * **0.8.0** -- May 2, 2019
   * Variables from inner override variables in parents (Daijobou, Cerdic)
-  * Bootstrap issues with {raw}@a{endraw}t-root`, self (l2a, Cerdic)
-  * `@supports` inside rule (Marat-Tanalin, Cerdic)
+  * Bootstrap issues with {% raw %}@{% endraw %}at-root, self (l2a, Cerdic)
+  * {% raw %}@{% endraw %}supports inside rule (Marat-Tanalin, Cerdic)
   * SourceMapGenerator Former: invalid offset (fabsn182)
   * Number parsing (ange007, robocoder)
   * Travis test updates (Cerdic)
