@@ -1883,7 +1883,7 @@ class Compiler
                 $compiledName = $this->compileValue($name);
 
                 // handle shorthand syntax: size / line-height
-                if ($compiledName === 'font') {
+                if ($compiledName === 'font' || $compiledName === 'grid-row' || $compiledName === 'grid-column') {
                     if ($value[0] === Type::T_VARIABLE) {
                         // if the font value comes from variable, the content is already reduced
                         // (i.e., formulas were already calculated), so we need the original unreduced value
