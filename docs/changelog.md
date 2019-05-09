@@ -5,6 +5,8 @@ title: Changelog
 
 ## Changelog
 
+* **0.8.2** -- May 9, 2019
+  * requires php 5.6+
 * **0.8.1** -- May 9, 2019
   * grid-row & grid-column shorthand (claytron5000, Cerdic)
   * {% raw %}@{% endraw %}mixin {% raw %}@{% endraw %}supports {% raw %}@{% endraw %}include compilation error (geoidesic, Cerdic)
