@@ -1123,26 +1123,25 @@ class Compiler
         // wrap assign children in a block
         // except for @font-face
         if ($block->type !== Type::T_DIRECTIVE || $block->name !== "font-face") {
-
             // need wraping?
             $needWrapping = false;
             foreach ($block->children as $child) {
                 if ($child[0] === Type::T_ASSIGN) {
-                  $needWrapping = true;
-                  break;
+                    $needWrapping = true;
+                    break;
                 }
             }
             if ($needWrapping) {
                 $wrapped = new Block;
-                $wrapped->sourceName   = $block->sourceName;
-                $wrapped->sourceIndex  = $block->sourceIndex;
-                $wrapped->sourceLine   = $block->sourceLine;
+                $wrapped->sourceName = $block->sourceName;
+                $wrapped->sourceIndex = $block->sourceIndex;
+                $wrapped->sourceLine = $block->sourceLine;
                 $wrapped->sourceColumn = $block->sourceColumn;
-                $wrapped->selectors    = [];
-                $wrapped->comments     = [];
-                $wrapped->parent       = $block;
-                $wrapped->children     = $block->children;
-                $wrapped->selfParent   = $block->selfParent;
+                $wrapped->selectors = [];
+                $wrapped->comments = [];
+                $wrapped->parent = $block;
+                $wrapped->children = $block->children;
+                $wrapped->selfParent = $block->selfParent;
 
                 $block->children = [[Type::T_BLOCK, $wrapped]];
             }
