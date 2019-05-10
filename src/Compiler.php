@@ -1658,7 +1658,7 @@ class Compiler
         $part1 = end($selectors1);
         $part2 = end($selectors2);
 
-        if (! $this->isImmediateRelationshipCombinator($part1[0]) || $part1 !== $part2) {
+        if (! $this->isImmediateRelationshipCombinator($part1[0]) && $part1 !== $part2) {
             return array_merge($selectors1, $selectors2);
         }
 
@@ -1668,8 +1668,13 @@ class Compiler
             $part1 = array_pop($selectors1);
             $part2 = array_pop($selectors2);
 
-            if (! $this->isImmediateRelationshipCombinator($part1[0]) || $part1 !== $part2) {
-                $merged = array_merge($selectors1, [$part1], $selectors2, [$part2], $merged);
+            if (! $this->isImmediateRelationshipCombinator($part1[0]) && $part1 !== $part2) {
+                if ($this->isImmediateRelationshipCombinator(reset($merged)[0])) {
+                    array_unshift($merged, [$part1[0] . $part2[0]]);
+                    $merged = array_merge($selectors1, $selectors2, $merged);
+                } else {
+                    $merged = array_merge($selectors1, [$part1], $selectors2, [$part2], $merged);
+                }
                 break;
             }
 
