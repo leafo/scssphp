@@ -35,3 +35,13 @@
 /* line 40, inputs/extends_nesting.scss */
 
 /* line 41, inputs/extends_nesting.scss */
+
+/* line 47, inputs/extends_nesting.scss */
+
+.nav-bar, header ul {
+  background: #eee; }
+/* line 49, inputs/extends_nesting.scss */
+.nav-bar > .item, header ul > .item, header ul > li, header ul.nav-bar > li {
+  margin: 0 10px; }
+/* line 54, inputs/extends_nesting.scss */
+/* line 56, inputs/extends_nesting.scss */

@@ -26,3 +26,8 @@
   content: "dropupbtn"; }
   .dropup.btn.caret, .extend .the-button.dropup.caret {
     content: "dropupbtncaret"; }
+
+.nav-bar, header ul {
+  background: #eee; }
+  .nav-bar > .item, header ul > .item, header ul > li, header ul.nav-bar > li {
+    margin: 0 10px; }
