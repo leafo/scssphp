@@ -467,6 +467,7 @@ class Compiler
      */
     protected function matchExtends($selector, &$out, $from = 0, $initial = true)
     {
+        static $partsPile = [];
         $selector = $this->glueFunctionSelectors($selector);
 
         foreach ($selector as $i => $part) {
@@ -474,7 +475,18 @@ class Compiler
                 continue;
             }
 
+            // check that we are not building an infinite loop of extensions
+            // if the new part is just including a previous part don't try to extend anymore
+            if (count($part) > 1) {
+                foreach ($partsPile as $previousPart) {
+                    if (! count(array_diff($previousPart, $part))) {
+                        continue 2;
+                    }
+                }
+            }
+
             if ($this->matchExtendsSingle($part, $origin)) {
+                $partsPile[] = $part;
                 $after = array_slice($selector, $i + 1);
                 $before = array_slice($selector, 0, $i);
 
@@ -551,6 +563,7 @@ class Compiler
                         $out[] = $result2;
                     }
                 }
+                array_pop($partsPile);
             }
         }
     }
