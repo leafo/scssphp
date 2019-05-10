@@ -3200,29 +3200,28 @@ class Compiler
                 continue;
             }
 
-            $selectors = [];
+            $selectors = $env->selectors;
 
-            foreach ($env->selectors as $selector) {
-                foreach ($parentSelectors as $parent) {
-                    if ($selfParentSelectors) {
-                        $previous = null;
+            do {
+                $stillHasSelf = false;
+                $prevSelectors = $selectors;
+                $selectors = [];
 
-                        foreach ($selfParentSelectors as $selfParent) {
-                            // if no '&' in the selector, each call will give same result, only add once
-                            $s = $this->joinSelectors($parent, $selector, $selfParent);
-
-                            if ($s !== $previous) {
+                foreach ($prevSelectors as $selector) {
+                    foreach ($parentSelectors as $parent) {
+                        if ($selfParentSelectors) {
+                            foreach ($selfParentSelectors as $selfParent) {
+                                // if no '&' in the selector, each call will give same result, only add once
+                                $s = $this->joinSelectors($parent, $selector, $stillHasSelf, $selfParent);
                                 $selectors[serialize($s)] = $s;
                             }
-
-                            $previous = $s;
+                        } else {
+                            $s = $this->joinSelectors($parent, $selector,$stillHasSelf);
+                            $selectors[serialize($s)] = $s;
                         }
-                    } else {
-                        $s = $this->joinSelectors($parent, $selector);
-                        $selectors[serialize($s)] = $s;
                     }
                 }
-            }
+            } while ($stillHasSelf);
 
             $parentSelectors = $selectors;
         }
@@ -3237,11 +3236,12 @@ class Compiler
      *
      * @param array $parent
      * @param array $child
+     * @param bool  &$stillHasSelf
      * @param array $selfParentSelectors
 
      * @return array
      */
-    protected function joinSelectors($parent, $child, $selfParentSelectors = null)
+    protected function joinSelectors($parent, $child, &$stillHasSelf, $selfParentSelectors = null)
     {
         $setSelf = false;
         $out = [];
@@ -3250,7 +3250,11 @@ class Compiler
             $newPart = [];
 
             foreach ($part as $p) {
-                if ($p === static::$selfSelector) {
+                // only replace & once and should be recalled to be able to make combinations
+                if ($p === static::$selfSelector && $setSelf) {
+                    $stillHasSelf = true;
+                }
+                if ($p === static::$selfSelector && !$setSelf) {
                     $setSelf = true;
 
                     if (is_null($selfParentSelectors)) {
