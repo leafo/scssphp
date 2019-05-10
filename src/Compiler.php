@@ -1668,13 +1668,12 @@ class Compiler
             $part1 = array_pop($selectors1);
             $part2 = array_pop($selectors2);
 
-            if ($this->isImmediateRelationshipCombinator($part1[0]) && $part1 !== $part2) {
+            if (! $this->isImmediateRelationshipCombinator($part1[0]) || $part1 !== $part2) {
                 $merged = array_merge($selectors1, [$part1], $selectors2, [$part2], $merged);
                 break;
             }
 
             array_unshift($merged, $part1);
-            array_unshift($merged, [array_pop($selectors1)[0] . array_pop($selectors2)[0]]);
         } while (! empty($selectors1) && ! empty($selectors2));
 
         return $merged;
