@@ -528,7 +528,8 @@ class Compiler
                     $out[] = $result;
 
                     // recursively check for more matches
-                    $this->matchExtends($result, $out, count($before) + count($mergedBefore), false);
+                    $startRecursFrom = count($before) + min(count($nonBreakableBefore), count($mergedBefore));
+                    $this->matchExtends($result, $out, $startRecursFrom, false);
 
                     // selector sequence merging
                     if (! empty($before) && count($new) > 1) {
