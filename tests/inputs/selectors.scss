@@ -280,3 +280,10 @@ $all: $span, $p, $div;
         content: "should match .parent + .parent";
     }
 }
+
+// combinatorial self
+ul, ol {
+    & & {
+        display: block;
+    }
+}
