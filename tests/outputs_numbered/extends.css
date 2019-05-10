@@ -269,3 +269,12 @@ div.popup, .prepend div.foo {
   color: red; }
 /* line 383, inputs/extends.scss */
 /* line 387, inputs/extends.scss */
+
+/* line 391, inputs/extends.scss */
+
+.inline-menu:hover > .sub-menu, .header-menu:hover > .sub-menu {
+  border-radius: 5px; }
+/* line 394, inputs/extends.scss */
+/* line 395, inputs/extends.scss */
+
+/* line 400, inputs/extends.scss */
