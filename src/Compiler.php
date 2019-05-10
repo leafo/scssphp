@@ -568,6 +568,11 @@ class Compiler
         $counts = [];
         $single = [];
 
+        // simple usual cases, no need to do the whole trick
+        if (in_array($rawSingle, [['>'],['+'],['~']])) {
+            return false;
+        }
+
         foreach ($rawSingle as $part) {
             // matches Number
             if (! is_string($part)) {
