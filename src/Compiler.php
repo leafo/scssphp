@@ -484,7 +484,7 @@ class Compiler
                     $k = 0;
 
                     // remove shared parts
-                    if ($initial) {
+                    if (count($new)>1) {
                         while ($k < $i && isset($new[$k]) && $selector[$k] === $new[$k]) {
                             $k++;
                         }
