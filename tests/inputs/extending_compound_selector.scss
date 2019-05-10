@@ -17,3 +17,27 @@
 .baz.bar:before {
   @extend .bar:before;
 }
+
+a {
+  color: #fff;
+}
+
+a:link {
+  @extend a;
+}
+
+a:visited {
+  @extend a;
+}
+
+a:active {
+  @extend a;
+}
+
+a:hover {
+  @extend a;
+}
+
+.nest a.some-class {
+  color: #ccc;
+}

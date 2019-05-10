@@ -2,3 +2,9 @@
   color: red; }
   .foo:hover:after, .bar:hover:after, .bar:before:hover, .baz.bar:before:hover {
     color: blue; }
+
+a, a:link, a:visited, a:active, a:hover {
+  color: #fff; }
+
+.nest a.some-class, .nest a:link.some-class, .nest a:visited.some-class, .nest a:active.some-class, .nest a:hover.some-class {
+  color: #ccc; }

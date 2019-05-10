@@ -9,3 +9,19 @@
 /* line 12, inputs/extending_compound_selector.scss */
 
 /* line 17, inputs/extending_compound_selector.scss */
+
+/* line 21, inputs/extending_compound_selector.scss */
+
+a, a:link, a:visited, a:active, a:hover {
+  color: #fff; }
+/* line 25, inputs/extending_compound_selector.scss */
+/* line 29, inputs/extending_compound_selector.scss */
+
+/* line 33, inputs/extending_compound_selector.scss */
+
+/* line 37, inputs/extending_compound_selector.scss */
+
+/* line 41, inputs/extending_compound_selector.scss */
+
+.nest a.some-class, .nest a:link.some-class, .nest a:visited.some-class, .nest a:active.some-class, .nest a:hover.some-class {
+  color: #ccc; }
