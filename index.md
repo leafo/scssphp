@@ -39,7 +39,7 @@ Note: git archives of stable versions no longer include the `tests/` folder.
 To install the unit tests, download the complete package source using `composer`'s
 `--prefer-source` option.
 
-**scssphp** requires PHP version 5.4 (or above).
+**scssphp** requires PHP version 5.6 (or above).
 
 ## Language Reference
 
