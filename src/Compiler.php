@@ -1521,6 +1521,13 @@ class Compiler
           Parser::SOURCE_LINE => $this->sourceLine,
           Parser::SOURCE_COLUMN => $this->sourceColumn
         ];
+        // infinite calling loop
+        if (count($this->callStack) > 25000) {
+            // not displayed but you can var_dump it to deep debug
+            $msg = $this->callStackMessage(true, 100);
+            $msg = "Infinite calling loop";
+            $this->throwError($msg);
+        }
     }
 
     protected function popCallStack()
@@ -1533,11 +1540,13 @@ class Compiler
      *
      * @param array                                $stms
      * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
+     * @param string                               $traceName
      *
      * @return array|null
      */
-    protected function compileChildren($stms, OutputBlock $out)
+    protected function compileChildren($stms, OutputBlock $out, $traceName = '')
     {
+        $this->pushCallStack($traceName);
         foreach ($stms as $stm) {
             $ret = $this->compileChild($stm, $out);
 
@@ -1545,6 +1554,7 @@ class Compiler
                 return $ret;
             }
         }
+        $this->popCallStack();
 
         return null;
     }
@@ -1555,11 +1565,13 @@ class Compiler
      * @param array                                $stms
      * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
      * @param \Leafo\ScssPhp\Block                 $selfParent
+     * @param string                               $traceName
      *
      * @throws \Exception
      */
-    protected function compileChildrenNoReturn($stms, OutputBlock $out, $selfParent = null)
+    protected function compileChildrenNoReturn($stms, OutputBlock $out, $selfParent = null, $traceName = '')
     {
+        $this->pushCallStack($traceName);
         foreach ($stms as $stm) {
             if ($selfParent && isset($stm[1]) && is_object($stm[1]) && $stm[1] instanceof Block) {
                 $stm[1]->selfParent = $selfParent;
@@ -1579,6 +1591,7 @@ class Compiler
                 return;
             }
         }
+        $this->popCallStack();
     }
 
 
@@ -2235,9 +2248,7 @@ class Compiler
 
                 $this->env->marker = 'mixin';
 
-                $this->pushCallStack($this->env->marker . " " . $name);
-                $this->compileChildrenNoReturn($mixin->children, $out, $selfParent);
-                $this->popCallStack();
+                $this->compileChildrenNoReturn($mixin->children, $out, $selfParent, $this->env->marker . " " . $name);
 
                 $this->storeEnv = $storeEnv;
 
@@ -2245,8 +2256,7 @@ class Compiler
                 break;
 
             case Type::T_MIXIN_CONTENT:
-                $content = $this->get(static::$namespaces['special'] . 'content', false, $this->getStoreEnv())
-                         ?: $this->get(static::$namespaces['special'] . 'content', false, $this->env);
+                $content = $this->get(static::$namespaces['special'] . 'content', false, isset($this->storeEnv) ? $this->storeEnv : $this->env);
 
                 if (! $content) {
                     $content = new \stdClass();
@@ -3983,20 +3993,41 @@ class Compiler
              : "line: $line";
         $msg = "$msg: $loc";
 
-        if ($this->callStack) {
-            $msg .= "\nCall Stack:\n";
-            $ncall = 0;
-
-            foreach (array_reverse($this->callStack) as $call) {
-                $msg .= "#" . $ncall++ . " " . $call['n'] . " ";
-                $msg .= (isset($this->sourceNames[$call[Parser::SOURCE_INDEX]])
-                      ? $this->sourceNames[$call[Parser::SOURCE_INDEX]]
-                      : '(unknown file)');
-                $msg .= " on line " . $call[Parser::SOURCE_LINE] . "\n";
-            }
+        $callStackMsg = $this->callStackMessage();
+        if ($callStackMsg) {
+            $msg .= "\nCall Stack:\n" . $callStackMsg;
         }
 
         throw new CompilerException($msg);
+    }
+
+    /**
+     * @param bool $all
+     * @param null $limit
+     * @return string
+     */
+    protected function callStackMessage($all = false, $limit = null)
+    {
+        $callStackMsg = [];
+        $ncall = 0;
+
+        if ($this->callStack) {
+            foreach (array_reverse($this->callStack) as $call) {
+                if ($all || (isset($call['n']) && $call['n'])) {
+                    $msg = "#" . $ncall++ . " " . $call['n'] . " ";
+                    $msg .= (isset($this->sourceNames[$call[Parser::SOURCE_INDEX]])
+                          ? $this->sourceNames[$call[Parser::SOURCE_INDEX]]
+                          : '(unknown file)');
+                    $msg .= " on line " . $call[Parser::SOURCE_LINE];
+                    $callStackMsg[] = $msg;
+                    if (!is_null($limit) && $ncall>$limit) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return implode("\n", $callStackMsg);
     }
 
     /**
@@ -4063,11 +4094,8 @@ class Compiler
         $tmp->children = [];
 
         $this->env->marker = 'function';
-        $this->pushCallStack($this->env->marker . " " . $name);
 
-        $ret = $this->compileChildren($func->children, $tmp);
-
-        $this->popCallStack();
+        $ret = $this->compileChildren($func->children, $tmp, $this->env->marker . " " . $name);
 
         $this->storeEnv = $storeEnv;
 
