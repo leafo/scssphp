@@ -1451,7 +1451,7 @@ class Compiler
           Parser::SOURCE_COLUMN => $this->sourceColumn
         ];
         // infinite calling loop
-        if (count($this->callStack) > 1000) {
+        if (count($this->callStack) > 25000) {
             // not displayed but you can var_dump it to deep debug
             $msg = $this->callStackMessage(true, 100);
             $msg = "Infinite calling loop";
