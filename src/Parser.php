@@ -2430,12 +2430,15 @@ class Parser
     {
         if ($this->match(
             $this->utf8
-                ? '([\pL\w\-_]+|#[{][$][\pL\w\-_]+[}])'
-                : '([\w\-_]+|#[{][$][\w\-_]+[}])',
+                ? '([\pL\w\-_]+)'
+                : '([\w\-_]+)',
             $m
         )) {
             $placeholder = $m[1];
 
+            return true;
+        }
+        if ($this->interpolation($placeholder)) {
             return true;
         }
 

@@ -169,3 +169,6 @@ div.popup, .prepend div.foo {
 
 .inline-menu:hover > .sub-menu, .header-menu:hover > .sub-menu {
   border-radius: 5px; }
+
+.myclass {
+  color: red; }
