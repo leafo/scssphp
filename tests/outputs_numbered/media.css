@@ -31,21 +31,23 @@ div {
 /* line 30, inputs/media.scss */
 pre {
   color: blue; } }
-  @media butt and (world) {
+  @media not hello and (world) {
+  @media butt {
     color: red;
 /* line 36, inputs/media.scss */
 div {
-color: red; } }
+color: red; } } }
 
-/* line 64, inputs/media.scss */
-
+@media c {
+    color: blue; }
+/* line 70, inputs/media.scss */
 div {
   color: blue; }
   @media screen and (-webkit-min-device-pixel-ratio: 1.5) {
-/* line 67, inputs/media.scss */
+/* line 73, inputs/media.scss */
 div .sidebar {
 width: 500px; } }
-/* line 81, inputs/media.scss */
+/* line 87, inputs/media.scss */
 div {
   position: absolute; }
   @media screen {
@@ -53,18 +55,18 @@ div {
     top: 0;
     bottom: 8em;
     color: red; }
-/* line 87, inputs/media.scss */
+/* line 93, inputs/media.scss */
 div p {
 margin: 5px; }
-/* line 76, inputs/media.scss */
+/* line 82, inputs/media.scss */
 div .success {
 color: green; } }
-/* line 95, inputs/media.scss */
+/* line 101, inputs/media.scss */
 .button {
   width: 300px;
   height: 100px;
   background: #eee; }
-/* line 100, inputs/media.scss */
+/* line 106, inputs/media.scss */
 .button :hover {
   background: #aaa; }
 
@@ -72,62 +74,82 @@ color: green; } }
     .button {
       width: 100px;
       height: 100px; } }
-/* line 110, inputs/media.scss */
+/* line 116, inputs/media.scss */
 code {
   position: absolute; }
 
 @media screen {
     code {
       height: 10px; }
-/* line 113, inputs/media.scss */
+/* line 119, inputs/media.scss */
 code pre {
   height: 20px; } }
-/* line 120, inputs/media.scss */
+/* line 126, inputs/media.scss */
 @media screen and (color: blue) {
       dt {
         height: 10px; } }
 
 @media screen {
-/* line 130, inputs/media.scss */
+/* line 136, inputs/media.scss */
 .screen {
   width: 12px; } }
 
 @media only screen {
-/* line 134, inputs/media.scss */
+/* line 140, inputs/media.scss */
 .only-screen {
   height: 11px; } }
 
 @media only screen {
-/* line 141, inputs/media.scss */
+/* line 147, inputs/media.scss */
 .only-screen {
   width: 14px; } }
 
 @media only screen {
-/* line 145, inputs/media.scss */
+/* line 151, inputs/media.scss */
 .only-screen {
   height: 16px; } }
 
 @media print {
-/* line 161, inputs/media.scss */
+/* line 167, inputs/media.scss */
 .only-print {
   height: 12px; } }
 
 @media screen {
-/* line 169, inputs/media.scss */
+/* line 175, inputs/media.scss */
 .only-print {
   height: 12px; } }
 
 @media not screen {
-/* line 185, inputs/media.scss */
+/* line 191, inputs/media.scss */
 .not-screen {
   height: 15px; } }
 
 @media only screen and (color: blue) and (width: 13) {
-/* line 202, inputs/media.scss */
+/* line 208, inputs/media.scss */
 .only-screen {
   height: 15px; } }
 
 @media screen and (max-width: 749px) and (max-width: 600px) and (min-width: 361px) {
-/* line 211, inputs/media.scss */
+/* line 217, inputs/media.scss */
 .item {
   color: red; } }
+/* line 223, inputs/media.scss */
+
+  @media not all and (max-width: 450px) {
+    @media not all and (max-width: 690px) and (orientation: portrait) {
+  @media (max-width: 1000px) {
+      a {
+        color: red; } } } }
+/* line 233, inputs/media.scss */
+
+  @media not all and (max-width: 450px) {
+    @media (max-width: 690px) and (orientation: portrait) and (max-width: 1000px) {
+    a {
+      color: red; } } }
+/* line 243, inputs/media.scss */
+
+  @media (max-width: 450px) {
+    @media not all and (max-width: 690px) and (orientation: portrait) {
+  @media not all and (max-width: 1000px) {
+      a {
+        color: red; } } } }

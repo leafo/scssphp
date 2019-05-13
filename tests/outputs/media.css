@@ -25,10 +25,14 @@
   color: blue;
     pre {
       color: blue; } }
-  @media butt and (world) {
+  @media not hello and (world) {
+  @media butt {
     color: red;
       div {
-        color: red; } }
+        color: red; } } }
+
+@media c {
+    color: blue; }
 
 div {
   color: blue; }
@@ -105,3 +109,23 @@ code {
 @media screen and (max-width: 749px) and (max-width: 600px) and (min-width: 361px) {
     .item {
       color: red; } }
+
+
+  @media not all and (max-width: 450px) {
+    @media not all and (max-width: 690px) and (orientation: portrait) {
+  @media (max-width: 1000px) {
+      a {
+        color: red; } } } }
+
+
+  @media not all and (max-width: 450px) {
+    @media (max-width: 690px) and (orientation: portrait) and (max-width: 1000px) {
+    a {
+      color: red; } } }
+
+
+  @media (max-width: 450px) {
+    @media not all and (max-width: 690px) and (orientation: portrait) {
+  @media not all and (max-width: 1000px) {
+      a {
+        color: red; } } } }

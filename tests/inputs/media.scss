@@ -57,6 +57,12 @@ $navbarCollapseWidth: 940px;
     }
 }
 
+@media all, b {
+    @media c {
+      color: blue;
+    }
+}
+
 $media: cree;
 $feature: -webkit-min-device-pixel-ratio;
 $value: 1.5;
@@ -211,5 +217,35 @@ dt {
     .item {
       color:red;
     }
+  }
+}
+
+a {
+  @media not all and (max-width: 450px) {
+  	@media not all and (max-width: 690px) and (orientation: portrait) {
+	  	@media (max-width: 1000px) {
+		  	color: red;
+		  }
+	  }
+  }
+}
+
+a {
+  @media not all and (max-width: 450px) {
+  	@media all and (max-width: 690px) and (orientation: portrait) {
+	  	@media (max-width: 1000px) {
+		  	color: red;
+		  }
+	  }
+  }
+}
+
+a {
+  @media all and (max-width: 450px) {
+  	@media not all and (max-width: 690px) and (orientation: portrait) {
+	  	@media not all and (max-width: 1000px) {
+		  	color: red;
+		  }
+	  }
   }
 }
