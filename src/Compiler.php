@@ -1450,6 +1450,13 @@ class Compiler
           Parser::SOURCE_LINE => $this->sourceLine,
           Parser::SOURCE_COLUMN => $this->sourceColumn
         ];
+        // infinite calling loop
+        if (count($this->callStack) > 1000) {
+            // not displayed but you can var_dump it to deep debug
+            $msg = $this->callStackMessage(true, 100);
+            $msg = "Infinite calling loop";
+            $this->throwError($msg);
+        }
     }
 
     protected function popCallStack()
@@ -3908,25 +3915,40 @@ class Compiler
              : "line: $line";
         $msg = "$msg: $loc";
 
-        if ($this->callStack) {
-            $callStackMsg = "";
-            $ncall = 0;
-
-            foreach (array_reverse($this->callStack) as $call) {
-                if (isset($call['n']) && $call['n']) {
-                    $callStackMsg .= "#" . $ncall++ . " " . $call['n'] . " ";
-                    $callStackMsg .= (isset($this->sourceNames[$call[Parser::SOURCE_INDEX]])
-                          ? $this->sourceNames[$call[Parser::SOURCE_INDEX]]
-                          : '(unknown file)');
-                    $callStackMsg .= " on line " . $call[Parser::SOURCE_LINE] . "\n";
-                }
-            }
-            if ($callStackMsg) {
-                $msg .= "\nCall Stack:\n" . $callStackMsg;
-            }
+        $callStackMsg = $this->callStackMessage();
+        if ($callStackMsg) {
+            $msg .= "\nCall Stack:\n" . $callStackMsg;
         }
 
         throw new CompilerException($msg);
+    }
+
+    /**
+     * @param bool $all
+     * @param null $limit
+     * @return string
+     */
+    protected function callStackMessage($all = false, $limit = null) {
+        $callStackMsg = [];
+        $ncall = 0;
+
+        if ($this->callStack) {
+            foreach (array_reverse($this->callStack) as $call) {
+                if ($all || (isset($call['n']) && $call['n'])) {
+                    $msg = "#" . $ncall++ . " " . $call['n'] . " ";
+                    $msg .= (isset($this->sourceNames[$call[Parser::SOURCE_INDEX]])
+                          ? $this->sourceNames[$call[Parser::SOURCE_INDEX]]
+                          : '(unknown file)');
+                    $msg .= " on line " . $call[Parser::SOURCE_LINE];
+                    $callStackMsg[] = $msg;
+                    if (!is_null($limit) && $ncall>$limit) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return implode("\n", $callStackMsg);
     }
 
     /**
