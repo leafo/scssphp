@@ -59,4 +59,18 @@ class Compressed extends Formatter
             $this->write($this->break);
         }
     }
+
+    /**
+     * Output block selectors
+     *
+     * @param \Leafo\ScssPhp\Formatter\OutputBlock $block
+     */
+    protected function blockSelectors(OutputBlock $block)
+    {
+        $inner = $this->indentStr();
+
+        $this->write($inner
+            . implode($this->tagSeparator, str_replace(array(' > ', ' + ', ' ~ '), array('>', '+', '~'), $block->selectors))
+            . $this->open . $this->break);
+    }
 }
