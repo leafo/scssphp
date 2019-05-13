@@ -757,6 +757,30 @@ class Compiler
                 $wrapped->children     = $media->children;
 
                 $media->children = [[Type::T_BLOCK, $wrapped]];
+                if (isset($this->lineNumberStyle)) {
+                    $annotation = $this->makeOutputBlock(Type::T_COMMENT);
+                    $annotation->depth = 0;
+
+                    $file = $this->sourceNames[$media->sourceIndex];
+                    $line = $media->sourceLine;
+
+                    switch ($this->lineNumberStyle) {
+                        case static::LINE_COMMENTS:
+                            $annotation->lines[] = '/* line ' . $line
+                                                 . ($file ? ', ' . $file : '')
+                                                 . ' */';
+                            break;
+
+                        case static::DEBUG_INFO:
+                            $annotation->lines[] = '@media -sass-debug-info{'
+                                                 . ($file ? 'filename{font-family:"' . $file . '"}' : '')
+                                                 . 'line{font-family:' . $line . '}}';
+                            break;
+                    }
+
+                    $this->scope->children[] = $annotation;
+                }
+
             }
 
             $this->compileChildrenNoReturn($media->children, $this->scope);

@@ -45,9 +45,10 @@ body .second {
   color: red; }
 /* line 49, inputs/at_root.scss */
 @media (min-width: 300px) {
-    /* line 51, inputs/at_root.scss */
-      .my-widget .inside-mq {
-        inside-style: mq; } }
+/* line 50, inputs/at_root.scss */
+/* line 51, inputs/at_root.scss */
+  .my-widget .inside-mq {
+    inside-style: mq; } }
 
 /* line 56, inputs/at_root.scss */
 .my-widget .outside-mq {
@@ -146,8 +147,9 @@ a.badge-secondary:focus, a.badge-secondary.focus {
   display: inline-block; }
 
 @media (prefers-reduced-motion: reduce) {
-    .badge {
-      transition: none; } }
+/* line 194, inputs/at_root.scss */
+.badge {
+  transition: none; } }
 /* line 210, inputs/at_root.scss */
 /* line 200, inputs/at_root.scss */
 
