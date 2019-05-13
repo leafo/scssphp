@@ -13,6 +13,7 @@ namespace Leafo\ScssPhp;
 
 use Leafo\ScssPhp\Base\Range;
 use Leafo\ScssPhp\Block;
+use Leafo\ScssPhp\Cache;
 use Leafo\ScssPhp\Colors;
 use Leafo\ScssPhp\Compiler\Environment;
 use Leafo\ScssPhp\Exception\CompilerException;
@@ -145,6 +146,8 @@ class Compiler
     protected $charsetSeen;
     protected $sourceNames;
 
+    protected $cache;
+
     protected $indentLevel;
     protected $extends;
     protected $extendsMap;
@@ -162,10 +165,28 @@ class Compiler
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct($cache_options = null)
     {
         $this->parsedFiles = [];
         $this->sourceNames = [];
+
+        if ($cache_options) {
+            $this->cache = new Cache($cache_options);
+        }
+    }
+
+    public function getCompileOptions()
+    {
+        $options = array(
+            'importPaths' => $this->importPaths,
+            'registeredVars' => $this->registeredVars,
+            'registeredFeatures' => $this->registeredFeatures,
+            'encoding' => $this->encoding,
+            'sourceMap' => serialize($this->sourceMap),
+            'sourceMapOptions' => $this->sourceMapOptions,
+            'formater' => $this->formatter,
+        );
+        return $options;
     }
 
     /**
@@ -180,6 +201,29 @@ class Compiler
      */
     public function compile($code, $path = null)
     {
+
+        if ($this->cache) {
+            $cache_key = ($path ? $path : "(stdin)") . ":" . md5($code);
+            $compile_options = $this->getCompileOptions();
+            $cache = $this->cache->getCache("compile", $cache_key, $compile_options);
+            if (is_array($cache)
+                and isset($cache['dependencies'])
+                and isset($cache['out']) ) {
+                // check if any dependency file changed before accepting the cache
+                foreach ($cache['dependencies'] as $file => $mtime) {
+                    if (!file_exists($file)
+                        or filemtime($file) !== $mtime) {
+                        unset($cache);
+                        break;
+                    }
+                }
+                if (isset($cache)) {
+                    return $cache['out'];
+                }
+            }
+        }
+
+
         $this->indentLevel    = -1;
         $this->extends        = [];
         $this->extendsMap     = [];
@@ -235,6 +279,14 @@ class Compiler
             $out .= sprintf('/*# sourceMappingURL=%s */', $sourceMapUrl);
         }
 
+        if ($this->cache and isset($cache_key) and isset($compile_options)) {
+            $v = array(
+                'dependencies' => $this->getParsedFiles(),
+                'out' => &$out,
+            );
+            $this->cache->setCache("compile", $cache_key, $v, $compile_options);
+        }
+
         return $out;
     }
 
@@ -247,7 +299,7 @@ class Compiler
      */
     protected function parserFactory($path)
     {
-        $parser = new Parser($path, count($this->sourceNames), $this->encoding);
+        $parser = new Parser($path, count($this->sourceNames), $this->encoding, $this->cache);
 
         $this->sourceNames[] = $path;
         $this->addParsedFile($path);
