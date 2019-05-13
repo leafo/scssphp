@@ -2181,8 +2181,7 @@ class Compiler
                 break;
 
             case Type::T_MIXIN_CONTENT:
-                $content = $this->get(static::$namespaces['special'] . 'content', false, $this->getStoreEnv())
-                         ?: $this->get(static::$namespaces['special'] . 'content', false, $this->env);
+                $content = $this->get(static::$namespaces['special'] . 'content', false, isset($this->storeEnv) ? $this->storeEnv : $this->env);
 
                 if (! $content) {
                     $content = new \stdClass();
