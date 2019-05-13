@@ -721,13 +721,17 @@ class Compiler
     {
         $this->pushEnv($media);
 
-        $mediaQuery = $this->compileMediaQuery($this->multiplyMedia($this->env));
+        $mediaQueries = $this->compileMediaQuery($this->multiplyMedia($this->env));
 
-        if (! empty($mediaQuery)) {
-            $this->scope = $this->makeOutputBlock(Type::T_MEDIA, [$mediaQuery]);
-
+        if (! empty($mediaQueries) && $mediaQueries) {
+            $previousScope = $this->scope;
             $parentScope = $this->mediaParent($this->scope);
-            $parentScope->children[] = $this->scope;
+            foreach ($mediaQueries as $mediaQuery) {
+                $this->scope = $this->makeOutputBlock(Type::T_MEDIA, [$mediaQuery]);
+
+                $parentScope->children[] = $this->scope;
+                $parentScope = $this->scope;
+            }
 
             // top level properties in a media cause it to be wrapped
             $needsWrap = false;
@@ -736,9 +740,9 @@ class Compiler
                 $type = $child[0];
 
                 if ($type !== Type::T_BLOCK &&
-                    $type !== Type::T_MEDIA &&
-                    $type !== Type::T_DIRECTIVE &&
-                    $type !== Type::T_IMPORT
+                  $type !== Type::T_MEDIA &&
+                  $type !== Type::T_DIRECTIVE &&
+                  $type !== Type::T_IMPORT
                 ) {
                     $needsWrap = true;
                     break;
@@ -747,21 +751,21 @@ class Compiler
 
             if ($needsWrap) {
                 $wrapped = new Block;
-                $wrapped->sourceName   = $media->sourceName;
-                $wrapped->sourceIndex  = $media->sourceIndex;
-                $wrapped->sourceLine   = $media->sourceLine;
+                $wrapped->sourceName = $media->sourceName;
+                $wrapped->sourceIndex = $media->sourceIndex;
+                $wrapped->sourceLine = $media->sourceLine;
                 $wrapped->sourceColumn = $media->sourceColumn;
-                $wrapped->selectors    = [];
-                $wrapped->comments     = [];
-                $wrapped->parent       = $media;
-                $wrapped->children     = $media->children;
+                $wrapped->selectors = [];
+                $wrapped->comments = [];
+                $wrapped->parent = $media;
+                $wrapped->children = $media->children;
 
                 $media->children = [[Type::T_BLOCK, $wrapped]];
             }
 
             $this->compileChildrenNoReturn($media->children, $this->scope);
 
-            $this->scope = $this->scope->parent;
+            $this->scope = $previousScope;
         }
 
         $this->popEnv();
@@ -1573,31 +1577,67 @@ class Compiler
      *
      * @param array $queryList
      *
-     * @return string
+     * @return array
      */
     protected function compileMediaQuery($queryList)
     {
-        $out = '@media';
-        $first = true;
+        $start = '@media ';
+        $default = trim($start);
+        $out = [];
+        $current = "";
 
         foreach ($queryList as $query) {
             $type = null;
             $parts = [];
 
+            $mediaTypeOnly = true;
+            foreach ($query as $q) {
+                if ($q[0] !== Type::T_MEDIA_TYPE) {
+                    $mediaTypeOnly = false;
+                    break;
+                }
+            }
             foreach ($query as $q) {
                 switch ($q[0]) {
                     case Type::T_MEDIA_TYPE:
-                        if ($type) {
-                            $type = $this->mergeMediaTypes(
-                                $type,
-                                array_map([$this, 'compileValue'], array_slice($q, 1))
-                            );
-
-                            if (empty($type)) { // merge failed
-                                return null;
+                        $newType = array_map([$this, 'compileValue'], array_slice($q, 1));
+                        // combining not and anything else than media type is too risky and should be avoided
+                        if (! $mediaTypeOnly) {
+                            if (in_array(Type::T_NOT, $newType) || ($type && in_array(Type::T_NOT, $type) )) {
+                                if ($type) {
+                                    array_unshift($parts, implode(' ', array_filter($type)));
+                                }
+                                if (! empty($parts)) {
+                                    if (strlen($current)) {
+                                        $current .= $this->formatter->tagSeparator;
+                                    }
+                                    $current .= implode(' and ', $parts);
+                                }
+                                if ($current) {
+                                    $out[] = $start . $current;
+                                }
+                                $current = "";
+                                $type = null;
+                                $parts = [];
                             }
-                        } else {
-                            $type = array_map([$this, 'compileValue'], array_slice($q, 1));
+                        }
+                        if ($newType === ['all'] && $default) {
+                            $default = $start . 'all';
+                        }
+                        // all can be safely ignored and mixed with whatever else
+                        if ($newType !== ['all']) {
+                            if ($type) {
+                                $type = $this->mergeMediaTypes($type, $newType);
+
+                                if (empty($type)) {
+                                    // merge failed : ignore this query that is not valid, skip to the next one
+                                    $parts = [];
+                                    $default = ''; // if everything fail, no @media at all
+                                    continue 3;
+                                }
+                            } else {
+                                $type = $newType;
+                            }
                         }
                         break;
 
@@ -1626,17 +1666,21 @@ class Compiler
             }
 
             if (! empty($parts)) {
-                if ($first) {
-                    $first = false;
-                    $out .= ' ';
-                } else {
-                    $out .= $this->formatter->tagSeparator;
+                if (strlen($current)) {
+                    $current .= $this->formatter->tagSeparator;
                 }
 
-                $out .= implode(' and ', $parts);
+                $current .= implode(' and ', $parts);
             }
         }
 
+        if ($current) {
+            $out[] = $start . $current;
+        }
+        // no @media type except all, and no conflict?
+        if (!$out && $default) {
+            $out[] = $default;
+        }
         return $out;
     }
 
@@ -3324,7 +3368,7 @@ class Compiler
 
             foreach ($parentQueries as $parentQuery) {
                 foreach ($originalQueries as $childQuery) {
-                    $childQueries []= array_merge($parentQuery, $childQuery);
+                    $childQueries []= array_merge($parentQuery, [[Type::T_MEDIA_TYPE, [Type::T_KEYWORD, 'all']]], $childQuery);
                 }
             }
         }
