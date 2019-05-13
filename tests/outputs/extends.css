@@ -166,3 +166,6 @@ div.popup, .prepend div.foo {
 
 .class1:not(:last-child), .class2:not(.foo):not(:last-child), .class3:not(:last-child) {
   color: red; }
+
+.inline-menu:hover > .sub-menu, .header-menu:hover > .sub-menu {
+  border-radius: 5px; }

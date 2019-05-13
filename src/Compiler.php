@@ -519,6 +519,7 @@ class Compiler
      */
     protected function matchExtends($selector, &$out, $from = 0, $initial = true)
     {
+        static $partsPile = [];
         $selector = $this->glueFunctionSelectors($selector);
 
         foreach ($selector as $i => $part) {
@@ -526,7 +527,18 @@ class Compiler
                 continue;
             }
 
+            // check that we are not building an infinite loop of extensions
+            // if the new part is just including a previous part don't try to extend anymore
+            if (count($part) > 1) {
+                foreach ($partsPile as $previousPart) {
+                    if (! count(array_diff($previousPart, $part))) {
+                        continue 2;
+                    }
+                }
+            }
+
             if ($this->matchExtendsSingle($part, $origin)) {
+                $partsPile[] = $part;
                 $after = array_slice($selector, $i + 1);
                 $before = array_slice($selector, 0, $i);
 
@@ -536,7 +548,7 @@ class Compiler
                     $k = 0;
 
                     // remove shared parts
-                    if ($initial) {
+                    if (count($new)>1) {
                         while ($k < $i && isset($new[$k]) && $selector[$k] === $new[$k]) {
                             $k++;
                         }
@@ -580,7 +592,8 @@ class Compiler
                     $out[] = $result;
 
                     // recursively check for more matches
-                    $this->matchExtends($result, $out, count($before) + count($mergedBefore), false);
+                    $startRecursFrom = count($before) + min(count($nonBreakableBefore), count($mergedBefore));
+                    $this->matchExtends($result, $out, $startRecursFrom, false);
 
                     // selector sequence merging
                     if (! empty($before) && count($new) > 1) {
@@ -602,6 +615,7 @@ class Compiler
                         $out[] = $result2;
                     }
                 }
+                array_pop($partsPile);
             }
         }
     }
@@ -618,6 +632,11 @@ class Compiler
     {
         $counts = [];
         $single = [];
+
+        // simple usual cases, no need to do the whole trick
+        if (in_array($rawSingle, [['>'],['+'],['~']])) {
+            return false;
+        }
 
         foreach ($rawSingle as $part) {
             // matches Number
@@ -1709,7 +1728,7 @@ class Compiler
         $part1 = end($selectors1);
         $part2 = end($selectors2);
 
-        if (! $this->isImmediateRelationshipCombinator($part1[0]) || $part1 !== $part2) {
+        if (! $this->isImmediateRelationshipCombinator($part1[0]) && $part1 !== $part2) {
             return array_merge($selectors1, $selectors2);
         }
 
@@ -1719,13 +1738,17 @@ class Compiler
             $part1 = array_pop($selectors1);
             $part2 = array_pop($selectors2);
 
-            if ($this->isImmediateRelationshipCombinator($part1[0]) && $part1 !== $part2) {
-                $merged = array_merge($selectors1, [$part1], $selectors2, [$part2], $merged);
+            if (! $this->isImmediateRelationshipCombinator($part1[0]) && $part1 !== $part2) {
+                if ($this->isImmediateRelationshipCombinator(reset($merged)[0])) {
+                    array_unshift($merged, [$part1[0] . $part2[0]]);
+                    $merged = array_merge($selectors1, $selectors2, $merged);
+                } else {
+                    $merged = array_merge($selectors1, [$part1], $selectors2, [$part2], $merged);
+                }
                 break;
             }
 
             array_unshift($merged, $part1);
-            array_unshift($merged, [array_pop($selectors1)[0] . array_pop($selectors2)[0]]);
         } while (! empty($selectors1) && ! empty($selectors2));
 
         return $merged;
