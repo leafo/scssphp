@@ -1399,13 +1399,16 @@ class Compiler
 
         foreach ($selectors as $selector) {
             $output = '';
+            foreach ($selector as $node) {
+                $output .= ($output ? ' ' : '');
 
-            array_walk_recursive(
-                $selector,
-                function ($value, $key) use (&$output) {
-                    $output .= $value;
-                }
-            );
+                array_walk_recursive(
+                    $node,
+                    function ($value, $key) use (&$output) {
+                        $output .= $value;
+                    }
+                );
+            }
 
             $parts[] = $output;
         }
