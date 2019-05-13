@@ -9,9 +9,10 @@
   border-color: blue; }
 
 @media only screen and (max-width: 480px) {
-  /* line 32, inputs/content.scss */
-    body {
-      color: red; } }
+/* line 26, inputs/content.scss */
+/* line 32, inputs/content.scss */
+  body {
+    color: red; } }
 /* line 36, inputs/content.scss */
 #sidebar {
   width: 300px; }
@@ -20,9 +21,10 @@
     width: 100px; } }
 
 @media only screen and (min-width: 40em) {
-  /* line 51, inputs/content.scss */
-    .grid-1 {
-      width: 100%; }
+/* line 46, inputs/content.scss */
+/* line 51, inputs/content.scss */
+  .grid-1 {
+    width: 100%; }
 /* line 51, inputs/content.scss */
 .grid-2 {
   width: 100%; } }

@@ -364,10 +364,12 @@ rule2 {
   prop: val; } }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
-  a: b; }
+/* line 440, inputs/scss_css.scss */
+a: b; }
 
 @media only screen, print and (foo: 0px) and (bar: flam(12px solid)) {
-  a: b; }
+/* line 444, inputs/scss_css.scss */
+a: b; }
 /* line 448, inputs/scss_css.scss */
 :-moz-any(h1, h2, h3) {
   a: b; }

@@ -106,8 +106,9 @@ div.parameter-name-scope {
   color: red; } }
 /* line 190, inputs/mixins.scss */
 @media screen and (min-width:0\0) {
-    .test {
-      color: #000; } }
+/* line 186, inputs/mixins.scss */
+.test {
+  color: #000; } }
 /* line 197, inputs/mixins.scss */
 div {
   content: "div";
