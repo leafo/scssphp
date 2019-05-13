@@ -400,3 +400,13 @@ embed.bar {
 .header-menu {
   @extend .inline-menu;
 }
+
+$placeholdername: 'myplaceholder';
+%#{$placeholdername} {
+  color: red;
+}
+.myclass {
+  @extend %myplaceholder;
+}
+
+
