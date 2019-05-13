@@ -3927,7 +3927,8 @@ class Compiler
      * @param null $limit
      * @return string
      */
-    protected function callStackMessage($all = false, $limit = null) {
+    protected function callStackMessage($all = false, $limit = null)
+    {
         $callStackMsg = [];
         $ncall = 0;
 
