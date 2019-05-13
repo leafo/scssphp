@@ -1462,11 +1462,13 @@ class Compiler
      *
      * @param array                                $stms
      * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
+     * @param string                               $traceName
      *
      * @return array|null
      */
-    protected function compileChildren($stms, OutputBlock $out)
+    protected function compileChildren($stms, OutputBlock $out, $traceName = '')
     {
+        $this->pushCallStack($traceName);
         foreach ($stms as $stm) {
             $ret = $this->compileChild($stm, $out);
 
@@ -1474,6 +1476,7 @@ class Compiler
                 return $ret;
             }
         }
+        $this->popCallStack();
 
         return null;
     }
@@ -1484,11 +1487,13 @@ class Compiler
      * @param array                                $stms
      * @param \Leafo\ScssPhp\Formatter\OutputBlock $out
      * @param \Leafo\ScssPhp\Block                 $selfParent
+     * @param string                               $traceName
      *
      * @throws \Exception
      */
-    protected function compileChildrenNoReturn($stms, OutputBlock $out, $selfParent = null)
+    protected function compileChildrenNoReturn($stms, OutputBlock $out, $selfParent = null, $traceName = '')
     {
+        $this->pushCallStack($traceName);
         foreach ($stms as $stm) {
             if ($selfParent && isset($stm[1]) && is_object($stm[1]) && $stm[1] instanceof Block) {
                 $stm[1]->selfParent = $selfParent;
@@ -1508,6 +1513,7 @@ class Compiler
                 return;
             }
         }
+        $this->popCallStack();
     }
 
 
@@ -2160,9 +2166,7 @@ class Compiler
 
                 $this->env->marker = 'mixin';
 
-                $this->pushCallStack($this->env->marker . " " . $name);
-                $this->compileChildrenNoReturn($mixin->children, $out, $selfParent);
-                $this->popCallStack();
+                $this->compileChildrenNoReturn($mixin->children, $out, $selfParent, $this->env->marker . " " . $name);
 
                 $this->storeEnv = $storeEnv;
 
@@ -3905,15 +3909,20 @@ class Compiler
         $msg = "$msg: $loc";
 
         if ($this->callStack) {
-            $msg .= "\nCall Stack:\n";
+            $callStackMsg = "";
             $ncall = 0;
 
             foreach (array_reverse($this->callStack) as $call) {
-                $msg .= "#" . $ncall++ . " " . $call['n'] . " ";
-                $msg .= (isset($this->sourceNames[$call[Parser::SOURCE_INDEX]])
-                      ? $this->sourceNames[$call[Parser::SOURCE_INDEX]]
-                      : '(unknown file)');
-                $msg .= " on line " . $call[Parser::SOURCE_LINE] . "\n";
+                if (isset($call['n']) && $call['n']) {
+                    $callStackMsg .= "#" . $ncall++ . " " . $call['n'] . " ";
+                    $callStackMsg .= (isset($this->sourceNames[$call[Parser::SOURCE_INDEX]])
+                          ? $this->sourceNames[$call[Parser::SOURCE_INDEX]]
+                          : '(unknown file)');
+                    $callStackMsg .= " on line " . $call[Parser::SOURCE_LINE] . "\n";
+                }
+            }
+            if ($callStackMsg) {
+                $msg .= "\nCall Stack:\n" . $callStackMsg;
             }
         }
 
@@ -3984,11 +3993,8 @@ class Compiler
         $tmp->children = [];
 
         $this->env->marker = 'function';
-        $this->pushCallStack($this->env->marker . " " . $name);
 
-        $ret = $this->compileChildren($func->children, $tmp);
-
-        $this->popCallStack();
+        $ret = $this->compileChildren($func->children, $tmp, $this->env->marker . " " . $name);
 
         $this->storeEnv = $storeEnv;
 
