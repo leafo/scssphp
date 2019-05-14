@@ -74,3 +74,6 @@ a.badge {
 
 .pagination .page-item:first-child .page-link {
   border-radius: 5px; }
+
+.element {
+  border: 2px solid #000; }

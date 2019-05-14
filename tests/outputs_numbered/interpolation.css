@@ -93,3 +93,6 @@ a.badge {
 /* line 126, inputs/interpolation.scss */
   .pagination .page-item:first-child .page-link {
     border-radius: 5px; }
+/* line 140, inputs/interpolation.scss */
+.element {
+  border: 2px solid #000; }
