@@ -1,0 +1,9 @@
+.foo, .bar, .foo2 .bar2, .foo3 > .bar3 {
+  content: ".foo";
+  content: ".bar";
+  content: ".foo2 .bar2";
+  content: ".foo3 > .bar3"; }
+
+.main aside:hover, .sidebar p {
+  content: ".main aside:hover";
+  content: ".sidebar p"; }
