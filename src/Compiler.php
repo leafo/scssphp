@@ -855,7 +855,6 @@ class Compiler
 
                     $this->scope->children[] = $annotation;
                 }
-
             }
 
             $this->compileChildrenNoReturn($media->children, $this->scope);
@@ -3375,7 +3374,7 @@ class Compiler
                                 $selectors[serialize($s)] = $s;
                             }
                         } else {
-                            $s = $this->joinSelectors($parent, $selector,$stillHasSelf);
+                            $s = $this->joinSelectors($parent, $selector, $stillHasSelf);
                             $selectors[serialize($s)] = $s;
                         }
                     }
