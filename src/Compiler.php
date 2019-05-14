@@ -1473,10 +1473,13 @@ class Compiler
 
     /**
      * Parse down the selector and revert [self] to "&" before a reparsing
+     *
      * @param array $selectors
+     *
      * @return array
      */
-    protected function revertSelfSelector($selectors) {
+    protected function revertSelfSelector($selectors)
+    {
         foreach ($selectors as &$part) {
             if (is_array($part)) {
                 if ($part === [Type::T_SELF]) {
