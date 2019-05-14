@@ -1359,6 +1359,7 @@ class Compiler
 
         // after evaluating interpolates, we might need a second pass
         if ($this->shouldEvaluate) {
+            $selectors = $this->revertSelfSelector($selectors);
             $buffer = $this->collapseSelectors($selectors);
             $parser = $this->parserFactory(__METHOD__);
 
@@ -1438,6 +1439,24 @@ class Compiler
         }
 
         return implode(', ', $parts);
+    }
+
+    /**
+     * Parse down the selector and revert [self] to "&" before a reparsing
+     * @param array $selectors
+     * @return array
+     */
+    protected function revertSelfSelector($selectors) {
+        foreach ($selectors as &$part) {
+            if (is_array($part)) {
+                if ($part === [Type::T_SELF]) {
+                    $part = '&';
+                } else {
+                    $part = $this->revertSelfSelector($part);
+                }
+            }
+        }
+        return $selectors;
     }
 
     /**
