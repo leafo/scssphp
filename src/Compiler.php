@@ -855,7 +855,6 @@ class Compiler
 
                     $this->scope->children[] = $annotation;
                 }
-
             }
 
             $this->compileChildrenNoReturn($media->children, $this->scope);
@@ -2661,6 +2660,9 @@ class Compiler
 
             case Type::T_INTERPOLATE:
                 $value[1] = $this->reduce($value[1]);
+                if ($inExp) {
+                    return $value[1];
+                }
 
                 return $value;
 
@@ -3402,7 +3404,7 @@ class Compiler
                                 $selectors[serialize($s)] = $s;
                             }
                         } else {
-                            $s = $this->joinSelectors($parent, $selector,$stillHasSelf);
+                            $s = $this->joinSelectors($parent, $selector, $stillHasSelf);
                             $selectors[serialize($s)] = $s;
                         }
                     }

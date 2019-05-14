@@ -133,3 +133,10 @@ div {
 .pagination {
   @include pagination-mixin(5px);
 }
+
+@mixin set-border($width) {
+    border: $width solid #000;
+}
+.element {
+    @include set-border(#{2px}); // compiles to "2px solid #000"
+}
