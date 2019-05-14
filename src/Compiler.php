@@ -2630,6 +2630,9 @@ class Compiler
 
             case Type::T_INTERPOLATE:
                 $value[1] = $this->reduce($value[1]);
+                if ($inExp) {
+                    return $value[1];
+                }
 
                 return $value;
 
