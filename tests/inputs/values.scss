@@ -15,6 +15,7 @@ multiline block \
     content: "This is a \
 multiline string.";
     border-radius: -1px -1px -1px black;
+    grid-template-columns: [avatar] 2fr [body] 6fr;
 }
 
 #subtraction {
