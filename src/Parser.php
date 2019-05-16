@@ -2154,7 +2154,7 @@ class Parser
         while ($this->selector($sel, $subSelector)) {
             $selectors[] = $sel;
 
-            if (! $this->matchChar(',',  true)) {
+            if (! $this->matchChar(',', true)) {
                 break;
             }
 
