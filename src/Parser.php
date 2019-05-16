@@ -2142,19 +2142,19 @@ class Parser
      *
      * @return boolean
      */
-    protected function selectors(&$out)
+    protected function selectors(&$out, $subSelector = false)
     {
         $s = $this->count;
         $selectors = [];
 
-        while ($this->selector($sel)) {
+        while ($this->selector($sel, $subSelector)) {
             $selectors[] = $sel;
 
-            if (! $this->matchChar(',')) {
+            if (! $this->matchChar(',',  true)) {
                 break;
             }
 
-            while ($this->matchChar(',')) {
+            while ($this->matchChar(',', true)) {
                 ; // ignore extra
             }
         }
@@ -2177,23 +2177,23 @@ class Parser
      *
      * @return boolean
      */
-    protected function selector(&$out)
+    protected function selector(&$out, $subSelector = false)
     {
         $selector = [];
 
         for (;;) {
-            if ($this->match('[>+~]+', $m)) {
+            if ($this->match('[>+~]+', $m, true)) {
                 $selector[] = [$m[0]];
                 continue;
             }
 
-            if ($this->selectorSingle($part)) {
+            if ($this->selectorSingle($part, $subSelector)) {
                 $selector[] = $part;
                 $this->match('\s+', $m);
                 continue;
             }
 
-            if ($this->match('\/[^\/]+\/', $m)) {
+            if ($this->match('\/[^\/]+\/', $m, true)) {
                 $selector[] = [$m[0]];
                 continue;
             }
@@ -2220,7 +2220,7 @@ class Parser
      *
      * @return boolean
      */
-    protected function selectorSingle(&$out)
+    protected function selectorSingle(&$out, $subSelector = false)
     {
         $oldWhite = $this->eatWhiteDefault;
         $this->eatWhiteDefault = false;
@@ -2241,6 +2241,11 @@ class Parser
 
             // see if we can stop early
             if ($char === '{' || $char === ',' || $char === ';' || $char === '}' || $char === '@') {
+                break;
+            }
+
+            // parsing a sub selector in () stop with the closing )
+            if ($subSelector && $char === ')') {
                 break;
             }
 
@@ -2307,21 +2312,46 @@ class Parser
 
                     $ss = $this->count;
 
-                    if ($this->matchChar('(') &&
-                      ($this->openString(')', $str, '(') || true) &&
-                      $this->matchChar(')')
-                    ) {
-                        $parts[] = '(';
+                    if ($nameParts === ['not'] || $nameParts === ['is'] || $nameParts === ['has'] || $nameParts === ['where']) {
+                        if ($this->matchChar('(') &&
+                          ($this->selectors($subs, true) || true) &&
+                          $this->matchChar(')')
+                        ) {
+                            $parts[] = '(';
 
-                        if (! empty($str)) {
-                            $parts[] = $str;
+                            while ($sub = array_shift($subs)) {
+                                while ($ps = array_shift($sub)) {
+                                    foreach ($ps as &$p) {
+                                        $parts[] = $p;
+                                    }
+                                    if (count($sub) && reset($sub)) {
+                                        $parts[] = ' ';
+                                    }
+                                }
+                                if (count($subs) && reset($subs)) {
+                                    $parts[] = ', ';
+                                }
+                            }
+                            $parts[] = ')';
+                        } else {
+                            $this->seek($ss);
                         }
-
-                        $parts[] = ')';
                     } else {
-                        $this->seek($ss);
-                    }
+                        if ($this->matchChar('(') &&
+                          ($this->openString(')', $str, '(') || true) &&
+                          $this->matchChar(')')
+                        ) {
+                            $parts[] = '(';
 
+                            if (! empty($str)) {
+                                $parts[] = $str;
+                            }
+
+                            $parts[] = ')';
+                        } else {
+                            $this->seek($ss);
+                        }
+                    }
                     continue;
                 }
             }
