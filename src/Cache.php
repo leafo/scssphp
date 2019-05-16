@@ -18,10 +18,10 @@ use Exception;
  *
  * In short:
  *
- * allow to put in cache/get from fache a generic result from a known operation on a generic dataset,
+ * allow to put in cache/get from cache a generic result from a known operation on a generic dataset,
  * taking in account options that affects the result
  *
- * The cache manager is agnostic about data format and only the operation is expected to be descripted by string
+ * The cache manager is agnostic about data format and only the operation is expected to be described by string
  *
  */
 
@@ -32,38 +32,36 @@ use Exception;
  */
 class Cache
 {
-
     const CACHE_VERSION = 0;
 
-
     // directory used for storing data
-    public static $cache_dir = false;
+    public static $cacheDir = false;
 
     // prefix for the storing data
     public static $prefix = 'scssphp_';
 
     // force a refresh : 'once' for refreshing the first hit on a cache only, true to never use the cache in this hit
-    public static $force_refresh = false;
+    public static $forceFefresh = false;
 
     // specifies the number of seconds after which data cached will be seen as 'garbage' and potentially cleaned up
-    public static $gc_lifetime = 604800;
+    public static $gcLifetime = 604800;
 
-
-    // array of already refreshed cache if $force_refresh==='once'
+    // array of already refreshed cache if $forceFefresh==='once'
     protected static $refreshed = [];
-
 
     /**
      * Constructor
+     *
+     * @param array $options
      */
     public function __construct($options)
     {
-        //check $cache_dir
+        // check $cacheDir
         if (isset($options['cache_dir'])) {
-            self::$cache_dir = $options['cache_dir'];
+            self::$cacheDir = $options['cache_dir'];
         }
 
-        if (empty(self::$cache_dir)) {
+        if (empty(self::$cacheDir)) {
             throw new Exception('cache_dir not set');
         }
 
@@ -75,40 +73,42 @@ class Cache
             throw new Exception('prefix not set');
         }
 
-        if (isset($options['force_refresh'])) {
-            self::$force_refresh = $options['force_refresh'];
+        if (isset($options['forceRefresh'])) {
+            self::$forceFefresh = $options['force_refresh'];
         }
 
         self::checkCacheDir();
     }
 
-
     /**
-     * Get the cached result of $operation on $what, which is known as dependant from the content of $options
+     * Get the cached result of $operation on $what,
+     * which is known as dependant from the content of $options
      *
-     * @param string $operation
-     *   parse, compile...
-     * @param $what
-     *  content key (filename to be treated for instance)
-     * @param array $options
-     *  any option that affect the operation result on the content
-     * @param int $last_modified
+     * @param string  $operation    parse, compile...
+     * @param mixed   $what         content key (e.g., filename to be treated)
+     * @param array   $options      any option that affect the operation result on the content
+     * @param integer $lastModified last modified timestamp
+     *
      * @return mixed
-     * @throws Exception
+     *
+     * @throws \Exception
      */
-    public function getCache($operation, $what, $options = array(), $last_modified = null)
+    public function getCache($operation, $what, $options = [], $lastModified = null)
     {
+        $fileCache = self::$cacheDir . self::cacheName($operation, $what, $options);
 
-        $fileCache = self::$cache_dir . self::cacheName($operation, $what, $options);
+        if ((! self::$forceRefresh || (self::$forceRefresh === 'once' && isset(self::$refreshed[$fileCache])))
+            && file_exists($fileCache)
+        ) {
+            $cacheTime = filemtime($fileCache);
 
-        if ((! self::$force_refresh || (self::$force_refresh === 'once' && isset(self::$refreshed[$fileCache])))
-          and file_exists($fileCache)) {
-            $cache_time = filemtime($fileCache);
-            if ((is_null($last_modified) or $cache_time > $last_modified)
-              and $cache_time + self::$gc_lifetime > time()) {
+            if ((is_null($lastModified) || $cacheTime > $lastModified)
+                && $cacheTime + self::$gcLifetime > time()
+            ) {
                 $c = file_get_contents($fileCache);
                 $c = unserialize($c);
-                if (is_array($c) and isset($c['value'])) {
+
+                if (is_array($c) && isset($c['value'])) {
                     return $c['value'];
                 }
             }
@@ -118,43 +118,45 @@ class Cache
     }
 
     /**
-     * Put in cache the result of $operation on $what, which is known as dependant from the content of $options
+     * Put in cache the result of $operation on $what,
+     * which is known as dependant from the content of $options
      *
      * @param string $operation
-     * @param $what
-     * @param $value
-     * @param array $options
+     * @param mixed  $what
+     * @param mixed  $value
+     * @param array  $options
      */
-    public function setCache($operation, $what, $value, $options = array())
+    public function setCache($operation, $what, $value, $options = [])
     {
-        $fileCache = self::$cache_dir . self::cacheName($operation, $what, $options);
+        $fileCache = self::$cacheDir . self::cacheName($operation, $what, $options);
 
-        $c = array('value' => $value);
+        $c = ['value' => $value];
         $c = serialize($c);
         file_put_contents($fileCache, $c);
 
-        if (self::$force_refresh === 'once') {
+        if (self::$forceRefresh === 'once') {
             self::$refreshed[$fileCache] = true;
         }
     }
 
-
     /**
-     * get the cachename for the caching of $opetation on $what, which is known as dependant from the content of $options
+     * Get the cache name for the caching of $operation on $what,
+     * which is known as dependant from the content of $options
+     *
      * @param string $operation
-     * @param $what
-     * @param array $options
+     * @param mixed  $what
+     * @param array  $options
+     *
      * @return string
      */
-    private static function cacheName($operation, $what, $options = array())
+    private static function cacheName($operation, $what, $options = [])
     {
-
-        $t = array(
+        $t = [
           'version' => self::CACHE_VERSION,
           'operation' => $operation,
           'what' => $what,
           'options' => $options
-        );
+        ];
 
         $t = self::$prefix
           . sha1(json_encode($t))
@@ -164,38 +166,35 @@ class Cache
         return $t;
     }
 
-
     /**
-     * Check that the cache dir is existing and writeable
-     * @throws Exception
+     * Check that the cache dir exists and is writeable
+     *
+     * @throws \Exception
      */
     public static function checkCacheDir()
     {
+        self::$cacheDir = str_replace('\\', '/', self::$cacheDir);
+        self::$cacheDir = rtrim(self::$cacheDir, '/') . '/';
 
-        self::$cache_dir = str_replace('\\', '/', self::$cache_dir);
-        self::$cache_dir = rtrim(self::$cache_dir, '/') . '/';
-
-        if (! file_exists(self::$cache_dir)) {
-            if (! mkdir(self::$cache_dir)) {
-                throw new Exception('Cache directory couldn\'t be created: ' . self::$cache_dir);
+        if (! file_exists(self::$cacheDir)) {
+            if (! mkdir(self::$cacheDir)) {
+                throw new Exception('Cache directory couldn\'t be created: ' . self::$cacheDir);
             }
-        } elseif (! is_dir(self::$cache_dir)) {
-            throw new Exception('Cache directory doesn\'t exist: ' . self::$cache_dir);
-        } elseif (! is_writable(self::$cache_dir)) {
-            throw new Exception('Cache directory isn\'t writable: ' . self::$cache_dir);
+        } elseif (! is_dir(self::$cacheDir)) {
+            throw new Exception('Cache directory doesn\'t exist: ' . self::$cacheDir);
+        } elseif (! is_writable(self::$cacheDir)) {
+            throw new Exception('Cache directory isn\'t writable: ' . self::$cacheDir);
         }
     }
 
     /**
      * Delete unused cached files
-     *
      */
     public static function cleanCache()
     {
         static $clean = false;
 
-
-        if ($clean || empty(self::$cache_dir)) {
+        if ($clean || empty(self::$cacheDir)) {
             return;
         }
 
@@ -203,14 +202,16 @@ class Cache
 
         // only remove files with extensions created by SCSSPHP Cache
         // css files removed based on the list files
-        $remove_types = array('scsscache' => 1);
+        $removeTypes = ['scsscache' => 1];
 
-        $files = scandir(self::$cache_dir);
+        $files = scandir(self::$cacheDir);
+
         if (! $files) {
             return;
         }
 
-        $check_time = time() - self::$gc_lifetime;
+        $checkTime = time() - self::$gcLifetime;
+
         foreach ($files as $file) {
             // don't delete if the file wasn't created with SCSSPHP Cache
             if (strpos($file, self::$prefix) !== 0) {
@@ -220,20 +221,19 @@ class Cache
             $parts = explode('.', $file);
             $type = array_pop($parts);
 
-
-            if (! isset($remove_types[$type])) {
+            if (! isset($removeTypes[$type])) {
                 continue;
             }
 
-            $full_path = self::$cache_dir . $file;
-            $mtime = filemtime($full_path);
+            $fullPath = self::$cacheDir . $file;
+            $mtime = filemtime($fullPath);
 
             // don't delete if it's a relatively new file
-            if ($mtime > $check_time) {
+            if ($mtime > $checkTime) {
                 continue;
             }
 
-            unlink($full_path);
+            unlink($fullPath);
         }
     }
 }

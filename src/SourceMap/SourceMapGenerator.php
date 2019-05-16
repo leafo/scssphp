@@ -137,7 +137,9 @@ class SourceMapGenerator
         // directory does not exist
         if (! is_dir($dir)) {
             // FIXME: create the dir automatically?
-            throw new CompilerException(sprintf('The directory "%s" does not exist. Cannot save the source map.', $dir));
+            throw new CompilerException(
+                sprintf('The directory "%s" does not exist. Cannot save the source map.', $dir)
+            );
         }
 
         // FIXME: proper saving, with dir write check!

@@ -99,17 +99,17 @@ class Compiler
         'function' => '^',
     ];
 
-    static public $true = [Type::T_KEYWORD, 'true'];
-    static public $false = [Type::T_KEYWORD, 'false'];
-    static public $null = [Type::T_NULL];
-    static public $nullString = [Type::T_STRING, '', []];
+    static public $true         = [Type::T_KEYWORD, 'true'];
+    static public $false        = [Type::T_KEYWORD, 'false'];
+    static public $null         = [Type::T_NULL];
+    static public $nullString   = [Type::T_STRING, '', []];
     static public $defaultValue = [Type::T_KEYWORD, ''];
     static public $selfSelector = [Type::T_SELF];
-    static public $emptyList = [Type::T_LIST, '', []];
-    static public $emptyMap = [Type::T_MAP, [], []];
-    static public $emptyString = [Type::T_STRING, '"', []];
-    static public $with = [Type::T_KEYWORD, 'with'];
-    static public $without = [Type::T_KEYWORD, 'without'];
+    static public $emptyList    = [Type::T_LIST, '', []];
+    static public $emptyMap     = [Type::T_MAP, [], []];
+    static public $emptyString  = [Type::T_STRING, '"', []];
+    static public $with         = [Type::T_KEYWORD, 'with'];
+    static public $without      = [Type::T_KEYWORD, 'without'];
 
     protected $importPaths = [''];
     protected $importCache = [];
@@ -165,27 +165,28 @@ class Compiler
     /**
      * Constructor
      */
-    public function __construct($cache_options = null)
+    public function __construct($cacheOptions = null)
     {
         $this->parsedFiles = [];
         $this->sourceNames = [];
 
-        if ($cache_options) {
-            $this->cache = new Cache($cache_options);
+        if ($cacheOptions) {
+            $this->cache = new Cache($cacheOptions);
         }
     }
 
     public function getCompileOptions()
     {
-        $options = array(
-            'importPaths' => $this->importPaths,
-            'registeredVars' => $this->registeredVars,
+        $options = [
+            'importPaths'        => $this->importPaths,
+            'registeredVars'     => $this->registeredVars,
             'registeredFeatures' => $this->registeredFeatures,
-            'encoding' => $this->encoding,
-            'sourceMap' => serialize($this->sourceMap),
-            'sourceMapOptions' => $this->sourceMapOptions,
-            'formater' => $this->formatter,
-        );
+            'encoding'           => $this->encoding,
+            'sourceMap'          => serialize($this->sourceMap),
+            'sourceMapOptions'   => $this->sourceMapOptions,
+            'formatter'          => $this->formatter,
+        ];
+
         return $options;
     }
 
@@ -201,22 +202,25 @@ class Compiler
      */
     public function compile($code, $path = null)
     {
-
         if ($this->cache) {
-            $cache_key = ($path ? $path : "(stdin)") . ":" . md5($code);
-            $compile_options = $this->getCompileOptions();
-            $cache = $this->cache->getCache("compile", $cache_key, $compile_options);
+            $cacheKey = ($path ? $path : "(stdin)") . ":" . md5($code);
+            $compileOptions = $this->getCompileOptions();
+            $cache = $this->cache->getCache("compile", $cacheKey, $compileOptions);
+
             if (is_array($cache)
-                and isset($cache['dependencies'])
-                and isset($cache['out']) ) {
+                && isset($cache['dependencies'])
+                && isset($cache['out'])
+            ) {
                 // check if any dependency file changed before accepting the cache
                 foreach ($cache['dependencies'] as $file => $mtime) {
-                    if (!file_exists($file)
-                        or filemtime($file) !== $mtime) {
+                    if (! file_exists($file)
+                        || filemtime($file) !== $mtime
+                    ) {
                         unset($cache);
                         break;
                     }
                 }
+
                 if (isset($cache)) {
                     return $cache['out'];
                 }
@@ -279,12 +283,13 @@ class Compiler
             $out .= sprintf('/*# sourceMappingURL=%s */', $sourceMapUrl);
         }
 
-        if ($this->cache and isset($cache_key) and isset($compile_options)) {
-            $v = array(
+        if ($this->cache && isset($cacheKey) && isset($compileOptions)) {
+            $v = [
                 'dependencies' => $this->getParsedFiles(),
                 'out' => &$out,
-            );
-            $this->cache->setCache("compile", $cache_key, $v, $compile_options);
+            ];
+
+            $this->cache->setCache("compile", $cacheKey, $v, $compileOptions);
         }
 
         return $out;
@@ -490,6 +495,7 @@ class Compiler
     protected function glueFunctionSelectors($parts)
     {
         $new = [];
+
         foreach ($parts as $part) {
             if (is_array($part)) {
                 $part = $this->glueFunctionSelectors($part);
@@ -506,6 +512,7 @@ class Compiler
                 }
             }
         }
+
         return $new;
     }
 
@@ -520,6 +527,7 @@ class Compiler
     protected function matchExtends($selector, &$out, $from = 0, $initial = true)
     {
         static $partsPile = [];
+
         $selector = $this->glueFunctionSelectors($selector);
 
         foreach ($selector as $i => $part) {
@@ -539,8 +547,8 @@ class Compiler
 
             if ($this->matchExtendsSingle($part, $origin)) {
                 $partsPile[] = $part;
-                $after = array_slice($selector, $i + 1);
-                $before = array_slice($selector, 0, $i);
+                $after       = array_slice($selector, $i + 1);
+                $before      = array_slice($selector, 0, $i);
 
                 list($before, $nonBreakableBefore) = $this->extractRelationshipFromFragment($before);
 
@@ -548,7 +556,7 @@ class Compiler
                     $k = 0;
 
                     // remove shared parts
-                    if (count($new)>1) {
+                    if (count($new) > 1) {
                         while ($k < $i && isset($new[$k]) && $selector[$k] === $new[$k]) {
                             $k++;
                         }
@@ -561,7 +569,7 @@ class Compiler
                         $slice = [];
 
                         foreach ($tempReplacement[$l] as $chunk) {
-                            if (!in_array($chunk, $slice)) {
+                            if (! in_array($chunk, $slice)) {
                                 $slice[] = $chunk;
                             }
                         }
@@ -592,19 +600,19 @@ class Compiler
                     $out[] = $result;
 
                     // recursively check for more matches
-                    $startRecursFrom = count($before) + min(count($nonBreakableBefore), count($mergedBefore));
-                    $this->matchExtends($result, $out, $startRecursFrom, false);
+                    $startRecurseFrom = count($before) + min(count($nonBreakableBefore), count($mergedBefore));
+                    $this->matchExtends($result, $out, $startRecurseFrom, false);
 
                     // selector sequence merging
                     if (! empty($before) && count($new) > 1) {
-                        $sharedParts = $k > 0 ? array_slice($before, 0, $k) : [];
+                        $preSharedParts = $k > 0 ? array_slice($before, 0, $k) : [];
                         $postSharedParts = $k > 0 ? array_slice($before, $k) : $before;
 
-                        list($injectBetweenSharedParts, $nonBreakable2) = $this->extractRelationshipFromFragment($afterBefore);
+                        list($betweenSharedParts, $nonBreakable2) = $this->extractRelationshipFromFragment($afterBefore);
 
                         $result2 = array_merge(
-                            $sharedParts,
-                            $injectBetweenSharedParts,
+                            $preSharedParts,
+                            $betweenSharedParts,
                             $postSharedParts,
                             $nonBreakable2,
                             $nonBreakableBefore,
@@ -615,6 +623,7 @@ class Compiler
                         $out[] = $result2;
                     }
                 }
+
                 array_pop($partsPile);
             }
         }
@@ -671,6 +680,7 @@ class Compiler
 
         foreach ($counts as $idx => $count) {
             list($target, $origin, /* $block */) = $this->extends[$idx];
+
             $origin = $this->glueFunctionSelectors($origin);
 
             // check count
@@ -797,6 +807,7 @@ class Compiler
         if (! empty($mediaQueries) && $mediaQueries) {
             $previousScope = $this->scope;
             $parentScope = $this->mediaParent($this->scope);
+
             foreach ($mediaQueries as $mediaQuery) {
                 $this->scope = $this->makeOutputBlock(Type::T_MEDIA, [$mediaQuery]);
 
@@ -811,9 +822,9 @@ class Compiler
                 $type = $child[0];
 
                 if ($type !== Type::T_BLOCK &&
-                  $type !== Type::T_MEDIA &&
-                  $type !== Type::T_DIRECTIVE &&
-                  $type !== Type::T_IMPORT
+                    $type !== Type::T_MEDIA &&
+                    $type !== Type::T_DIRECTIVE &&
+                    $type !== Type::T_IMPORT
                 ) {
                     $needsWrap = true;
                     break;
@@ -1002,7 +1013,7 @@ class Compiler
             }
         }
 
-        if (!count($filteredScopes)) {
+        if (! count($filteredScopes)) {
             return $this->rootBlock;
         }
 
@@ -1413,8 +1424,8 @@ class Compiler
     /**
      * Collapse selectors
      *
-     * @param array $selectors
-     * @param bool $selectorFormat
+     * @param array   $selectors
+     * @param boolean $selectorFormat
      *   if false return a collapsed string
      *   if true return an array description of a structured selector
      *
@@ -1427,6 +1438,7 @@ class Compiler
         foreach ($selectors as $selector) {
             $output = [];
             $glueNext = false;
+
             foreach ($selector as $node) {
                 $compound = '';
 
@@ -1436,6 +1448,7 @@ class Compiler
                         $compound .= $value;
                     }
                 );
+
                 if ($selectorFormat && $this->isImmediateRelationshipCombinator($compound)) {
                     if (count($output)) {
                         $output[count($output) - 1] .= ' ' . $compound;
@@ -1459,6 +1472,7 @@ class Compiler
             } else {
                 $output = implode(' ', $output);
             }
+
             $parts[] = $output;
         }
 
@@ -1489,6 +1503,7 @@ class Compiler
                 }
             }
         }
+
         return $selectors;
     }
 
@@ -1604,6 +1619,7 @@ class Compiler
           Parser::SOURCE_LINE => $this->sourceLine,
           Parser::SOURCE_COLUMN => $this->sourceColumn
         ];
+
         // infinite calling loop
         if (count($this->callStack) > 25000) {
             // not displayed but you can var_dump it to deep debug
@@ -1630,6 +1646,7 @@ class Compiler
     protected function compileChildren($stms, OutputBlock $out, $traceName = '')
     {
         $this->pushCallStack($traceName);
+
         foreach ($stms as $stm) {
             $ret = $this->compileChild($stm, $out);
 
@@ -1637,6 +1654,7 @@ class Compiler
                 return $ret;
             }
         }
+
         $this->popCallStack();
 
         return null;
@@ -1655,6 +1673,7 @@ class Compiler
     protected function compileChildrenNoReturn($stms, OutputBlock $out, $selfParent = null, $traceName = '')
     {
         $this->pushCallStack($traceName);
+
         foreach ($stms as $stm) {
             if ($selfParent && isset($stm[1]) && is_object($stm[1]) && $stm[1] instanceof Block) {
                 $stm[1]->selfParent = $selfParent;
@@ -1674,6 +1693,7 @@ class Compiler
                 return;
             }
         }
+
         $this->popCallStack();
     }
 
@@ -1754,12 +1774,14 @@ class Compiler
             $parts = [];
 
             $mediaTypeOnly = true;
+
             foreach ($query as $q) {
                 if ($q[0] !== Type::T_MEDIA_TYPE) {
                     $mediaTypeOnly = false;
                     break;
                 }
             }
+
             foreach ($query as $q) {
                 switch ($q[0]) {
                     case Type::T_MEDIA_TYPE:
@@ -1770,23 +1792,29 @@ class Compiler
                                 if ($type) {
                                     array_unshift($parts, implode(' ', array_filter($type)));
                                 }
+
                                 if (! empty($parts)) {
                                     if (strlen($current)) {
                                         $current .= $this->formatter->tagSeparator;
                                     }
+
                                     $current .= implode(' and ', $parts);
                                 }
+
                                 if ($current) {
                                     $out[] = $start . $current;
                                 }
+
                                 $current = "";
                                 $type = null;
                                 $parts = [];
                             }
                         }
+
                         if ($newType === ['all'] && $default) {
                             $default = $start . 'all';
                         }
+
                         // all can be safely ignored and mixed with whatever else
                         if ($newType !== ['all']) {
                             if ($type) {
@@ -1840,10 +1868,12 @@ class Compiler
         if ($current) {
             $out[] = $start . $current;
         }
+
         // no @media type except all, and no conflict?
-        if (!$out && $default) {
+        if (! $out && $default) {
             $out[] = $default;
         }
+
         return $out;
     }
 
@@ -1881,6 +1911,7 @@ class Compiler
                 } else {
                     $merged = array_merge($selectors1, [$part1], $selectors2, [$part2], $merged);
                 }
+
                 break;
             }
 
@@ -2018,11 +2049,11 @@ class Compiler
             $this->sourceIndex = isset($child[Parser::SOURCE_INDEX]) ? $child[Parser::SOURCE_INDEX] : null;
             $this->sourceLine = isset($child[Parser::SOURCE_LINE]) ? $child[Parser::SOURCE_LINE] : -1;
             $this->sourceColumn = isset($child[Parser::SOURCE_COLUMN]) ? $child[Parser::SOURCE_COLUMN] : -1;
-        } elseif (is_array($child) and isset($child[1]->sourceLine)) {
+        } elseif (is_array($child) && isset($child[1]->sourceLine)) {
             $this->sourceIndex = $child[1]->sourceIndex;
             $this->sourceLine = $child[1]->sourceLine;
             $this->sourceColumn = $child[1]->sourceColumn;
-        } elseif (! empty($out->sourceLine) and ! empty($out->sourceName)) {
+        } elseif (! empty($out->sourceLine) && ! empty($out->sourceName)) {
             $this->sourceLine = $out->sourceLine;
             $this->sourceIndex = array_search($out->sourceName, $this->sourceNames);
 
@@ -2379,7 +2410,8 @@ class Compiler
                 break;
 
             case Type::T_MIXIN_CONTENT:
-                $content = $this->get(static::$namespaces['special'] . 'content', false, isset($this->storeEnv) ? $this->storeEnv : $this->env);
+                $env = isset($this->storeEnv) ? $this->storeEnv : $this->env;
+                $content = $this->get(static::$namespaces['special'] . 'content', false, $env);
 
                 if (! $content) {
                     $content = new \stdClass();
@@ -2901,7 +2933,7 @@ class Compiler
             return null;
         }
 
-        if ($left !== static::$false and $left !== static::$null) {
+        if ($left !== static::$false && $left !== static::$null) {
             return $this->reduce($right, true);
         }
 
@@ -2923,7 +2955,7 @@ class Compiler
             return null;
         }
 
-        if ($left !== static::$false and $left !== static::$null) {
+        if ($left !== static::$false && $left !== static::$null) {
             return $left;
         }
 
@@ -3401,7 +3433,7 @@ class Compiler
 
         $selfParentSelectors = null;
 
-        if (!is_null($selfParent) and $selfParent->selectors) {
+        if (! is_null($selfParent) && $selfParent->selectors) {
             $selfParentSelectors = $this->evalSelectors($selfParent->selectors);
         }
 
@@ -3444,10 +3476,10 @@ class Compiler
     /**
      * Join selectors; looks for & to replace, or append parent before child
      *
-     * @param array $parent
-     * @param array $child
-     * @param bool  &$stillHasSelf
-     * @param array $selfParentSelectors
+     * @param array   $parent
+     * @param array   $child
+     * @param boolean &$stillHasSelf
+     * @param array   $selfParentSelectors
 
      * @return array
      */
@@ -3464,7 +3496,8 @@ class Compiler
                 if ($p === static::$selfSelector && $setSelf) {
                     $stillHasSelf = true;
                 }
-                if ($p === static::$selfSelector && !$setSelf) {
+
+                if ($p === static::$selfSelector && ! $setSelf) {
                     $setSelf = true;
 
                     if (is_null($selfParentSelectors)) {
@@ -3485,6 +3518,7 @@ class Compiler
                                 });
                                 $pp = implode($flatten);
                             }
+
                             $newPart[] = $pp;
                         }
                     }
@@ -3538,7 +3572,11 @@ class Compiler
 
             foreach ($parentQueries as $parentQuery) {
                 foreach ($originalQueries as $childQuery) {
-                    $childQueries []= array_merge($parentQuery, [[Type::T_MEDIA_TYPE, [Type::T_KEYWORD, 'all']]], $childQuery);
+                    $childQueries[] = array_merge(
+                        $parentQuery,
+                        [[Type::T_MEDIA_TYPE, [Type::T_KEYWORD, 'all']]],
+                        $childQuery
+                    );
                 }
             }
         }
@@ -3727,6 +3765,7 @@ class Compiler
             if ($maxDepth-- <= 0) {
                 break;
             }
+
             if (array_key_exists($normalizedName, $env->store)) {
                 if ($unreduced && isset($env->storeUnreduced[$normalizedName])) {
                     return $env->storeUnreduced[$normalizedName];
@@ -4040,7 +4079,7 @@ class Compiler
                 // check urls for normal import paths
                 foreach ($urls as $full) {
                     $separator = (
-                        !empty($dir) &&
+                        ! empty($dir) &&
                         substr($dir, -1) !== '/' &&
                         substr($full, 0, 1) !== '/'
                     ) ? '/' : '';
@@ -4119,6 +4158,7 @@ class Compiler
         $msg = "$msg: $loc";
 
         $callStackMsg = $this->callStackMessage();
+
         if ($callStackMsg) {
             $msg .= "\nCall Stack:\n" . $callStackMsg;
         }
@@ -4127,8 +4167,11 @@ class Compiler
     }
 
     /**
-     * @param bool $all
-     * @param null $limit
+     * Beautify call stack for output
+     *
+     * @param boolean $all
+     * @param null    $limit
+     *
      * @return string
      */
     protected function callStackMessage($all = false, $limit = null)
@@ -4145,7 +4188,8 @@ class Compiler
                           : '(unknown file)');
                     $msg .= " on line " . $call[Parser::SOURCE_LINE];
                     $callStackMsg[] = $msg;
-                    if (!is_null($limit) && $ncall>$limit) {
+
+                    if (! is_null($limit) && $ncall>$limit) {
                         break;
                     }
                 }

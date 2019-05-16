@@ -67,8 +67,13 @@ class Crunched extends Formatter
     {
         $inner = $this->indentStr();
 
-        $this->write($inner
-            . implode($this->tagSeparator, str_replace(array(' > ', ' + ', ' ~ '), array('>', '+', '~'), $block->selectors))
-            . $this->open . $this->break);
+        $this->write(
+            $inner
+            . implode(
+                $this->tagSeparator,
+                str_replace([' > ', ' + ', ' ~ '], ['>', '+', '~'], $block->selectors)
+            )
+            . $this->open . $this->break
+        );
     }
 }
