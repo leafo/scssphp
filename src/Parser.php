@@ -1270,7 +1270,10 @@ class Parser
         }
 
         if ($this->matchChar('[')) {
-            if ($this->parenExpression($out, $s, "]")) {
+            if ($this->parenExpression($out, $s, "]", [Type::T_LIST, Type::T_KEYWORD])) {
+                if ($out[0] !== Type::T_LIST && $out[0] !== Type::T_MAP) {
+                    $out = [Type::T_STRING, '', [ '[', $out, ']' ]];
+                }
                 return true;
             }
 
@@ -1292,10 +1295,11 @@ class Parser
      * @param array   $out
      * @param integer $s
      * @param string  $closingParen
+     * @param array   $allowedTypes
      *
      * @return boolean
      */
-    protected function parenExpression(&$out, $s, $closingParen = ")")
+    protected function parenExpression(&$out, $s, $closingParen = ")", $allowedTypes = [Type::T_LIST, Type::T_MAP])
     {
         if ($this->matchChar($closingParen)) {
             $out = [Type::T_LIST, '', []];
@@ -1303,13 +1307,13 @@ class Parser
             return true;
         }
 
-        if ($this->valueList($out) && $this->matchChar($closingParen) && $out[0] === Type::T_LIST) {
+        if ($this->valueList($out) && $this->matchChar($closingParen) && in_array($out[0], $allowedTypes)) {
             return true;
         }
 
         $this->seek($s);
 
-        if ($this->map($out)) {
+        if (in_array(Type::T_MAP, $allowedTypes) && $this->map($out)) {
             return true;
         }
 

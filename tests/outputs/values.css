@@ -13,7 +13,8 @@ multiline block \
   margin: 4, 3, 1;
   content: "This is a \
 multiline string.";
-  border-radius: -1px -1px -1px black; }
+  border-radius: -1px -1px -1px black;
+  grid-template-columns: [avatar] 2fr [body] 6fr; }
 
 #subtraction {
   lit: 10 -11;
