@@ -200,8 +200,6 @@ class Parser
             array_unshift($this->env->children, $this->charset);
         }
 
-        $this->env->isRoot    = true;
-
         $this->restoreEncoding();
 
         if ($this->cache) {
@@ -675,6 +673,10 @@ class Parser
             $foundSomething = false;
 
             if ($this->valueList($value)) {
+                if (empty($this->env->parent)) {
+                    $this->throwParseError('expected "{"');
+                }
+
                 $this->append([Type::T_ASSIGN, $name, $value], $s);
                 $foundSomething = true;
             }
