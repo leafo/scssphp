@@ -5,6 +5,22 @@ title: Changelog
 
 ## Changelog
 
+* **0.8.3** -- May 31, 2019
+  * grid-template-columns (gKreator, Cerdic)
+  * {% raw %}self{% endraw %} in selector and parse improvements (designerno1, Cerdic)
+  * invalid css output when using interpolation with mixins (Jasonkoolman, Cerdic)
+  * parser error for {% raw %}@each $selector in & {...}{% endraw %} (wesleyvicthor, Cerdic)
+  * {% raw %}@extend{% endraw %} in extended class or placeholder, doesn't produce extended selector (dimitrov-adrian, Cerdic)
+  * weird {% raw %}@extend{% endraw %} behavior (Kenneth-KT, Cerdic)
+  * nested selector issue (ruby vs libsass difference) (designerno1, Cerdic)
+  * {% raw %}pscss{% endraw %} exhausts memory (gsmith-daed, Cerdic)
+  * infinite loop compiling mixin with nested {% raw %}@content{% endraw %} (exigon, Cerdic)
+  * nested media queries error (arnoschaefer, Cerdic)
+  * set upper bound for php version requirement (staabm)
+  * "crunched" formatter features (Daijobou, Cerdic)
+  * line comments for {% raw %}@media{% endraw %} statements (gajcapuder, Cerdic)
+  * failed interpolation in placeholder (GuidoJansen, Cerdic)
+  * parentheses in selector causes loss of whitespace (Netmosfera, Cerdic)
 * **0.8.2** -- May 9, 2019
   * requires php 5.6+
 * **0.8.1** -- May 9, 2019
