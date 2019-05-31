@@ -235,13 +235,20 @@ echo $scss->compile('
 
 ### Source Maps
 
-To enable source maps, use the `setSourceMap()' method.
+To enable source maps, use the `setSourceMap()' and `setSourceMapOptions()` methods.
 
 {% highlight php startinline=true %}
 use Leafo\ScssPhp\Compiler;
 
 $scss = new Compiler();
 $scss->setSourceMap(Compiler::SOURCE_MAP_INLINE);
+$scss->setSourceMapOptions([
+    'sourceMapWriteTo'  => '/var/www/vhost/my-style.map',
+    'sourceMapURL'      => 'content/themes/THEME/assets/css/my-style.map',
+    'sourceMapFilename' => 'my-style',
+    'sourceMapBasepath' => '/var/www/vhost',
+    'sourceRoot'        => '/',
+]);
 
 // use Compiler::SOURCE_MAP_FILE for file-based source maps
 {% endhighlight %}
