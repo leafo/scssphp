@@ -130,9 +130,11 @@ class Parser
      */
     public function throwParseError($msg = 'parse error')
     {
-        list($line, /* $column */) = $this->getSourcePosition($this->count);
+        list($line, $column) = $this->getSourcePosition($this->count);
 
-        $loc = empty($this->sourceName) ? "line: $line" : "$this->sourceName on line $line";
+        $loc = empty($this->sourceName)
+             ? "line: $line, column: $column"
+             : "$this->sourceName on line $line, at column $column";
 
         if ($this->peek("(.*?)(\n|$)", $m, $this->count)) {
             throw new ParserException("$msg: failed at `$m[1]` $loc");

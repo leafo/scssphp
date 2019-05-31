@@ -4147,14 +4147,17 @@ class Compiler
             return;
         }
 
+        $line   = $this->sourceLine;
+        $column = $this->sourceColumn;
+
+        $loc = isset($this->sourceNames[$this->sourceIndex])
+             ? $this->sourceNames[$this->sourceIndex] . " on line $line, at column $column"
+             : "line: $line, column: $column";
+
         if (func_num_args() > 1) {
             $msg = call_user_func_array('sprintf', func_get_args());
         }
 
-        $line = $this->sourceLine;
-        $loc = isset($this->sourceNames[$this->sourceIndex])
-             ? $this->sourceNames[$this->sourceIndex] . " on line $line"
-             : "line: $line";
         $msg = "$msg: $loc";
 
         $callStackMsg = $this->callStackMessage();
