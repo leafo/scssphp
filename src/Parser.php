@@ -1413,6 +1413,19 @@ class Parser
 
         $this->seek($s);
 
+        if ($this->literal('url(', 4, false) && $this->match('\s*(\/\/\S+)\s*', $m)) {
+            $content = 'url(' . $m[1];
+
+            if ($this->matchChar(')')) {
+                $content .= ')';
+                $out = [Type::T_KEYWORD, $content];
+
+                return true;
+            }
+        }
+
+        $this->seek($s);
+
         // not
         if ($char === 'n' && $this->literal('not', 3, false)) {
             if ($this->whitespace() && $this->value($inner)) {

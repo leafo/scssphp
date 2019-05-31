@@ -6,6 +6,7 @@
   width: 80%;
   color: "hello world";
   height: url("http://google.com");
+  background-image: url(//host/image.png);
   dads: url(http://leafo.net);
   padding: 10px 10px 10px 10px, 3px 3px 3px;
   textblock: "This is a \
@@ -16,7 +17,7 @@ multiline block \
 multiline string.";
   border-radius: -1px -1px -1px black;
   grid-template-columns: [avatar] 2fr [body] 6fr; }
-/* line 21, inputs/values.scss */
+/* line 23, inputs/values.scss */
 #subtraction {
   lit: 10 -11;
   lit: -1;
@@ -26,14 +27,14 @@ multiline string.";
   var: -90;
   var: -90;
   var: -90; }
-/* line 35, inputs/values.scss */
+/* line 37, inputs/values.scss */
 #special {
   a: 12px expression(1 + (3 / Foo.bar("baz" + "bang") + function() {return 12;}) % 12); }
-/* line 39, inputs/values.scss */
+/* line 41, inputs/values.scss */
 #unary {
   b: 0.5em;
   c: -foo(12px);
   d: +foo(12px); }
-/* line 45, inputs/values.scss */
+/* line 47, inputs/values.scss */
 #self {
   content: "#self"; }
