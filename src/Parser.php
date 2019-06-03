@@ -980,12 +980,47 @@ class Parser
 
         while (preg_match(static::$whitePattern, $this->buffer, $m, null, $this->count)) {
             if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
-                $this->appendComment([Type::T_COMMENT, $m[1]]);
+                // comment that are kept in the output CSS
+                $comment = [];
+                $endCommentCount = $this->count + strlen($m[1]);
+                // find interpolations in comment
+                $p = strpos($this->buffer, '#{', $this->count);
+                while ($p !== false && $p < $endCommentCount) {
+                    $c = substr($this->buffer, $this->count, $p - $this->count);
+                    $comment[] = $c;
+                    $this->count = $p;
 
+                    $out = null;
+                    if ($this->interpolation($out)) {
+                        // keep right spaces in the following string part
+                        if ($out[3]) {
+                            while($this->buffer[$this->count-1] !== '}') {
+                                $this->count--;
+                            }
+                            $out[3] = '';
+                        }
+                        $comment[] = $out;
+                    }
+
+                    $p = strpos($this->buffer, '#{', $this->count);
+                }
+                // remaining part
+                $c = substr($this->buffer, $this->count, $endCommentCount - $this->count);
+
+                if (!$comment) {
+                    // single part static comment
+                    $this->appendComment([Type::T_COMMENT, $c]);
+                } else {
+                    $comment[] = $c;
+                    var_dump($comment);
+                    $this->appendComment([Type::T_COMMENT, [Type::T_STRING, '', $comment]]);
+                }
                 $this->commentsSeen[$this->count] = true;
+                $this->count = $endCommentCount;
+            } else {
+                // comment that are ignored and not kept in the output css
+                $this->count += strlen($m[0]);
             }
-
-            $this->count += strlen($m[0]);
             $gotWhite = true;
         }
 
@@ -999,7 +1034,9 @@ class Parser
      */
     protected function appendComment($comment)
     {
-        $comment[1] = substr(preg_replace(['/^\s+/m', '/^(.)/m'], ['', ' \1'], $comment[1]), 1);
+        if ($comment[0] === Type::T_COMMENT && is_string($comment[1])) {
+            $comment[1] = substr(preg_replace(['/^\s+/m', '/^(.)/m'], ['', ' \1'], $comment[1]), 1);
+        }
 
         $this->env->comments[] = $comment;
     }
