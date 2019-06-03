@@ -45,4 +45,12 @@ a {
 
 // коммент
 
+$color:red;
+$radius:2px;
+
+/* This is a comment with vars references:
+color:#{$color}
+radius:#{$radius}
+ */
+
 // end
