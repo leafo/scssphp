@@ -77,3 +77,6 @@ a.badge {
 
 .element {
   border: 2px solid #000; }
+
+div > p > strong, div > h1 > strong {
+  color: red; }

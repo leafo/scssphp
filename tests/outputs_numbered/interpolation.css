@@ -96,3 +96,8 @@ a.badge {
 /* line 140, inputs/interpolation.scss */
 .element {
   border: 2px solid #000; }
+/* line 149, inputs/interpolation.scss */
+/* line 150, inputs/interpolation.scss */
+
+div > p > strong, div > h1 > strong {
+  color: red; }
