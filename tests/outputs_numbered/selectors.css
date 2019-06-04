@@ -407,3 +407,10 @@ span a, p a, div a {
 
 ul ul, ul ol, ol ul, ol ol {
   display: block; }
+/* line 292, inputs/selectors.scss */
+.👤 {
+  display: inline-block; }
+/* line 296, inputs/selectors.scss */
+.❮ {
+  display: inline;
+  content: '↦'; }
