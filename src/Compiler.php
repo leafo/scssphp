@@ -1147,10 +1147,14 @@ class Compiler
 
         foreach ($envs as $e) {
             if ($e->block && $this->isWithout($without, $e->block)) {
-                continue;
+                $ec = clone $e;
+                $ec->block = null;
+                $ec->selectors = [];
+                $filtered[] = $ec;
             }
-
-            $filtered[] = $e;
+            else {
+                $filtered[] = $e;
+            }
         }
 
         return $this->extractEnv($filtered);
