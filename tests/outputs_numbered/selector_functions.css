@@ -8,3 +8,43 @@
 .main aside:hover, .sidebar p {
   content: ".main aside:hover";
   content: ".sidebar p"; }
+/* line 15, inputs/selector_functions.scss */
+.is-superselector {
+  content: false;
+  /* false */ }
+/* line 18, inputs/selector_functions.scss */
+.is-superselector1 {
+  content: true;
+  /*true*/ }
+/* line 21, inputs/selector_functions.scss */
+.is-superselector2 {
+  content: true;
+  /*true*/ }
+/* line 25, inputs/selector_functions.scss */
+.is-superselector3 {
+  content: true;
+  /*true*/ }
+/* line 29, inputs/selector_functions.scss */
+.is-superselector4 {
+  content: false;
+  /*false*/ }
+/* line 33, inputs/selector_functions.scss */
+.is-superselector5 {
+  content: true;
+  /* true*/ }
+/* line 37, inputs/selector_functions.scss */
+.is-superselector6 {
+  content: false;
+  /* false*/ }
+/* line 41, inputs/selector_functions.scss */
+.is-superselector7 {
+  content: true;
+  /* true*/ }
+/* line 44, inputs/selector_functions.scss */
+.is-superselector8 {
+  content: false;
+  /* false*/ }
+/* line 47, inputs/selector_functions.scss */
+.is-superselector9 {
+  content: true;
+  /* true*/ }

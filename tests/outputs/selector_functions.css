@@ -7,3 +7,43 @@
 .main aside:hover, .sidebar p {
   content: ".main aside:hover";
   content: ".sidebar p"; }
+
+.is-superselector {
+  content: false;
+  /* false */ }
+
+.is-superselector1 {
+  content: true;
+  /*true*/ }
+
+.is-superselector2 {
+  content: true;
+  /*true*/ }
+
+.is-superselector3 {
+  content: true;
+  /*true*/ }
+
+.is-superselector4 {
+  content: false;
+  /*false*/ }
+
+.is-superselector5 {
+  content: true;
+  /* true*/ }
+
+.is-superselector6 {
+  content: false;
+  /* false*/ }
+
+.is-superselector7 {
+  content: true;
+  /* true*/ }
+
+.is-superselector8 {
+  content: false;
+  /* false*/ }
+
+.is-superselector9 {
+  content: true;
+  /* true*/ }

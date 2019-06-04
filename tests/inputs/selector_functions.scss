@@ -12,3 +12,38 @@
 	}
 }
 
+.is-superselector {
+  content: is-superselector(".is-superselector", ".selector"); /* false */
+}
+.is-superselector1 {
+  content: is-superselector("a", "a.disabled"); /*true*/
+}
+.is-superselector2 {
+  content: is-superselector("a", "a:not(:visited)"); /*true*/
+}
+
+.is-superselector3 {
+  content: is-superselector("a", "a[href]"); /*true*/
+}
+
+.is-superselector4 {
+  content: is-superselector("a.disabled", "a"); /*false*/
+}
+
+.is-superselector5 {
+  content: is-superselector("a.disabled", "a.foo.disabled"); /* true*/
+}
+
+.is-superselector6 {
+  content: is-superselector("a.disabled", "a.foo#disabled"); /* false*/
+}
+
+.is-superselector7 {
+  content: is-superselector("a", "sidebar a"); /* true*/
+}
+.is-superselector8 {
+  content: is-superselector("sidebar a", "a"); /* false*/
+}
+.is-superselector9 {
+  content: is-superselector("a", "a"); /* true*/
+}
