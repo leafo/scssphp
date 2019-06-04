@@ -1001,6 +1001,10 @@ class Parser
                         }
                         $comment[] = $out;
                     }
+                    else {
+                        $comment[] = substr($this->buffer, $this->count, 2);
+                        $this->count += 2;
+                    }
 
                     $p = strpos($this->buffer, '#{', $this->count);
                 }
@@ -1012,7 +1016,6 @@ class Parser
                     $this->appendComment([Type::T_COMMENT, $c]);
                 } else {
                     $comment[] = $c;
-                    var_dump($comment);
                     $this->appendComment([Type::T_COMMENT, [Type::T_STRING, '', $comment]]);
                 }
                 $this->commentsSeen[$this->count] = true;

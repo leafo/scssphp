@@ -32,5 +32,6 @@ a {
 /* коммент */
 /* This is a comment with vars references:
 color:red
+and a fake #{ doing nothing
 radius:2px
  */
