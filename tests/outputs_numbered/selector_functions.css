@@ -60,3 +60,12 @@ a.disabled {
 /* line 63, inputs/selector_functions.scss */
 .accordion__copy, .slider__copy, .accordion__image, .slider__image {
   content: '.accordion__copy, .slider__copy, .accordion__image, .slider__image'; }
+/* line 67, inputs/selector_functions.scss */
+a.disabled, .link.disabled {
+  content: "a.disabled, .link.disabled"; }
+/* line 70, inputs/selector_functions.scss */
+a.disabled {
+  content: "a.disabled"; }
+/* line 74, inputs/selector_functions.scss */
+.guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar {
+  content: ".guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar"; }

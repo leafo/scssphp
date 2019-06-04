@@ -63,3 +63,14 @@
 #{selector-append(".accordion, .slider", "__copy, __image")} {
 	content:'.accordion__copy, .slider__copy, .accordion__image, .slider__image';
 }
+
+#{selector-extend("a.disabled", "a", ".link")} {
+	content: "a.disabled, .link.disabled";
+}
+#{selector-extend("a.disabled", "h1", "h2")} {
+	content: "a.disabled";
+}
+
+#{selector-extend(".guide .info", ".info", ".content nav.sidebar")} {
+	content: ".guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar";
+}

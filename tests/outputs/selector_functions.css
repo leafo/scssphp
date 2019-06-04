@@ -59,3 +59,12 @@ a.disabled {
 
 .accordion__copy, .slider__copy, .accordion__image, .slider__image {
   content: '.accordion__copy, .slider__copy, .accordion__image, .slider__image'; }
+
+a.disabled, .link.disabled {
+  content: "a.disabled, .link.disabled"; }
+
+a.disabled {
+  content: "a.disabled"; }
+
+.guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar {
+  content: ".guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar"; }
