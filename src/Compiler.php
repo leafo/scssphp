@@ -6151,7 +6151,7 @@ class Compiler
         return true;
     }
 
-    protected static $libSelectorAppend = ['selector...'];
+    //protected static $libSelectorAppend = ['selector...'];
     protected function libSelectorAppend($args)
     {
         if (count($args) < 1) {
@@ -6236,5 +6236,28 @@ class Compiler
         $this->extendsMap = $saveExtendsMap;
 
         return $this->formatOutputSelector($extended);
+    }
+
+    //protected static $libSelectorNest = ['selector...'];
+    protected function libSelectorNest($args)
+    {
+        if (count($args) < 1) {
+            $this->throwError("selector-nest() needs at least 1 argument");
+        }
+
+        $selectorss = array_map([$this, 'getSelectorArg'], $args);
+
+        $envs = [];
+        foreach ($selectorss as $selectors) {
+            $env = new Environment();
+            $env->selectors = $selectors;
+            $envs[] = $env;
+        }
+
+        $envs = array_reverse($envs);
+        $env = $this->extractEnv($envs);
+        $outputSelectors = $this->multiplySelectors($env);
+
+        return $this->formatOutputSelector($outputSelectors);
     }
 }
