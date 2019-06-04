@@ -1151,8 +1151,7 @@ class Compiler
                 $ec->block = null;
                 $ec->selectors = [];
                 $filtered[] = $ec;
-            }
-            else {
+            } else {
                 $filtered[] = $e;
             }
         }
@@ -6069,7 +6068,8 @@ class Compiler
      * @param array $sub
      * @return bool
      */
-    protected function isSuperSelector($super, $sub) {
+    protected function isSuperSelector($super, $sub)
+    {
         // one and only one selector for each arg
         if (! $super || count($super) !== 1) {
             return false;
@@ -6089,10 +6089,10 @@ class Compiler
             $compound = '';
 
             array_walk_recursive(
-              $node,
-              function ($value, $key) use (&$compound) {
-                  $compound .= $value;
-              }
+                $node,
+                function ($value, $key) use (&$compound) {
+                    $compound .= $value;
+                }
             );
 
             if ($this->isImmediateRelationshipCombinator($compound)) {
@@ -6101,9 +6101,8 @@ class Compiler
                 }
                 $nextMustMatch = true;
                 $i++;
-            }
-            else {
-                while($i<count($sub) && !$this->isSuperPart($node, $sub[$i])) {
+            } else {
+                while ($i < count($sub) && ! $this->isSuperPart($node, $sub[$i])) {
                     if ($nextMustMatch) {
                         return false;
                     }
@@ -6116,6 +6115,7 @@ class Compiler
                 $nextMustMatch = false;
             }
         }
+
         return true;
     }
 
@@ -6125,10 +6125,11 @@ class Compiler
      * @param array $subParts
      * @return bool
      */
-    protected function isSuperPart($superParts, $subParts) {
+    protected function isSuperPart($superParts, $subParts)
+    {
         $i = 0;
         foreach ($superParts as $superPart) {
-            while($i<count($subParts) && $subParts[$i] !== $superPart) {
+            while ($i < count($subParts) && $subParts[$i] !== $superPart) {
                 $i++;
             }
             if ($i >= count($subParts)) {
@@ -6136,6 +6137,7 @@ class Compiler
             }
             $i++;
         }
+
         return true;
     }
 
