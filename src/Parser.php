@@ -664,10 +664,12 @@ class Parser
         // opening css block
         if ($this->selectors($selectors) && $this->matchChar('{', false)) {
             $this->pushBlock($selectors, $s);
+
             if ($this->eatWhiteDefault) {
                 $this->whitespace();
                 $this->append(null); // collect comments at the begining if needed
             }
+
             return true;
         }
 
@@ -986,46 +988,54 @@ class Parser
                 // comment that are kept in the output CSS
                 $comment = [];
                 $endCommentCount = $this->count + strlen($m[1]);
+
                 // find interpolations in comment
                 $p = strpos($this->buffer, '#{', $this->count);
+
                 while ($p !== false && $p < $endCommentCount) {
                     $c = substr($this->buffer, $this->count, $p - $this->count);
                     $comment[] = $c;
                     $this->count = $p;
-
                     $out = null;
+
                     if ($this->interpolation($out)) {
                         // keep right spaces in the following string part
                         if ($out[3]) {
                             while ($this->buffer[$this->count-1] !== '}') {
                                 $this->count--;
                             }
+
                             $out[3] = '';
                         }
+
                         $comment[] = $out;
                     } else {
                         $comment[] = substr($this->buffer, $this->count, 2);
+
                         $this->count += 2;
                     }
 
                     $p = strpos($this->buffer, '#{', $this->count);
                 }
+
                 // remaining part
                 $c = substr($this->buffer, $this->count, $endCommentCount - $this->count);
 
-                if (!$comment) {
+                if (! $comment) {
                     // single part static comment
                     $this->appendComment([Type::T_COMMENT, $c]);
                 } else {
                     $comment[] = $c;
                     $this->appendComment([Type::T_COMMENT, [Type::T_STRING, '', $comment]]);
                 }
+
                 $this->commentsSeen[$this->count] = true;
                 $this->count = $endCommentCount;
             } else {
                 // comment that are ignored and not kept in the output css
                 $this->count += strlen($m[0]);
             }
+
             $gotWhite = true;
         }
 
