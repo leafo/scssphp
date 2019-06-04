@@ -95,3 +95,14 @@ a.disabled {
 
 .guide .content nav.sidebar, .content .guide nav.sidebar {
   content: ".guide .content nav.sidebar, .content .guide nav.sidebar"; }
+
+a, .disabled {
+  /* a, .disabled */
+  content: "a";
+  content: ".disabled"; }
+
+main, .blog, :after {
+  /* main, .blog, :after */
+  content: "main";
+  content: ".blog";
+  content: ":after"; }

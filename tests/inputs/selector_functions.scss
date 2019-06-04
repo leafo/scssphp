@@ -109,3 +109,16 @@
 #{selector-replace(".guide .info", ".info", ".content nav.sidebar")} {
 	content: ".guide .content nav.sidebar, .content .guide nav.sidebar";
 }
+
+#{simple-selectors("a.disabled")} {
+	/* a, .disabled */
+	@each $part in simple-selectors("a.disabled") {
+		content:"#{$part}";
+	}
+}
+#{simple-selectors("main.blog:after")} {
+	/* main, .blog, :after */
+	@each $part in simple-selectors("main.blog:after") {
+		content:"#{$part}";
+	}
+}

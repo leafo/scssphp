@@ -98,3 +98,14 @@ a.disabled {
 /* line 109, inputs/selector_functions.scss */
 .guide .content nav.sidebar, .content .guide nav.sidebar {
   content: ".guide .content nav.sidebar, .content .guide nav.sidebar"; }
+/* line 113, inputs/selector_functions.scss */
+a, .disabled {
+  /* a, .disabled */
+  content: "a";
+  content: ".disabled"; }
+/* line 119, inputs/selector_functions.scss */
+main, .blog, :after {
+  /* main, .blog, :after */
+  content: "main";
+  content: ".blog";
+  content: ":after"; }
