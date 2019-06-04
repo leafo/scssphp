@@ -6308,4 +6308,23 @@ class Compiler
 
         return $this->formatOutputSelector($selectors);
     }
+
+    protected static $libSimpleSelectors = ['selector'];
+    protected function libSimpleSelectors($args)
+    {
+        $selector = reset($args);
+        $selector = $this->getSelectorArg($selector);
+
+        // remove selectors list layer, keeping the first one
+        $selector = reset($selector);
+        // remove parts list layer, keeping the first part
+        $part = reset($selector);
+
+        $listParts = [];
+        foreach ($part as $p) {
+            $listParts[] = [Type::T_STRING, '', [$p]];
+        }
+
+        return [Type::T_LIST, ',', $listParts];
+    }
 }
