@@ -6215,6 +6215,38 @@ class Compiler
             $this->throwError("selector-extend() invalid arguments");
         }
 
+        $extended = $this->extendOrReplaceSelectors($selectors, $extendee, $extender);
+        return $this->formatOutputSelector($extended);
+    }
+
+    protected static $libSelectorReplace = ['selectors', 'original', 'replacement'];
+    protected function libSelectorReplace($args)
+    {
+        list($selectors, $original, $replacement) = $args;
+        $selectors = $this->getSelectorArg($selectors);
+        $original = $this->getSelectorArg($original);
+        $replacement = $this->getSelectorArg($replacement);
+
+        if (! $selectors || ! $original || ! $replacement) {
+            $this->throwError("selector-replace() invalid arguments");
+        }
+
+        $replaced = $this->extendOrReplaceSelectors($selectors, $original, $replacement, true);
+        return $this->formatOutputSelector($replaced);
+    }
+
+    /**
+     * Extend/replace in selectors
+     * used by selector-extend and selector-replace that use the same logic
+     *
+     * @param $selectors
+     * @param $extendee
+     * @param $extender
+     * @param bool $replace
+     * @return array
+     */
+    protected function extendOrReplaceSelectors($selectors, $extendee, $extender, $replace = false)
+    {
         $saveExtends = $this->extends;
         $saveExtendsMap = $this->extendsMap;
 
@@ -6228,14 +6260,21 @@ class Compiler
 
         $extended = [];
         foreach ($selectors as $selector) {
-            $extended[] = $selector;
+            if (!$replace) {
+                $extended[] = $selector;
+            }
+            $n = count($extended);
             $this->matchExtends($selector, $extended);
+            // if didnt match, keep the original selector if we are in a replace operation
+            if ($replace and count($extended) === $n) {
+                $extended[] = $selector;
+            }
         }
 
         $this->extends = $saveExtends;
         $this->extendsMap = $saveExtendsMap;
 
-        return $this->formatOutputSelector($extended);
+        return $extended;
     }
 
     //protected static $libSelectorNest = ['selector...'];
