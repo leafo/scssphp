@@ -107,3 +107,7 @@ a.badge {
 
 .btn:hover, .btn:focus {
   text-decoration: none; }
+
+.other {
+  content: "bar";
+  content: "foo"; }
