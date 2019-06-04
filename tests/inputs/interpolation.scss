@@ -140,3 +140,14 @@ div {
 .element {
     @include set-border(#{2px}); // compiles to "2px solid #000"
 }
+
+$foo: "\
+div > p, \
+div > h1 \
+";
+
+#{$foo} {
+  & > strong {
+    color: red;
+  }
+}

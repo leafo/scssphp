@@ -1968,6 +1968,11 @@ class Parser
                     $content[] = $m[2] . "'";
                 } elseif ($this->literal("\\", 1, false)) {
                     $content[] = $m[2] . "\\";
+                } elseif ($this->literal("\r\n", 2, false)
+                  || $this->matchChar("\r", false)
+                  || $this->matchChar("\n", false)
+                  || $this->matchChar("\f", false)) {
+                    // this is a continuation escaping, to be ignored
                 } else {
                     $content[] = $m[2];
                 }
