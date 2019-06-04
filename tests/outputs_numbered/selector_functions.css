@@ -81,3 +81,11 @@ ul li {
 /* line 90, inputs/selector_functions.scss */
 .accordion__copy {
   content: ".accordion__copy"; }
+/* line 95, inputs/selector_functions.scss */
+.main aside:hover {
+  content: ".main";
+  content: "aside:hover"; }
+/* line 95, inputs/selector_functions.scss */
+.sidebar p {
+  content: ".sidebar";
+  content: "p"; }

@@ -80,3 +80,9 @@ ul li {
 
 .accordion__copy {
   content: ".accordion__copy"; }
+  .main aside:hover {
+    content: ".main";
+    content: "aside:hover"; }
+  .sidebar p {
+    content: ".sidebar";
+    content: "p"; }

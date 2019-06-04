@@ -90,3 +90,11 @@
 #{selector-nest(".accordion", "&__copy")} {
 	content: ".accordion__copy";
 }
+
+@each $selector in selector-parse(".main aside:hover, .sidebar p") {
+  #{$selector} {
+    @each $part in $selector {
+      content: "#{$part}";
+    }
+  }
+}
