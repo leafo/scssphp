@@ -6029,4 +6029,114 @@ class Compiler
 
         return $args[0];
     }
+
+    /**
+     * Preprocess selector args
+     * @param $arg
+     * @return array|bool
+     */
+    protected function getSelectorArg($arg)
+    {
+        static $parser = null;
+        if (is_null($parser)) {
+            $parser = $this->parserFactory(__METHOD__);
+        }
+        $arg = $this->libUnquote([$arg]);
+        $arg = $this->compileValue($arg);
+        $parsedSelector = [];
+        if ($parser->parseSelector($arg, $parsedSelector)) {
+            $selector = $this->evalSelectors($parsedSelector);
+
+            return $selector;
+        }
+
+        return false;
+    }
+
+    protected static $libIsSuperselector = ['super', 'sub'];
+    protected function libIsSuperselector($args)
+    {
+        list($super, $sub) = $args;
+        $super = $this->getSelectorArg($super);
+        $sub = $this->getSelectorArg($sub);
+
+        return $this->isSuperSelector($super, $sub);
+    }
+
+    /**
+     * Test a $super selector again $sub
+     * @param array $super
+     * @param array $sub
+     * @return bool
+     */
+    protected function isSuperSelector($super, $sub) {
+        // one and only one selector for each arg
+        if (! $super || count($super) !== 1) {
+            return false;
+        }
+        if (! $sub || count($sub) !== 1) {
+            return false;
+        }
+        $super = $this->glueFunctionSelectors($super);
+        $sub = $this->glueFunctionSelectors($sub);
+        $super = reset($super);
+        $sub = reset($sub);
+
+
+        $i = 0;
+        $nextMustMatch = false;
+        foreach ($super as $node) {
+            $compound = '';
+
+            array_walk_recursive(
+              $node,
+              function ($value, $key) use (&$compound) {
+                  $compound .= $value;
+              }
+            );
+
+            if ($this->isImmediateRelationshipCombinator($compound)) {
+                if ($node !== $sub[$i]) {
+                    return false;
+                }
+                $nextMustMatch = true;
+                $i++;
+            }
+            else {
+                while($i<count($sub) && !$this->isSuperPart($node, $sub[$i])) {
+                    if ($nextMustMatch) {
+                        return false;
+                    }
+                    $i++;
+                }
+                if ($i >= count($sub)) {
+                    return false;
+                }
+                $i++;
+                $nextMustMatch = false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Test a part of super selector again a part of sub selector
+     * @param array $superParts
+     * @param array $subParts
+     * @return bool
+     */
+    protected function isSuperPart($superParts, $subParts) {
+        $i = 0;
+        foreach ($superParts as $superPart) {
+            while($i<count($subParts) && $subParts[$i] !== $superPart) {
+                $i++;
+            }
+            if ($i >= count($subParts)) {
+                return false;
+            }
+            $i++;
+        }
+        return true;
+    }
+
 }
