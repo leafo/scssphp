@@ -35,3 +35,8 @@ color:red
 and a fake #{ doing nothing
 radius:2px
  */
+.textimage-background-fullheight .background {
+  /* @noflip */
+  display: block;
+  /* hop */
+  width: 100%; }
