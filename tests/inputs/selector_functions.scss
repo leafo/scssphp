@@ -47,3 +47,19 @@
 .is-superselector9 {
   content: is-superselector("a", "a"); /* true*/
 }
+
+#{selector-append("a", ".disabled")} {
+	content:'a.disabled';
+}
+
+#{selector-append(".accordion", "__copy")} {
+	content:'.accordion__copy';
+}
+
+#{selector-append(".accordion", "__copy, __image")} {
+	content:'.accordion__copy, .accordion__image';
+}
+
+#{selector-append(".accordion, .slider", "__copy, __image")} {
+	content:'.accordion__copy, .slider__copy, .accordion__image, .slider__image';
+}
