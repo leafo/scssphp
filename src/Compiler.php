@@ -6260,4 +6260,13 @@ class Compiler
 
         return $this->formatOutputSelector($outputSelectors);
     }
+
+    protected static $libSelectorParse = ['selectors'];
+    protected function libSelectorParse($args)
+    {
+        $selectors = reset($args);
+        $selectors = $this->getSelectorArg($selectors);
+
+        return $this->formatOutputSelector($selectors);
+    }
 }
