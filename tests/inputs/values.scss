@@ -49,3 +49,11 @@ multiline string.";
     $self2: &;
     content:'#{$self2}';
 }
+
+@font-face {
+    unicode-range: U+26;
+    unicode-range: U+0-7F;
+    unicode-range: U+0025-00FF;
+    unicode-range: U+4??;
+    unicode-range: U+0025-00FF, U+4??;
+}

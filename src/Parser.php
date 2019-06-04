@@ -1506,6 +1506,12 @@ class Parser
             return true;
         }
 
+        // unicode range with wildcards
+        if ($this->literal('U+', 2) && $this->match('([0-9A-F]+\?*)(-([0-9A-F]+))?', $m, false)) {
+            $out = [Type::T_KEYWORD, 'U+' . $m[0]];
+            return true;
+        }
+
         if ($this->keyword($keyword, false)) {
             if ($this->func($keyword, $out)) {
                 return true;
