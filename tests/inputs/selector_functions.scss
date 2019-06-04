@@ -74,3 +74,19 @@
 #{selector-extend(".guide .info", ".info", ".content nav.sidebar")} {
 	content: ".guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar";
 }
+
+#{selector-nest("ul", "li")} {
+	content: "ul li";
+}
+
+#{selector-nest(".alert, .warning", "p")} {
+	content: ".alert p, .warning p";
+}
+
+#{selector-nest(".alert", "&:hover")} {
+	content: ".alert:hover";
+}
+
+#{selector-nest(".accordion", "&__copy")} {
+	content: ".accordion__copy";
+}

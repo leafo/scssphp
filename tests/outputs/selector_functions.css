@@ -68,3 +68,15 @@ a.disabled {
 
 .guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar {
   content: ".guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar"; }
+
+ul li {
+  content: "ul li"; }
+
+.alert p, .warning p {
+  content: ".alert p, .warning p"; }
+
+.alert:hover {
+  content: ".alert:hover"; }
+
+.accordion__copy {
+  content: ".accordion__copy"; }

@@ -69,3 +69,15 @@ a.disabled {
 /* line 74, inputs/selector_functions.scss */
 .guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar {
   content: ".guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar"; }
+/* line 78, inputs/selector_functions.scss */
+ul li {
+  content: "ul li"; }
+/* line 82, inputs/selector_functions.scss */
+.alert p, .warning p {
+  content: ".alert p, .warning p"; }
+/* line 86, inputs/selector_functions.scss */
+.alert:hover {
+  content: ".alert:hover"; }
+/* line 90, inputs/selector_functions.scss */
+.accordion__copy {
+  content: ".accordion__copy"; }
