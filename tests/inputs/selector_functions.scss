@@ -98,3 +98,14 @@
     }
   }
 }
+
+#{selector-replace("a.disabled", "a", ".link")} {
+	content: ".link.disabled";
+}
+#{selector-replace("a.disabled", "h1", "h2")} {
+	content: "a.disabled";
+}
+
+#{selector-replace(".guide .info", ".info", ".content nav.sidebar")} {
+	content: ".guide .content nav.sidebar, .content .guide nav.sidebar";
+}

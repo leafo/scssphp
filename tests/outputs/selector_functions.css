@@ -86,3 +86,12 @@ ul li {
   .sidebar p {
     content: ".sidebar";
     content: "p"; }
+
+.link.disabled {
+  content: ".link.disabled"; }
+
+a.disabled {
+  content: "a.disabled"; }
+
+.guide .content nav.sidebar, .content .guide nav.sidebar {
+  content: ".guide .content nav.sidebar, .content .guide nav.sidebar"; }

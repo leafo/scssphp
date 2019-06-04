@@ -89,3 +89,12 @@ ul li {
 .sidebar p {
   content: ".sidebar";
   content: "p"; }
+/* line 102, inputs/selector_functions.scss */
+.link.disabled {
+  content: ".link.disabled"; }
+/* line 105, inputs/selector_functions.scss */
+a.disabled {
+  content: "a.disabled"; }
+/* line 109, inputs/selector_functions.scss */
+.guide .content nav.sidebar, .content .guide nav.sidebar {
+  content: ".guide .content nav.sidebar, .content .guide nav.sidebar"; }
