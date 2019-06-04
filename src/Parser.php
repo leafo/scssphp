@@ -994,14 +994,13 @@ class Parser
                     if ($this->interpolation($out)) {
                         // keep right spaces in the following string part
                         if ($out[3]) {
-                            while($this->buffer[$this->count-1] !== '}') {
+                            while ($this->buffer[$this->count-1] !== '}') {
                                 $this->count--;
                             }
                             $out[3] = '';
                         }
                         $comment[] = $out;
-                    }
-                    else {
+                    } else {
                         $comment[] = substr($this->buffer, $this->count, 2);
                         $this->count += 2;
                     }
