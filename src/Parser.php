@@ -662,9 +662,12 @@ class Parser
         }
 
         // opening css block
-        if ($this->selectors($selectors) && $this->matchChar('{')) {
+        if ($this->selectors($selectors) && $this->matchChar('{', false)) {
             $this->pushBlock($selectors, $s);
-
+            if ($this->eatWhiteDefault) {
+                $this->whitespace();
+                $this->append(null); // collect comments at the begining if needed
+            }
             return true;
         }
 
@@ -1051,15 +1054,17 @@ class Parser
      */
     protected function append($statement, $pos = null)
     {
-        if ($pos !== null) {
-            list($line, $column) = $this->getSourcePosition($pos);
+        if (! is_null($statement)) {
+            if ($pos !== null) {
+                list($line, $column) = $this->getSourcePosition($pos);
 
-            $statement[static::SOURCE_LINE]   = $line;
-            $statement[static::SOURCE_COLUMN] = $column;
-            $statement[static::SOURCE_INDEX]  = $this->sourceIndex;
+                $statement[static::SOURCE_LINE]   = $line;
+                $statement[static::SOURCE_COLUMN] = $column;
+                $statement[static::SOURCE_INDEX]  = $this->sourceIndex;
+            }
+
+            $this->env->children[] = $statement;
         }
-
-        $this->env->children[] = $statement;
 
         $comments = $this->env->comments;
 
