@@ -6045,11 +6045,23 @@ class Compiler
         $parsedSelector = [];
         if ($parser->parseSelector($arg, $parsedSelector)) {
             $selector = $this->evalSelectors($parsedSelector);
+            $gluedSelector = $this->glueFunctionSelectors($selector);
 
-            return $selector;
+            return $gluedSelector;
         }
 
         return false;
+    }
+
+    /**
+     * Postprocess selector to output in right format
+     * @param $selectors
+     * @return string
+     */
+    protected function formatOutputSelector($selectors)
+    {
+        $selectors = $this->collapseSelectors($selectors, true);
+        return $selectors;
     }
 
     protected static $libIsSuperselector = ['super', 'sub'];
@@ -6077,8 +6089,6 @@ class Compiler
         if (! $sub || count($sub) !== 1) {
             $this->throwError("Invalid sub selector for isSuperSelector()");
         }
-        $super = $this->glueFunctionSelectors($super);
-        $sub = $this->glueFunctionSelectors($sub);
         $super = reset($super);
         $sub = reset($sub);
 
@@ -6141,4 +6151,56 @@ class Compiler
         return true;
     }
 
+    protected static $libSelectorAppend = ['selector...'];
+    protected function libSelectorAppend($args)
+    {
+        if (count($args) < 1) {
+            $this->throwError("selector-append() needs at least 1 argument");
+        }
+
+        $selectors = array_map([$this, 'getSelectorArg'], $args);
+        return $this->formatOutputSelector($this->selectorAppend($selectors));
+    }
+
+    /**
+     * Append parts of the last selector in the list to the previous, recursively
+     * @param array $selectors
+     * @return array
+     * @throws CompilerException
+     */
+    protected function selectorAppend($selectors)
+    {
+        $lastSelectors = array_pop($selectors);
+        if (!$lastSelectors) {
+            $this->throwError("Invalid selector list in selector-append()");
+        }
+
+        while (count($selectors)) {
+            $previousSelectors = array_pop($selectors);
+            if (!$previousSelectors) {
+                $this->throwError("Invalid selector list in selector-append()");
+            }
+
+            // do the trick, happening $lastSelector to $previousSelector
+            $appended = [];
+            foreach ($lastSelectors as $lastSelector) {
+                $previous = $previousSelectors;
+                foreach ($lastSelector as $lastSelectorParts) {
+                    foreach ($lastSelectorParts as $lastSelectorPart) {
+                        foreach ($previous as $i => $previousSelector) {
+                            foreach ($previousSelector as $j => $previousSelectorParts) {
+                                $previous[$i][$j][] = $lastSelectorPart;
+                            }
+                        }
+                    }
+                }
+                foreach ($previous as $ps) {
+                    $appended[] = $ps;
+                }
+            }
+            $lastSelectors = $appended;
+        }
+
+        return $lastSelectors;
+    }
 }
