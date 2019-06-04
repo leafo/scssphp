@@ -8,3 +8,122 @@
 .main aside:hover, .sidebar p {
   content: ".main aside:hover";
   content: ".sidebar p"; }
+/* line 15, inputs/selector_functions.scss */
+.is-superselector {
+  content: false;
+  /* false */ }
+/* line 18, inputs/selector_functions.scss */
+.is-superselector1 {
+  content: true;
+  /*true*/ }
+/* line 21, inputs/selector_functions.scss */
+.is-superselector2 {
+  content: true;
+  /*true*/ }
+/* line 25, inputs/selector_functions.scss */
+.is-superselector3 {
+  content: true;
+  /*true*/ }
+/* line 29, inputs/selector_functions.scss */
+.is-superselector4 {
+  content: false;
+  /*false*/ }
+/* line 33, inputs/selector_functions.scss */
+.is-superselector5 {
+  content: true;
+  /* true*/ }
+/* line 37, inputs/selector_functions.scss */
+.is-superselector6 {
+  content: false;
+  /* false*/ }
+/* line 41, inputs/selector_functions.scss */
+.is-superselector7 {
+  content: true;
+  /* true*/ }
+/* line 44, inputs/selector_functions.scss */
+.is-superselector8 {
+  content: false;
+  /* false*/ }
+/* line 47, inputs/selector_functions.scss */
+.is-superselector9 {
+  content: true;
+  /* true*/ }
+/* line 51, inputs/selector_functions.scss */
+a.disabled {
+  content: 'a.disabled'; }
+/* line 55, inputs/selector_functions.scss */
+.accordion__copy {
+  content: '.accordion__copy'; }
+/* line 59, inputs/selector_functions.scss */
+.accordion__copy, .accordion__image {
+  content: '.accordion__copy, .accordion__image'; }
+/* line 63, inputs/selector_functions.scss */
+.accordion__copy, .slider__copy, .accordion__image, .slider__image {
+  content: '.accordion__copy, .slider__copy, .accordion__image, .slider__image'; }
+/* line 67, inputs/selector_functions.scss */
+a.disabled, .link.disabled {
+  content: "a.disabled, .link.disabled"; }
+/* line 70, inputs/selector_functions.scss */
+a.disabled {
+  content: "a.disabled"; }
+/* line 74, inputs/selector_functions.scss */
+.guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar {
+  content: ".guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar"; }
+/* line 78, inputs/selector_functions.scss */
+ul li {
+  content: "ul li"; }
+/* line 82, inputs/selector_functions.scss */
+.alert p, .warning p {
+  content: ".alert p, .warning p"; }
+/* line 86, inputs/selector_functions.scss */
+.alert:hover {
+  content: ".alert:hover"; }
+/* line 90, inputs/selector_functions.scss */
+.accordion__copy {
+  content: ".accordion__copy"; }
+/* line 95, inputs/selector_functions.scss */
+.main aside:hover {
+  content: ".main";
+  content: "aside:hover"; }
+/* line 95, inputs/selector_functions.scss */
+.sidebar p {
+  content: ".sidebar";
+  content: "p"; }
+/* line 102, inputs/selector_functions.scss */
+.link.disabled {
+  content: ".link.disabled"; }
+/* line 105, inputs/selector_functions.scss */
+a.disabled {
+  content: "a.disabled"; }
+/* line 109, inputs/selector_functions.scss */
+.guide .content nav.sidebar, .content .guide nav.sidebar {
+  content: ".guide .content nav.sidebar, .content .guide nav.sidebar"; }
+/* line 113, inputs/selector_functions.scss */
+a, .disabled {
+  /* a, .disabled */
+  content: "a";
+  content: ".disabled"; }
+/* line 119, inputs/selector_functions.scss */
+main, .blog, :after {
+  /* main, .blog, :after */
+  content: "main";
+  content: ".blog";
+  content: ":after"; }
+/* line 126, inputs/selector_functions.scss */
+a.disabled {
+  content: "a.disabled"; }
+/* line 130, inputs/selector_functions.scss */
+a.disabled.outgoing {
+  content: "a.disabled.outgoing"; }
+/* line 134, inputs/selector_functions.scss */
+ {
+  content: "null"; }
+/* line 138, inputs/selector_functions.scss */
+.warning main a, main .warning a {
+  content: ".warning main a, main .warning a"; }
+/* line 142, inputs/selector_functions.scss */
+main.warning a.disabled {
+  content: "main.warning a.disabled"; }
+/* line 146, inputs/selector_functions.scss */
+main .warning a {
+  content: "main .warning a"; }

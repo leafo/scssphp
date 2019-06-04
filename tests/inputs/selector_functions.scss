@@ -12,3 +12,137 @@
 	}
 }
 
+.is-superselector {
+  content: is-superselector(".is-superselector", ".selector"); /* false */
+}
+.is-superselector1 {
+  content: is-superselector("a", "a.disabled"); /*true*/
+}
+.is-superselector2 {
+  content: is-superselector("a", "a:not(:visited)"); /*true*/
+}
+
+.is-superselector3 {
+  content: is-superselector("a", "a[href]"); /*true*/
+}
+
+.is-superselector4 {
+  content: is-superselector("a.disabled", "a"); /*false*/
+}
+
+.is-superselector5 {
+  content: is-superselector("a.disabled", "a.foo.disabled"); /* true*/
+}
+
+.is-superselector6 {
+  content: is-superselector("a.disabled", "a.foo#disabled"); /* false*/
+}
+
+.is-superselector7 {
+  content: is-superselector("a", "sidebar a"); /* true*/
+}
+.is-superselector8 {
+  content: is-superselector("sidebar a", "a"); /* false*/
+}
+.is-superselector9 {
+  content: is-superselector("a", "a"); /* true*/
+}
+
+#{selector-append("a", ".disabled")} {
+	content:'a.disabled';
+}
+
+#{selector-append(".accordion", "__copy")} {
+	content:'.accordion__copy';
+}
+
+#{selector-append(".accordion", "__copy, __image")} {
+	content:'.accordion__copy, .accordion__image';
+}
+
+#{selector-append(".accordion, .slider", "__copy, __image")} {
+	content:'.accordion__copy, .slider__copy, .accordion__image, .slider__image';
+}
+
+#{selector-extend("a.disabled", "a", ".link")} {
+	content: "a.disabled, .link.disabled";
+}
+#{selector-extend("a.disabled", "h1", "h2")} {
+	content: "a.disabled";
+}
+
+#{selector-extend(".guide .info", ".info", ".content nav.sidebar")} {
+	content: ".guide .info, .guide .content nav.sidebar, .content .guide nav.sidebar";
+}
+
+#{selector-nest("ul", "li")} {
+	content: "ul li";
+}
+
+#{selector-nest(".alert, .warning", "p")} {
+	content: ".alert p, .warning p";
+}
+
+#{selector-nest(".alert", "&:hover")} {
+	content: ".alert:hover";
+}
+
+#{selector-nest(".accordion", "&__copy")} {
+	content: ".accordion__copy";
+}
+
+@each $selector in selector-parse(".main aside:hover, .sidebar p") {
+  #{$selector} {
+    @each $part in $selector {
+      content: "#{$part}";
+    }
+  }
+}
+
+#{selector-replace("a.disabled", "a", ".link")} {
+	content: ".link.disabled";
+}
+#{selector-replace("a.disabled", "h1", "h2")} {
+	content: "a.disabled";
+}
+
+#{selector-replace(".guide .info", ".info", ".content nav.sidebar")} {
+	content: ".guide .content nav.sidebar, .content .guide nav.sidebar";
+}
+
+#{simple-selectors("a.disabled")} {
+	/* a, .disabled */
+	@each $part in simple-selectors("a.disabled") {
+		content:"#{$part}";
+	}
+}
+#{simple-selectors("main.blog:after")} {
+	/* main, .blog, :after */
+	@each $part in simple-selectors("main.blog:after") {
+		content:"#{$part}";
+	}
+}
+
+#{selector-unify("a", ".disabled")} {
+	content:"a.disabled";
+}
+
+#{selector-unify("a.disabled", "a.outgoing")} {
+	content: "a.disabled.outgoing";
+}
+
+#{selector-unify("a", "h1")} {
+	content: "null";
+}
+
+#{selector-unify(".warning a", "main a")} {
+	content: ".warning main a, main .warning a";
+}
+
+#{selector-unify("main.warning a", "main a.disabled")} {
+	content: "main.warning a.disabled";
+}
+
+#{selector-unify("main .warning a", "main a")} {
+	content: "main .warning a";
+}

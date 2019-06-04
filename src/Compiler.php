@@ -6040,4 +6040,533 @@ class Compiler
 
         return $args[0];
     }
+
+    /**
+     * Preprocess selector args
+     * @param $arg
+     * @return array|bool
+     */
+    protected function getSelectorArg($arg)
+    {
+        static $parser = null;
+        if (is_null($parser)) {
+            $parser = $this->parserFactory(__METHOD__);
+        }
+        $arg = $this->libUnquote([$arg]);
+        $arg = $this->compileValue($arg);
+        $parsedSelector = [];
+        if ($parser->parseSelector($arg, $parsedSelector)) {
+            $selector = $this->evalSelectors($parsedSelector);
+            $gluedSelector = $this->glueFunctionSelectors($selector);
+
+            return $gluedSelector;
+        }
+
+        return false;
+    }
+
+    /**
+     * Postprocess selector to output in right format
+     * @param $selectors
+     * @return string
+     */
+    protected function formatOutputSelector($selectors)
+    {
+        $selectors = $this->collapseSelectors($selectors, true);
+        return $selectors;
+    }
+
+    protected static $libIsSuperselector = ['super', 'sub'];
+    protected function libIsSuperselector($args)
+    {
+        list($super, $sub) = $args;
+        $super = $this->getSelectorArg($super);
+        $sub = $this->getSelectorArg($sub);
+
+        return $this->isSuperSelector($super, $sub);
+    }
+
+    /**
+     * Test a $super selector again $sub
+     * @param array $super
+     * @param array $sub
+     * @return bool
+     */
+    protected function isSuperSelector($super, $sub)
+    {
+        // one and only one selector for each arg
+        if (! $super || count($super) !== 1) {
+            $this->throwError("Invalid super selector for isSuperSelector()");
+        }
+        if (! $sub || count($sub) !== 1) {
+            $this->throwError("Invalid sub selector for isSuperSelector()");
+        }
+        $super = reset($super);
+        $sub = reset($sub);
+
+
+        $i = 0;
+        $nextMustMatch = false;
+        foreach ($super as $node) {
+            $compound = '';
+
+            array_walk_recursive(
+                $node,
+                function ($value, $key) use (&$compound) {
+                    $compound .= $value;
+                }
+            );
+
+            if ($this->isImmediateRelationshipCombinator($compound)) {
+                if ($node !== $sub[$i]) {
+                    return false;
+                }
+                $nextMustMatch = true;
+                $i++;
+            } else {
+                while ($i < count($sub) && ! $this->isSuperPart($node, $sub[$i])) {
+                    if ($nextMustMatch) {
+                        return false;
+                    }
+                    $i++;
+                }
+                if ($i >= count($sub)) {
+                    return false;
+                }
+                $i++;
+                $nextMustMatch = false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Test a part of super selector again a part of sub selector
+     * @param array $superParts
+     * @param array $subParts
+     * @return bool
+     */
+    protected function isSuperPart($superParts, $subParts)
+    {
+        $i = 0;
+        foreach ($superParts as $superPart) {
+            while ($i < count($subParts) && $subParts[$i] !== $superPart) {
+                $i++;
+            }
+            if ($i >= count($subParts)) {
+                return false;
+            }
+            $i++;
+        }
+
+        return true;
+    }
+
+    //protected static $libSelectorAppend = ['selector...'];
+    protected function libSelectorAppend($args)
+    {
+        if (count($args) < 1) {
+            $this->throwError("selector-append() needs at least 1 argument");
+        }
+
+        $selectors = array_map([$this, 'getSelectorArg'], $args);
+        return $this->formatOutputSelector($this->selectorAppend($selectors));
+    }
+
+    /**
+     * Append parts of the last selector in the list to the previous, recursively
+     * @param array $selectors
+     * @return array
+     * @throws CompilerException
+     */
+    protected function selectorAppend($selectors)
+    {
+        $lastSelectors = array_pop($selectors);
+        if (!$lastSelectors) {
+            $this->throwError("Invalid selector list in selector-append()");
+        }
+
+        while (count($selectors)) {
+            $previousSelectors = array_pop($selectors);
+            if (!$previousSelectors) {
+                $this->throwError("Invalid selector list in selector-append()");
+            }
+
+            // do the trick, happening $lastSelector to $previousSelector
+            $appended = [];
+            foreach ($lastSelectors as $lastSelector) {
+                $previous = $previousSelectors;
+                foreach ($lastSelector as $lastSelectorParts) {
+                    foreach ($lastSelectorParts as $lastSelectorPart) {
+                        foreach ($previous as $i => $previousSelector) {
+                            foreach ($previousSelector as $j => $previousSelectorParts) {
+                                $previous[$i][$j][] = $lastSelectorPart;
+                            }
+                        }
+                    }
+                }
+                foreach ($previous as $ps) {
+                    $appended[] = $ps;
+                }
+            }
+            $lastSelectors = $appended;
+        }
+
+        return $lastSelectors;
+    }
+
+    protected static $libSelectorExtend = ['selectors', 'extendee', 'extender'];
+    protected function libSelectorExtend($args)
+    {
+        list($selectors, $extendee, $extender) = $args;
+        $selectors = $this->getSelectorArg($selectors);
+        $extendee = $this->getSelectorArg($extendee);
+        $extender = $this->getSelectorArg($extender);
+        if (! $selectors || ! $extendee || ! $extender) {
+            $this->throwError("selector-extend() invalid arguments");
+        }
+
+        $extended = $this->extendOrReplaceSelectors($selectors, $extendee, $extender);
+        return $this->formatOutputSelector($extended);
+    }
+
+    protected static $libSelectorReplace = ['selectors', 'original', 'replacement'];
+    protected function libSelectorReplace($args)
+    {
+        list($selectors, $original, $replacement) = $args;
+        $selectors = $this->getSelectorArg($selectors);
+        $original = $this->getSelectorArg($original);
+        $replacement = $this->getSelectorArg($replacement);
+
+        if (! $selectors || ! $original || ! $replacement) {
+            $this->throwError("selector-replace() invalid arguments");
+        }
+
+        $replaced = $this->extendOrReplaceSelectors($selectors, $original, $replacement, true);
+        return $this->formatOutputSelector($replaced);
+    }
+
+    /**
+     * Extend/replace in selectors
+     * used by selector-extend and selector-replace that use the same logic
+     *
+     * @param $selectors
+     * @param $extendee
+     * @param $extender
+     * @param bool $replace
+     * @return array
+     */
+    protected function extendOrReplaceSelectors($selectors, $extendee, $extender, $replace = false)
+    {
+        $saveExtends = $this->extends;
+        $saveExtendsMap = $this->extendsMap;
+
+        $this->extends = [];
+        $this->extendsMap = [];
+
+        foreach ($extendee as $es) {
+            // only use the first one
+            $this->pushExtends(reset($es), $extender, null);
+        }
+
+        $extended = [];
+        foreach ($selectors as $selector) {
+            if (!$replace) {
+                $extended[] = $selector;
+            }
+            $n = count($extended);
+            $this->matchExtends($selector, $extended);
+            // if didnt match, keep the original selector if we are in a replace operation
+            if ($replace and count($extended) === $n) {
+                $extended[] = $selector;
+            }
+        }
+
+        $this->extends = $saveExtends;
+        $this->extendsMap = $saveExtendsMap;
+
+        return $extended;
+    }
+
+    //protected static $libSelectorNest = ['selector...'];
+    protected function libSelectorNest($args)
+    {
+        if (count($args) < 1) {
+            $this->throwError("selector-nest() needs at least 1 argument");
+        }
+
+        $selectorss = array_map([$this, 'getSelectorArg'], $args);
+
+        $envs = [];
+        foreach ($selectorss as $selectors) {
+            $env = new Environment();
+            $env->selectors = $selectors;
+            $envs[] = $env;
+        }
+
+        $envs = array_reverse($envs);
+        $env = $this->extractEnv($envs);
+        $outputSelectors = $this->multiplySelectors($env);
+
+        return $this->formatOutputSelector($outputSelectors);
+    }
+
+    protected static $libSelectorParse = ['selectors'];
+    protected function libSelectorParse($args)
+    {
+        $selectors = reset($args);
+        $selectors = $this->getSelectorArg($selectors);
+
+        return $this->formatOutputSelector($selectors);
+    }
+
+    protected static $libSelectorUnify = ['selectors1', 'selectors2'];
+    protected function libSelectorUnify($args)
+    {
+        list($selectors1, $selectors2) = $args;
+        $selectors1 = $this->getSelectorArg($selectors1);
+        $selectors2 = $this->getSelectorArg($selectors2);
+
+        if (! $selectors1 || ! $selectors2) {
+            $this->throwError("selector-unify() invalid arguments");
+        }
+
+        // only consider the first compound of each
+        $compound1 = reset($selectors1);
+        $compound2 = reset($selectors2);
+
+        // unify them and that's it
+        $unified = $this->unifyCompoundSelectors($compound1, $compound2);
+
+        return $this->formatOutputSelector($unified);
+    }
+
+    /**
+     * The selector-unify magic as its best
+     * (at least works as expected on test cases)
+     *
+     * @param array $compound1
+     * @param array $compound2
+     * @return array|mixed
+     */
+    protected function unifyCompoundSelectors($compound1, $compound2)
+    {
+
+        if (!count($compound1)) {
+            return $compound2;
+        }
+        if (!count($compound2)) {
+            return $compound1;
+        }
+
+        // check that last part are compatible
+        $lastPart1 = array_pop($compound1);
+        $lastPart2 = array_pop($compound2);
+        $last = $this->mergeParts($lastPart1, $lastPart2);
+        if (!$last) {
+            return [[]];
+        }
+        $unifiedCompound = [$last];
+        $unifiedSelectors = [$unifiedCompound];
+
+        // do the rest
+        while (count($compound1) || count($compound2)) {
+            $part1 = end($compound1);
+            $part2 = end($compound2);
+            if ($part1 && ($match2 = $this->matchPartInCompound($part1, $compound2))) {
+                list($compound2, $part2, $after2) = $match2;
+                if ($after2) {
+                    $unifiedSelectors = $this->prependSelectors($unifiedSelectors, $after2);
+                }
+                $c = $this->mergeParts($part1, $part2);
+                $unifiedSelectors = $this->prependSelectors($unifiedSelectors, [$c]);
+                $part1 = $part2 = null;
+                array_pop($compound1);
+            }
+            if ($part2 && ($match1 = $this->matchPartInCompound($part2, $compound1))) {
+                list($compound1, $part1, $after1) = $match1;
+                if ($after1) {
+                    $unifiedSelectors = $this->prependSelectors($unifiedSelectors, $after1);
+                }
+                $c = $this->mergeParts($part2, $part1);
+                $unifiedSelectors = $this->prependSelectors($unifiedSelectors, [$c]);
+                $part1 = $part2 = null;
+                array_pop($compound2);
+            }
+            $new = [];
+            if ($part1 && $part2) {
+                array_pop($compound1);
+                array_pop($compound2);
+                $s = $this->prependSelectors($unifiedSelectors, [$part2]);
+                $new = array_merge($new, $this->prependSelectors($s, [$part1]));
+                $s = $this->prependSelectors($unifiedSelectors, [$part1]);
+                $new = array_merge($new, $this->prependSelectors($s, [$part2]));
+            } elseif ($part1) {
+                array_pop($compound1);
+                $new = array_merge($new, $this->prependSelectors($unifiedSelectors, [$part1]));
+            } elseif ($part2) {
+                array_pop($compound2);
+                $new = array_merge($new, $this->prependSelectors($unifiedSelectors, [$part2]));
+            }
+            if ($new) {
+                $unifiedSelectors = $new;
+            }
+        }
+
+        return $unifiedSelectors;
+    }
+
+    /**
+     * Prepend each selector from $selectors with $parts
+     * @param $selectors
+     * @param $parts
+     * @return array
+     */
+    protected function prependSelectors($selectors, $parts)
+    {
+        $new = [];
+        foreach ($selectors as $compoundSelector) {
+            array_unshift($compoundSelector, $parts);
+            $new[] = $compoundSelector;
+        }
+        return $new;
+    }
+
+    /**
+     * Try to find a matching part in a compound:
+     * - with same html tag name
+     * - with some class or id or something in common
+     * @param array $part
+     * @param array $compound
+     * @return array|bool
+     */
+    protected function matchPartInCompound($part, $compound)
+    {
+        $partTag = $this->findTagName($part);
+        $before = $compound;
+        $after = [];
+        // try to find a match by tag name first
+        while (count($before)) {
+            $p = array_pop($before);
+            if ($partTag && $partTag !== '*' && $partTag == $this->findTagName($p)) {
+                return [$before, $p, $after];
+            }
+            $after[] = $p;
+        }
+        // try again matching a non empty intersection and a compatible tagname
+        $before = $compound;
+        $after = [];
+        while (count($before)) {
+            $p = array_pop($before);
+            if ($this->checkCompatibleTags($partTag, $this->findTagName($p))) {
+                if (count(array_intersect($part, $p))) {
+                    return [$before, $p, $after];
+                }
+            }
+            $after[] = $p;
+        }
+
+        return false;
+    }
+
+    /**
+     * Merge two part list taking care that
+     * - the html tag is coming first - if any
+     * - the :something are coming last
+     *
+     * @param $parts1
+     * @param $parts2
+     * @return array
+     */
+    protected function mergeParts($parts1, $parts2)
+    {
+        $tag1 = $this->findTagName($parts1);
+        $tag2 = $this->findTagName($parts2);
+        $tag = $this->checkCompatibleTags($tag1, $tag2);
+        // not compatible tags
+        if ($tag === false) {
+            return [];
+        }
+
+        if ($tag) {
+            if ($tag1) {
+                $parts1 = array_diff($parts1, [$tag1]);
+            }
+            if ($tag2) {
+                $parts2 = array_diff($parts2, [$tag2]);
+            }
+        }
+
+        $mergedParts = array_merge($parts1, $parts2);
+        $mergedOrderedParts = [];
+        foreach ($mergedParts as $part) {
+            if (strpos($part, ':') === 0) {
+                $mergedOrderedParts[] = $part;
+            }
+        }
+        $mergedParts = array_diff($mergedParts, $mergedOrderedParts);
+        $mergedParts = array_merge($mergedParts, $mergedOrderedParts);
+        if ($tag) {
+            array_unshift($mergedParts, $tag);
+        }
+        return $mergedParts;
+    }
+
+    /**
+     * Check the compatibility between two tag names:
+     * if both are defined they should be identical or one has to be '*'
+     *
+     * @param $tag1
+     * @param $tag2
+     * @return array|bool
+     */
+    protected function checkCompatibleTags($tag1, $tag2)
+    {
+        $tags = [$tag1, $tag2];
+        $tags = array_unique($tags);
+        $tags = array_filter($tags);
+        if (count($tags)>1) {
+            $tags = array_diff($tags, ['*']);
+        }
+        // not compatible nodes
+        if (count($tags)>1) {
+            return false;
+        }
+        return $tags;
+    }
+
+    /**
+     * Find the html tag name in a selector parts list
+     * @param array $parts
+     * @return mixed|string
+     */
+    protected function findTagName($parts)
+    {
+        foreach ($parts as $part) {
+            if (! preg_match('/^[\[.:#%_-]/', $part)) {
+                return $part;
+            }
+        }
+        return '';
+    }
+
+    protected static $libSimpleSelectors = ['selector'];
+    protected function libSimpleSelectors($args)
+    {
+        $selector = reset($args);
+        $selector = $this->getSelectorArg($selector);
+
+        // remove selectors list layer, keeping the first one
+        $selector = reset($selector);
+        // remove parts list layer, keeping the first part
+        $part = reset($selector);
+
+        $listParts = [];
+        foreach ($part as $p) {
+            $listParts[] = [Type::T_STRING, '', [$p]];
+        }
+
+        return [Type::T_LIST, ',', $listParts];
+    }
 }
