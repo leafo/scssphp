@@ -6203,4 +6203,38 @@ class Compiler
 
         return $lastSelectors;
     }
+
+    protected static $libSelectorExtend = ['selectors', 'extendee', 'extender'];
+    protected function libSelectorExtend($args)
+    {
+        list($selectors, $extendee, $extender) = $args;
+        $selectors = $this->getSelectorArg($selectors);
+        $extendee = $this->getSelectorArg($extendee);
+        $extender = $this->getSelectorArg($extender);
+        if (! $selectors || ! $extendee || ! $extender) {
+            $this->throwError("selector-extend() invalid arguments");
+        }
+
+        $saveExtends = $this->extends;
+        $saveExtendsMap = $this->extendsMap;
+
+        $this->extends = [];
+        $this->extendsMap = [];
+
+        foreach ($extendee as $es) {
+            // only use the first one
+            $this->pushExtends(reset($es), $extender, null);
+        }
+
+        $extended = [];
+        foreach ($selectors as $selector) {
+            $extended[] = $selector;
+            $this->matchExtends($selector, $extended);
+        }
+
+        $this->extends = $saveExtends;
+        $this->extendsMap = $saveExtendsMap;
+
+        return $this->formatOutputSelector($extended);
+    }
 }
