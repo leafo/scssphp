@@ -6072,10 +6072,10 @@ class Compiler
     {
         // one and only one selector for each arg
         if (! $super || count($super) !== 1) {
-            return false;
+            $this->throwError("Invalid super selector for isSuperSelector()");
         }
         if (! $sub || count($sub) !== 1) {
-            return false;
+            $this->throwError("Invalid sub selector for isSuperSelector()");
         }
         $super = $this->glueFunctionSelectors($super);
         $sub = $this->glueFunctionSelectors($sub);
