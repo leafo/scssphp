@@ -109,3 +109,21 @@ main, .blog, :after {
   content: "main";
   content: ".blog";
   content: ":after"; }
+/* line 126, inputs/selector_functions.scss */
+a.disabled {
+  content: "a.disabled"; }
+/* line 130, inputs/selector_functions.scss */
+a.disabled.outgoing {
+  content: "a.disabled.outgoing"; }
+/* line 134, inputs/selector_functions.scss */
+ {
+  content: "null"; }
+/* line 138, inputs/selector_functions.scss */
+.warning main a, main .warning a {
+  content: ".warning main a, main .warning a"; }
+/* line 142, inputs/selector_functions.scss */
+main.warning a.disabled {
+  content: "main.warning a.disabled"; }
+/* line 146, inputs/selector_functions.scss */
+main .warning a {
+  content: "main .warning a"; }

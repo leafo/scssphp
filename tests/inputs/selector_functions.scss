@@ -122,3 +122,27 @@
 		content:"#{$part}";
 	}
 }
+
+#{selector-unify("a", ".disabled")} {
+	content:"a.disabled";
+}
+
+#{selector-unify("a.disabled", "a.outgoing")} {
+	content: "a.disabled.outgoing";
+}
+
+#{selector-unify("a", "h1")} {
+	content: "null";
+}
+
+#{selector-unify(".warning a", "main a")} {
+	content: ".warning main a, main .warning a";
+}
+
+#{selector-unify("main.warning a", "main a.disabled")} {
+	content: "main.warning a.disabled";
+}
+
+#{selector-unify("main .warning a", "main a")} {
+	content: "main .warning a";
+}

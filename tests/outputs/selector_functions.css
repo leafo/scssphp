@@ -106,3 +106,21 @@ main, .blog, :after {
   content: "main";
   content: ".blog";
   content: ":after"; }
+
+a.disabled {
+  content: "a.disabled"; }
+
+a.disabled.outgoing {
+  content: "a.disabled.outgoing"; }
+
+ {
+  content: "null"; }
+
+.warning main a, main .warning a {
+  content: ".warning main a, main .warning a"; }
+
+main.warning a.disabled {
+  content: "main.warning a.disabled"; }
+
+main .warning a {
+  content: "main .warning a"; }
