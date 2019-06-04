@@ -32,3 +32,15 @@ a {
   /* comment 6 */ }
 /* comment 7 */
 /* коммент */
+/* This is a comment with vars references:
+color:red
+and a fake #{ doing nothing
+radius:2px
+ */
+/* line 60, inputs/comments.scss */
+/* line 61, inputs/comments.scss */
+  .textimage-background-fullheight .background {
+    /* @noflip */
+    display: block;
+    /* hop */
+    width: 100%; }

@@ -1349,7 +1349,11 @@ class Compiler
     protected function compileComment($block)
     {
         $out = $this->makeOutputBlock(Type::T_COMMENT);
-        $out->lines[] = $block[1];
+        if (is_string($block[1])) {
+            $out->lines[] = $block[1];
+        } else {
+            $out->lines[] = $this->compileValue($block[1]);
+        }
 
         $this->scope->children[] = $out;
     }

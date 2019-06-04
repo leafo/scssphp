@@ -30,3 +30,13 @@ a {
   /* comment 6 */ }
 /* comment 7 */
 /* коммент */
+/* This is a comment with vars references:
+color:red
+and a fake #{ doing nothing
+radius:2px
+ */
+.textimage-background-fullheight .background {
+  /* @noflip */
+  display: block;
+  /* hop */
+  width: 100%; }

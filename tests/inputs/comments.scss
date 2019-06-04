@@ -45,4 +45,23 @@ a {
 
 // коммент
 
+$color:red;
+$radius:2px;
+
+/* This is a comment with vars references:
+color:#{$color}
+and a fake #{ doing nothing
+radius:#{$radius}
+ */
+
 // end
+
+// comment position in blocks
+.textimage-background-fullheight {
+  .background {
+    /* @noflip */
+    display: block;
+    /* hop */
+    width: 100%;
+  }
+}
