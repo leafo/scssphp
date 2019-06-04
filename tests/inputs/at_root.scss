@@ -220,3 +220,15 @@ $table-padding: 10px !default;
     text-decoration: none;
   }
 }
+
+// variable scoping
+$test1: 'foo';
+.any {
+  $test2: 'bar';
+  @at-root {
+    .other {
+      content: "#{$test2}";
+      content: "#{$test1}";
+    }
+  }
+}
