@@ -174,3 +174,13 @@ div {
 /* line 190, inputs/operators.scss */
 .foo {
   width: 12.5%; }
+/* line 212, inputs/operators.scss */
+#bools-test {
+  a: false;
+  b: true;
+  f: false;
+  n: true;
+  o: true;
+  p: false;
+  r: one;
+  s: one; }

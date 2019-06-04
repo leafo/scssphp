@@ -191,3 +191,37 @@ $gridRowWidth: 20px;
 {
 width: (2.5 / $gridRowWidth * 100px * 1% );
 }
+
+$and: true and false;
+$or: false or true;
+
+$and1: null and true;  // (null)
+$and2: true and null;  // (null)
+$and3: null and false; // (null)
+$and4: false and null; // false
+$and5: one and null;   // (null)
+$and6: null and one;   // (null)
+
+$or1: null or true;    // true
+$or2: true or null;    // true
+$or3: null or false;   // false
+$or4: false or null;   // (null)
+$or5: one or null;     // one
+$or6: null or one;     // one
+
+#bools-test {
+  a: $and;
+  b: $or;
+  c: $and1;
+  d: $and2;
+  e: $and3;
+  f: $and4;
+  g: $and5;
+  h: $and6;
+  n: $or1;
+  o: $or2;
+  p: $or3;
+  q: $or4;
+  r: $or5;
+  s: $or6;
+}

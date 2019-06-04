@@ -1151,8 +1151,7 @@ class Compiler
                 $ec->block = null;
                 $ec->selectors = [];
                 $filtered[] = $ec;
-            }
-            else {
+            } else {
                 $filtered[] = $e;
             }
         }
@@ -2937,8 +2936,14 @@ class Compiler
      */
     protected function opAnd($left, $right, $shouldEval)
     {
+        $truthy = ($left === static::$null || $right === static::$null) ||
+                  ($left === static::$false || $left === static::$true) &&
+                  ($right === static::$false || $right === static::$true);
+
         if (! $shouldEval) {
-            return null;
+            if (! $truthy) {
+                return null;
+            }
         }
 
         if ($left !== static::$false && $left !== static::$null) {
@@ -2959,8 +2964,14 @@ class Compiler
      */
     protected function opOr($left, $right, $shouldEval)
     {
+        $truthy = ($left === static::$null || $right === static::$null) ||
+                  ($left === static::$false || $left === static::$true) &&
+                  ($right === static::$false || $right === static::$true);
+
         if (! $shouldEval) {
-            return null;
+            if (! $truthy) {
+                return null;
+            }
         }
 
         if ($left !== static::$false && $left !== static::$null) {

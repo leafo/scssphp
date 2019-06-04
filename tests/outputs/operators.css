@@ -173,3 +173,13 @@ div {
 
 .foo {
   width: 12.5%; }
+
+#bools-test {
+  a: false;
+  b: true;
+  f: false;
+  n: true;
+  o: true;
+  p: false;
+  r: one;
+  s: one; }
