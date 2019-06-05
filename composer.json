@@ -39,5 +39,6 @@
             "/phpunit.xml.dist",
             "/tests"
         ]
-    }
+    },
+    "abandoned": "scssphp/scssphp"
 }
