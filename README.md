@@ -6,13 +6,10 @@
 ----
 
 ## scssphp
-<http://leafo.github.io/scssphp>
 
 ![License](https://poser.pugx.org/leafo/scssphp/license.svg)
 
 `scssphp` is a compiler for SCSS written in PHP.
-
-Checkout the homepage, <http://leafo.github.io/scssphp>, for directions on how to use.
 
 ### Running Tests
 
