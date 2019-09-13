@@ -2552,7 +2552,9 @@ class Compiler
      */
     protected function reduce($value, $inExp = false)
     {
-
+        if (is_null($value)) {
+            return null;
+        }
         switch ($value[0]) {
             case Type::T_EXPRESSION:
                 list(, $op, $left, $right, $inParens) = $value;
@@ -4373,7 +4375,7 @@ class Compiler
         foreach ($args as $arg) {
             list($key, $value) = $arg;
 
-            $key = $key[1];
+            $key = (isset($key[1]) ? $key[1] : '');
 
             if (empty($key)) {
                 $posArgs[] = empty($arg[2]) ? $value : $arg;
@@ -5889,7 +5891,7 @@ class Compiler
             $start--;
         }
 
-        $end    = (int) $args[2][1];
+        $end    = (isset($args[2][1]) ? (int) $args[2][1] : 0);
         $length = $end < 0 ? $end + 1 : ($end > 0 ? $end - $start : $end);
 
         $string[2] = $length
